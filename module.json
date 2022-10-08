@@ -1,0 +1,38 @@
+{
+    "title": "Beaver's Crafting System",
+    "description": "A Crafting Module for DnD",
+    "id": "beavers-crafting",
+    "version": "0.1",
+    "authors": [
+      {
+        "name": "angryBeaver",
+        "url": "https://github.com/angrybeaver"
+      }
+    ],
+    "languages": [
+      {
+        "lang": "en",
+        "name": "English",
+        "path": "lang/en.json"
+      }
+    ],
+    "scripts": [
+    ],
+    "esmodules": [
+      "src/main.js"
+    ],
+    "styles": [
+      "css/crafting.css"
+    ],
+    "packs": [
+    ],
+    "url": "https://github.com/angrybeaver",
+    "manifest": "",
+    "download": "",
+    "relationships": {
+    },
+    "compatibility": {
+      "minimum": "10",
+      "verified": "10"
+    }
+  }

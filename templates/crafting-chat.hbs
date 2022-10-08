@@ -1,0 +1,77 @@
+<div class="beavers-crafting chat flexcol">
+    <div class="flexrow header">
+        <div class="image" style="background-image: url('{{item.img}}')"></div>
+        <div style="flex:1"> {{item.name}}</div>
+        <div class="flexrow" style="flex:0 0 60px;height:30px">
+            <div class="dice-roll">
+                <div class="dice-total flexrow" style="flex:1;padding:2px;margin-top:5px">
+                    <span class="total">{{roll.total}}</span>
+                    {{#if result.hasErrors}}
+                        <i class="fas fa-times"></i>
+                    {{else}}
+                        <i class="fas fa-check"></i>
+                    {{/if}}
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    <div class="flexrow">
+        <div class="left">
+            <div class="currencies items-list">
+                {{#if recipe.currency}}
+                    <div class="flexrow item">
+                        <div class="item-name flexrow" style="flex:1">
+                            <div class="item-image"
+                                 style="background-image: url('icons/commodities/currency/coins-assorted-mix-copper-silver-gold.webp')"></div>
+                            <h4>{{recipe.currency.value}} {{recipe.currency.name}}</h4>
+                        </div>
+                        <div class="action" style="flex:0 0 20px;">
+                            {{#if result.errors.currencies}}
+                                <i class="fas fa-times"></i>
+                            {{else}}
+                                <i class="fas fa-check"></i>
+                            {{/if}}
+                        </div>
+                    </div>
+                {{/if}}
+                {{#each recipe.ingredients}}
+                    <div class="flexrow item">
+                        <div class="item-name flexrow" style="flex:1" title="{{this.name}}">
+                            <div class="item-image"
+                                 style="background-image: url('{{this.img}}')"></div>
+                            <h4>{{this.quantity}}</h4>
+                        </div>
+                        <div class="action" style="flex:0 0 20px;">
+                            {{#hasKey ../result.errors.ingredients @key}}
+                                <i class="fas fa-times"></i>
+                            {{else}}
+                                <i class="fas fa-check"></i>
+                            {{/hasKey}}
+                        </div>
+                    </div>
+                {{/each}}
+            </div>
+        </div>
+        <div class="right">
+            <div class="results items-list">
+                <div class="title">
+                    <div class="name">{{localize "beaversCrafting.recipe.results"}}</div>
+                </div>
+                {{#unless result.hasErrors}}
+                    {{#each recipe.results}}
+                        <div class="flexrow item">
+                            <div class=""></div>
+                            <div class="item-name flexrow" title="{{this.name}}">
+                                {{this.quantity}}
+                                <div class="item-image" style="background-image: url('{{this.img}}')"></div>
+                            </div>
+                            <div class=""></div>
+                        </div>
+                    {{/each}}
+                {{/unless}}
+            </div>
+        </div>
+    </div>
+</div>

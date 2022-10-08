@@ -1,0 +1,119 @@
+.beavers-crafting .crafting-app .dropdownarea {
+    font-family: "Signika", serif;
+    font-size: 13px;
+    resize: none;
+    width: 100%;
+    height: 150px;
+    padding: 5px;
+    background: rgba(0, 0, 0, 0.05);
+    border: 2px groove #eeede0;
+    border-radius: 3px;
+}
+.beavers-crafting .crafting-app .ingredients {
+    padding: 5px 0px 0px 5px
+}
+
+.beavers-crafting .recipe .header{
+    height: 28px;
+    margin: 5px 0;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.05);
+    border: 2px groove #eeede0;
+    font-weight: bold;
+    color: #7a7971;
+    font-weight: 700;
+    font-size: 16px;
+    font-family: "Modesto Condensed", "Palatino Linotype", serif;
+    text-align: left;
+    padding-left:2px;
+}
+
+.beavers-crafting .recipe .attribute{
+    flex: 0 0 80px;
+    border-left: 1px solid #c9c7b8;
+    padding-left:5px;
+}
+
+.beavers-crafting .recipe .action{
+    flex: 0 0 30px;
+    border-left: 1px solid #c9c7b8;
+    padding-left:5px;
+}
+
+.beavers-crafting .drop-area {
+    /* Center the content */
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    height:30px;
+
+    /* Border */
+    border: 1px dashed #ffffff;
+    border-radius: 0.25rem;
+}
+
+.beavers-crafting.chat .header {
+    padding: 3px 0;
+    border-top: 2px groove #FFF;
+    border-bottom: 2px groove #FFF;
+    height:40px;
+    line-height:40px;
+    color:#555;
+    font-weight:bold;
+}
+.beavers-crafting.chat .header .image{
+    flex: 0 0 40px;
+    height:40px;
+    background-size: cover;
+    background-position: 50% 0;
+    border: none;
+    margin-right: 5px;
+}
+
+.beavers-crafting.chat .header .skill{
+    flex: 0 0 100%;
+    position: relative;
+    margin: 0;
+    line-height: 24px;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--color-border-light-2);
+    border-radius: 3px;
+    box-shadow: 0 0 2px #fff inset;
+    word-break: break-all;
+}
+.beavers-crafting.chat .header .fas{
+    line-height:24px;
+}
+.beavers-crafting.chat .fa-times{
+    color:#b94a48
+}
+.beavers-crafting.chat .fa-check{
+    color:#468847
+}
+.beavers-crafting.chat .item-image{
+    height:30px;
+    flex:0 0 30px;
+    background-size: cover;
+    background-position: 50% 0;
+    margin-right: 5px;
+}
+.beavers-crafting.chat .item{
+    height:30px;
+    line-height:30px;
+}
+.beavers-crafting.chat .results .title{
+    flex: 0 0 100%;
+    position: relative;
+    margin: 0;
+    line-height: 15px;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--color-border-light-2);
+    border-radius: 3px;
+    box-shadow: 0 0 2px #fff inset;
+    word-break: break-all;
+}
+.beavers-crafting.chat .right{
+    border-left: 2px groove #FFF;
+}

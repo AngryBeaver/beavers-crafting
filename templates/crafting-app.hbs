@@ -1,0 +1,53 @@
+<div class="journal-sheet-container crafting-app">
+    <aside class="sidebar directory flexcol journal-sidebar">
+        <nav class="pages-list" aria-label="Journal Entry Table of Contents" data-tooltip-direction="RIGHT">
+            <ol class="directory-list scrollable">
+                {{#each items}}
+                    <li class="directory-item level1 inventory">
+                        <div class="page-heading " data-item-id="{{this.id}}" draggable="true">
+                            <img src="{{this.img}}" alt="">
+                            <div>
+                                <span class="page-title">{{this.name}}</span><span
+                                    style="color: var(--color-text-dark-6);"> ({{this.quantity}})</span>
+                            </div>
+                        </div>
+                    </li>
+                {{/each}}
+            </ol>
+        </nav>
+    </aside>
+    <section class="journal-entry-content ingredients" style="overflow: scroll;">
+        <h3>Recipes</h3>
+        <header class="directory-header">
+            <div class="header-search flexrow">
+                <select>
+                    <option>none</option>
+                    {{#each recipes}}
+                        <option><img src="{{this.img}}/>{{this.name}}</option>
+                    {{/each}}
+                </select>
+            </div>
+        </header>
+        <div class="flexcol">
+            <div>
+                <h3>Ingredient</h3>
+                <div class="dropdownarea">
+
+                </div>
+            </div>
+            <div>
+                <h3>Skill</h3>
+
+            </div>
+            <div>
+                <h3>Result</h3>
+            </div>
+        </div>
+        <footer class="sheet-footer flexrow">
+            <button type="submit" name="submit">
+                <i class="fa fa-check"></i> OK
+            </button>
+        </footer>
+    </section>
+</div>
+

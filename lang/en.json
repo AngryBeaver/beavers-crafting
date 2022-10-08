@@ -1,0 +1,28 @@
+{
+  "beaversCrafting": {
+    "actorLink": "Craft",
+    "inventory": {
+      "type" : "Type",
+      "title": "Inventory"
+    },
+    "recipe": {
+      "ingredients": "Ingredients",
+      "quantity": "Quantity",
+      "skills": "Skill",
+      "dc": "DC",
+      "results": "Results",
+      "dropitem": "drop item",
+      "currency": "Cost",
+      "consumeOnFailedSaveHint": "Consumes Cost on failed Skill check"
+    },
+    "component": {
+      "warning": "Your controlled Actor does not have an item named "
+    },
+    "settings": {
+      "craftById": {
+        "name": "craftById",
+        "hint": "when crafting the actor item has to match in name and sourceId"
+      }
+    }
+  }
+}
