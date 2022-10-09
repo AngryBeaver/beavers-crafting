@@ -48,11 +48,12 @@ Hooks.on("renderDialog", (app, html, content) => {
         if (html[0].localName !== "div") {
             html = $(html[0].parentElement.parentElement);
         }
-        html.find("select").append("<option value='loot'>📜Recipe📜</option>");
+        html.find("select[name='type']").append("<option value='loot'>📜Recipe📜</option>");
         if (html.find("input.subtype").length === 0) {
             html.find("form").append('<input class="subtype" name="subtype" style="display:none" value="">');
         }
-        html.find("select").on("change", function () {
+        console.log("here");
+        html.find("select[name='type']").on("change", function () {
             const name = $(this).find("option:selected").text();
             let value = "";
             if (name === "📜Recipe📜") {
