@@ -7,6 +7,7 @@ export const CONVERSION = "conversion";
 export class Exchange {
 
     static pay(priceCurrency, actorCurrencies) {
+        this.fixCurrencies(actorCurrencies);
         let lowestActorCurrency = this.toLowestCurrency(actorCurrencies);
         const lowestPriceCurrency = this.toLowestCurrency(this.toCurrencies(priceCurrency));
         const result = new DefaultCurrency();
@@ -17,6 +18,14 @@ export class Exchange {
         }
         const exchangeCurrencies = this.toCurrencies(result);
         return this.toHighestCurrencies(exchangeCurrencies);
+    }
+
+    static fixCurrencies(currencies){
+        getCurrencies().forEach(c => {
+            if (Number.isNaN(currencies[ABBREVIATION])) {
+                currencies[ABBREVIATION] = 0;
+            }
+        })
     }
 
     static toCurrencies(currency:Currency) {

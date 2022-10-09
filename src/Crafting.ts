@@ -24,7 +24,7 @@ export class Crafting {
         return new Crafting(actor, item);
     }
 
-    async craft() {
+    async craft():Promise<Result> {
         const result = await this.checkSkill();
         RecipeCompendium.validateRecipeToItemList(this.recipe,this.actor.items,result);
         this.checkCurrency(result);
@@ -127,7 +127,7 @@ export class Crafting {
         }
         await this.actor.createEmbeddedDocuments("Item", createItems)
         await this.actor.update({
-            "system.currency": result.currencies
+            "system.currency": result.changes.currencies
         });
         return result;
     }
