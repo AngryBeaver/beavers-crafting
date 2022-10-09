@@ -1,6 +1,6 @@
 {
   "beaversCrafting": {
-    "actorLink": "Craft",
+    "actorLink": "Recipes",
     "inventory": {
       "type" : "Type",
       "title": "Inventory"
@@ -18,10 +18,22 @@
     "component": {
       "warning": "Your controlled Actor does not have an item named "
     },
+    "crafting-app": {
+      "title": "Beaver's Recipe Compendium",
+      "button": "Craft"
+    },
     "settings": {
       "craftById": {
         "name": "craftById",
         "hint": "when crafting the actor item has to match in name and sourceId"
+      },
+      "createItemTitle": {
+        "name": "createItemTitle",
+        "hint": "Enter the title the create item window has so we can detect it and inject our recipe subtype"
+      },
+      "recipeSourceName":{
+        "name": "recipeSourceName",
+        "hint": "Enter the name the source of an item must have to switch to recipe"
       }
     }
   }

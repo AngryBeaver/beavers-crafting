@@ -1,7 +1,10 @@
 import {Settings} from "./Settings.js";
-import {Currency} from "./Exchange.js";
+import {DefaultCurrency} from "./Exchange.js";
 
-export class Recipe {
+export class Recipe implements RecipeStoreData{
+    id:string;
+    name:string;
+    img:string;
     ingredients:Map<string,Component>;
     results:Map<string,Component>;
     skill?:Skill;
@@ -11,6 +14,9 @@ export class Recipe {
     constructor(item) {
         const flags = item.flags[Settings.NAMESPACE]?.recipe;
         const data = mergeObject(this.defaultData(), flags || {}, {inplace: false});
+        this.id = item.id;
+        this.name = item.name;
+        this.img = item.img;
         this.ingredients = data.ingredients;
         this.results = data.results;
         this.skill = data.skill;
@@ -28,13 +34,21 @@ export class Recipe {
         }
     }
     serialize() {
-        return {
+        const serialized = {
             ingredients: this.serializeIngredients(),
             skill: this.skill,
             results: this.serializeResults(),
             currency: this.currency
         }
+        if(!this.skill){
+            serialized["-=skill"] = null;
+        }
+        if(!this.currency){
+            serialized["-=currency"] = null;
+        }
+        return serialized;
     }
+
     serializeIngredients(){
         return {...this.ingredients,...this._trash.ingredients}
     }
@@ -44,9 +58,9 @@ export class Recipe {
 
     addIngredient(entity,uuid) {
         if(!this.ingredients[entity.id]){
-            this.ingredients[entity.id] = new Component(entity,uuid);
+            this.ingredients[entity.id] = new DefaultComponent(entity,uuid);
         }else{
-            Component.inc(this.ingredients[entity.id])
+            DefaultComponent.inc(this.ingredients[entity.id])
         }
     }
     removeIngredient(id){
@@ -55,9 +69,9 @@ export class Recipe {
     }
     addResult(entity,uuid) {
         if(!this.results[entity.id]){
-            this.results[entity.id] = new Component(entity,uuid);
+            this.results[entity.id] = new DefaultComponent(entity,uuid);
         }else{
-            Component.inc(this.results[entity.id])
+            DefaultComponent.inc(this.results[entity.id])
         }
     }
     removeResults(id) {
@@ -65,30 +79,30 @@ export class Recipe {
         this._trash.results["-=" + id] = null;
     }
     addSkill() {
-        this.skill = new Skill();
+        this.skill = new DefaultSkill();
     }
     removeSkill(){
         delete this.skill;
     }
     addCurrency(){
-        this.currency = new Currency();
+        this.currency = new DefaultCurrency();
     }
     removeCurrency(){
         delete this.currency;
     }
 }
-class Trash {
+interface Trash {
     ingredients:{};
     results:{};
 }
 
-class Component {
-    id:string;
-    uuid:string;
-    sourceId:string;
-    name:string;
-    img:string;
-    quantity:number;
+class DefaultComponent implements Component {
+    id: string;
+    img: string;
+    name: string;
+    quantity: number;
+    sourceId: string;
+    uuid: string;
 
     constructor(entity,uuid) {
         this.id = entity.id;
@@ -104,8 +118,15 @@ class Component {
     }
 }
 
-class Skill {
+class DefaultSkill implements DefaultSkill{
     name:string;
     dc:number= 8;
     consume:boolean=true;
+}
+
+interface RecipeStoreData {
+    ingredients:Map<string,Component>;
+    results:Map<string,Component>;
+    skill?:Skill;
+    currency?:Currency;
 }

@@ -1,11 +1,11 @@
 <div class="beavers-crafting chat flexcol">
     <div class="flexrow header">
-        <div class="image" style="background-image: url('{{item.img}}')"></div>
-        <div style="flex:1"> {{item.name}}</div>
+        <div class="image" style="background-image: url('{{recipe.img}}')"></div>
+        <div style="flex:1"> {{recipe.name}}</div>
         <div class="flexrow" style="flex:0 0 60px;height:30px">
             <div class="dice-roll">
                 <div class="dice-total flexrow" style="flex:1;padding:2px;margin-top:5px">
-                    <span class="total">{{roll.total}}</span>
+                    <span class="total">{{result.skill.total}}</span>
                     {{#if result.hasErrors}}
                         <i class="fas fa-times"></i>
                     {{else}}
@@ -28,7 +28,7 @@
                             <h4>{{recipe.currency.value}} {{recipe.currency.name}}</h4>
                         </div>
                         <div class="action" style="flex:0 0 20px;">
-                            {{#if result.errors.currencies}}
+                            {{#if result.currencies}}
                                 <i class="fas fa-times"></i>
                             {{else}}
                                 <i class="fas fa-check"></i>
@@ -44,11 +44,13 @@
                             <h4>{{this.quantity}}</h4>
                         </div>
                         <div class="action" style="flex:0 0 20px;">
-                            {{#hasKey ../result.errors.ingredients @key}}
-                                <i class="fas fa-times"></i>
-                            {{else}}
-                                <i class="fas fa-check"></i>
-                            {{/hasKey}}
+                            {{#with (lookup ../result.ingredients @key) as |ingredient|}}
+                                {{#if (lt ingredient.difference 0) }}
+                                    <i class="fas fa-times"></i>
+                                {{else}}
+                                    <i class="fas fa-check"></i>
+                                {{/if}}
+                            {{/with}}
                         </div>
                     </div>
                 {{/each}}

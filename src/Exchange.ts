@@ -9,7 +9,7 @@ export class Exchange {
     static pay(priceCurrency, actorCurrencies) {
         let lowestActorCurrency = this.toLowestCurrency(actorCurrencies);
         const lowestPriceCurrency = this.toLowestCurrency(this.toCurrencies(priceCurrency));
-        const result = new Currency();
+        const result = new DefaultCurrency();
         result.name=lowestActorCurrency.name;
         result.value=lowestActorCurrency.value - lowestPriceCurrency.value;
         if (result.value < 0) {
@@ -19,7 +19,7 @@ export class Exchange {
         return this.toHighestCurrencies(exchangeCurrencies);
     }
 
-    static toCurrencies(currency) {
+    static toCurrencies(currency:Currency) {
         let currencies = {};
         getCurrencies().forEach(c => {
             if (currency.name === c[ABBREVIATION]) {
@@ -43,7 +43,7 @@ export class Exchange {
             transform = transform * nextHighestCurrency[CONVERSION].each;
             highestCurrency = nextHighestCurrency;
         }
-        const result = new Currency();
+        const result = new DefaultCurrency();
         result.name = highestCurrency[ABBREVIATION];
         result.value = transform;
         return result;
@@ -67,8 +67,7 @@ export class Exchange {
         return result;
     }
 }
-
-export class Currency {
+export class DefaultCurrency implements Currency {
     name;
     value= 5;
 }

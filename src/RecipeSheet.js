@@ -1,17 +1,16 @@
-import {BEAVERS_CRAFTING} from "./consts.js";
 import {Recipe} from "./Recipe.js";
 import {Settings} from "./Settings.js";
 import {getCurrencies, getSkills} from "./systems/dnd5e.js"
+import {RecipeCompendium} from "./RecipeCompendium.js";
 
 const recipeSheets = [];
 
 export class RecipeSheet {
-    static bind(app, html, item) {
-        if(item.document.type === 'loot' && item.document.system.source === BEAVERS_CRAFTING.recipe.source){
+    static bind(app, html, data) {
+        if(RecipeCompendium.isRecipe(app.item)){
             if(!recipeSheets[app.id]){
-                recipeSheets[app.id] = new RecipeSheet(app,item);
+                recipeSheets[app.id] = new RecipeSheet(app,data);
             }
-            console.log(item);
             recipeSheets[app.id].init(html);
         }
     }
