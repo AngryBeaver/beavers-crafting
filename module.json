@@ -2,7 +2,7 @@
     "title": "Beaver's Crafting System",
     "description": "A Crafting Module for DnD",
     "id": "beavers-crafting",
-    "version": "0.1",
+    "version": "0.0.2",
     "authors": [
       {
         "name": "angryBeaver",
@@ -26,9 +26,9 @@
     ],
     "packs": [
     ],
-    "url": "https://github.com/angrybeaver",
-    "manifest": "",
-    "download": "",
+    "url": "https://github.com/AngryBeaver/beavers-crafting",
+    "manifest": "https://github.com/AngryBeaver/beavers-crafting/releases/download/latest/module.json",
+    "download": "https://github.com/AngryBeaver/beavers-crafting/releases/download/latest/beavers-crafting.zip",
     "relationships": {
     },
     "compatibility": {

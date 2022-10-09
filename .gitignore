@@ -3,3 +3,4 @@ node_modules
 /beavers-crafting.iml
 /.idea/
 /dist/
+/package/

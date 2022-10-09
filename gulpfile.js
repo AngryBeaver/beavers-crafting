@@ -153,7 +153,7 @@ function compressDistribution() {
     () =>
       gulp
         .src(DIST + PACKAGE.name + "/" + GLOB)
-        .pipe(zip(PACKAGE.name + `-v` + PACKAGE.version + ".zip"))
+        .pipe(zip(PACKAGE.name + ".zip"))
         .pipe(gulp.dest(BUNDLE)),
     // Copy the module.json to the bundle directory
     () => gulp.src(DIST + "/module.json").pipe(gulp.dest(BUNDLE)),
