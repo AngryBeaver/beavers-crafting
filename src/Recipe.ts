@@ -96,7 +96,7 @@ interface Trash {
     results:{};
 }
 
-class DefaultComponent implements Component {
+export class DefaultComponent implements Component {
     id: string;
     img: string;
     name: string;

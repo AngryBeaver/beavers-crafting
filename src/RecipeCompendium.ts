@@ -4,47 +4,58 @@ import {Settings} from "./Settings.js";
 
 export class RecipeCompendium {
 
-    static getAll(): Recipe[]{
+    static getAll(): Recipe[] {
         // @ts-ignore
         return game.items.directory.documents
-            .filter(item=>RecipeCompendium.isRecipe(item))
-            .map(item=>new Recipe(item));
+            .filter(item => RecipeCompendium.isRecipe(item))
+            .map(item => new Recipe(item));
     }
 
-    filterForItem(recipes,item){
-
+    static filterForItems(recipes: Recipe[], items) {
+        return recipes.filter(recipe => {
+            const recipeItemsInItemList = items.filter(
+                item => {
+                    for (const [k, component] of Object.entries(recipe.ingredients)) {
+                        if (this.isSame(item, component)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                })
+            return recipeItemsInItemList.length === items.length;
+        });
     }
 
-    static filterForActor(actor,filter){
+    static filterForActor(actor, filter) {
         return RecipeCompendium.getAll()
-            .filter(recipe=>{
-                if(filter == FilterType.all){
+            .filter(recipe => {
+                if (filter == FilterType.all) {
                     return true;
                 }
-                const result = RecipeCompendium.validateRecipeToItemList(recipe,actor.items);
-                return ((filter==FilterType.usable && !result.hasErrors)
-                    || (filter==FilterType.available && result.isAvailable));
+                const result = RecipeCompendium.validateRecipeToItemList(recipe, actor.items);
+                return ((filter == FilterType.usable && !result.hasErrors)
+                    || (filter == FilterType.available && result.isAvailable));
             });
 
     }
 
-    static validateRecipeToItemList(recipe:Recipe,listOfItems,result?:Result):Result {
+    static validateRecipeToItemList(recipe: Recipe, listOfItems, result?: Result): Result {
         if (!result) result = new DefaultResult();
-        result.isAvailable=recipe.ingredients.size===0;
+        result.isAvailable = recipe.ingredients.size === 0;
         for (const [k, component] of Object.entries(recipe.ingredients)) {
-            const itemChange = RecipeCompendium.findComponentInList(listOfItems,component);
+            const itemChange = RecipeCompendium.findComponentInList(listOfItems, component);
             const remainingQuantity = itemChange.toUpdate["system.quantity"] - component.quantity;
-            const isAvailAble = itemChange.toUpdate["system.quantity"]>0;
+            const isAvailAble = itemChange.toUpdate["system.quantity"] > 0;
             result.ingredients[k] = {
-                component:component,
+                component: component,
                 isAvailable: isAvailAble,
                 difference: remainingQuantity,
             };
-            if(isAvailAble){
+            if (isAvailAble) {
                 result.isAvailable = isAvailAble;
             }
             if (remainingQuantity < 0) {
-                result.hasErrors=true;
+                result.hasErrors = true;
             } else {
                 if (remainingQuantity == 0) {
                     result.changes.items.toDelete.push(itemChange.toUpdate._id);
@@ -58,7 +69,7 @@ export class RecipeCompendium {
         return result;
     }
 
-    static findComponentInList(listOfItems, component:Component):ItemChange {
+    static findComponentInList(listOfItems, component: Component): ItemChange {
         const itemChange = new DefaultItemChange();
         listOfItems.forEach((i) => {
             if (this.isSame(i, component)) {
@@ -73,22 +84,22 @@ export class RecipeCompendium {
         return itemChange;
     }
 
-    static isSame(item, component:Component) {
+    static isSame(item, component: Component) {
         const isSameName = (item, component) => item.name === component.name;
         const isFromSource = (item, component) => item.flags?.core?.sourceId == component.uuid;
         const hasSameSource = (item, component) => item.flags?.core?.sourceId == component.sourceId;
         return isSameName(item, component) && (isFromSource(item, component) || hasSameSource(item, component));
     }
 
-    static isRecipe(item){
+    static isRecipe(item) {
         // @ts-ignore
-        return (item?.type === 'loot' && item?.system?.source === game.settings.get(Settings.NAMESPACE,Settings.RECIPE_SOURCE_NAME));
+        return (item?.type === 'loot' && item?.system?.source === game.settings.get(Settings.NAMESPACE, Settings.RECIPE_SOURCE_NAME));
     }
 
 }
 
 export enum FilterType {
-    usable,available,all
+    usable, available, all
 }
 
 class DefaultItemChange implements ItemChange {
@@ -99,9 +110,9 @@ class DefaultItemChange implements ItemChange {
     };
 }
 
-export class DefaultResult implements Result{
-    ingredients= {};
-    currencies=true;
+export class DefaultResult implements Result {
+    ingredients = {};
+    currencies = true;
     changes = {
         items: {
             toUpdate: [],

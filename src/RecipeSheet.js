@@ -2,6 +2,7 @@ import {Recipe} from "./Recipe.js";
 import {Settings} from "./Settings.js";
 import {getCurrencies, getSkills} from "./systems/dnd5e.js"
 import {RecipeCompendium} from "./RecipeCompendium.js";
+import {getDataFrom} from "./apps/CraftingApp.js";
 
 const recipeSheets = [];
 
@@ -98,14 +99,8 @@ export class RecipeSheet {
         if(!isIngredient && !isResult){
             return;
         }
-        let data;
-        try {
-            data = JSON.parse(e.dataTransfer.getData('text/plain'));
-        }
-        catch (err) {
-            return false;
-        }
-        if(data.type !== "Item") return;
+        const data = getDataFrom(e);
+        if(!data || data.type !== "Item") return;
         const entity = await fromUuid(data.uuid);
         if(entity) {
             if(isIngredient){

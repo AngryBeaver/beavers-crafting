@@ -1,6 +1,7 @@
 import {getCurrencies, getSkills} from "../systems/dnd5e.js";
 import {FilterType, RecipeCompendium} from "../RecipeCompendium.js";
 import {Crafting} from "../Crafting.js";
+import {DefaultComponent} from "../Recipe";
 
 export class CraftingApp extends Application {
     data: {
@@ -8,9 +9,10 @@ export class CraftingApp extends Application {
         filter,
         recipes,
         index,
+        filterItems:{},
         recipe?,
         content?,
-        result?
+        result?,
     };
 
     constructor(actor, options: any = {}) {
@@ -19,8 +21,10 @@ export class CraftingApp extends Application {
             actor: actor,
             filter: FilterType.available,
             recipes: [],
-            index:0
+            index: 0,
+            filterItems: {}
         };
+
     }
 
     static get defaultOptions() {
@@ -34,24 +38,27 @@ export class CraftingApp extends Application {
             submitOnClose: true,
             submitOnChange: true,
             resizable: true,
-            classes: ["dnd5e","sheet","beavers-crafting"],
+            classes: ["dnd5e", "sheet", "beavers-crafting"],
             popOut: true,
-            id: 'beavers-crafting',
-            dragDrop: [{dragSelector: ".item-list .item", dropSelector: null}]
+            id: 'beavers-crafting'
         });
     }
 
-    async getData(options={}) {
+    async getData(options = {}) {
         const data: any = mergeObject(this.data, await super.getData(options));
-        data.recipes = RecipeCompendium.filterForActor(data.actor, data.filter);
+        let recipes = RecipeCompendium.filterForActor(data.actor, data.filter);
+        if(Object.values(data.filterItems).length != 0){
+            recipes = RecipeCompendium.filterForItems(recipes,Object.values(data.filterItems));
+        }
+        data.recipes = recipes;
         await this.renderRecipeSheet(data);
         return data;
     }
 
-    async renderRecipeSheet(data){
+    async renderRecipeSheet(data) {
         data.recipe = data.recipes[data.index];
-        console.log(data);
-        if(!data.recipe) {
+        if (!data.recipe) {
+            data.content = null;
             return null;
         }
         data.result = RecipeCompendium.validateRecipeToItemList(data.recipe, this.data.actor.items);
@@ -63,7 +70,6 @@ export class CraftingApp extends Application {
                 editable: false,
                 result: data.result
             });
-        console.log(data);
         return data;
     }
 
@@ -79,24 +85,75 @@ export class CraftingApp extends Application {
         html.find(".sidebar a.item").on("click", (e) => {
             const index = $(e.currentTarget).data().id;
             this.data.index = index;
-            this.renderRecipeSheet(this.data).then( data => {
+            this.renderRecipeSheet(this.data).then(data => {
                 html.find(".sheet-body").empty();
                 html.find(".sheet-body").append(data.content);
                 html.find(".crafting-app a.item.selected").removeClass("selected");
-                html.find(".crafting-app a.item[data-id ="+index+"]").addClass("selected");
+                html.find(".crafting-app a.item[data-id =" + index + "]").addClass("selected");
             });
         });
 
-        html.find(".dialog-button").on("click",(e)=>{
-            Crafting.from(this.data.actor.id,this.data.recipe.id)
-                .then(crafting=>{
+        html.find(".dialog-button").on("click", (e) => {
+            Crafting.from(this.data.actor.id, this.data.recipe.id)
+                .then(crafting => {
                     return crafting.craft();
 
-                }).then(result=>{
-                    if(!result.hasErrors){
-                        this.render();
-                    }
-                });
+                }).then(result => {
+                if (!result.hasErrors) {
+                    this.render();
+                }
+            });
         });
+        html.find(".header .drop-area .item").on("click", (e) => {
+            const uuid = $(e.currentTarget).data("id");
+            delete this.data.filterItems[uuid];
+            this.render();
+        });
+        this.addDragDrop(html);
+    }
+
+    addDragDrop(html) {
+        const dropFilter = new DragDrop({
+            dropSelector: '.drop-area',
+            permissions: {
+                dragstart: this._canDragStart.bind(this),
+                drop: this._canDragDrop.bind(this)
+            },
+            callbacks: {
+                dragstart: this._onDragStart.bind(this),
+                dragover: this._onDragOver.bind(this),
+                drop: this._onDrop.bind(this)
+            }
+        });
+        this._dragDrop.push(dropFilter);
+        dropFilter.bind(html[0]);
+    }
+
+    async _onDrop(e){
+        const isFilterDrop = $(e.target).hasClass("drop-area");
+        if(isFilterDrop){
+            return this._onDropFilter(e);
+        }
+    }
+
+    async _onDropFilter(e:DragEvent){
+        const data = getDataFrom(e)
+        if(data){
+            if(data.type !== "Item") return;
+            let entity = await fromUuid(data.uuid);
+            this.data.filterItems[data.uuid] = entity;
+
+            this.render();
+        }
+    }
+}
+
+export function getDataFrom(e:DragEvent){
+    try {
+        // @ts-ignore
+        return JSON.parse(e.dataTransfer.getData('text/plain'));
+    }
+    catch (err) {
+        return false;
     }
 }

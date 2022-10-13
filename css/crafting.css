@@ -108,6 +108,10 @@
     border-left: 2px groove #FFF;
 }
 
+.beaversCrafting.crafting-app{
+    min-width:560px;
+}
+
 .beavers-crafting .crafting-app.header{
     height:40px;
     line-height:40px;
@@ -160,3 +164,35 @@
 .beavers-crafting .dialog-button {
     flex:0;
 }
+
+.beavers-crafting .crafting-app .drop-area .item{
+    /* Center the content */
+    width:20px;
+    margin:2px;
+}
+.beavers-crafting .crafting-app .drop-area .item img{
+    /* Center the content */
+    border:0px;
+}
+
+.beavers-crafting .crafting-app.header .filter{
+    /* Center the content */
+    height: 40px;
+    line-height: 40px;
+    text-align: right;
+    color: grey;
+}
+.beavers-crafting .crafting-app.header .drop-area {
+    /* Center the content */
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    height:30px;
+    margin:4px;
+
+    /* Border */
+    border: 1px dashed #ffffff;
+    border-radius: 0.25rem;
+}
+
+

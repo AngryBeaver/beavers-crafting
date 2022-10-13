@@ -2,15 +2,20 @@
     <div class="crafting-app header flexrow">
         <div class="entry-filter">
             <select class="search">
-{{#select filter}}
-                <option value="2">all</option>
-                <option value="1">available</option>
-                <option value="0">usable</option>
-{{/select}}
+                {{#select filter}}
+                    <option value="2">all</option>
+                    <option value="1">available</option>
+                    <option value="0">usable</option>
+                {{/select}}
             </select>
         </div>
+        <div class="filter">filter by item:</div>
         <div class="drop-area">
-            + filter by item
+            {{#each filterItems}}
+                <a class="item flexrow" data-id="{{@key}}" title="{{this.name}}">
+                    <img src="{{this.img}}" alt="{{this.name}}">
+                </a>
+            {{/each}}
         </div>
     </div>
     <div class="flexrow">
@@ -26,9 +31,9 @@
         </aside>
         <section class="flexcol">
             <div class="sheet-body">
-            {{#if content}}
-                {{{content}}}
-            {{/if}}
+                {{#if content}}
+                    {{{content}}}
+                {{/if}}
             </div>
             <button class="dialog-button ok default" data-button="ok">
                 <i class="fas fa-check"></i>
