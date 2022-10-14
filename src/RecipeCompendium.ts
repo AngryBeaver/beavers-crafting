@@ -121,6 +121,8 @@ export class DefaultResult implements Result {
         },
         currencies: {},
     };
+    results = {};
     hasErrors = false;
+    hasException:false;
     isAvailable = true;
 }

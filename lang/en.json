@@ -20,7 +20,12 @@
     },
     "crafting-app": {
       "title": "Beaver's Recipe Compendium",
-      "button": "Craft"
+      "button": "Craft",
+      "errors": {
+        "tableNotFound": "RollTable not found for : ",
+        "tableNotValid": "RollTable return invalid Object : ",
+        "tableItemNotFound": "Item not found in RollTable for :"
+      }
     },
     "settings": {
       "craftById": {

@@ -56,27 +56,27 @@ export class Recipe implements RecipeStoreData{
         return {...this.results,...this._trash.results}
     }
 
-    addIngredient(entity,uuid) {
-        if(!this.ingredients[entity.id]){
-            this.ingredients[entity.id] = new DefaultComponent(entity,uuid);
+    addIngredient(entity,uuid,type) {
+        if(!this.ingredients[uuid]){
+            this.ingredients[uuid] = new DefaultComponent(entity,uuid,type);
         }else{
-            DefaultComponent.inc(this.ingredients[entity.id])
+            DefaultComponent.inc(this.ingredients[uuid])
         }
     }
-    removeIngredient(id){
-        delete this.ingredients[id];
-        this._trash.ingredients["-="+id] = null;
+    removeIngredient(uuid){
+        delete this.ingredients[uuid];
+        this._trash.ingredients["-="+uuid] = null;
     }
-    addResult(entity,uuid) {
-        if(!this.results[entity.id]){
-            this.results[entity.id] = new DefaultComponent(entity,uuid);
+    addResult(entity,uuid,type) {
+        if(!this.results[uuid]){
+            this.results[uuid] = new DefaultComponent(entity,uuid,type);
         }else{
-            DefaultComponent.inc(this.results[entity.id])
+            DefaultComponent.inc(this.results[uuid])
         }
     }
-    removeResults(id) {
-        delete this.results[id];
-        this._trash.results["-=" + id] = null;
+    removeResults(uuid) {
+        delete this.results[uuid];
+        this._trash.results["-=" + uuid] = null;
     }
     addSkill() {
         this.skill = new DefaultSkill();
@@ -103,13 +103,15 @@ export class DefaultComponent implements Component {
     quantity: number;
     sourceId: string;
     uuid: string;
+    type: string;
 
-    constructor(entity,uuid) {
+    constructor(entity, uuid, type) {
         this.id = entity.id;
         this.uuid = uuid;
+        this.type = type;
         this.name = entity.name;
         this.img = entity.img;
-        this.quantity = entity.system.quantity;
+        this.quantity = entity.system?.quantity || 1;
         this.sourceId = entity.flags.core?.sourceId;
     }
 

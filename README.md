@@ -4,8 +4,11 @@
 ![Download Count](https://img.shields.io/github/downloads/AngryBeaver/beavers-crafting/total?color=bright-green)
 
 ## Work in progress
-! Carefull structure will probably change until i finalize this module, 
+
+! Carefully structure will probably change until i finalize this module with version 1.0.0 !, 
 so do not start creating tones of recipes already ! The future upgrades might break them.
+
+! breaking change release: 0.1.x -> 0.2.x !
 
 ## Features
 ### Loot subtype Recipe
@@ -17,11 +20,21 @@ Default is "Create New Item" obviously you need to adapt if you have a different
 ### Configure subtype Recipe
 ![img.png](pictures/configure.png)
 
-- cost: you may add costs to the crafting process
-- ingredients: you add items that will get consumed while crafting
-- skill: you may add a skill that is required in the crafting process
-    - your may check that all costs are payed in the crafting process no matter of success or fail.
-- results: you may add items as a result of a successfull crafting process of this recipe.
+#### cost: 
+you may add costs to the crafting process
+#### Ingredients:
+
+
+You may add Items via drag and drop as Ingredients.
+#### skill: 
+you may add a skill that is required in the crafting process.
+you can enable that costs and ingredients are also payed when the check failed.
+#### results:
+![img.png](pictures/rollTable.png)
+
+You may add Items or RollTable via drag and drop as result.
+The result is the outcome of a successfull crafting process.
+If you add a RollTable you will get quantity amount of rolls on that table not one roll quantity of times.
 
 ### Crafting
 ![img.png](pictures/crafting.png)
@@ -41,11 +54,16 @@ or throu recipe compendium
 
 You will see a chat message with your result 
 
+## latest features:
+### 0.2.x feature add rollTable result
+you now can produce a random Potion.
+breaking change 0.1.x -> 0.2.x
+
 ## Upcoming Changes
 ### "any" of ingredient
-I want to create recipes with "any" weapon or mushroom therefor i may need some new fields in recipe or a new subtype ingredient
-### results should include rollTables
-I want to create a random potion with random ingredients.
+I want to create recipes with "any" xxx e.g. (weapon,mushroom,etc) therefor i may need some new fields in recipe or a new subtype ingredient
+### results should include rollTables (done 0.2.x)
+I want to create a random potion.
 ### macro
 I want to be able to add macros to recipes.
 giving them more flexibility e.g. get damage on certain recipes where you failed your check.
@@ -67,7 +85,6 @@ When adding costs to your recipe your currency will get exchanged to highest val
 ### Items reorder
 Actor Items will get merged to stacks in the crafting process. 
 (only those that match ingredients or results)
-
 
 
 ## Credits

@@ -10,6 +10,7 @@ interface Result {
     }
     ingredients: {
         [key: string]: IngredientResult }
+    results: { [key: string]: Component }
     currencies: boolean;
     skill?:{
         name: string,
@@ -17,6 +18,7 @@ interface Result {
         difference: number,
     };
     hasErrors:boolean;
+    hasException:boolean;
     isAvailable:boolean;
 }
 
@@ -29,6 +31,7 @@ interface IngredientResult {
 interface Component {
     id:string;
     uuid:string;
+    type:string;
     sourceId:string;
     name:string;
     img:string;

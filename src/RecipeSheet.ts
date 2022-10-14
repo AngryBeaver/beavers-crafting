@@ -4,9 +4,16 @@ import {getCurrencies, getSkills} from "./systems/dnd5e.js"
 import {RecipeCompendium} from "./RecipeCompendium.js";
 import {getDataFrom} from "./apps/CraftingApp.js";
 
-const recipeSheets = [];
+const recipeSheets: { [key: string]: RecipeSheet } = {};
 
 export class RecipeSheet {
+    app;
+    item;
+    editable:boolean;
+    recipe:Recipe;
+    recipeElement?;
+
+
     static bind(app, html, data) {
         if(RecipeCompendium.isRecipe(app.item)){
             if(!recipeSheets[app.id]){
@@ -94,22 +101,27 @@ export class RecipeSheet {
 
 
     async _onDrop(e) {
-        const isIngredient = !$(e.target).parents(".beavers-crafting .recipe .ingredients").length ==0;
-        const isResult = !$(e.target).parents(".beavers-crafting .recipe .results").length ==0;
+        const isIngredient = $(e.target).parents(".beavers-crafting .recipe .ingredients").length !==0;
+        const isResult = $(e.target).parents(".beavers-crafting .recipe .results").length !==0;
         if(!isIngredient && !isResult){
             return;
         }
         const data = getDataFrom(e);
-        if(!data || data.type !== "Item") return;
-        const entity = await fromUuid(data.uuid);
-        if(entity) {
-            if(isIngredient){
-                this.recipe.addIngredient(entity,data.uuid);
+        if(data &&
+            (data.type === "Item" ||
+                (data.type === "RollTable" && isResult)
+            )
+        ) {
+            const entity = await fromUuid(data.uuid);
+            if (entity) {
+                if (isIngredient) {
+                    this.recipe.addIngredient(entity, data.uuid,data.type);
+                }
+                if (isResult) {
+                    this.recipe.addResult(entity, data.uuid, data.type);
+                }
+                this.update();
             }
-            if(isResult){
-                this.recipe.addResult(entity,data.uuid);
-            }
-            this.update();
         }
     }
 

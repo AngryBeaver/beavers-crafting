@@ -62,14 +62,15 @@
                     <div class="name">{{localize "beaversCrafting.recipe.results"}}</div>
                 </div>
                 {{#unless result.hasErrors}}
-                    {{#each recipe.results}}
+                    {{#each result.results}}
                         <div class="flexrow item">
-                            <div class=""></div>
-                            <div class="item-name flexrow" title="{{this.name}}">
-                                {{this.quantity}}
-                                <div class="item-image" style="background-image: url('{{this.img}}')"></div>
+                            <div class="item-name flexrow" style="flex:1" title="{{this.name}}">
+                                <div class="item-image"
+                                     style="background-image: url('{{this.img}}')"></div>
+                                <h4>{{this.quantity}}</h4>
                             </div>
-                            <div class=""></div>
+                            <div class="action" style="flex:0 0 20px;">
+                            </div>
                         </div>
                     {{/each}}
                 {{/unless}}
