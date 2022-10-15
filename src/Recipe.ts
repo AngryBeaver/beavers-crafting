@@ -105,14 +105,18 @@ export class DefaultComponent implements Component {
     uuid: string;
     type: string;
 
+    static clone(component: Component):Component{
+        return new DefaultComponent(component,component.uuid, component.type)
+    }
+
     constructor(entity, uuid, type) {
         this.id = entity.id;
         this.uuid = uuid;
         this.type = type;
         this.name = entity.name;
         this.img = entity.img;
-        this.quantity = entity.system?.quantity || 1;
-        this.sourceId = entity.flags.core?.sourceId;
+        this.quantity = entity.system?.quantity || entity.quantity || 1;
+        this.sourceId = entity.flags?.core?.sourceId || entity.sourceId;
     }
 
     static inc(component){

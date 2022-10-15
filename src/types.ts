@@ -4,7 +4,7 @@ interface Result {
         items: {
             toUpdate:any[],
             toDelete:any[],
-            toCreate:any[]
+            toCreate:Component[]
         },
         currencies: {},
     }

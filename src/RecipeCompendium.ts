@@ -70,7 +70,7 @@ export class RecipeCompendium {
     }
 
     static findComponentInList(listOfItems, component: Component): ItemChange {
-        const itemChange = new DefaultItemChange();
+        const itemChange = new DefaultItemChange(component);
         listOfItems.forEach((i) => {
             if (this.isSame(i, component)) {
                 if (itemChange.toUpdate["system.quantity"] == 0) {
@@ -108,6 +108,10 @@ class DefaultItemChange implements ItemChange {
         "_id": "",
         "system.quantity": 0
     };
+    constructor(component:Component){
+        this.toUpdate._id = component.id;
+    }
+
 }
 
 export class DefaultResult implements Result {

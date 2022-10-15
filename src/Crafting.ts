@@ -81,8 +81,6 @@ export class Crafting {
     async updateActor(result: Result) {
         if (!result) result = new DefaultResult();
         if (result.hasException || (result.hasErrors && (!this.recipe.skill?.consume || !result.skill))) return;
-        await this.actor.updateEmbeddedDocuments("Item", result.changes.items.toUpdate);
-        await this.actor.deleteEmbeddedDocuments("Item", result.changes.items.toDelete);
         const createItems: any[] = [];
         for (const component of result.changes.items.toCreate) {
             if (component.uuid) {
@@ -97,7 +95,9 @@ export class Crafting {
 
             }
         }
-        await this.actor.createEmbeddedDocuments("Item", createItems)
+        await this.actor.createEmbeddedDocuments("Item", createItems);
+        await this.actor.updateEmbeddedDocuments("Item", result.changes.items.toUpdate);
+        await this.actor.deleteEmbeddedDocuments("Item", result.changes.items.toDelete);
         await this.actor.update({
             "system.currency": result.changes.currencies
         });
@@ -114,30 +114,38 @@ export class Crafting {
         })
     }
 
-    //if you have to comment it, its not clean code !
     _addComponentToResult(result: Result, component: Component) {
         const itemChange = RecipeCompendium.findComponentInList(this.actor.items, component);
+        const isAlreadyOnActor = itemChange.toUpdate["system.quantity"] > 0
+        const isAlreadyUpdated = result.changes.items.toUpdate
+            .filter(x => x._id === itemChange.toUpdate._id).length > 0
+        const isAlreadyCreated = result.changes.items.toCreate
+            .filter(x => x.id === itemChange.toUpdate._id).length > 0
+        const isAlreadyDeleted = result.changes.items.toDelete.includes(itemChange.toUpdate._id)
+
         if(result.results[component.uuid]){
-            DefaultComponent.inc(result.results[component.uuid])
+            DefaultComponent.inc(result.results[component.uuid]);
         }else{
             result.results[component.uuid] = component;
         }
-        if (itemChange.toUpdate["system.quantity"] == 0) {                                                            // actor does not have item
-            result.changes.items.toCreate.push(component);                                                              //add that item
-        } else {                                                                                                      // actor does have item
-            const updates = result.changes.items.toUpdate
-                .filter(x => x._id === itemChange.toUpdate._id);
-            if (updates.length > 0) {                                                                                 //crafting already updated that item
-                updates.forEach(x => x["system.quantity"] = x["system.quantity"] + component.quantity)               //reupdate it
-            } else {                                                                                                  //crafting does not update that item
-                if (result.changes.items.toDelete.includes(itemChange.toUpdate._id)) {                                //crafting deleted that item
-                    result.changes.items.toCreate.push(component);                                                      //add that item // now i delete it then create it again.
-                } else {                                                                                              //on actor but not yet touched
-                    itemChange.toUpdate["system.quantity"] = itemChange.toUpdate["system.quantity"] + component.quantity
-                    result.changes.items.toUpdate.push(itemChange.toUpdate);
-                    result.changes.items.toDelete.push(...itemChange.toDelete);
-
-                }
+        if (!isAlreadyOnActor) {
+            if(isAlreadyCreated){
+                const creates =  result.changes.items.toCreate.filter(x => x.id === itemChange.toUpdate._id);
+                creates.forEach(x => x.quantity = x.quantity + component.quantity)
+            } else {
+                result.changes.items.toCreate.push(DefaultComponent.clone(component));
+            }
+        } else {
+            if(isAlreadyDeleted){
+                const deleteIndex = result.changes.items.toDelete.indexOf(itemChange.toUpdate._id);
+                result.changes.items.toDelete.splice(deleteIndex,1);
+            }
+            if(isAlreadyUpdated){
+                const updates = result.changes.items.toUpdate.filter(x => x._id === itemChange.toUpdate._id)
+                updates.forEach(x => x["system.quantity"] = x["system.quantity"] + component.quantity)
+            }else{
+                itemChange.toUpdate["system.quantity"] = itemChange.toUpdate["system.quantity"] + component.quantity
+                result.changes.items.toUpdate.push(itemChange.toUpdate);
             }
         }
     }
