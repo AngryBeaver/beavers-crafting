@@ -1,0 +1,23 @@
+<div class="flexcol anyOf">
+    <textarea placeholder="your code here...&#10;e.g:&#10;return item.type==='weapon'"
+              {{#unless editable}}disabled{{/unless}}
+              name="flags.beavers-crafting.anyOf.macro">{{anyOf.macro}}</textarea>
+    <span style="color:darkred;flex:0">{{macroResult.error.message}}</span>
+    <div class="flexrow bottom">
+        <div class="drop-area">
+            {{#if checkItem}}
+                <a class="item flexrow" title="{{checkItem.name}}">
+                    <img src="{{checkItem.img}}" alt="{{checkItem.name}}">
+                </a>
+                {{#if macroResult.value }}
+                    <i class="fas fa-check"></i>
+                {{else}}
+                    <i class="fas fa-times"></i>
+                {{/if}}
+            {{else}}
+                {{localize "beaversCrafting.anyOf.dropItem"}}
+            {{/if}}
+        </div>
+        <button>{{localize "beaversCrafting.anyOf.button"}}</button>
+    </div>
+</div>

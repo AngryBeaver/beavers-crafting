@@ -1,5 +1,6 @@
 import {Settings} from "./Settings.js";
 import {DefaultCurrency} from "./Exchange.js";
+import {sanitizeUuid} from "./helpers/Utility.js";
 
 export class Recipe implements RecipeStoreData{
     id:string;
@@ -11,14 +12,19 @@ export class Recipe implements RecipeStoreData{
     currency?:Currency;
     _trash:Trash;
 
-    constructor(item) {
+    static fromItem(item):Recipe{
         const flags = item.flags[Settings.NAMESPACE]?.recipe;
-        const data = mergeObject(this.defaultData(), flags || {}, {inplace: false});
-        this.id = item.id;
-        this.name = item.name;
-        this.img = item.img;
-        this.ingredients = data.ingredients;
-        this.results = data.results;
+        const data = mergeObject({ingredients:{},results:{}}, flags || {}, {inplace: false});
+        return new Recipe(item.id,item.name,item.img,data);
+    }
+
+
+    constructor(id,name,img,data:RecipeStoreData){
+        this.id = id;
+        this.name = name;
+        this.img = img;
+        this.ingredients = data.ingredients || {}
+        this.results = data.results || {}
         this.skill = data.skill;
         this.currency = data.currency;
         this._trash = {
@@ -27,13 +33,7 @@ export class Recipe implements RecipeStoreData{
         };
     }
 
-    defaultData() {
-        return {
-            ingredients: {},
-            results: {},
-        }
-    }
-    serialize() {
+    serialize():RecipeStoreData {
         const serialized = {
             ingredients: this.serializeIngredients(),
             skill: this.skill,
@@ -57,26 +57,28 @@ export class Recipe implements RecipeStoreData{
     }
 
     addIngredient(entity,uuid,type) {
-        if(!this.ingredients[uuid]){
-            this.ingredients[uuid] = new DefaultComponent(entity,uuid,type);
+        const uuidS = sanitizeUuid(uuid);
+        if(!this.ingredients[uuidS]){
+            this.ingredients[uuidS] = new DefaultComponent(entity,uuid,type);
         }else{
-            DefaultComponent.inc(this.ingredients[uuid])
+            DefaultComponent.inc(this.ingredients[uuidS])
         }
     }
-    removeIngredient(uuid){
-        delete this.ingredients[uuid];
-        this._trash.ingredients["-="+uuid] = null;
+    removeIngredient(uuidS){
+        delete this.ingredients[uuidS];
+        this._trash.ingredients["-="+uuidS] = null;
     }
     addResult(entity,uuid,type) {
-        if(!this.results[uuid]){
-            this.results[uuid] = new DefaultComponent(entity,uuid,type);
+        const uuidS = sanitizeUuid(uuid);
+        if(!this.results[uuidS]){
+            this.results[uuidS] = new DefaultComponent(entity,uuid,type);
         }else{
-            DefaultComponent.inc(this.results[uuid])
+            DefaultComponent.inc(this.results[uuidS])
         }
     }
-    removeResults(uuid) {
-        delete this.results[uuid];
-        this._trash.results["-=" + uuid] = null;
+    removeResults(uuidS) {
+        delete this.results[uuidS];
+        this._trash.results["-=" + uuidS] = null;
     }
     addSkill() {
         this.skill = new DefaultSkill();

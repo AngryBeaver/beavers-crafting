@@ -56,3 +56,8 @@ interface ItemChange {
         "system.quantity": number
     };
 }
+
+interface MacroResult<t> {
+    value:t,
+    error?:Error
+}

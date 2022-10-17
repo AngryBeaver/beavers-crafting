@@ -1,8 +1,9 @@
 import {DefaultComponent, Recipe} from "./Recipe.js";
 import {Exchange} from "./Exchange.js";
 import {Settings} from "./Settings.js";
-import {DefaultResult, RecipeCompendium} from "./RecipeCompendium.js";
-import {rollTableToComponents} from "./helpers/RollTableToComponent.js";
+import {DefaultResult, RecipeCompendium} from "./apps/RecipeCompendium.js";
+import {rollTableToComponents} from "./helpers/Utility.js";
+import {AnyOf} from "./apps/AnyOfSheet.js";
 
 export class Crafting {
     recipe: Recipe;
@@ -11,7 +12,7 @@ export class Crafting {
     roll;
 
     constructor(actor, item) {
-        this.recipe = new Recipe(item)
+        this.recipe = Recipe.fromItem(item)
         this.actor = actor;
         this.item = item;
     }
@@ -28,7 +29,8 @@ export class Crafting {
 
     async craft(): Promise<Result> {
         const result = await this.checkSkill();
-        RecipeCompendium.validateRecipeToItemList(this.recipe, this.actor.items, result);
+        await this.evaluateAnyOf();
+        RecipeCompendium.validateRecipeToItemList(Object.values(this.recipe.ingredients), this.actor.items, result);
         this.checkCurrency(result);
         await this.addResults(result);
         await this.updateActor(result);
@@ -51,6 +53,27 @@ export class Crafting {
             }
         }
         return result;
+    }
+
+    async evaluateAnyOf(){
+        const toDelete:string[] = [];
+        const toAdd:Component[] = [];
+        for(const [key,component] of Object.entries(this.recipe.ingredients)){
+            if(component.type === Settings.ANYOF_SUBTYPE){
+                const item = await fromUuid(component.uuid);
+                const anyOf = new AnyOf(item);
+                let results = await anyOf.filter(this.actor.items);
+                results = results.filter(c=>c.quantity >= component.quantity);
+                if(results.length >= 0) {
+                    const result = results[Math.floor(Math.random() * results.length)];
+                    result.quantity = component.quantity;
+                    toAdd.push(result);
+                    toDelete.push(key);
+                }
+            }
+        }
+        toDelete.forEach(k=>this.recipe.removeIngredient(k));
+        toAdd.forEach(component=>{this.recipe.addIngredient(component,component.uuid,component.type)});
     }
 
     //simple stupid functional but not performant (yagni)

@@ -8,7 +8,7 @@
 ! Carefully structure will probably change until i finalize this module with version 1.0.0 !, 
 so do not start creating tones of recipes already ! The future upgrades might break them.
 
-! breaking change release: 0.1.x -> 0.2.x !
+! breaking change release: 0.2.x -> 0.3.x !
 
 ## Features
 ### Loot subtype Recipe
@@ -55,13 +55,22 @@ or throu recipe compendium
 You will see a chat message with your result 
 
 ## latest features:
+### 0.3.x feature add initial anyOf ingredient
+you now can have anyOf ingredients
+breaking change 0.2.x -> 0.3.x
 ### 0.2.x feature add rollTable result
 you now can produce a random Potion.
 breaking change 0.1.x -> 0.2.x
 
+
 ## Upcoming Changes
-### "any" of ingredient
+### "any" of ingredient (initial 0.3.x)
+
 I want to create recipes with "any" xxx e.g. (weapon,mushroom,etc) therefor i may need some new fields in recipe or a new subtype ingredient
+---
+currently it will only take randomly from avaiable items on actor in required quantity.
+the precast is wrong it always shows that AnyOf is not available.
+
 ### results should include rollTables (done 0.2.x)
 I want to create a random potion.
 ### macro

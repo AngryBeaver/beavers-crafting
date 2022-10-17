@@ -1,8 +1,9 @@
 import {CraftingApp} from './apps/CraftingApp.js';
-import {RecipeSheet} from './RecipeSheet.js';
+import {RecipeSheet} from './apps/RecipeSheet.js';
 import {Settings} from './Settings.js';
 import {Crafting} from "./Crafting.js";
-import {RecipeCompendium} from "./RecipeCompendium.js";
+import {RecipeCompendium} from "./apps/RecipeCompendium.js";
+import {AnyOfSheet} from "./apps/AnyOfSheet.js";
 
 Hooks.once('init', async function () {
     Settings.init();
@@ -29,35 +30,46 @@ Hooks.on(`dnd5e.preUseItem`, (item, config, options) => {
     }
 });
 
-//RecipeSubTypeSheet
+//SubTypeSheet
 Hooks.on(`renderItemSheet5e`, (app, html, data) => {
     RecipeSheet.bind(app, html, data);
+    AnyOfSheet.bind(app,html,data);
 });
 
-//add RecipeSubtype to create Item
+
+//add Subtype to create Item
 Hooks.on("preCreateItem", (doc, createData, options, user) => {
     if (createData.subtype && createData.subtype === 'recipe' &&
         !foundry.utils.hasProperty(createData, "system.source")) {
-        doc.updateSource({"system.source": game.settings.get(Settings.NAMESPACE,Settings.RECIPE_SOURCE_NAME),"img":"icons/sundries/scrolls/scroll-worn-tan.webp"});
+        doc.updateSource({"system.source": Settings.RECIPE_SUBTYPE,"img":"icons/sundries/scrolls/scroll-worn-tan.webp"});
+    }
+    if (createData.subtype && createData.subtype === 'anyOf' &&
+        !foundry.utils.hasProperty(createData, "system.source")) {
+        doc.updateSource({"system.source": Settings.ANYOF_SUBTYPE,"img":"modules/beavers-crafting/icons/anyOf.png"});
     }
 });
+
 //evil
 Hooks.on("renderDialog", (app, html, content) => {
     const title = game.settings.get(Settings.NAMESPACE,Settings.CREATE_ITEM_TITLE)||"Create New Item";
+
     if (app.data.title === title) {
         if (html[0].localName !== "div") {
             html = $(html[0].parentElement.parentElement);
         }
         html.find("select[name='type']").append("<option value='loot'>📜Recipe📜</option>");
+        html.find("select[name='type']").append("<option value='loot'>❔AnyOf❔</option>");
         if (html.find("input.subtype").length === 0) {
             html.find("form").append('<input class="subtype" name="subtype" style="display:none" value="">');
         }
-        console.log("here");
         html.find("select[name='type']").on("change", function () {
             const name = $(this).find("option:selected").text();
             let value = "";
             if (name === "📜Recipe📜") {
                 value = "recipe"
+            }
+            if (name === "❔AnyOf❔") {
+                value = "anyOf"
             }
             html.find("input.subtype").val(value);
         })

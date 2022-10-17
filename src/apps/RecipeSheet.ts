@@ -1,8 +1,9 @@
-import {Recipe} from "./Recipe.js";
-import {Settings} from "./Settings.js";
-import {getCurrencies, getSkills} from "./systems/dnd5e.js"
+import {Recipe} from "../Recipe.js";
+import {Settings} from "../Settings.js";
+import {getCurrencies, getSkills} from "../systems/dnd5e.js"
 import {RecipeCompendium} from "./RecipeCompendium.js";
-import {getDataFrom} from "./apps/CraftingApp.js";
+import {getDataFrom} from "../helpers/Utility.js";
+import {isAnyOf} from "./AnyOfSheet.js";
 
 const recipeSheets: { [key: string]: RecipeSheet } = {};
 
@@ -41,7 +42,7 @@ export class RecipeSheet {
         this.recipeElement = $('<div class="beavers-crafting"></div>');
         html.find(".sheet-body").empty();
         html.find(".sheet-body").append(this.recipeElement);
-        this.recipe = new Recipe(this.item);
+        this.recipe = Recipe.fromItem(this.item);
         this.render();
     }
 
@@ -115,7 +116,11 @@ export class RecipeSheet {
             const entity = await fromUuid(data.uuid);
             if (entity) {
                 if (isIngredient) {
-                    this.recipe.addIngredient(entity, data.uuid,data.type);
+                    let type = data.type;
+                    if(isAnyOf(entity)){
+                        type = Settings.ANYOF_SUBTYPE;
+                    }
+                    this.recipe.addIngredient(entity, data.uuid,type);
                 }
                 if (isResult) {
                     this.recipe.addResult(entity, data.uuid, data.type);

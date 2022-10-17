@@ -1,7 +1,7 @@
 import {getCurrencies, getSkills} from "../systems/dnd5e.js";
-import {FilterType, RecipeCompendium} from "../RecipeCompendium.js";
+import {FilterType, RecipeCompendium} from "./RecipeCompendium.js";
 import {Crafting} from "../Crafting.js";
-import {DefaultComponent} from "../Recipe";
+import {getDataFrom} from "../helpers/Utility.js";
 
 export class CraftingApp extends Application {
     data: {
@@ -46,7 +46,7 @@ export class CraftingApp extends Application {
 
     async getData(options = {}) {
         const data: any = mergeObject(this.data, await super.getData(options));
-        let recipes = RecipeCompendium.filterForActor(data.actor, data.filter);
+        let recipes = await RecipeCompendium.filterForActor(data.actor, data.filter);
         if(Object.values(data.filterItems).length != 0){
             recipes = RecipeCompendium.filterForItems(recipes,Object.values(data.filterItems));
         }
@@ -61,7 +61,7 @@ export class CraftingApp extends Application {
             data.content = null;
             return null;
         }
-        data.result = RecipeCompendium.validateRecipeToItemList(data.recipe, this.data.actor.items);
+        data.result = RecipeCompendium.validateRecipeToItemList(Object.values(data.recipe.ingredients), this.data.actor.items);
         data.content = await renderTemplate('modules/beavers-crafting/templates/recipe-sheet.hbs',
             {
                 recipe: data.recipe,
@@ -97,7 +97,6 @@ export class CraftingApp extends Application {
             Crafting.from(this.data.actor.id, this.data.recipe.id)
                 .then(crafting => {
                     return crafting.craft();
-
                 }).then(result => {
                 if (!result.hasErrors) {
                     this.render();
@@ -148,12 +147,3 @@ export class CraftingApp extends Application {
     }
 }
 
-export function getDataFrom(e:DragEvent){
-    try {
-        // @ts-ignore
-        return JSON.parse(e.dataTransfer.getData('text/plain'));
-    }
-    catch (err) {
-        return false;
-    }
-}

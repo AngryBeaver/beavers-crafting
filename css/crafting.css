@@ -14,6 +14,13 @@
     padding-left:2px;
 }
 
+.beavers-crafting .recipe .left{
+    max-width:50%;
+}
+
+.beavers-crafting .recipe .right{
+    max-width:50%;
+}
 .beavers-crafting .recipe .attribute{
     flex: 0 0 60px;
     border-left: 1px solid #c9c7b8;
@@ -165,12 +172,12 @@
     flex:0;
 }
 
-.beavers-crafting .crafting-app .drop-area .item{
+.beavers-crafting .drop-area .item{
     /* Center the content */
     width:20px;
     margin:2px;
 }
-.beavers-crafting .crafting-app .drop-area .item img{
+.beavers-crafting .drop-area .item img{
     /* Center the content */
     border:0px;
 }
@@ -195,4 +202,28 @@
     border-radius: 0.25rem;
 }
 
+.beavers-crafting .anyOf textarea {
+    height: calc(100% - 30px);
+    resize: none;
+    padding:5px;
+    width: calc(100% - 20px);
+    margin:10px;
+}
 
+.sheet-body .beavers-crafting {
+    height:100%;
+    flex:1;
+}
+.beavers-crafting .anyOf{
+    height:100%;
+}
+
+.beavers-crafting .anyOf .drop-area{
+    margin:0px 5px;
+    height:34px;
+}
+
+.beavers-crafting .anyOf .bottom{
+    margin: 0px 5px 10px;
+    flex:0 0 30px;
+}
