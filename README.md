@@ -65,9 +65,8 @@ breaking change 0.1.x -> 0.2.x
 
 ## Upcoming Changes
 ### "any" of ingredient (initial 0.3.x)
-
 I want to create recipes with "any" xxx e.g. (weapon,mushroom,etc) therefor i may need some new fields in recipe or a new subtype ingredient
----
+- 0.3.0
 currently it will only take randomly from avaiable items on actor in required quantity.
 the precast is wrong it always shows that AnyOf is not available.
 
