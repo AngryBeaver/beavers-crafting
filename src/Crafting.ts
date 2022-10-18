@@ -63,7 +63,15 @@ export class Crafting {
                 const item = await fromUuid(component.uuid);
                 const anyOf = new AnyOf(item);
                 let results = await anyOf.filter(this.actor.items);
-                results = results.filter(c=>c.quantity >= component.quantity);
+                results = results.filter(c=>{
+                    let quantity = c.quantity;
+                    toAdd.forEach(a=>{
+                        if(a.id === c.id){
+                            quantity = quantity-a.quantity;
+                        }
+                    });
+                    return quantity >= component.quantity
+                });
                 if(results.length >= 0) {
                     const result = results[Math.floor(Math.random() * results.length)];
                     result.quantity = component.quantity;

@@ -117,10 +117,12 @@ export class RecipeSheet {
             if (entity) {
                 if (isIngredient) {
                     let type = data.type;
+                    let uuid = data.uuid;
                     if(isAnyOf(entity)){
                         type = Settings.ANYOF_SUBTYPE;
+                        uuid = foundry.utils.randomID();
                     }
-                    this.recipe.addIngredient(entity, data.uuid,type);
+                    this.recipe.addIngredient(entity, uuid,type);
                 }
                 if (isResult) {
                     this.recipe.addResult(entity, data.uuid, data.type);

@@ -113,7 +113,7 @@ export class DefaultComponent implements Component {
 
     constructor(entity, uuid, type) {
         this.id = entity.id;
-        this.uuid = uuid;
+        this.uuid = entity.uuid;
         this.type = type;
         this.name = entity.name;
         this.img = entity.img;
