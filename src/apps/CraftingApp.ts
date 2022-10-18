@@ -48,7 +48,7 @@ export class CraftingApp extends Application {
         const data: any = mergeObject(this.data, await super.getData(options));
         let recipes = await RecipeCompendium.filterForActor(data.actor, data.filter);
         if(Object.values(data.filterItems).length != 0){
-            recipes = RecipeCompendium.filterForItems(recipes,Object.values(data.filterItems));
+            recipes = await RecipeCompendium.filterForItems(recipes,Object.values(data.filterItems));
         }
         data.recipes = recipes;
         await this.renderRecipeSheet(data);

@@ -12,35 +12,51 @@ export class RecipeCompendium {
             .filter(item => RecipeCompendium.isRecipe(item))
             .map(item => Recipe.fromItem(item));
     }
-    //todo ANYOF
-    static filterForItems(recipes: Recipe[], items) {
-        return recipes.filter(recipe => {
-            const recipeItemsInItemList = items.filter(
-                item => {
-                    for (const [k, component] of Object.entries(recipe.ingredients)) {
-                        if (this.isSame(item, component)) {
-                            return true;
-                        }
+
+    static async filterForItems(recipes: Recipe[], items) {
+        const returnList: Recipe[] = [];
+        for (const recipe of recipes) {
+            const listOfAnyOfIngredients = Object.values(recipe.ingredients).filter(component => component.type === Settings.ANYOF_SUBTYPE);
+            const listOfIngredientsWithoutAnyOf = Object.values(recipe.ingredients).filter(component => component.type !== Settings.ANYOF_SUBTYPE);
+            let countItems = 0;
+            itemLoop: for(const item of items) {
+                for (const component of listOfIngredientsWithoutAnyOf) {
+                    if (this.isSame(item, component)) {
+                        countItems++;
+                        continue itemLoop;
                     }
-                    return false;
-                })
-            return recipeItemsInItemList.length === items.length;
-        });
+                }
+                for (const component of listOfAnyOfIngredients) {
+                    const entity = await fromUuid(component.uuid);
+                    const anyOf = new AnyOf(entity);
+                    const isOf = await anyOf.executeMacro(item);
+                    if (isOf.value) {
+                        countItems++
+                        continue itemLoop;
+                    }
+                }
+                break itemLoop;
+            }
+            if (countItems === items.length) {
+                returnList.push(recipe);
+            }
+        }
+        return returnList;
     }
 
     static async filterForActor(actor, filter) {
         const list = RecipeCompendium.getAll();
-        const returnList:Recipe[] = [];
-        for(const recipe of list){
+        const returnList: Recipe[] = [];
+        for (const recipe of list) {
             if (filter == FilterType.all) {
                 returnList.push(recipe);
-            }else{
+            } else {
                 const listOfAnyOfIngredients = Object.values(recipe.ingredients).filter(component => component.type === Settings.ANYOF_SUBTYPE);
                 if (await this.isAnyAnyOfInList(listOfAnyOfIngredients, actor.items)) {                                       //isAvailable or usable ! when any item matches anyOf has the given quantity
                     const listOfIngredientsWithoutAnyOf = Object.values(recipe.ingredients).filter(component => component.type !== Settings.ANYOF_SUBTYPE);
                     const result = RecipeCompendium.validateRecipeToItemList(listOfIngredientsWithoutAnyOf, actor.items);
-                    if((filter == FilterType.usable && !result.hasErrors)
-                        || (filter == FilterType.available && result.isAvailable)){
+                    if ((filter == FilterType.usable && !result.hasErrors)
+                        || (filter == FilterType.available && result.isAvailable)) {
                         returnList.push(recipe);
                     }
                 }
@@ -56,7 +72,7 @@ export class RecipeCompendium {
                 const item = await fromUuid(component.uuid);
                 const anyOf = new AnyOf(item);
                 const results = await anyOf.filter(listOfItems);
-                if (results.filter(c=>c.quantity >= component.quantity).length == 0) {
+                if (results.filter(c => c.quantity >= component.quantity).length == 0) {
                     return false;
                 }
             }
