@@ -5,12 +5,11 @@
 
 ## Work in progress
 
-! Carefully structure will probably change until i finalize this module with version 1.0.0 !, 
-so do not start creating tones of recipes already ! The future upgrades might break them.
+! Carefully structure might change until i finalize this module with version 1.0.0 !,
 
 ! breaking change release: 0.2.x -> 0.3.x !
-
 ## Features
+![img.gif](pictures/video.gif)
 ### Loot subtype Recipe
 ![img.png](pictures/newItem.png)
 
@@ -30,16 +29,16 @@ You may add Items via drag and drop as Ingredients.
 you may add a skill that is required in the crafting process.
 you can enable that costs and ingredients are also payed when the check failed.
 #### results:
-![img.png](pictures/rollTable.png)
-
 You may add Items or RollTable via drag and drop as result.
 The result is the outcome of a successfull crafting process.
 If you add a RollTable you will get quantity amount of rolls on that table not one roll quantity of times.
 
 ### Crafting
-![img.png](pictures/crafting.png)
+You can start a crafting process by clicking on a recipe in your inventar
 
-You can start a crafting process by clicking on a recipe in your inventar 
+#### Recipe Compendium
+![img.png](pictures/img.png)
+![img.png](pictures/crafting.png)
 or throu recipe compendium
 - list all recipes that you have permission to see for all items in your world (not compendium)
   - filter available: only those that you have at least one ingredient of any quantity of.
@@ -48,13 +47,37 @@ or throu recipe compendium
 - you can display details for a Recipe:
   - it will display you an uneditable recipe and shows you which ingredients are missing.
 - you can hit the craft button to start a craft process.
-  - a craft process will ask for the given skill if any and returns with an result
+  - a craft process will ask for the given skill if any and returns with a result
 ### Result
 ![img.png](pictures/result.png)
 
-You will see a chat message with your result 
+You will see a chat message with your result
+
+### Compendiums
+This module comes with some example compendiums.
+#### Ingredients
+![img.png](pictures/ingredients.png)
+
+You do not need to import those just drag and drop them into your recipes or use the recipe compendium.
+#### Potions
+![img.png](pictures/potions.png)
+
+You do not need to import those just drag and drop them into your recipes or use the recipe compendium.
+#### RandomTable
+![img.png](pictures/table.png)
+
+You do not need to import those just drag and drop them into your recipes or use the recipe compendium.
+#### Recipes
+![img.png](pictures/recipes.png)
+
+You need to import them and then grant permission to the users you want to have access to it.
+The recipecompendium will only show the recipes the user has access to.
+
 
 ## latest features:
+### 0.4.x feature compendiums,
+you now can use items directly from compendium,
+module comes with 4 compendiums ingredients,rolltables,potions and recipes
 ### 0.3.x feature add initial anyOf ingredient
 you now can have anyOf ingredients
 breaking change 0.2.x -> 0.3.x
@@ -75,7 +98,7 @@ I want to create a random potion.
 ### macro
 I want to be able to add macros to recipes.
 giving them more flexibility e.g. get damage on certain recipes where you failed your check.
-### ingredients/potions/recipes package
+### ingredients/potions/recipes package (done 0.4.x)
 The identity of ingredients works best when the item originates from compendium
 - I want a compendium package with lots of garbage items (mushrooms etc. that you can drop as loot)
 - I want a compendium package with various potions (dnd5e is so borring here)

@@ -2,7 +2,7 @@
     "title": "Beaver's Crafting System",
     "description": "A Crafting Module for DnD",
     "id": "beavers-crafting",
-    "version": "0.3.2",
+    "version": "0.4.0",
     "authors": [
       {
         "name": "angryBeaver",
@@ -25,6 +25,42 @@
       "css/crafting.css"
     ],
     "packs": [
+      {
+        "entity": "Item",
+        "label": "potions",
+        "name": "potions",
+        "path": "./packs/potions.db",
+        "module": "beavers-crafting",
+        "type": "Item",
+        "private": false
+      },
+      {
+        "entity": "Item",
+        "label": "ingredients",
+        "name": "ingredients",
+        "path": "./packs/ingredients.db",
+        "module": "beavers-crafting",
+        "type": "Item",
+        "private": false
+      },
+      {
+        "entity": "RollTable",
+        "label": "crafting",
+        "name": "crafting",
+        "path": "./packs/crafting.db",
+        "module": "beavers-crafting",
+        "type": "RollTable",
+        "private": false
+      },
+      {
+        "entity": "Item",
+        "label": "recipes",
+        "name": "recipes",
+        "path": "./packs/recipes.db",
+        "module": "beavers-crafting",
+        "type": "Item",
+        "private": false
+      }
     ],
     "url": "https://github.com/AngryBeaver/beavers-crafting",
     "manifest": "https://github.com/AngryBeaver/beavers-crafting/releases/latest/download/module.json",

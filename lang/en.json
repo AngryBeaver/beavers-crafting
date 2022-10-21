@@ -29,7 +29,7 @@
       "errors": {
         "tableNotFound": "RollTable not found for : ",
         "tableNotValid": "RollTable return invalid Object : ",
-        "tableItemNotFound": "Item not found in RollTable for :"
+        "itemNotFound": "Item not found in RollTable for :"
       }
     },
     "settings": {

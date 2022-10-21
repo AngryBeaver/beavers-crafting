@@ -2,7 +2,7 @@
 import {Recipe} from "../Recipe.js";
 import {Settings} from "../Settings.js";
 import {AnyOf} from "./AnyOfSheet.js";
-import {sanitizeUuid} from "../helpers/Utility.js";
+import {getItem, sanitizeUuid} from "../helpers/Utility.js";
 
 export class RecipeCompendium {
 
@@ -27,7 +27,7 @@ export class RecipeCompendium {
                     }
                 }
                 for (const component of listOfAnyOfIngredients) {
-                    const entity = await fromUuid(component.uuid);
+                    const entity = await getItem(component.uuid);
                     const anyOf = new AnyOf(entity);
                     const isOf = await anyOf.executeMacro(item);
                     if (isOf.value) {
@@ -69,7 +69,7 @@ export class RecipeCompendium {
     static async isAnyAnyOfInList(listOfAnyOfIngredients: Component[], listOfItems) {
         for (const component of listOfAnyOfIngredients) {
             if (component.type === Settings.ANYOF_SUBTYPE) {
-                const item = await fromUuid(component.uuid);
+                const item = await getItem(component.uuid);
                 const anyOf = new AnyOf(item);
                 const results = await anyOf.filter(listOfItems);
                 if (results.filter(c => c.quantity >= component.quantity).length == 0) {
