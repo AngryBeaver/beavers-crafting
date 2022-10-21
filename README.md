@@ -34,7 +34,7 @@ You can start a crafting process by clicking on a recipe in your inventar
 #### Recipe Compendium
 ![img.png](pictures/img.png)
 ![img.png](pictures/crafting.png)
-or throu recipe compendium
+
 - list all recipes that you have permission to see for all items in your world (not compendium)
   - filter available: only those that you have at least one ingredient of any quantity of.
   - filter useable: only those that you have all ingredients in required quantity of.
