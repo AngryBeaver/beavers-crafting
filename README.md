@@ -3,11 +3,6 @@
 ![Foundry System](https://img.shields.io/endpoint?url=https%3A%2F%2Ffoundryshields.com%2Fsystem%3FnameType%3Draw%26showVersion%3D1%26style%3Dflat%26url%3Dhttps%3A%2F%2Fraw.githubusercontent.com%2FAngryBeaver%2Fbeavers-crafting%2Fmain%2Fmodule.json)
 ![Download Count](https://img.shields.io/github/downloads/AngryBeaver/beavers-crafting/total?color=bright-green)
 
-## Work in progress
-
-! Carefully structure might change until i finalize this module with version 1.0.0 !,
-
-! breaking change release: 0.2.x -> 0.3.x !
 ## Features
 ![img.gif](pictures/video.gif)
 ### Loot subtype Recipe
@@ -39,7 +34,7 @@ You can start a crafting process by clicking on a recipe in your inventar
 #### Recipe Compendium
 ![img.png](pictures/img.png)
 ![img.png](pictures/crafting.png)
-or throu recipe compendium
+
 - list all recipes that you have permission to see for all items in your world (not compendium)
   - filter available: only those that you have at least one ingredient of any quantity of.
   - filter useable: only those that you have all ingredients in required quantity of.
@@ -116,7 +111,8 @@ When adding costs to your recipe your currency will get exchanged to highest val
 ### Items reorder
 Actor Items will get merged to stacks in the crafting process. 
 (only those that match ingredients or results)
-
+### Work in progress
+! Carefully structure might change until i finalize this module with version 1.0.0 !,
 
 ## Credits
 Copy organizational structur from midi-qol (gulpfile,package.json,tsconcig.json)
