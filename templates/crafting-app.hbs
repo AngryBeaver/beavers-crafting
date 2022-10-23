@@ -1,5 +1,5 @@
-<div class="flexcol">
-    <div class="crafting-app header flexrow">
+<div class="flexcol" style="height:100%">
+    <div class="compendium header flexrow">
         <div class="entry-filter">
             <select class="search">
                 {{#select filter}}
@@ -18,8 +18,8 @@
             {{/each}}
         </div>
     </div>
-    <div class="flexrow">
-        <aside class="crafting-app sidebar flexcol">
+    <div class="flexrow" style="height:calc( 100% - 40px)">
+        <aside class="sidebar flexcol">
             <nav>
                 {{#each recipes}}
                     <a class="item flexrow {{#if (eq ../index @key)}}selected{{/if}}" data-id="{{@key}}">

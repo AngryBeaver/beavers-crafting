@@ -1,7 +1,8 @@
 import {getCurrencies, getSkills} from "../systems/dnd5e.js";
 import {FilterType, RecipeCompendium} from "./RecipeCompendium.js";
 import {Crafting} from "../Crafting.js";
-import {getDataFrom} from "../helpers/Utility.js";
+import {getDataFrom, getItem} from "../helpers/Utility.js";
+import {Settings} from "../Settings.js";
 
 export class CraftingApp extends Application {
     data: {
@@ -38,7 +39,7 @@ export class CraftingApp extends Application {
             submitOnClose: true,
             submitOnChange: true,
             resizable: true,
-            classes: ["dnd5e", "sheet", "beavers-crafting"],
+            classes: ["dnd5e", "sheet", "beavers-crafting","crafting-app"],
             popOut: true,
             id: 'beavers-crafting'
         });
@@ -68,7 +69,9 @@ export class CraftingApp extends Application {
                 currencies: getCurrencies(),
                 skills: getSkills(),
                 editable: false,
-                result: data.result
+                result: data.result,
+                displayResults:Settings.get(Settings.DISPLAY_RESULTS),
+                displayIngredients:Settings.get(Settings.DISPLAY_RESULTS)
             });
         return data;
     }
@@ -108,6 +111,19 @@ export class CraftingApp extends Application {
             delete this.data.filterItems[uuid];
             this.render();
         });
+        html.find('.results .item-name').on("click",e=>{
+            const uuid = $(e.currentTarget).data("id");
+            if(Settings.get(Settings.DISPLAY_RESULTS)) {
+                getItem(uuid).then(i=>i.sheet._render(true));
+            }
+        });
+        html.find('.ingredients .item-name').on("click",e=>{
+            const uuid = $(e.currentTarget).data("id");
+            if(Settings.get(Settings.DISPLAY_INGREDIENTS)) {
+                getItem(uuid).then(i=>i.sheet._render(true));
+            }
+        });
+
         this.addDragDrop(html);
     }
 

@@ -1,3 +1,6 @@
+.beavers-crafting.recipe {
+    overflow-y: scroll;
+}
 
 .beavers-crafting .recipe .header{
     height: 28px;
@@ -35,6 +38,15 @@
     flex: 0 0 30px;
     border-left: 1px solid #c9c7b8;
     padding-left:5px;
+}
+.beavers-crafting .recipe input[type="checkbox"]{
+    flex:0 0 15px;
+    width:15px;
+    height:15px;
+}
+
+.beavers-crafting .recipe .clickable{
+    cursor: pointer;
 }
 
 .beavers-crafting .drop-area {
@@ -115,59 +127,60 @@
     border-left: 2px groove #FFF;
 }
 
-.beaversCrafting.crafting-app{
+.beavers-crafting.crafting-app .window-content {
+    overflow-y:auto;
+    height:100%;
+}
+
+.beavers-crafting.crafting-app{
     min-width:560px;
 }
 
-.beavers-crafting .crafting-app.header{
+.beavers-crafting.crafting-app .compendium.header{
     height:40px;
     line-height:40px;
     border-bottom: 1px solid var(--color-border-light-primary);
     flex: 0 0 40px;
 }
 
-.beavers-crafting aside.crafting-app.sidebar{
+.beavers-crafting.crafting-app aside.sidebar{
     flex: 0 0 140px;
     height: 100%;
     width: 140px;
     border-right: 1px solid var(--color-border-light-primary);
     font-size: var(--font-size-12);
+    overflow-y: scroll;
 }
 
-.beavers-crafting .crafting-app nav .item{
+.beavers-crafting.crafting-app nav .item{
     height:30px;
     line-height:30px;
     margin:5px;
     border-radius: 5px;
 }
 
-.beavers-crafting .crafting-app nav .item img{
+.beavers-crafting.crafting-app nav .item img{
     flex:0 0 30px;
     height: 30px;
     margin-right:5px;
     border-radius: 5px;
 }
 
-.beavers-crafting .crafting-app nav .item span{
+.beavers-crafting.crafting-app nav .item span{
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.beavers-crafting .crafting-app .sheet-body{
+.beavers-crafting.crafting-app .sheet-body{
     padding:5px;
 }
 
-.beavers-crafting .crafting-app nav .item.selected{
+.beavers-crafting.crafting-app nav .item.selected{
     box-shadow: 6px 6px 10px hsl(300deg 15% 25% / 30%) inset;
     background-color: rgba(0, 0, 0, 0.05);
 }
 
-.beavers-crafting .recipe input[type="checkbox"]{
-    flex:0 0 15px;
-    width:15px;
-    height:15px;
-}
 .beavers-crafting .dialog-button {
     flex:0;
 }

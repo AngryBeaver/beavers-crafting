@@ -2,7 +2,7 @@ import {Recipe} from "../Recipe.js";
 import {Settings} from "../Settings.js";
 import {getCurrencies, getSkills} from "../systems/dnd5e.js"
 import {RecipeCompendium} from "./RecipeCompendium.js";
-import {getDataFrom} from "../helpers/Utility.js";
+import {getDataFrom, getItem} from "../helpers/Utility.js";
 import {isAnyOf} from "./AnyOfSheet.js";
 
 const recipeSheets: { [key: string]: RecipeSheet } = {};
@@ -39,7 +39,7 @@ export class RecipeSheet {
         if(exists.length != 0){
             return;
         }
-        this.recipeElement = $('<div class="beavers-crafting"></div>');
+        this.recipeElement = $('<div class="beavers-crafting recipe"></div>');
         html.find(".sheet-body").empty();
         html.find(".sheet-body").append(this.recipeElement);
         this.recipe = Recipe.fromItem(this.item);
@@ -67,7 +67,7 @@ export class RecipeSheet {
 
     async render(){
         let template = await renderTemplate('modules/beavers-crafting/templates/recipe-sheet.hbs',
-            {recipe: this.recipe,currencies: getCurrencies(),skills: getSkills(),editable:this.editable});
+            {recipe: this.recipe,currencies: getCurrencies(),skills: getSkills(),editable:this.editable,displayResults:Settings.get(Settings.DISPLAY_RESULTS),displayIngredients:Settings.get(Settings.DISPLAY_RESULTS)});
         this.recipeElement.find('.recipe').remove();
         this.recipeElement.append(template);
         this.handleEvents();
@@ -98,7 +98,20 @@ export class RecipeSheet {
             this.recipe.addCurrency();
             this.update();
         });
+        this.recipeElement.find('.results .item-name').on("click",e=>{
+            const uuid = $(e.currentTarget).data("id");
+            if(Settings.get(Settings.DISPLAY_RESULTS)) {
+                getItem(uuid).then(i=>i.sheet._render(true));
+            }
+        });
+        this.recipeElement.find('.ingredients .item-name').on("click",e=>{
+            const uuid = $(e.currentTarget).data("id");
+            if(Settings.get(Settings.DISPLAY_INGREDIENTS)) {
+                getItem(uuid).then(i=>i.sheet._render(true));
+            }
+        });
     }
+
 
 
     async _onDrop(e) {

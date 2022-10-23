@@ -35,7 +35,15 @@
     "settings": {
       "createItemTitle": {
         "name": "Title of Item Creation Dialog",
-        "hint": "This Title is needed to detect the Item Creation Dialog to add 'Recipe' and 'AnyOf' Subtype"
+        "hint": "This Title is needed to detect the Item Creation Dialog to add 'Recipe' and 'AnyOf' Subtype."
+      },
+      "displayResults": {
+        "name": "Display result sheet",
+        "hint": "Show ItemSheet when clicking on result items of a recipe."
+      },
+      "displayIngredients": {
+        "name": "Display ingredient sheet",
+        "hint": "Show ItemSheet when clicking on ingredient items of a recipe."
       }
     }
   }
