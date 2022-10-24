@@ -20,6 +20,23 @@
     <div class="flexrow">
         <div class="left">
             <div class="currencies items-list">
+                {{#if displayTool}}
+                    {{#if recipe.tool}}
+                        <div class="flexrow item">
+                            <div class="item-name flexrow" style="flex:1" title="{{result.tool.component.name}}">
+                                <div class="item-image"
+                                     style="background-image: url('{{result.tool.component.img}}')"></div>
+                            </div>
+                            <div class="action" style="flex:0 0 20px;">
+                                {{#if result.tool.isAvailable }}
+                                    <i class="fas fa-check"></i>
+                                {{else}}
+                                    <i class="fas fa-times"></i>
+                                {{/if}}
+                            </div>
+                        </div>
+                    {{/if}}
+                {{/if}}
                 {{#if recipe.currency}}
                     <div class="flexrow item">
                         <div class="item-name flexrow" style="flex:1">

@@ -4,6 +4,7 @@ import {getCurrencies, getSkills} from "../systems/dnd5e.js"
 import {RecipeCompendium} from "./RecipeCompendium.js";
 import {getDataFrom, getItem} from "../helpers/Utility.js";
 import {isAnyOf} from "./AnyOfSheet.js";
+import {getToolConfig} from "./ToolConfig.js";
 
 const recipeSheets: { [key: string]: RecipeSheet } = {};
 
@@ -67,7 +68,16 @@ export class RecipeSheet {
 
     async render(){
         let template = await renderTemplate('modules/beavers-crafting/templates/recipe-sheet.hbs',
-            {recipe: this.recipe,currencies: getCurrencies(),skills: getSkills(),editable:this.editable,displayResults:Settings.get(Settings.DISPLAY_RESULTS),displayIngredients:Settings.get(Settings.DISPLAY_RESULTS)});
+            {
+                recipe: this.recipe,
+                currencies: getCurrencies(),
+                skills: getSkills(),
+                editable:this.editable,
+                displayResults:Settings.get(Settings.DISPLAY_RESULTS),
+                displayIngredients:Settings.get(Settings.DISPLAY_RESULTS),
+                tools: await getToolConfig(),
+                displayTool: Settings.get(Settings.USE_TOOL)
+            });
         this.recipeElement.find('.recipe').remove();
         this.recipeElement.append(template);
         this.handleEvents();
@@ -88,6 +98,14 @@ export class RecipeSheet {
         });
         this.recipeElement.find('.skills .item-add').click(e=>{
             this.recipe.addSkill();
+            this.update();
+        });
+        this.recipeElement.find('.tools .item-add').click(e=>{
+            this.recipe.addTool()
+                .then(()=>this.update());
+        });
+        this.recipeElement.find('.tools .item-delete').click(e=>{
+            this.recipe.removeTool();
             this.update();
         });
         this.recipeElement.find('.currencies .item-delete').click(e=>{

@@ -1,8 +1,9 @@
 import {Settings} from "./Settings.js";
 import {DefaultCurrency} from "./Exchange.js";
-import {sanitizeUuid} from "./helpers/Utility.js";
+import {getItem, sanitizeUuid} from "./helpers/Utility.js";
+import {getToolConfig} from "./apps/ToolConfig.js";
 
-export class Recipe implements RecipeStoreData{
+export class Recipe {
     id:string;
     name:string;
     img:string;
@@ -10,6 +11,7 @@ export class Recipe implements RecipeStoreData{
     results:Map<string,Component>;
     skill?:Skill;
     currency?:Currency;
+    tool?:string;
     _trash:Trash;
 
     static fromItem(item):Recipe{
@@ -27,6 +29,7 @@ export class Recipe implements RecipeStoreData{
         this.results = data.results || {}
         this.skill = data.skill;
         this.currency = data.currency;
+        this.tool = data.tool;
         this._trash = {
             ingredients:{},
             results:{},
@@ -38,7 +41,11 @@ export class Recipe implements RecipeStoreData{
             ingredients: this.serializeIngredients(),
             skill: this.skill,
             results: this.serializeResults(),
-            currency: this.currency
+            currency: this.currency,
+            tool: this.tool,
+        }
+        if(!this.tool){
+            serialized["-=tool"] = null;
         }
         if(!this.skill){
             serialized["-=skill"] = null;
@@ -92,6 +99,14 @@ export class Recipe implements RecipeStoreData{
     removeCurrency(){
         delete this.currency;
     }
+    async addTool(){
+        const config = await getToolConfig()
+        this.tool = config[0].uuid;
+    }
+    removeTool(){
+        delete this.tool;
+    }
+
 }
 interface Trash {
     ingredients:{};
@@ -137,4 +152,5 @@ interface RecipeStoreData {
     results:Map<string,Component>;
     skill?:Skill;
     currency?:Currency;
+    tool?:string;
 }

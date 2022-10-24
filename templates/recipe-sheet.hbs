@@ -1,5 +1,49 @@
 <div class="sheet flexrow recipe">
     <div class="left">
+        {{#if displayTool}}
+            <div class="tools">
+                <div class="flexrow header">
+                    <div class="name">{{localize "beaversCrafting.recipe.tools"}}</div>
+                    {{#if editable}}
+                        <div class="action">
+                            {{#unless recipe.tool}}
+                                <a class="item-control item-add">
+                                    <i class="fas fa-plus"></i>
+                                </a>
+                            {{/unless}}
+                        </div>
+                    {{/if}}
+                </div>
+                {{#if recipe.tool}}
+                    <div class="flexrow item">
+                        <select name="flags.beavers-crafting.recipe.tool"
+                                {{#unless editable}}disabled{{/unless}} class="tool-selection">
+                            {{#select recipe.tool}}
+                                {{#each tools}}
+                                    <option value="{{this.uuid}}"/> {{this.name}}</option>
+                                {{/each}}
+                            {{/select}}
+                        </select>
+                        {{#if result}}
+                            <div class="action result flexrow">
+                                {{#if result.tool.isAvailable }}
+                                    <i class="fas fa-check"></i>
+                                {{else}}
+                                    <i class="fas fa-times"></i>
+                                {{/if}}
+                            </div>
+                        {{/if}}
+                        {{#if editable}}
+                            <div class="action">
+                                <a class="item-control item-delete">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        {{/if}}
+                    </div>
+                {{/if}}
+            </div>
+        {{/if}}
         <div class="currencies">
             <div class="flexrow header">
                 <div class="name">{{localize "beaversCrafting.recipe.currency"}}</div>
@@ -49,7 +93,8 @@
             </div>
             {{#each recipe.ingredients}}
                 <div class="flexrow item">
-                    <div class="item-name flexrow {{#if ../displayIngredients}}clickable{{/if}}" data-id="{{this.uuid}}">
+                    <div class="item-name flexrow {{#if ../displayIngredients}}clickable{{/if}}"
+                         data-id="{{this.uuid}}">
                         <div class="item-image" style="background-image: url('{{this.img}}')"></div>
                         <h4>{{this.name}}</h4>
                     </div>

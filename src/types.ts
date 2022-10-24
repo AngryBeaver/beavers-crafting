@@ -17,6 +17,7 @@ interface Result {
         total: number,
         difference: number,
     };
+    tool?:IngredientResult
     hasErrors:boolean;
     hasException:boolean;
     isAvailable:boolean;

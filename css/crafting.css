@@ -49,6 +49,10 @@
     cursor: pointer;
 }
 
+.beavers-crafting .recipe .action.result {
+    padding:5px;
+}
+
 .beavers-crafting .drop-area {
     /* Center the content */
     align-items: center;

@@ -3,6 +3,7 @@ import {FilterType, RecipeCompendium} from "./RecipeCompendium.js";
 import {Crafting} from "../Crafting.js";
 import {getDataFrom, getItem} from "../helpers/Utility.js";
 import {Settings} from "../Settings.js";
+import {getToolConfig} from "./ToolConfig.js";
 
 export class CraftingApp extends Application {
     data: {
@@ -63,6 +64,8 @@ export class CraftingApp extends Application {
             return null;
         }
         data.result = RecipeCompendium.validateRecipeToItemList(Object.values(data.recipe.ingredients), this.data.actor.items);
+        const crafting = await Crafting.from(this.data.actor.id, this.data.recipe.id);
+        data.result = await crafting.checkTool(data.result);
         data.content = await renderTemplate('modules/beavers-crafting/templates/recipe-sheet.hbs',
             {
                 recipe: data.recipe,
@@ -71,7 +74,9 @@ export class CraftingApp extends Application {
                 editable: false,
                 result: data.result,
                 displayResults:Settings.get(Settings.DISPLAY_RESULTS),
-                displayIngredients:Settings.get(Settings.DISPLAY_RESULTS)
+                displayIngredients:Settings.get(Settings.DISPLAY_RESULTS),
+                tools: await getToolConfig(),
+                displayTool: Settings.get(Settings.USE_TOOL)
             });
         return data;
     }

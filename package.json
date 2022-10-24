@@ -1,7 +1,7 @@
 {
 	"name": "beavers-crafting",
 	"title": "Beaver's Crafting",
-	"version": "0.4.1",
+	"version": "0.5.0",
 	"description": "Crafting",
 	"devDir": "C:\\Users\\User\\AppData\\Local\\FoundryVTT\\Data\\modules",
 	"main": "src/main.js",

@@ -1,5 +1,5 @@
 //the firstdraft implementation will be kept simple stupid and not performant at all.
-import {Recipe} from "../Recipe.js";
+import {DefaultComponent, Recipe} from "../Recipe.js";
 import {Settings} from "../Settings.js";
 import {AnyOf} from "./AnyOfSheet.js";
 import {getItem, sanitizeUuid} from "../helpers/Utility.js";
@@ -55,6 +55,7 @@ export class RecipeCompendium {
                 if (await this.isAnyAnyOfInList(listOfAnyOfIngredients, actor.items)) {                                       //isAvailable or usable ! when any item matches anyOf has the given quantity
                     const listOfIngredientsWithoutAnyOf = Object.values(recipe.ingredients).filter(component => component.type !== Settings.ANYOF_SUBTYPE);
                     const result = RecipeCompendium.validateRecipeToItemList(listOfIngredientsWithoutAnyOf, actor.items);
+                    await RecipeCompendium.validateTool(recipe,actor.items,result);
                     if ((filter == FilterType.usable && !result.hasErrors)
                         || (filter == FilterType.available && result.isAvailable)) {
                         returnList.push(recipe);
@@ -78,6 +79,24 @@ export class RecipeCompendium {
             }
         }
         return true;
+    }
+
+    static async validateTool(recipe,listOfItems,result ?: Result): Promise<Result>{
+        if (!result) result = new DefaultResult();
+        if( recipe.tool && Settings.get(Settings.USE_TOOL)) {
+            const item = await getItem(recipe.tool);
+            const component = new DefaultComponent(item, item.uuid, "Item");
+            result.tool = {
+                component: component,
+                isAvailable: false,
+                difference: 0,
+            };
+            result.tool.isAvailable = listOfItems.filter((i) => RecipeCompendium.isSame(i, component)).length > 0;
+            if(!result.tool.isAvailable){
+                result.hasErrors = true;
+            }
+        }
+        return result;
     }
 
     static validateRecipeToItemList(listOfIngredients: Component[], listOfItems, result ?: Result): Result {

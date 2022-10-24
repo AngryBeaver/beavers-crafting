@@ -14,11 +14,11 @@ Default is "Create New Item" obviously you need to adapt if you have a different
 ### Configure subtype Recipe
 ![img.png](pictures/configure.png)
 
+#### tool: (0.5.x)
+you may add a tool the crafting process requires.
 #### cost: 
 you may add costs to the crafting process
 #### Ingredients:
-
-
 You may add Items via drag and drop as Ingredients.
 #### skill: 
 you may add a skill that is required in the crafting process.
@@ -67,9 +67,16 @@ You do not need to import those just drag and drop them into your recipes or use
 
 You need to import them and then grant permission to the users you want to have access to it.
 The recipecompendium will only show the recipes the user has access to.
+### Settings
+![img.png](pictures/toolconfig.png)
 
+- You can enable or disable tools for recipes feature 0.5.x default it is disabled.
+- You can configure the tool list your recipes can select from. 
+(however if you do you might risk incompatibility to others, if the list is missing some default dnd5e tools tell me so)
 
 ## latest features:
+### 0.5.x feature tool
+you now can use tools, if you do not have the tool you dont get a check you simple fail and your ingredients won't vanish.
 ### 0.4.x feature compendiums,
 you now can use items directly from compendium,
 module comes with 4 compendiums ingredients,rolltables,potions and recipes

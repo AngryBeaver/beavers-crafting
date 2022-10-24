@@ -28,7 +28,8 @@ export class Crafting {
     }
 
     async craft(): Promise<Result> {
-        const result = await this.checkSkill();
+        const result =  await this.checkTool();
+        await this.checkSkill(result);
         await this.evaluateAnyOf();
         RecipeCompendium.validateRecipeToItemList(Object.values(this.recipe.ingredients), this.actor.items, result);
         this.checkCurrency(result);
@@ -53,6 +54,12 @@ export class Crafting {
             }
         }
         return result;
+    }
+
+    async checkTool(result?: Result): Promise<Result> {
+        if(!result) result = new DefaultResult();
+        if (result.hasErrors) return result;
+        return await RecipeCompendium.validateTool(this.recipe,this.actor.items,result);
     }
 
     async evaluateAnyOf(){
@@ -137,7 +144,12 @@ export class Crafting {
 
     async _sendToChat(result: Result) {
         let content = await renderTemplate(`modules/${Settings.NAMESPACE}/templates/crafting-chat.hbs`,
-            {recipe: this.recipe, result: result, roll: this.roll})
+            {
+                recipe: this.recipe,
+                result: result,
+                roll: this.roll,
+                displayTool: Settings.get(Settings.USE_TOOL)
+            })
         content = TextEditor.enrichHTML(content);
         await ChatMessage.create({
             content: content,
