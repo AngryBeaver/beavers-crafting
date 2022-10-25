@@ -29,7 +29,7 @@ The result is the outcome of a successfull crafting process.
 If you add a RollTable you will get quantity amount of rolls on that table not one roll quantity of times.
 
 #### Usage
-- When you create recipes be carfully from where you pull your results/ingredients items. The recipes does not store an item but a reference to the item.
+- When you create recipes be carfully from where you pull your results/ingredients items. The recipes do not store an item but a reference to the item.
 - Do not pull items from actor !
 - You might pull items form your imported world items, if you do your recipe will work perfectly within your world. You can manipulate your items afterward the recipe always refers to the actual item.
 - You can pull items from compendium (preferred). This way your recipe can be exported/imported to other worlds as long as those worlds have the same compendiums.
