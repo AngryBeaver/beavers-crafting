@@ -77,7 +77,7 @@ The recipecompendium will only show the recipes the user has access to.
 ### AnyOf
 AnyOf is an Item that is intended to be used as ingredient to create recipes that do not need a specific ingredient but any ingredient of... e.g. specific type.
 
-There for AnyOf Item has an input field to write a macro code that gets executed when a recipe is checked for its ingredients.
+Therefor AnyOf Item has an input field to write a macro code that gets executed when a recipe is checked for its ingredients.
 The macro has "item" as input and should return boolean as output. The macro will test if the given item hits the conditions of the AnyOf Ingredient.
 
 You can test your AnyOf Conditions by dropping an item in the dropArea and hit the "test item" button.
