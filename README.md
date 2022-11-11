@@ -84,9 +84,9 @@ You can test your AnyOf Conditions by dropping an item in the dropArea and hit t
 
 To understand the intension of this feature you can have a look at the provided examples:
 
-In the compendium "ingredients" you find an "Any Mushroom" example:
+- In the compendium "ingredients" you find an "Any Mushroom" example:
 ````return item.system.source === "Ingredients.Mushroom"````
-In the compendium "recipes" you find a "Random Potion" example that uses Any 5 Mushrooms to produce a random potion.
+- In the compendium "recipes" you find a "Random Potion" example that uses Any 5 Mushrooms to produce a random potion.
 
 
 ### Settings
