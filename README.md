@@ -73,6 +73,22 @@ You do not need to import those just drag and drop them into your recipes or use
 
 You need to import them and then grant permission to the users you want to have access to it.
 The recipecompendium will only show the recipes the user has access to.
+
+### AnyOf
+AnyOf is an Item that is intended to be used as ingredient to create recipes that do not need a specific ingredient but any ingredient of... e.g. specific type.
+
+There for AnyOf Item has an input field to write a macro code that gets executed when a recipe is checked for its ingredients.
+The macro has "item" as input and should return boolean as output. The macro will test if the given item hits the conditions of the AnyOf Ingredient.
+
+You can test your AnyOf Conditions by dropping an item in the dropArea and hit the "test item" button.
+
+To understand the intension of this feature you can have a look at the provided examples:
+
+In the compendium "ingredients" you find an "Any Mushroom" example:
+````return item.system.source === "Ingredients.Mushroom"````
+In the compendium "recipes" you find a "Random Potion" example that uses Any 5 Mushrooms to produce a random potion.
+
+
 ### Settings
 ![img.png](pictures/toolconfig.png)
 
