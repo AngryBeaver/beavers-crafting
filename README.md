@@ -88,6 +88,16 @@ To understand the intension of this feature you can have a look at the provided 
 ````return item.system.source === "Ingredients.Mushroom"````
 - In the compendium "recipes" you find a "Random Potion" example that uses Any 5 Mushrooms to produce a random potion.
 
+When you use a recipe with AnyOf you can customize it and by doing so define what specific ingredients you want to use for this recipe.
+
+![img.png](pictures/anyOfDrop1.png)
+![img.png](pictures/anyOfDrop2.png)
+
+- drag and drop an ingredient (e.g. from your inventar) to "anyOf" ingredient within your recipeCompendium.
+- it will automatically check if that new ingredient is available in that quantity.
+- it will stack same (identity) ingredients.
+- when you reselect the recipe it will remove your customization and start over with anyOf Items again.
+- none customized AnyOf ingredients will consume a random fitting ingredient of your inventory.
 
 ### Settings
 ![img.png](pictures/toolconfig.png)
@@ -97,6 +107,9 @@ To understand the intension of this feature you can have a look at the provided 
 (however if you do you might risk incompatibility to others, if the list is missing some default dnd5e tools tell me so)
 
 ## latest features:
+have a look at the changelog.md
+### 0.6.x customized AnyOf
+you now can customize recipes with anyOf Ingredients.
 ### 0.5.x feature tool
 you now can use tools, if you do not have the tool you dont get a check you simple fail and your ingredients won't vanish.
 ### 0.4.x feature compendiums,
@@ -111,10 +124,12 @@ breaking change 0.1.x -> 0.2.x
 
 
 ## Upcoming Changes
-### "any" of ingredient (initial 0.3.x)
+### "any" of ingredient (initial 0.3.x, cusomized 0.6.x)
 I want to create recipes with "any" xxx e.g. (weapon,mushroom,etc) therefor i may need some new fields in recipe or a new subtype ingredient
 - 0.3.0
 currently it will only take randomly from avaiable items on actor in required quantity.
+- 0.6.0 customized "anyOf"
+- 
 the precast is wrong it always shows that AnyOf is not available.
 
 ### results should include rollTables (done 0.2.x)

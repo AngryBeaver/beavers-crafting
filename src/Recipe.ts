@@ -1,6 +1,6 @@
 import {Settings} from "./Settings.js";
 import {DefaultCurrency} from "./Exchange.js";
-import {getItem, sanitizeUuid} from "./helpers/Utility.js";
+import {sanitizeUuid} from "./helpers/Utility.js";
 import {getToolConfig} from "./apps/ToolConfig.js";
 
 export class Recipe {
@@ -20,6 +20,10 @@ export class Recipe {
         return new Recipe(item.id,item.name,item.img,data);
     }
 
+    static fromRecipe(recipe: Recipe):Recipe{
+        const data = recipe.serialize();
+        return new Recipe(recipe.id,recipe.name,recipe.img,data);
+    }
 
     constructor(id,name,img,data:RecipeStoreData){
         this.id = id;

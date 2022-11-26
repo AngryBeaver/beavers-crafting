@@ -94,7 +94,7 @@
             {{#each recipe.ingredients}}
                 <div class="flexrow item">
                     <div class="item-name flexrow {{#if ../displayIngredients}}clickable{{/if}}"
-                         data-id="{{this.uuid}}">
+                         data-id="{{this.uuid}}" data-key="{{@key}}">
                         <div class="item-image" style="background-image: url('{{this.img}}')"></div>
                         <h4>{{this.name}}</h4>
                     </div>

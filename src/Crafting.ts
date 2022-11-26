@@ -11,20 +11,23 @@ export class Crafting {
     item;
     roll;
 
-    constructor(actor, item) {
-        this.recipe = Recipe.fromItem(item)
+    constructor(actor, recipe: Recipe) {
+        this.recipe = recipe;
         this.actor = actor;
-        this.item = item;
+    }
+
+    static async fromRecipe(actorId,recipe: Recipe){
+        const actor = await fromUuid("Actor." + actorId);
+        return new Crafting(actor,  recipe);
     }
 
     static fromOwned(item): Crafting {
-        return new Crafting(item.parent, item);
+        return new Crafting(item.parent,  Recipe.fromItem(item));
     }
 
     static async from(actorId, itemId): Promise<Crafting> {
-        const actor = await fromUuid("Actor." + actorId)
         const item = await fromUuid("Item." + itemId);
-        return new Crafting(actor, item);
+        return Crafting.fromRecipe(actorId, Recipe.fromItem(item));
     }
 
     async craft(): Promise<Result> {

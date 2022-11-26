@@ -1,9 +1,11 @@
 import {getCurrencies, getSkills} from "../systems/dnd5e.js";
 import {FilterType, RecipeCompendium} from "./RecipeCompendium.js";
 import {Crafting} from "../Crafting.js";
-import {getDataFrom, getItem} from "../helpers/Utility.js";
+import {getDataFrom, getItem, sanitizeUuid} from "../helpers/Utility.js";
 import {Settings} from "../Settings.js";
 import {getToolConfig} from "./ToolConfig.js";
+import {AnyOf, isAnyOf} from "./AnyOfSheet.js";
+import {DefaultComponent, Recipe} from "../Recipe.js";
 
 export class CraftingApp extends Application {
     data: {
@@ -53,32 +55,35 @@ export class CraftingApp extends Application {
             recipes = await RecipeCompendium.filterForItems(recipes,Object.values(data.filterItems));
         }
         data.recipes = recipes;
-        await this.renderRecipeSheet(data);
+        data.recipe = data.recipes[data.index];
+        data.content = null;
         return data;
     }
 
-    async renderRecipeSheet(data) {
-        data.recipe = data.recipes[data.index];
-        if (!data.recipe) {
-            data.content = null;
-            return null;
+    async renderRecipeSheet() {
+        if (!this.data.recipe || this._element === null) {
+            return;
         }
-        data.result = RecipeCompendium.validateRecipeToItemList(Object.values(data.recipe.ingredients), this.data.actor.items);
+        this.data.result = RecipeCompendium.validateRecipeToItemList(Object.values(this.data.recipe.ingredients), this.data.actor.items);
+        console.log(this.data.result);
+        console.log(this.data.recipe);
         const crafting = await Crafting.from(this.data.actor.id, this.data.recipe.id);
-        data.result = await crafting.checkTool(data.result);
-        data.content = await renderTemplate('modules/beavers-crafting/templates/recipe-sheet.hbs',
+        this.data.result = await crafting.checkTool(this.data.result);
+        this.data.content = await renderTemplate('modules/beavers-crafting/templates/recipe-sheet.hbs',
             {
-                recipe: data.recipe,
+                recipe: this.data.recipe,
                 currencies: getCurrencies(),
                 skills: getSkills(),
                 editable: false,
-                result: data.result,
+                result: this.data.result,
                 displayResults:Settings.get(Settings.DISPLAY_RESULTS),
                 displayIngredients:Settings.get(Settings.DISPLAY_RESULTS),
                 tools: await getToolConfig(),
                 displayTool: Settings.get(Settings.USE_TOOL)
             });
-        return data;
+        this._element.find(".sheet-body").empty();
+        this._element.find(".sheet-body").append(this.data.content);
+        this.activateRecipeSheetListener(this._element);
     }
 
     activateListeners(html) {
@@ -89,20 +94,8 @@ export class CraftingApp extends Application {
             this.data.content = null;
             this.render();
         });
-
-        html.find(".sidebar a.item").on("click", (e) => {
-            const index = $(e.currentTarget).data().id;
-            this.data.index = index;
-            this.renderRecipeSheet(this.data).then(data => {
-                html.find(".sheet-body").empty();
-                html.find(".sheet-body").append(data.content);
-                html.find(".crafting-app a.item.selected").removeClass("selected");
-                html.find(".crafting-app a.item[data-id =" + index + "]").addClass("selected");
-            });
-        });
-
         html.find(".dialog-button").on("click", (e) => {
-            Crafting.from(this.data.actor.id, this.data.recipe.id)
+            Crafting.fromRecipe(this.data.actor.id, this.data.recipe)
                 .then(crafting => {
                     return crafting.craft();
                 }).then(result => {
@@ -116,6 +109,18 @@ export class CraftingApp extends Application {
             delete this.data.filterItems[uuid];
             this.render();
         });
+        html.find(".sidebar a.item").on("click", (e) => {
+            const index = $(e.currentTarget).data().id;
+            this.data.index = index;
+            this.data.recipe = this.data.recipes[index];
+            html.find(".sidebar a.item.selected").removeClass("selected");
+            html.find(".sidebar a.item[data-id =" + index + "]").addClass("selected");
+            void this.renderRecipeSheet();
+        });
+        void this.renderRecipeSheet();
+    }
+
+    activateRecipeSheetListener(html) {
         html.find('.results .item-name').on("click",e=>{
             const uuid = $(e.currentTarget).data("id");
             if(Settings.get(Settings.DISPLAY_RESULTS)) {
@@ -128,13 +133,12 @@ export class CraftingApp extends Application {
                 getItem(uuid).then(i=>i.sheet._render(true));
             }
         });
-
         this.addDragDrop(html);
     }
 
     addDragDrop(html) {
         const dropFilter = new DragDrop({
-            dropSelector: '.drop-area',
+            dropSelector: '.drop-area, .ingredients .item-name',
             permissions: {
                 dragstart: this._canDragStart.bind(this),
                 drop: this._canDragDrop.bind(this)
@@ -145,6 +149,9 @@ export class CraftingApp extends Application {
                 drop: this._onDrop.bind(this)
             }
         });
+        if(this._dragDrop.length > 1){
+            this._dragDrop.pop();
+        }
         this._dragDrop.push(dropFilter);
         dropFilter.bind(html[0]);
     }
@@ -153,6 +160,52 @@ export class CraftingApp extends Application {
         const isFilterDrop = $(e.target).hasClass("drop-area");
         if(isFilterDrop){
             return this._onDropFilter(e);
+        }
+        const isIngredient = $(e.target).parent("item");
+        if(isIngredient){
+            const uuid = $(e.currentTarget).data("id");
+            const key = $(e.currentTarget).data("key");
+            getItem(uuid).then(
+                item => {
+                    if(isAnyOf(item)){
+                       return this._onDropAnyOf(new AnyOf(item),key,e);
+                    }
+                    return;
+                }
+            )
+        }
+
+    }
+
+    async _onDropAnyOf(anyOf:AnyOf, key:string, e:DragEvent) {
+        const data = getDataFrom(e);
+        if(data) {
+            if (data.type !== "Item") return;
+            const entity = await fromUuid(data.uuid);
+            let result = await anyOf.executeMacro(entity);
+            if(result.value) {
+                const previousComponent = this.data.recipe.ingredients[key];
+                const component = new DefaultComponent(entity, data.uuid, data.type);
+                const nextKey = sanitizeUuid(data.uuid);
+                component.quantity = previousComponent.quantity;
+                this.data.recipe = Recipe.fromRecipe(this.data.recipe);
+                //remove existing ingredient with same id and add quantity;
+                if(this.data.recipe.ingredients[nextKey]){
+                    component.quantity = component.quantity + this.data.recipe.ingredients[nextKey].quantity;
+                    delete this.data.recipe.ingredients[nextKey];
+                }
+                //copyInPlace;
+                const ingredients = Object.fromEntries(
+                    Object.entries(this.data.recipe.ingredients).map(([o_key, o_val]) => {
+                        if (o_key === key) return [nextKey, component];
+                        return [o_key, o_val];
+                    })
+                );
+                this.data.recipe.ingredients = ingredients;
+                console.log(this.data.recipe.ingredients);
+                void this.renderRecipeSheet();
+            }
+
         }
     }
 
