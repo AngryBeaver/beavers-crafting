@@ -51,7 +51,7 @@
         "hint": "A Recipe can require to have a tool present on actor."
       },
       "toolButton": {
-        "name": "Configrue tools available",
+        "name": "Configure tools available",
         "hint": "Configure list of tools that are available in tool dropdown when creating recipes",
         "label": "configure"
       }
