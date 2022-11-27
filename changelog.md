@@ -1,5 +1,14 @@
 # Changelog
-## 0.6.0
+## 0.7.x Upcomming
+### TODO
+### feature add abilities as skillCheck
+
+![img.png](pictures/abilities.png)
+
+### bug: "consume costs on failed check with insufficient requirements" fixed
+### bug: "roll skill with insufficient requirements" fixed
+
+## 0.6.x
 ### feature customized AnyOf ingredient
 You now are able to customize recipes that uses anyOf Ingredients,
 and by doing so define what specific ingredients you want to use for this recipe.

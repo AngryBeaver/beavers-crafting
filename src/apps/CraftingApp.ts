@@ -1,4 +1,4 @@
-import {getCurrencies, getSkills} from "../systems/dnd5e.js";
+import {getAbilities, getCurrencies, getSkills} from "../systems/dnd5e.js";
 import {FilterType, RecipeCompendium} from "./RecipeCompendium.js";
 import {Crafting} from "../Crafting.js";
 import {getDataFrom, getItem, sanitizeUuid} from "../helpers/Utility.js";
@@ -74,6 +74,7 @@ export class CraftingApp extends Application {
                 recipe: this.data.recipe,
                 currencies: getCurrencies(),
                 skills: getSkills(),
+                abilities: getAbilities(),
                 editable: false,
                 result: this.data.result,
                 displayResults:Settings.get(Settings.DISPLAY_RESULTS),

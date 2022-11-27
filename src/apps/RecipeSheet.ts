@@ -1,6 +1,6 @@
 import {Recipe} from "../Recipe.js";
 import {Settings} from "../Settings.js";
-import {getCurrencies, getSkills} from "../systems/dnd5e.js"
+import {getAbilities, getCurrencies, getSkills} from "../systems/dnd5e.js"
 import {RecipeCompendium} from "./RecipeCompendium.js";
 import {getDataFrom, getItem} from "../helpers/Utility.js";
 import {isAnyOf} from "./AnyOfSheet.js";
@@ -72,6 +72,7 @@ export class RecipeSheet {
                 recipe: this.recipe,
                 currencies: getCurrencies(),
                 skills: getSkills(),
+                abilities: getAbilities(),
                 editable:this.editable,
                 displayResults:Settings.get(Settings.DISPLAY_RESULTS),
                 displayIngredients:Settings.get(Settings.DISPLAY_RESULTS),

@@ -46,7 +46,12 @@ export class Crafting {
         if (!result) result = new DefaultResult();
         if (result.hasErrors) return result;
         if (this.recipe.skill) {
-            this.roll = await this.actor.rollSkill(this.recipe.skill.name, {"chatMessage": false});
+            const skillParts = this.recipe.skill.name.split("-")
+            if(skillParts[0] === 'ability'){
+                this.roll = await this.actor.rollAbilityTest(skillParts[1], {"chatMessage": false});
+            }else{
+                this.roll = await this.actor.rollSkill(this.recipe.skill.name, {"chatMessage": false});
+            }
             result.skill = {
                 name: this.recipe.skill.name,
                 difference: this.roll.total - this.recipe.skill.dc,
