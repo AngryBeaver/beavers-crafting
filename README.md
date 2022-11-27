@@ -113,7 +113,7 @@ When you use a recipe with AnyOf you can customize it and by doing so define wha
 ## latest features:
 have a look at the changelog.md
 ### 0.7.x optional attendants
-you now can customize recipes with anyOf Ingredients.
+you recipe can now depend on attendants that are required in the craft process but are not consumed. like class, race, background, tools etc...
 ### 0.6.x customized AnyOf
 you now can customize recipes with anyOf Ingredients.
 ### 0.5.x optional tool
