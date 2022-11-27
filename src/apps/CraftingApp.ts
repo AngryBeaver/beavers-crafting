@@ -65,8 +65,6 @@ export class CraftingApp extends Application {
             return;
         }
         this.data.result = RecipeCompendium.validateRecipeToItemList(Object.values(this.data.recipe.ingredients), this.data.actor.items);
-        console.log(this.data.result);
-        console.log(this.data.recipe);
         const crafting = await Crafting.from(this.data.actor.id, this.data.recipe.id);
         this.data.result = await crafting.checkTool(this.data.result);
         this.data.content = await renderTemplate('modules/beavers-crafting/templates/recipe-sheet.hbs',
@@ -203,7 +201,6 @@ export class CraftingApp extends Application {
                     })
                 );
                 this.data.recipe.ingredients = ingredients;
-                console.log(this.data.recipe.ingredients);
                 void this.renderRecipeSheet();
             }
 

@@ -23,7 +23,6 @@ Hooks.on("getActorSheetHeaderButtons", (app, buttons) => {
 
 //Recipe remap use action
 Hooks.on(`dnd5e.preUseItem`, (item, config, options) => {
-    console.log(item);
     if(item.flags[Settings.NAMESPACE]?.recipe){
         Crafting.fromOwned(item).craft();
         return false;
