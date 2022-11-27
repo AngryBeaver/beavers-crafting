@@ -12,11 +12,12 @@ export class Recipe {
     skill?:Skill;
     currency?:Currency;
     tool?:string;
+    attendants:Map<string,Component>;
     _trash:Trash;
 
     static fromItem(item):Recipe{
         const flags = item.flags[Settings.NAMESPACE]?.recipe;
-        const data = mergeObject({ingredients:{},results:{}}, flags || {}, {inplace: false});
+        const data = mergeObject({attendants:{},ingredients:{},results:{}}, flags || {}, {inplace: false});
         return new Recipe(item.id,item.name,item.img,data);
     }
 
@@ -34,9 +35,11 @@ export class Recipe {
         this.skill = data.skill;
         this.currency = data.currency;
         this.tool = data.tool;
+        this.attendants = data.attendants || {}
         this._trash = {
             ingredients:{},
             results:{},
+            attendants:{}
         };
     }
 
@@ -47,6 +50,7 @@ export class Recipe {
             results: this.serializeResults(),
             currency: this.currency,
             tool: this.tool,
+            attendants: this.serializeAttendants()
         }
         if(!this.tool){
             serialized["-=tool"] = null;
@@ -60,11 +64,27 @@ export class Recipe {
         return serialized;
     }
 
+    serializeAttendants(){
+        return {...this.attendants,...this._trash.attendants}
+    }
     serializeIngredients(){
         return {...this.ingredients,...this._trash.ingredients}
     }
     serializeResults(){
         return {...this.results,...this._trash.results}
+    }
+
+    addAttendant(entity,uuid,type) {
+        const uuidS = sanitizeUuid(uuid);
+        if(!this.attendants[uuidS]){
+            this.attendants[uuidS] = new DefaultComponent(entity,uuid,type);
+        }else{
+            DefaultComponent.inc(this.attendants[uuidS])
+        }
+    }
+    removeAttendant(uuidS){
+        delete this.attendants[uuidS];
+        this._trash.attendants["-="+uuidS] = null;
     }
 
     addIngredient(entity,uuid,type) {
@@ -87,7 +107,7 @@ export class Recipe {
             DefaultComponent.inc(this.results[uuidS])
         }
     }
-    removeResults(uuidS) {
+    removeResult(uuidS) {
         delete this.results[uuidS];
         this._trash.results["-=" + uuidS] = null;
     }
@@ -115,6 +135,7 @@ export class Recipe {
 interface Trash {
     ingredients:{};
     results:{};
+    attendants:{};
 }
 
 export class DefaultComponent implements Component {
@@ -157,4 +178,5 @@ interface RecipeStoreData {
     skill?:Skill;
     currency?:Currency;
     tool?:string;
+    attendants: Map<string,Component>;
 }

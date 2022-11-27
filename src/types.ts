@@ -18,6 +18,9 @@ interface Result {
         difference: number,
     };
     tool?:IngredientResult
+    attendants: {
+        [key: string]: IngredientResult
+    }
     hasErrors:boolean;
     hasException:boolean;
     isAvailable:boolean;

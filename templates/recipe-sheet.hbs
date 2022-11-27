@@ -1,6 +1,6 @@
 <div class="sheet flexrow recipe">
     <div class="left">
-        {{#if displayTool}}
+        {{#if useTool}}
             <div class="tools">
                 <div class="flexrow header">
                     <div class="name">{{localize "beaversCrafting.recipe.tools"}}</div>
@@ -15,7 +15,7 @@
                     {{/if}}
                 </div>
                 {{#if recipe.tool}}
-                    <div class="flexrow item">
+                    <div class="flexrow item" style="background: rgba(0,0,0,0.025)">
                         <select name="flags.beavers-crafting.recipe.tool"
                                 {{#unless editable}}disabled{{/unless}} class="tool-selection">
                             {{#select recipe.tool}}
@@ -44,6 +44,48 @@
                 {{/if}}
             </div>
         {{/if}}
+        {{#if useAttendants}}
+            <div class="attendants items-list">
+                    <div class="flexrow item header">
+                        <div class="name">{{localize "beaversCrafting.recipe.attendants"}}</div>
+                        {{#if editable}}
+                            <div class="action">-</div>
+                        {{/if}}
+                    </div>
+                    {{#each recipe.attendants}}
+                        <div class="flexrow item" style="background: rgba(0,0,0,0.025)">
+                            <div class="item-name flexrow {{#if ../displayIngredients}}clickable{{/if}}"
+                                 data-id="{{this.uuid}}" data-key="{{@key}}">
+                                <div class="item-image" style="background-image: url('{{this.img}}')"></div>
+                                <h4>{{this.name}}</h4>
+                            </div>
+                            <div class="action flexrow">
+                                 {{#if ../result}}
+                                     {{#with (lookup ../result.attendants @key) as |attendant|}}
+                                         {{#if (lt attendant.difference 0) }}
+                                              <i class="fas fa-times"></i>
+                                         {{else}}
+                                              <i class="fas fa-check"></i>
+                                         {{/if}}
+                                     {{/with}}
+                                 {{/if}}
+                            </div>
+                            {{#if ../editable}}
+                                <div class="action">
+                                    <a class="item-control item-delete">
+                                        <i class="fas fa-trash" data-id="{{@key}}"></i>
+                                    </a>
+                                </div>
+                            {{/if}}
+                        </div>
+                    {{/each}}
+                    {{#if editable}}
+                        <div class="flexrow item">
+                            <div class="drop-area">{{localize "beaversCrafting.recipe.dropItem"}}</div>
+                        </div>
+                    {{/if}}
+                </div>
+         {{/if}}
         <div class="currencies">
             <div class="flexrow header">
                 <div class="name">{{localize "beaversCrafting.recipe.currency"}}</div>

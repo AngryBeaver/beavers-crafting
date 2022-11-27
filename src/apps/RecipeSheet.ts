@@ -77,7 +77,8 @@ export class RecipeSheet {
                 displayResults:Settings.get(Settings.DISPLAY_RESULTS),
                 displayIngredients:Settings.get(Settings.DISPLAY_RESULTS),
                 tools: await getToolConfig(),
-                displayTool: Settings.get(Settings.USE_TOOL)
+                useTool: Settings.get(Settings.USE_TOOL),
+                useAttendants: Settings.get(Settings.USE_ATTENDANTS)
             });
         this.recipeElement.find('.recipe').remove();
         this.recipeElement.append(template);
@@ -90,7 +91,11 @@ export class RecipeSheet {
             this.update();
         });
         this.recipeElement.find('.results .item-delete').click(e=>{
-            this.recipe.removeResults(e.target.dataset.id);
+            this.recipe.removeResult(e.target.dataset.id);
+            this.update();
+        });
+        this.recipeElement.find('.attendants .item-delete').click(e=>{
+            this.recipe.removeAttendant(e.target.dataset.id);
             this.update();
         });
         this.recipeElement.find('.skills .item-delete').click(e=>{
@@ -129,14 +134,19 @@ export class RecipeSheet {
                 getItem(uuid).then(i=>i.sheet._render(true));
             }
         });
+        this.recipeElement.find('.attendants .item-name').on("click",e=>{
+            const uuid = $(e.currentTarget).data("id");
+            if(Settings.get(Settings.DISPLAY_INGREDIENTS)) {
+                getItem(uuid).then(i=>i.sheet._render(true));
+            }
+        });
     }
-
-
 
     async _onDrop(e) {
         const isIngredient = $(e.target).parents(".beavers-crafting .recipe .ingredients").length !==0;
         const isResult = $(e.target).parents(".beavers-crafting .recipe .results").length !==0;
-        if(!isIngredient && !isResult){
+        const isAttendant = $(e.target).parents(".beavers-crafting .recipe .attendants").length !==0;
+        if(!isIngredient && !isResult && !isAttendant){
             return;
         }
         const data = getDataFrom(e);
@@ -147,6 +157,9 @@ export class RecipeSheet {
         ) {
             const entity = await fromUuid(data.uuid);
             if (entity) {
+                if(isAnyOf(entity) && !isIngredient){
+                    return;
+                }
                 if (isIngredient) {
                     let type = data.type;
                     let uuid = data.uuid;
@@ -158,6 +171,9 @@ export class RecipeSheet {
                 }
                 if (isResult) {
                     this.recipe.addResult(entity, data.uuid, data.type);
+                }
+                if (isAttendant) {
+                    this.recipe.addAttendant(entity, data.uuid, data.type);
                 }
                 this.update();
             }

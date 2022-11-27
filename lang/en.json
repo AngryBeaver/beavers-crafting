@@ -14,7 +14,8 @@
       "results": "Results",
       "dropItem": "drop item",
       "currency": "Cost",
-      "consumeOnFailedSaveHint": "Consumes Cost on failed Skill check"
+      "consumeOnFailedSaveHint": "Consumes Cost on failed Skill check",
+      "attendants": "Attendants"
     },
     "anyOf": {
       "dropItem": "drop item",
@@ -47,8 +48,12 @@
         "hint": "Show ItemSheet when clicking on ingredient items of a recipe."
       },
       "useTool": {
-        "name": "Recipes use tools",
-        "hint": "A Recipe can require to have a tool present on actor."
+        "name": "Recipes use tools (deprecated)",
+        "hint": "A Recipe can require to have a tool present on actor. Deprecated since 0.7.x in favour of attendants. It will get removed at somePoint in future, you should migrate to attendants."
+      },
+      "useAttendants": {
+        "name": "Recipes use attendants",
+        "hint": "A Recipe can require to have attendance present on actor. You can setUp anything you want feats, class, background, tools etc!"
       },
       "toolButton": {
         "name": "Configure tools available",

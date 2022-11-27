@@ -7,12 +7,21 @@ export class Settings {
     static DISPLAY_RESULTS = "displayResults";
     static DISPLAY_INGREDIENTS = "displayIngredients";
     static USE_TOOL = "useTool";
+    static USE_ATTENDANTS = "useAttendants";
     static TOOL_CONFIG_BUTTON= "toolConfigButton";
     static TOOL_CONFIG = "toolConfig;"
     static RECIPE_SUBTYPE = "Recipe";
     static ANYOF_SUBTYPE = "AnyOf";
 
     static init() {
+        game.settings.register(this.NAMESPACE, this.CREATE_ITEM_TITLE, {
+            name: game.i18n.localize('beaversCrafting.settings.createItemTitle.name'),
+            hint: game.i18n.localize('beaversCrafting.settings.createItemTitle.hint'),
+            scope: "world",
+            config: true,
+            default: "Create New Item",
+            type: String,
+        });
         game.settings.register(this.NAMESPACE, this.USE_TOOL, {
             name: game.i18n.localize('beaversCrafting.settings.useTool.name'),
             hint: game.i18n.localize('beaversCrafting.settings.useTool.hint'),
@@ -21,13 +30,13 @@ export class Settings {
             default: false,
             type: Boolean,
         });
-        game.settings.register(this.NAMESPACE, this.CREATE_ITEM_TITLE, {
-            name: game.i18n.localize('beaversCrafting.settings.createItemTitle.name'),
-            hint: game.i18n.localize('beaversCrafting.settings.createItemTitle.hint'),
+        game.settings.register(this.NAMESPACE, this.USE_ATTENDANTS, {
+            name: game.i18n.localize('beaversCrafting.settings.useAttendants.name'),
+            hint: game.i18n.localize('beaversCrafting.settings.useAttendants.hint'),
             scope: "world",
             config: true,
-            default: "Create New Item",
-            type: String,
+            default: false,
+            type: Boolean,
         });
         game.settings.register(this.NAMESPACE, this.DISPLAY_RESULTS, {
             name: game.i18n.localize('beaversCrafting.settings.displayResults.name'),

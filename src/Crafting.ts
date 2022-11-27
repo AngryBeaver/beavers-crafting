@@ -32,6 +32,7 @@ export class Crafting {
 
     async craft(): Promise<Result> {
         const result =  await this.checkTool();
+        await this.checkAttendants(result);
         await this.evaluateAnyOf();
         RecipeCompendium.validateRecipeToItemList(Object.values(this.recipe.ingredients), this.actor.items, result);
         this.checkCurrency(result);
@@ -66,8 +67,12 @@ export class Crafting {
 
     async checkTool(result?: Result): Promise<Result> {
         if(!result) result = new DefaultResult();
-        if (result.hasErrors) return result;
         return await RecipeCompendium.validateTool(this.recipe,this.actor.items,result);
+    }
+
+    async checkAttendants(result?: Result): Promise<Result> {
+        if(!result) result = new DefaultResult();
+        return await RecipeCompendium.validateAttendants(this.recipe,this.actor.items,result);
     }
 
     async evaluateAnyOf(){
@@ -156,7 +161,8 @@ export class Crafting {
                 recipe: this.recipe,
                 result: result,
                 roll: this.roll,
-                displayTool: Settings.get(Settings.USE_TOOL)
+                useTool: Settings.get(Settings.USE_TOOL),
+                useAttendants: Settings.get(Settings.USE_ATTENDANTS)
             })
         content = TextEditor.enrichHTML(content);
         await ChatMessage.create({

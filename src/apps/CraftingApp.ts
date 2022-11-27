@@ -67,6 +67,7 @@ export class CraftingApp extends Application {
         this.data.result = RecipeCompendium.validateRecipeToItemList(Object.values(this.data.recipe.ingredients), this.data.actor.items);
         const crafting = await Crafting.from(this.data.actor.id, this.data.recipe.id);
         this.data.result = await crafting.checkTool(this.data.result);
+        this.data.result = await crafting.checkAttendants(this.data.result);
         this.data.content = await renderTemplate('modules/beavers-crafting/templates/recipe-sheet.hbs',
             {
                 recipe: this.data.recipe,
@@ -78,7 +79,8 @@ export class CraftingApp extends Application {
                 displayResults:Settings.get(Settings.DISPLAY_RESULTS),
                 displayIngredients:Settings.get(Settings.DISPLAY_RESULTS),
                 tools: await getToolConfig(),
-                displayTool: Settings.get(Settings.USE_TOOL)
+                useTool: Settings.get(Settings.USE_TOOL),
+                useAttendants: Settings.get(Settings.USE_ATTENDANTS)
             });
         this._element.find(".sheet-body").empty();
         this._element.find(".sheet-body").append(this.data.content);

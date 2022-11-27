@@ -1,14 +1,24 @@
 # Changelog
-## 0.7.x Upcomming
-### TODO
+## 0.7.x attendants
+### feature optional attendants
+You now are able to create recipes with attendance that are items, features, tools or classes that are required in the craft process but not consumed.
+
+![img.png](pictures/mining.png)
+
+![img.png](pictures/gathering.png)
+
+This enables completly diffrent kinds of recipes like e.g. mining or gathering
+that requires certain items like sickle or backgrounds like Farmer etc...
+
 ### feature add abilities as skillCheck
 
 ![img.png](pictures/abilities.png)
 
+### bug: "missing tools check whem ingredients are already insufficient" fixed
 ### bug: "consume costs on failed check with insufficient requirements" fixed
 ### bug: "roll skill with insufficient requirements" fixed
 
-## 0.6.x
+## 0.6.x customized AnyOf
 ### feature customized AnyOf ingredient
 You now are able to customize recipes that uses anyOf Ingredients,
 and by doing so define what specific ingredients you want to use for this recipe.

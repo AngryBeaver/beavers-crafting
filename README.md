@@ -14,7 +14,9 @@ Default is "Create New Item" obviously you need to adapt if you have a different
 ### Configure subtype Recipe
 ![img.png](pictures/configure.png)
 
-#### tool: (0.5.x)
+#### attendants: optional (0.7.x)
+you may add an attendant the crafting process requires but is not consumed.
+#### tool: optional (0.5.x)
 you may add a tool the crafting process requires.
 #### cost: 
 you may add costs to the crafting process
@@ -100,6 +102,8 @@ When you use a recipe with AnyOf you can customize it and by doing so define wha
 - none customized AnyOf ingredients will consume a random fitting ingredient of your inventory.
 
 ### Settings
+- You can enable or disable attendants for recipes feature 0.7.x default it is disabled.
+
 ![img.png](pictures/toolconfig.png)
 
 - You can enable or disable tools for recipes feature 0.5.x default it is disabled.
@@ -108,17 +112,19 @@ When you use a recipe with AnyOf you can customize it and by doing so define wha
 
 ## latest features:
 have a look at the changelog.md
+### 0.7.x optional attendants
+you now can customize recipes with anyOf Ingredients.
 ### 0.6.x customized AnyOf
 you now can customize recipes with anyOf Ingredients.
-### 0.5.x feature tool
+### 0.5.x optional tool
 you now can use tools, if you do not have the tool you dont get a check you simple fail and your ingredients won't vanish.
-### 0.4.x feature compendiums,
+### 0.4.x starter compendiums,
 you now can use items directly from compendium,
 module comes with 4 compendiums ingredients,rolltables,potions and recipes
-### 0.3.x feature add initial anyOf ingredient
+### 0.3.x initial anyOf ingredient
 you now can have anyOf ingredients
 breaking change 0.2.x -> 0.3.x
-### 0.2.x feature add rollTable result
+### 0.2.x rollTable result
 you now can produce a random Potion.
 breaking change 0.1.x -> 0.2.x
 
