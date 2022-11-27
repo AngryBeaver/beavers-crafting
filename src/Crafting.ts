@@ -32,10 +32,10 @@ export class Crafting {
 
     async craft(): Promise<Result> {
         const result =  await this.checkTool();
-        await this.checkSkill(result);
         await this.evaluateAnyOf();
         RecipeCompendium.validateRecipeToItemList(Object.values(this.recipe.ingredients), this.actor.items, result);
         this.checkCurrency(result);
+        await this.checkSkill(result);
         await this.addResults(result);
         await this.updateActor(result);
         await this._sendToChat(result);
