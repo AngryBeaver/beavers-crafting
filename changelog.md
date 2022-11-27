@@ -14,8 +14,8 @@ that requires certain items like sickle or backgrounds like Farmer etc...
 
 ![img.png](pictures/abilities.png)
 
-### bug: "missing tools check whem ingredients are already insufficient" fixed
-### bug: "consume costs on failed check with insufficient requirements" fixed
+### bug: "missing tools check when ingredients are not available" fixed
+### bug: "consume costs on failed check while recipe requirements are not fullfilled" fixed
 ### bug: "roll skill with insufficient requirements" fixed
 
 ## 0.6.x customized AnyOf
