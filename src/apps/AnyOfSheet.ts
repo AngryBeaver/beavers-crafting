@@ -1,6 +1,6 @@
 import {Settings} from "../Settings.js";
 import {getDataFrom, sanitizeUuid} from "../helpers/Utility.js";
-import {DefaultComponent} from "../Recipe.js";
+import {Component} from "../Recipe.js";
 import {RecipeCompendium} from "./RecipeCompendium.js";
 
 const anyOfSheets: { [key: string]: AnyOfSheet } = {};
@@ -151,8 +151,8 @@ export class AnyOf {
         return result;
     }
 
-    async filter(itemList): Promise<Component[]>{
-        const resultList:Component[] = [];
+    async filter(itemList): Promise<ComponentData[]>{
+        const resultList:ComponentData[] = [];
         for(const item of itemList){
             const result = await this.executeMacro(item);
             if(result.value){
@@ -160,7 +160,7 @@ export class AnyOf {
                 if(same.length > 0){
                     same[0].quantity = same[0].quantity + item.system?.quantity;
                 }else{
-                    resultList.push(new DefaultComponent(item,item.uuid,"Item"));
+                    resultList.push(new Component(item,item.uuid,"Item"));
                 }
             }
         }

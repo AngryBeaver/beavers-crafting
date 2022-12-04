@@ -1,49 +1,70 @@
 import {Settings} from "./Settings.js";
 import {DefaultCurrency} from "./Exchange.js";
-import {sanitizeUuid} from "./helpers/Utility.js";
+import {getItem, sanitizeUuid} from "./helpers/Utility.js";
 import {getToolConfig} from "./apps/ToolConfig.js";
 
-export class Recipe {
+export class Recipe implements RecipeData {
+    uuid:string;
     id:string;
     name:string;
     img:string;
-    ingredients:Map<string,Component>;
-    results:Map<string,Component>;
+    ingredients:{
+        [key: string]: Component
+    }
+    results: {
+        [key: string]: Component
+    }
     skill?:Skill;
     currency?:Currency;
     tool?:string;
-    attendants:Map<string,Component>;
-    _trash:Trash;
+    attendants:{
+        [key: string]: Component
+    }
+    _trash:{
+        ingredients:{};
+        results:{};
+        attendants:{};
+    }
 
     static fromItem(item):Recipe{
         const flags = item.flags[Settings.NAMESPACE]?.recipe;
         const data = mergeObject({attendants:{},ingredients:{},results:{}}, flags || {}, {inplace: false});
-        return new Recipe(item.id,item.name,item.img,data);
+        return new Recipe(item.uuid,item.id,item.name,item.img,data);
     }
 
     static fromRecipe(recipe: Recipe):Recipe{
         const data = recipe.serialize();
-        return new Recipe(recipe.id,recipe.name,recipe.img,data);
+        return new Recipe(recipe.uuid,recipe.id,recipe.name,recipe.img,data);
     }
 
-    constructor(id,name,img,data:RecipeStoreData){
+    constructor(uuid, id,name,img,data:RecipeData){
+        function deserializeComponents(map:{[key: string]: ComponentData}): {[key: string]: Component}{
+            const result = {};
+            for(const key in map){
+                const component = map[key];
+                result[key] = new Component(component,component.uuid,component.type);
+            }
+            return result;
+        }
+        this.uuid=uuid;
         this.id = id;
         this.name = name;
         this.img = img;
-        this.ingredients = data.ingredients || {}
-        this.results = data.results || {}
+        this.ingredients = deserializeComponents(data.ingredients || {});
+        this.results = deserializeComponents(data.results || {});
         this.skill = data.skill;
         this.currency = data.currency;
         this.tool = data.tool;
-        this.attendants = data.attendants || {}
+        this.attendants = deserializeComponents(data.attendants || {});
         this._trash = {
             ingredients:{},
             results:{},
             attendants:{}
         };
+
     }
 
-    serialize():RecipeStoreData {
+    serialize():RecipeData {
         const serialized = {
             ingredients: this.serializeIngredients(),
             skill: this.skill,
@@ -77,9 +98,9 @@ export class Recipe {
     addAttendant(entity,uuid,type) {
         const uuidS = sanitizeUuid(uuid);
         if(!this.attendants[uuidS]){
-            this.attendants[uuidS] = new DefaultComponent(entity,uuid,type);
+            this.attendants[uuidS] = new Component(entity,uuid,type);
         }else{
-            DefaultComponent.inc(this.attendants[uuidS])
+            this.attendants[uuidS].inc();
         }
     }
     removeAttendant(uuidS){
@@ -90,9 +111,9 @@ export class Recipe {
     addIngredient(entity,uuid,type) {
         const uuidS = sanitizeUuid(uuid);
         if(!this.ingredients[uuidS]){
-            this.ingredients[uuidS] = new DefaultComponent(entity,uuid,type);
+            this.ingredients[uuidS] = new Component(entity,uuid,type);
         }else{
-            DefaultComponent.inc(this.ingredients[uuidS])
+            this.ingredients[uuidS].inc();
         }
     }
     removeIngredient(uuidS){
@@ -102,9 +123,9 @@ export class Recipe {
     addResult(entity,uuid,type) {
         const uuidS = sanitizeUuid(uuid);
         if(!this.results[uuidS]){
-            this.results[uuidS] = new DefaultComponent(entity,uuid,type);
+            this.results[uuidS] = new Component(entity,uuid,type);
         }else{
-            DefaultComponent.inc(this.results[uuidS])
+            this.results[uuidS].inc();
         }
     }
     removeResult(uuidS) {
@@ -131,37 +152,55 @@ export class Recipe {
         delete this.tool;
     }
 
-}
-interface Trash {
-    ingredients:{};
-    results:{};
-    attendants:{};
+    async update(){
+        const flags={};
+        flags[Settings.NAMESPACE] = {
+            recipe: this.serialize()
+        };
+        const item = await fromUuid(this.uuid);
+        if(item?.update !== undefined) {
+            await item.update({
+                "flags": flags
+            });
+        }
+    }
+
 }
 
-export class DefaultComponent implements Component {
+export class Component implements ComponentData {
     id: string;
     img: string;
     name: string;
     quantity: number;
-    sourceId: string;
     uuid: string;
     type: string;
+    itemType?: string;
 
-    static clone(component: Component):Component{
-        return new DefaultComponent(component,component.uuid, component.type)
+    static clone(component: ComponentData):ComponentData{
+        return new Component(component,component.uuid, component.type)
     }
 
     constructor(entity, uuid, type) {
         this.id = entity.id;
         this.uuid = entity.uuid;
         this.type = type;
+        if(type === "Item") {
+            this.itemType = entity.itemType || (entity.type==="Item"?undefined:entity.type);
+        }
         this.name = entity.name;
         this.img = entity.img;
         this.quantity = entity.system?.quantity || entity.quantity || 1;
-        this.sourceId = entity.flags?.core?.sourceId || entity.sourceId;
     }
 
-    static inc(component){
+    inc(){
+        this.quantity = this.quantity+1;
+    }
+
+    async getEntity(){
+        return getItem(this.uuid);
+    }
+
+    static inc(component: ComponentData){
         component.quantity = component.quantity+1;
     }
 }
@@ -170,13 +209,4 @@ class DefaultSkill implements DefaultSkill{
     name:string;
     dc:number= 8;
     consume:boolean=true;
-}
-
-interface RecipeStoreData {
-    ingredients:Map<string,Component>;
-    results:Map<string,Component>;
-    skill?:Skill;
-    currency?:Currency;
-    tool?:string;
-    attendants: Map<string,Component>;
 }

@@ -5,16 +5,16 @@ import {getDataFrom, getItem, sanitizeUuid} from "../helpers/Utility.js";
 import {Settings} from "../Settings.js";
 import {getToolConfig} from "./ToolConfig.js";
 import {AnyOf, isAnyOf} from "./AnyOfSheet.js";
-import {DefaultComponent, Recipe} from "../Recipe.js";
+import {Component, Recipe} from "../Recipe.js";
 
 export class CraftingApp extends Application {
     data: {
         actor,
         filter,
-        recipes,
+        recipes:Recipe[],
         index,
         filterItems:{},
-        recipe?,
+        recipe?:Recipe,
         content?,
         result?,
     };
@@ -61,11 +61,11 @@ export class CraftingApp extends Application {
     }
 
     async renderRecipeSheet() {
-        if (!this.data.recipe || this._element === null) {
+        if (this.data.recipe === undefined || this._element === null) {
             return;
         }
         this.data.result = RecipeCompendium.validateRecipeToItemList(Object.values(this.data.recipe.ingredients), this.data.actor.items);
-        const crafting = await Crafting.from(this.data.actor.id, this.data.recipe.id);
+        const crafting = await Crafting.from(this.data.actor.id, this.data.recipe.uuid);
         this.data.result = await crafting.checkTool(this.data.result);
         this.data.result = await crafting.checkAttendants(this.data.result);
         this.data.content = await renderTemplate('modules/beavers-crafting/templates/recipe-sheet.hbs',
@@ -88,6 +88,7 @@ export class CraftingApp extends Application {
     }
 
     activateListeners(html) {
+
         super.activateListeners(html);
         html.find(".header .entry-filter select.search").on("change", (e) => {
             this.data.filter = $(e.target).val();
@@ -96,6 +97,9 @@ export class CraftingApp extends Application {
             this.render();
         });
         html.find(".dialog-button").on("click", (e) => {
+            if (this.data.recipe === undefined){
+                return;
+            }
             Crafting.fromRecipe(this.data.actor.id, this.data.recipe)
                 .then(crafting => {
                     return crafting.craft();
@@ -179,6 +183,9 @@ export class CraftingApp extends Application {
     }
 
     async _onDropAnyOf(anyOf:AnyOf, key:string, e:DragEvent) {
+        if (this.data.recipe === undefined){
+            return;
+        }
         const data = getDataFrom(e);
         if(data) {
             if (data.type !== "Item") return;
@@ -186,7 +193,7 @@ export class CraftingApp extends Application {
             let result = await anyOf.executeMacro(entity);
             if(result.value) {
                 const previousComponent = this.data.recipe.ingredients[key];
-                const component = new DefaultComponent(entity, data.uuid, data.type);
+                const component = new Component(entity, data.uuid, data.type);
                 const nextKey = sanitizeUuid(data.uuid);
                 component.quantity = previousComponent.quantity;
                 this.data.recipe = Recipe.fromRecipe(this.data.recipe);

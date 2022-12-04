@@ -1,4 +1,4 @@
-import {DefaultComponent} from "../Recipe.js";
+import {Component} from "../Recipe.js";
 
 export async function rollTableToComponents(component, result) {
     const table = await getItem(component.uuid);
@@ -30,7 +30,7 @@ export async function rollTableToComponents(component, result) {
                 result.hasException = true;
                 return [];
             }
-            components.push(new DefaultComponent(item, item.uuid, r.documentCollection));
+            components.push(new Component(item, item.uuid, r.documentCollection));
         }
     }
     return components;
@@ -38,13 +38,11 @@ export async function rollTableToComponents(component, result) {
 
 export async function getItem(uuid) {
     const parts = uuid.split(".");
-    let item = undefined;
     if (parts[0] === "Compendium") {
-        item = await game.packs.get(parts[1] + "." + parts[2]).getDocument(parts[3]);
+        return await game.packs.get(parts[1] + "." + parts[2]).getDocument(parts[3]);
     } else {
-        item = await fromUuid(uuid);
+        return await fromUuid(uuid);
     }
-    return item;
 }
 
 export function getDataFrom(e) {

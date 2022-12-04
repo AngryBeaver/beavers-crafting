@@ -6,10 +6,53 @@ import {RecipeCompendium} from "./apps/RecipeCompendium.js";
 import {AnyOfSheet} from "./apps/AnyOfSheet.js";
 
 Hooks.once('init', async function () {
+
+    async function itemTypeMigration(){
+        async function addItemType(component){
+            if(component.type === "Item") {
+                const entity = await component.getEntity();
+                component.itemType = entity.type;
+            }
+        }
+        async function migrateRecipe(recipe){
+            for(const key in recipe.attendants){
+                await addItemType(recipe.attendants[key]);
+            }
+            for(const key in recipe.ingredients){
+                await addItemType(recipe.ingredients[key]);
+            }
+            for(const key in recipe.results){
+                await addItemType(recipe.results[key]);
+            }
+            await recipe.update();
+        }
+        ui.notifications.info("Beavers Crafting | migration: items");
+        for(const recipe of game[Settings.NAMESPACE].RecipeCompendium.getAllItems()){
+            await migrateRecipe(recipe);
+        }
+        ui.notifications.info("Beavers Crafting | migration: actors");
+        for (const actor of game.actors){
+            for(const recipe of game[Settings.NAMESPACE].RecipeCompendium.getForActor(actor)){
+                await migrateRecipe(recipe);
+            }
+        }
+        ui.notifications.info("Beavers Crafting | migration: done");
+    }
     Settings.init();
     if(!game[Settings.NAMESPACE])game[Settings.NAMESPACE]={};
     game[Settings.NAMESPACE].Crafting = Crafting;
     game[Settings.NAMESPACE].RecipeCompendium = RecipeCompendium;
+    game[Settings.NAMESPACE].itemTypeMigration = itemTypeMigration;
+});
+
+Hooks.on("ready",async function () {
+    const version = Settings.get(Settings.MAJOR_VERSION);
+    if(!version || version<=0){
+        //I created the first breaking change,while I am still in version 0 and users are informed that there might be breaking changes I ship out a migration script.
+        //I think I soon should move this module out of develop phase version 0. I already start counting the internal major version.
+        await game[Settings.NAMESPACE].itemTypeMigration();
+        Settings.set(Settings.MAJOR_VERSION,1);
+    }
 });
 
 Hooks.on("getActorSheetHeaderButtons", (app, buttons) => {
@@ -74,8 +117,6 @@ Hooks.on("renderDialog", (app, html, content) => {
         })
     }
 });
-
-
 
 //fucking stupid handlebars !!!
 Handlebars.registerHelper('hasKey', function (param1, key, options) {

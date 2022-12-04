@@ -1,6 +1,36 @@
 # Changelog
 ## 0.7.x attendants
-### feature optional attendants
+### 0.7.1 update: identity check
+!Breaking Change!
+This module intended to match items by a dnd5 core flag "source". Two objects are matching if they have the same name and are from the same source.
+Sadly this was broken in various ways. e.g. Using attendants with class, feature or similar imported von dnd-beyond did not work on recipes.
+
+Therefor I changed the identity check of this module to match items when they have the same itemType and name.
+A migration script is running the first time you install 0.7.1. fixing all recipes not in compendiums. If you still have broken recipes or you just imported broken recipes from compendium you can fix those with:
+````javascript
+game['beavers-crafting'].itemTypeMigration()
+````
+### 0.7.1 update: weaken reference
+Recipes do not store the complete Item but a reduced view called Component that has all basic information needed for recipes as well as a reference the uuid.
+UUIDs are not unique to items but to the instance. So each copy has a new uuid making it hard to create recipes that can be transfered to other worlds as you also need to transfer the referenced items with the exact same uuid.
+Only uuids within compendiums are unique across worlds. That is why I recommend using compendiums in the recipe creation process.
+
+! As of 0.7.1 items no longer need to match the source so you may decouple your recipe from your referenced items.
+
+Components do now also store the itemType for comparing Components to Items. Old Components do not have this property.
+You can fix your existing recipes (not compendium recipes)
+````javascript
+game['beavers-crafting'].itemTypeMigration()
+````
+Meaning you can copy your recipes to another world witch does not have the original sources your recipes needed, but instead any instance with the same name and type.
+This does only work for Attendants and Ingredients that are not of type "AnyOf". (may come later)
+For results you still need the original item as this is copied over to the actor. (complete items are not stored but components)
+
+Keep in mind that you can not click and show up the item descriptor of Ingredients, Attendants that are not also imported into the new world. You can disable this setting: "display ingredient sheet"
+### 0.7.1 feature: own recipes
+Your RecipeCompendium now contains also the recipes the user owns e.g. are in his inventar. You can also filter for own recipes only.
+
+### 0.7.0 feature optional attendants
 You now are able to create recipes with attendance that are items, features, tools or classes that are required in the craft process but not consumed.
 
 ![img.png](pictures/mining.png)
@@ -10,13 +40,13 @@ You now are able to create recipes with attendance that are items, features, too
 This enables completly diffrent kinds of recipes like e.g. mining or gathering
 that requires certain items like sickle or backgrounds like Farmer etc...
 
-### feature add abilities as skillCheck
+### 0.7.0 feature add abilities as skillCheck
 
 ![img.png](pictures/abilities.png)
 
-### bug: "missing tools check when ingredients are not available" fixed
-### bug: "consume costs on failed check while recipe requirements are not fullfilled" fixed
-### bug: "roll skill with insufficient requirements" fixed
+### 0.7.0 bug: "missing tools check when ingredients are not available" fixed
+### 0.7.0 bug: "consume costs on failed check while recipe requirements are not fullfilled" fixed
+### 0.7.0 bug: "roll skill with insufficient requirements" fixed
 
 ## 0.6.x customized AnyOf
 ### feature customized AnyOf ingredient

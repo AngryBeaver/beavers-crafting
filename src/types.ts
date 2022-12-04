@@ -4,13 +4,13 @@ interface Result {
         items: {
             toUpdate:any[],
             toDelete:any[],
-            toCreate:Component[]
+            toCreate:ComponentData[]
         },
         currencies: {},
     }
     ingredients: {
         [key: string]: IngredientResult }
-    results: { [key: string]: Component }
+    results: { [key: string]: ComponentData }
     currencies: boolean;
     skill?:{
         name: string,
@@ -27,19 +27,19 @@ interface Result {
 }
 
 interface IngredientResult {
-    component:Component,
+    component:ComponentData,
     isAvailable:boolean,
     difference:number
 }
 
-interface Component {
+interface ComponentData {
     id:string;
     uuid:string;
     type:string;
-    sourceId:string;
     name:string;
     img:string;
     quantity:number;
+    itemType?: string;
 }
 
 interface Skill {
@@ -64,4 +64,19 @@ interface ItemChange {
 interface MacroResult<t> {
     value:t,
     error?:Error
+}
+
+interface RecipeData {
+    ingredients:{
+        [key: string]: ComponentData
+    }
+    results: {
+        [key: string]: ComponentData
+    }
+    skill?:Skill;
+    currency?:Currency;
+    tool?:string;
+    attendants:{
+        [key: string]: ComponentData
+    }
 }

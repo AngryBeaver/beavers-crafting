@@ -1,12 +1,12 @@
-import {DefaultComponent} from "../Recipe.js";
+import {Component} from "../Recipe.js";
 import {Settings} from "../Settings.js";
 import {getDataFrom, getItem} from "../helpers/Utility.js";
 
-const components:Component[] = [];
+const components:ComponentData[] = [];
 
 export class ToolConfig extends FormApplication {
 
-    tools:Component[]
+    tools:ComponentData[]
 
     static get defaultOptions(): any {
         // @ts-ignore
@@ -84,7 +84,7 @@ export class ToolConfig extends FormApplication {
 
 
 
-export async function getToolConfig(): Promise<Component[]>{
+export async function getToolConfig(): Promise<ComponentData[]>{
     if(components.length === 0) {
         await _setToolConfig();
     }
@@ -100,6 +100,6 @@ async function _setToolConfig(){
 }
 async function _addToolConfig(uuid){
     const item = await getItem(uuid);
-    const component = new DefaultComponent(item, uuid, "Tool");
+    const component = new Component(item, uuid, "Tool");
     components.push(component);
 }

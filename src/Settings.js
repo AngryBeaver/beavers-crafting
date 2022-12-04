@@ -12,6 +12,7 @@ export class Settings {
     static TOOL_CONFIG = "toolConfig;"
     static RECIPE_SUBTYPE = "Recipe";
     static ANYOF_SUBTYPE = "AnyOf";
+    static MAJOR_VERSION = "majorVersion";
 
     static init() {
         game.settings.register(this.NAMESPACE, this.CREATE_ITEM_TITLE, {
@@ -20,6 +21,7 @@ export class Settings {
             scope: "world",
             config: true,
             default: "Create New Item",
+            requiresReload: true,
             type: String,
         });
         game.settings.register(this.NAMESPACE, this.USE_TOOL, {
@@ -28,6 +30,7 @@ export class Settings {
             scope: "world",
             config: true,
             default: false,
+            requiresReload: true,
             type: Boolean,
         });
         game.settings.register(this.NAMESPACE, this.USE_ATTENDANTS, {
@@ -36,6 +39,7 @@ export class Settings {
             scope: "world",
             config: true,
             default: false,
+            requiresReload: true,
             type: Boolean,
         });
         game.settings.register(this.NAMESPACE, this.DISPLAY_RESULTS, {
@@ -60,7 +64,20 @@ export class Settings {
             config: false,
             default: defaultToolConfig,
             type: Object
-
+        });
+        game.settings.register(this.NAMESPACE, this.MAJOR_VERSION, {
+            scope: "world",
+            config: false,
+            default: 0,
+            type: Number,
+        });
+        game.settings.registerMenu(this.NAMESPACE, this.TOOL_CONFIG_BUTTON, {
+            name: game.i18n.localize('beaversCrafting.settings.toolButton.name'),
+            label: game.i18n.localize("beaversCrafting.settings.toolButton.label"),
+            hint: game.i18n.localize('beaversCrafting.settings.toolButton.hint'),
+            scope: "world",
+            type: ToolConfig,
+            restricted: true
         });
         game.settings.registerMenu(this.NAMESPACE, this.TOOL_CONFIG_BUTTON, {
             name: game.i18n.localize('beaversCrafting.settings.toolButton.name'),

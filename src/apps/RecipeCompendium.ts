@@ -1,16 +1,27 @@
 //the firstdraft implementation will be kept simple stupid and not performant at all.
-import {DefaultComponent, Recipe} from "../Recipe.js";
+import {Component, Recipe} from "../Recipe.js";
 import {Settings} from "../Settings.js";
 import {AnyOf} from "./AnyOfSheet.js";
 import {getItem, sanitizeUuid} from "../helpers/Utility.js";
 
 export class RecipeCompendium {
 
-    static getAll(): Recipe[] {
+    static getForActor(actor): Recipe[] {
+        // @ts-ignore
+        return actor.items
+            .filter(item => RecipeCompendium.isRecipe(item))
+            .map(item => Recipe.fromItem(item));
+    }
+
+    static getAllItems(): Recipe[] {
         // @ts-ignore
         return game.items.directory.documents
             .filter(item => RecipeCompendium.isRecipe(item))
             .map(item => Recipe.fromItem(item));
+    }
+
+    static getAll(actor): Recipe[] {
+        return [...RecipeCompendium.getAllItems(),...RecipeCompendium.getForActor(actor)];
     }
 
     static async filterForItems(recipes: Recipe[], items) {
@@ -27,7 +38,7 @@ export class RecipeCompendium {
                     }
                 }
                 for (const component of listOfAnyOfIngredients) {
-                    const entity = await getItem(component.uuid);
+                    const entity = await component.getEntity();
                     const anyOf = new AnyOf(entity);
                     const isOf = await anyOf.executeMacro(item);
                     if (isOf.value) {
@@ -45,10 +56,12 @@ export class RecipeCompendium {
     }
 
     static async filterForActor(actor, filter) {
-        const list = RecipeCompendium.getAll();
+        const items = RecipeCompendium.getAllItems();
+        const own = RecipeCompendium.getForActor(actor);
+        const list = (filter == FilterType.own)?own:[...items,...own];
         const returnList: Recipe[] = [];
         for (const recipe of list) {
-            if (filter == FilterType.all) {
+            if (filter == FilterType.all || filter == FilterType.own) {
                 returnList.push(recipe);
             } else {
                 const listOfAnyOfIngredients = Object.values(recipe.ingredients).filter(component => component.type === Settings.ANYOF_SUBTYPE);
@@ -71,7 +84,7 @@ export class RecipeCompendium {
     static async isAnyAnyOfInList(listOfAnyOfIngredients: Component[], listOfItems) {
         for (const component of listOfAnyOfIngredients) {
             if (component.type === Settings.ANYOF_SUBTYPE) {
-                const item = await getItem(component.uuid);
+                const item = await component.getEntity();
                 const anyOf = new AnyOf(item);
                 const results = await anyOf.filter(listOfItems);
                 if (results.filter(c => c.quantity >= component.quantity).length == 0) {
@@ -103,12 +116,11 @@ export class RecipeCompendium {
         return result;
     }
 
-
     static async validateTool(recipe,listOfItems,result ?: Result): Promise<Result>{
         if (!result) result = new DefaultResult();
         if( recipe.tool && Settings.get(Settings.USE_TOOL)) {
             const item = await getItem(recipe.tool);
-            const component = new DefaultComponent(item, item.uuid, "Item");
+            const component = new Component(item, item.uuid, "Item");
             result.tool = {
                 component: component,
                 isAvailable: false,
@@ -156,7 +168,7 @@ export class RecipeCompendium {
         return result;
     }
 
-    static findComponentInList(listOfItems, component: Component): ItemChange {
+    static findComponentInList(listOfItems, component: ComponentData): ItemChange {
         const itemChange = new DefaultItemChange(component);
         listOfItems.forEach((i) => {
             if (this.isSame(i, component)) {
@@ -171,11 +183,10 @@ export class RecipeCompendium {
         return itemChange;
     }
 
-    static isSame(item, component: Component) {
-        const isSameName = (item, component) => item.name === component.name;
-        const isFromSource = (item, component) => item.flags?.core?.sourceId === component.uuid;
-        const hasSameSource = (item, component) => item.flags?.core?.sourceId === component.sourceId || item.sourceId === component.sourceId;
-        return isSameName(item, component) && (isFromSource(item, component) || hasSameSource(item, component));
+    static isSame(item, component: ComponentData) {
+        const isSameName = item.name === component.name;
+        const hasSameItemType = item.documentName==="Item" && item.type === component.itemType;
+        return isSameName && hasSameItemType;
     }
 
     static isRecipe(item) {
@@ -188,7 +199,8 @@ export class RecipeCompendium {
 export enum FilterType {
     usable,
     available,
-    all
+    all,
+    own
 }
 
 class DefaultItemChange implements ItemChange {
@@ -198,7 +210,7 @@ class DefaultItemChange implements ItemChange {
         "system.quantity": 0
     };
 
-    constructor(component: Component) {
+    constructor(component: ComponentData) {
         this.toUpdate._id = component.id;
     }
 

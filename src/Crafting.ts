@@ -1,4 +1,4 @@
-import {DefaultComponent, Recipe} from "./Recipe.js";
+import {Component, Recipe} from "./Recipe.js";
 import {Exchange} from "./Exchange.js";
 import {Settings} from "./Settings.js";
 import {DefaultResult, RecipeCompendium} from "./apps/RecipeCompendium.js";
@@ -25,8 +25,8 @@ export class Crafting {
         return new Crafting(item.parent,  Recipe.fromItem(item));
     }
 
-    static async from(actorId, itemId): Promise<Crafting> {
-        const item = await fromUuid("Item." + itemId);
+    static async from(actorId, uuid): Promise<Crafting> {
+        const item = await fromUuid(uuid);
         return Crafting.fromRecipe(actorId, Recipe.fromItem(item));
     }
 
@@ -77,10 +77,10 @@ export class Crafting {
 
     async evaluateAnyOf(){
         const toDelete:string[] = [];
-        const toAdd:Component[] = [];
+        const toAdd:ComponentData[] = [];
         for(const [key,component] of Object.entries(this.recipe.ingredients)){
             if(component.type === Settings.ANYOF_SUBTYPE){
-                const item = await fromUuid(component.uuid);
+                const item = await component.getEntity();
                 const anyOf = new AnyOf(item);
                 let results = await anyOf.filter(this.actor.items);
                 results = results.filter(c=>{
@@ -138,12 +138,7 @@ export class Crafting {
                 const item = await fromUuid(component.uuid);
                 const itemData = item?.toObject();
                 itemData.system.quantity = component.quantity;
-                if (!itemData.flags.core?.sourceId) {
-                    itemData.flags.core = itemData.flags.core || {};
-                    itemData.flags.core.sourceId = component.uuid;
-                }
                 createItems.push(itemData);
-
             }
         }
         await this.actor.createEmbeddedDocuments("Item", createItems);
@@ -171,7 +166,7 @@ export class Crafting {
         })
     }
 
-    _addComponentToResult(result: Result, component: Component) {
+    _addComponentToResult(result: Result, component: ComponentData) {
         const itemChange = RecipeCompendium.findComponentInList(this.actor.items, component);
         const isAlreadyOnActor = itemChange.toUpdate["system.quantity"] > 0
         const isAlreadyUpdated = result.changes.items.toUpdate
@@ -181,7 +176,7 @@ export class Crafting {
         const isAlreadyDeleted = result.changes.items.toDelete.includes(itemChange.toUpdate._id)
 
         if(result.results[component.uuid]){
-            DefaultComponent.inc(result.results[component.uuid]);
+            Component.inc(result.results[component.uuid]);
         }else{
             result.results[component.uuid] = component;
         }
@@ -190,7 +185,7 @@ export class Crafting {
                 const creates =  result.changes.items.toCreate.filter(x => x.id === itemChange.toUpdate._id);
                 creates.forEach(x => x.quantity = x.quantity + component.quantity)
             } else {
-                result.changes.items.toCreate.push(DefaultComponent.clone(component));
+                result.changes.items.toCreate.push(Component.clone(component));
             }
         } else {
             if(isAlreadyDeleted){
@@ -207,7 +202,7 @@ export class Crafting {
         }
     }
 
-    async _getResultComponents(result: Result): Promise<Component[]> {
+    async _getResultComponents(result: Result): Promise<ComponentData[]> {
         const items = Object.values(this.recipe.results).filter(component => component.type === "Item");
         const tables = Object.values(this.recipe.results).filter(component => component.type === "RollTable");
         for (const component of tables) {
