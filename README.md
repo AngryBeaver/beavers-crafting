@@ -1,7 +1,11 @@
-# Beaver's Crafting System
+# Beaver's Crafting Module
+With this module you can create recipes to craft items. E.g. a bunch of mushrooms to brew a potion. Specifically you can use it for crafting, brewing, harvesting, mining, fabricating, gathering specific or random items by optionally consuming ingredients and money and optionally requireing features, tools, classes, backgrounds and skill checks. 
+
 ![Foundry Core Compatible Version](https://img.shields.io/endpoint?url=https%3A%2F%2Ffoundryshields.com%2Fversion%3Fstyle%3Dflat%26url%3Dhttps%3A%2F%2Fgithub.com%2FAngryBeaver%2Fbeavers-crafting%2Freleases%2Flatest%2Fdownload%2Fmodule.json)
 ![Foundry System](https://img.shields.io/endpoint?url=https%3A%2F%2Ffoundryshields.com%2Fsystem%3FnameType%3Draw%26showVersion%3D1%26style%3Dflat%26url%3Dhttps%3A%2F%2Fraw.githubusercontent.com%2FAngryBeaver%2Fbeavers-crafting%2Fmain%2Fmodule.json)
 ![Download Count](https://img.shields.io/github/downloads/AngryBeaver/beavers-crafting/total?color=bright-green)
+
+
 
 ## Features
 ![img.gif](pictures/video.gif)
@@ -113,7 +117,7 @@ When you use a recipe with AnyOf you can customize it and by doing so define wha
 ## latest features:
 have a look at the changelog.md
 ### 0.7.x optional attendants
-you now can customize recipes with anyOf Ingredients.
+you recipe can now depend on attendants that are required in the craft process but are not consumed. like class, race, background, tools etc...
 ### 0.6.x customized AnyOf
 you now can customize recipes with anyOf Ingredients.
 ### 0.5.x optional tool
