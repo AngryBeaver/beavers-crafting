@@ -14,6 +14,9 @@ export class RecipeSheet {
     editable:boolean;
     recipe:Recipe;
     recipeElement?;
+    sheet:{
+        active:string
+    }
 
 
     static bind(app, html, data) {
@@ -22,6 +25,12 @@ export class RecipeSheet {
                 recipeSheets[app.id] = new RecipeSheet(app,data);
             }
             recipeSheets[app.id].init(html);
+            app.options.height = 500;
+            app.setPosition({height:app.options.height});
+            app._onResize = (e)=>{
+                app.options.height = app.position.height;
+                app.options.width = app.position.width;
+            }
         }
     }
 
@@ -29,6 +38,9 @@ export class RecipeSheet {
         this.app = app;
         this.item = app.item;
         this.editable = data.editable;
+        this.sheet = {
+            active : "main"
+        };
         this.addDragDrop();
     }
 
@@ -67,7 +79,7 @@ export class RecipeSheet {
     }
 
     async render(){
-        let template = await renderTemplate('modules/beavers-crafting/templates/recipe-sheet.hbs',
+        let main = await renderTemplate('modules/beavers-crafting/templates/recipe-main.hbs',
             {
                 recipe: this.recipe,
                 currencies: getCurrencies(),
@@ -80,12 +92,41 @@ export class RecipeSheet {
                 useTool: Settings.get(Settings.USE_TOOL),
                 useAttendants: Settings.get(Settings.USE_ATTENDANTS)
             });
+        let template = await renderTemplate('modules/beavers-crafting/templates/recipe-sheet.hbs',{
+            main: main,
+            active: this.sheet.active,
+            advanced: "test"
+        });
         this.recipeElement.find('.recipe').remove();
         this.recipeElement.append(template);
         this.handleEvents();
     }
 
-    handleEvents() {
+    handleEvents(){
+        this.recipeElement.find('.tabs a').click(e=>{
+            this.sheet.active = $(e.currentTarget).data("tab");
+            this.render();
+        });
+
+        this.handleMainEvents();
+    }
+
+    async _onDrop(e) {
+        await this._onDropMain(e);
+    }
+
+    update() {
+        const flags={};
+        flags[Settings.NAMESPACE] = {
+            recipe: this.recipe.serialize()
+        };
+        this.item.update({
+            "flags": flags
+        });
+        this.render();
+    }
+
+    handleMainEvents() {
         this.recipeElement.find('.ingredients .item-delete').click(e=>{
             this.recipe.removeIngredient(e.target.dataset.id);
             this.update();
@@ -142,7 +183,8 @@ export class RecipeSheet {
         });
     }
 
-    async _onDrop(e) {
+
+    async _onDropMain(e){
         const isIngredient = $(e.target).parents(".beavers-crafting .recipe .ingredients").length !==0;
         const isResult = $(e.target).parents(".beavers-crafting .recipe .results").length !==0;
         const isAttendant = $(e.target).parents(".beavers-crafting .recipe .attendants").length !==0;
@@ -178,16 +220,5 @@ export class RecipeSheet {
                 this.update();
             }
         }
-    }
-
-    update() {
-        const flags={};
-        flags[Settings.NAMESPACE] = {
-            recipe: this.recipe.serialize()
-        };
-        this.item.update({
-            "flags": flags
-        });
-        this.render();
     }
 }

@@ -68,7 +68,7 @@ export class CraftingApp extends Application {
         const crafting = await Crafting.from(this.data.actor.id, this.data.recipe.uuid);
         this.data.result = await crafting.checkTool(this.data.result);
         this.data.result = await crafting.checkAttendants(this.data.result);
-        this.data.content = await renderTemplate('modules/beavers-crafting/templates/recipe-sheet.hbs',
+        this.data.content = await renderTemplate('modules/beavers-crafting/templates/recipe-main.hbs',
             {
                 recipe: this.data.recipe,
                 currencies: getCurrencies(),
