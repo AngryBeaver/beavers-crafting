@@ -65,7 +65,7 @@ export class CraftingApp extends Application {
         if (this.data.recipe === undefined || this._element === null) {
             return;
         }
-        this.data.result = RecipeCompendium.validateRecipeToItemList(Object.values(this.data.recipe.ingredients), this.data.actor.items,new Result(this.data.recipe));
+        this.data.result = RecipeCompendium.validateRecipeToItemList(Object.values(this.data.recipe.ingredients), this.data.actor.items,new Result(this.data.recipe,this.data.actor));
         const crafting = await Crafting.from(this.data.actor.id, this.data.recipe.uuid);
         this.data.result = await crafting.checkTool(this.data.result);
         this.data.result = await crafting.checkAttendants(this.data.result);
@@ -76,7 +76,7 @@ export class CraftingApp extends Application {
                 skills: getSkills(),
                 abilities: getAbilities(),
                 editable: false,
-                result: this.data.result,
+                precast: this.data.result.precast,
                 displayResults:Settings.get(Settings.DISPLAY_RESULTS),
                 displayIngredients:Settings.get(Settings.DISPLAY_RESULTS),
                 tools: await getToolConfig(),

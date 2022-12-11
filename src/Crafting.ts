@@ -44,8 +44,8 @@ export class Crafting {
         return result;
     }
 
-    async checkSkill(result?: ResultData): Promise<ResultData> {
-        if (!result) result = new Result(this.recipe);
+    async checkSkill(result?: Result): Promise<Result> {
+        if (!result) result = new Result(this.recipe,this.actor);
         if (result.hasErrors) return result;
         if (this.recipe.skill) {
             const skillParts = this.recipe.skill.name.split("-")
@@ -54,7 +54,7 @@ export class Crafting {
             }else{
                 this.roll = await this.actor.rollSkill(this.recipe.skill.name, {"chatMessage": false});
             }
-            result.chat.skill ={
+            result.chat.skill = {
                 name: this.recipe.skill.name,
                 difference: this.roll.total - this.recipe.skill.dc,
                 total: this.roll.total
@@ -67,13 +67,13 @@ export class Crafting {
         return result;
     }
 
-    async checkTool(result?: ResultData): Promise<ResultData> {
-        if(!result) result = new Result(this.recipe);
+    async checkTool(result?: Result): Promise<Result> {
+        if(!result) result = new Result(this.recipe,this.actor);
         return await RecipeCompendium.validateTool(this.recipe,this.actor.items,result);
     }
 
-    async checkAttendants(result?: ResultData): Promise<ResultData> {
-        if(!result) result = new Result(this.recipe);
+    async checkAttendants(result?: Result): Promise<Result> {
+        if(!result) result = new Result(this.recipe,this.actor);
         return await RecipeCompendium.validateAttendants(this.recipe,this.actor.items,result);
     }
 
@@ -106,40 +106,16 @@ export class Crafting {
         toAdd.forEach(component=>{this.recipe.addIngredient(component,component.uuid,component.type)});
     }
 
-    //simple stupid functional but not performant (yagni)
-    checkCurrency(result?: ResultData): ResultData {
-        if (!result) result = new Result(this.recipe);
-        result.updates.actor["system.currency"] = this.actor.system.currency;
+    checkCurrency(result?: Result): Result {
+        if (!result) result = new Result(this.recipe,this.actor);
         if (this.recipe.currency) {
-            let isAvailable = false;
-            try {
-                result.updates.actor["system.currency"] = Exchange.pay(this.recipe.currency, result.updates.actor["system.currency"]);
-                isAvailable = true;
-            } catch (e) {
-            }
-            result.chat.input.consumed["currency"] = {
-                component: {
-                    id: "invalid",
-                    uuid: "invalid",
-                    type: "Currency",
-                    name: this.recipe.currency.name,
-                    img: 'icons/commodities/currency/coins-assorted-mix-copper-silver-gold.webp',
-                    quantity: this.recipe.currency.value
-                },
-                isAvailable:isAvailable
-            }
-
-            if(!isAvailable){
-                result.currencies = false
-                result.hasErrors = true;
-                result.chat.success = false;
-            }
+            result.changeCurrency(this.recipe.currency);
         }
         return result;
     }
 
-    async addResults(result?: ResultData): Promise<ResultData> {
-        if (!result) result = new Result(this.recipe);
+    async addResults(result?: Result): Promise<Result> {
+        if (!result) result = new Result(this.recipe,this.actor);
         if (result.hasErrors) return result;
         const components = await this._getResultComponents(result);
         for (const component of components) {
@@ -148,9 +124,9 @@ export class Crafting {
         return result;
     }
 
-    async updateActor(result: ResultData) {
-        if (!result) result = new Result(this.recipe);
-        if (result.hasException || (result.hasErrors && (!this.recipe.skill?.consume || !result.skill))) return;
+    async updateActor(result: Result) {
+        if (!result) result = new Result(this.recipe,this.actor);
+        if (result.hasException || (result.hasErrors && (!this.recipe.skill?.consume ))) return;
         const createItems: any[] = [];
         for (const component of result.updates.items.toCreate) {
             if (component.uuid) {
@@ -192,12 +168,6 @@ export class Crafting {
             Component.inc(result.chat.output["result."+component.uuid]);
         }else{
             result.chat.output["result."+component.uuid] = component;
-        }
-        //deprecated
-        if(result.results[component.uuid]){
-            Component.inc(result.results[component.uuid]);
-        }else{
-            result.results[component.uuid] = component;
         }
         if (!isAlreadyOnActor) {
             if(isAlreadyCreated){

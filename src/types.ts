@@ -11,33 +11,10 @@ interface ResultData {
         }
     }
     chat: ChatData;
-    recipe?: {
-        ingredients: {
-            [key: string]: boolean;
-        }
-        attendants: {
-            [key: string]: boolean;
-        }
-        tool: boolean;
-        currencies: boolean
-    }
-    ingredients: {
-        [key: string]: IngredientResult
-    }
-    results: { [key: string]: ComponentData }
-    currencies: boolean;
-    skill?: {
-        name: string,
-        total: number,
-        difference: number,
-    };
-    tool?: IngredientResult
-    attendants: {
-        [key: string]: IngredientResult
-    }
+    precast: PreCastData;
+    isAvailable: boolean;
     hasErrors: boolean;
     hasException: boolean;
-    isAvailable: boolean;
 }
 
 interface ChatData {
@@ -60,6 +37,21 @@ interface ChatData {
         total: number,
         difference: number,
     }
+}
+
+interface PreCastData{
+    ingredients: {
+        [key: string]: {
+            isAvailable: boolean
+        }
+    }
+    attendants: {
+        [key: string]: {
+            isAvailable: boolean
+        }
+    }
+    tool?: boolean;
+    currencies?: boolean
 }
 
 interface ComponentResult {

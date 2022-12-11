@@ -25,9 +25,9 @@
                                 {{/each}}
                             {{/select}}
                         </select>
-                        {{#if result}}
+                        {{#if precast}}
                             <div class="action result flexrow">
-                                {{#if result.tool.isAvailable }}
+                                {{#if precast.tool.isAvailable }}
                                     <i class="fas fa-check"></i>
                                 {{else}}
                                     <i class="fas fa-times"></i>
@@ -61,12 +61,12 @@
                             <h4>{{this.name}}</h4>
                         </div>
                         <div class="action flexrow">
-                            {{#if ../result}}
-                                {{#with (lookup ../result.attendants @key) as |attendant|}}
-                                    {{#if (lt attendant.difference 0) }}
-                                        <i class="fas fa-times"></i>
-                                    {{else}}
+                            {{#if ../precast}}
+                                {{#with (lookup ../precast.attendants @key) as |attendant|}}
+                                    {{#if attendant.isAvailable }}
                                         <i class="fas fa-check"></i>
+                                    {{else}}
+                                        <i class="fas fa-times"></i>
                                     {{/if}}
                                 {{/with}}
                             {{/if}}
@@ -146,12 +146,12 @@
                                name="flags.beavers-crafting.recipe.ingredients.{{@key}}.quantity"
                                type="number"
                                step="any" value="{{this.quantity}}"/>
-                        {{#if ../result}}
-                            {{#with (lookup ../result.ingredients @key) as |ingredient|}}
-                                {{#if (lt ingredient.difference 0) }}
-                                    <i class="fas fa-times"></i>
-                                {{else}}
+                        {{#if ../precast}}
+                            {{#with (lookup ../precast.ingredients @key) as |ingredient|}}
+                                {{#if ingredient.isAvailable }}
                                     <i class="fas fa-check"></i>
+                                {{else}}
+                                    <i class="fas fa-times"></i>
                                 {{/if}}
                             {{/with}}
                         {{/if}}
