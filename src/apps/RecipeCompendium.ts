@@ -1,7 +1,7 @@
 //the firstdraft implementation will be kept simple stupid and not performant at all.
 import {Component, Recipe} from "../Recipe.js";
 import {Settings} from "../Settings.js";
-import {AnyOf} from "./AnyOfSheet.js";
+import {AnyOf} from "../AnyOf.js";
 import {getItem, sanitizeUuid} from "../helpers/Utility.js";
 
 export class RecipeCompendium {
@@ -9,14 +9,14 @@ export class RecipeCompendium {
     static getForActor(actor): Recipe[] {
         // @ts-ignore
         return actor.items
-            .filter(item => RecipeCompendium.isRecipe(item))
+            .filter(item => Recipe.isRecipe(item))
             .map(item => Recipe.fromItem(item));
     }
 
     static getAllItems(): Recipe[] {
         // @ts-ignore
         return game.items.directory.documents
-            .filter(item => RecipeCompendium.isRecipe(item))
+            .filter(item => Recipe.isRecipe(item))
             .map(item => Recipe.fromItem(item));
     }
 
@@ -189,11 +189,6 @@ export class RecipeCompendium {
         return isSameName && hasSameItemType;
     }
 
-    static isRecipe(item) {
-        // @ts-ignore
-        return (item?.type === 'loot' && item?.system?.source === Settings.RECIPE_SUBTYPE);
-    }
-
 }
 
 export enum FilterType {
@@ -226,7 +221,7 @@ export class DefaultResult implements Result {
             toDelete: [],
             toCreate: []
         },
-        currencies: {},
+        actor: {},
     };
     results = {};
     hasErrors = false;

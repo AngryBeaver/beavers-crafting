@@ -3,7 +3,7 @@ import {Exchange} from "./Exchange.js";
 import {Settings} from "./Settings.js";
 import {DefaultResult, RecipeCompendium} from "./apps/RecipeCompendium.js";
 import {rollTableToComponents} from "./helpers/Utility.js";
-import {AnyOf} from "./apps/AnyOfSheet.js";
+import {AnyOf} from "./AnyOf.js";
 
 export class Crafting {
     recipe: Recipe;
@@ -107,10 +107,10 @@ export class Crafting {
     //simple stupid functional but not performant (yagni)
     checkCurrency(result?: Result): Result {
         if (!result) result = new DefaultResult();
-        result.changes.currencies = this.actor.system.currency;
+        result.changes.actor["system.currency"] = this.actor.system.currency;
         if (this.recipe.currency) {
             try {
-                result.changes.currencies = Exchange.pay(this.recipe.currency, result.changes.currencies);
+                result.changes.actor["system.currency"] = Exchange.pay(this.recipe.currency, result.changes.actor["system.currency"]);
             } catch (e) {
                 result.currencies = false
                 result.hasErrors = true;
@@ -144,9 +144,7 @@ export class Crafting {
         await this.actor.createEmbeddedDocuments("Item", createItems);
         await this.actor.updateEmbeddedDocuments("Item", result.changes.items.toUpdate);
         await this.actor.deleteEmbeddedDocuments("Item", result.changes.items.toDelete);
-        await this.actor.update({
-            "system.currency": result.changes.currencies
-        });
+        await this.actor.update(result.changes.actor);
         return result;
     }
 

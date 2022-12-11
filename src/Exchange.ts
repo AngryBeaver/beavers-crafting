@@ -1,12 +1,11 @@
 import {getCurrencies} from "./systems/dnd5e.js";
 
-//no typescript so at least some safty
 export const ABBREVIATION = "abbreviation";
 export const CONVERSION = "conversion";
 
 export class Exchange {
 
-    static pay(priceCurrency, actorCurrencies) {
+    static pay(priceCurrency, actorCurrencies):Currencies5e {
         this.fixCurrencies(actorCurrencies);
         let lowestActorCurrency = this.toLowestCurrency(actorCurrencies);
         const lowestPriceCurrency = this.toLowestCurrency(this.toCurrencies(priceCurrency));
@@ -28,7 +27,7 @@ export class Exchange {
         })
     }
 
-    static toCurrencies(currency:Currency) {
+    static toCurrencies(currency:Currency):Currencies5e {
         let currencies = {};
         getCurrencies().forEach(c => {
             if (currency.name === c[ABBREVIATION]) {
@@ -40,7 +39,7 @@ export class Exchange {
         return currencies;
     }
 
-    static toLowestCurrency(currencies) {
+    static toLowestCurrency(currencies):Currency {
         let highestCurrency = getCurrencies().find(c => !c[CONVERSION]);
         let transform = 0;
         while (true) {
@@ -58,7 +57,7 @@ export class Exchange {
         return result;
     }
 
-    static toHighestCurrencies(currencies) {
+    static toHighestCurrencies(currencies):Currencies5e {
         let currency = this.toLowestCurrency(currencies);
         let lowestCurrency = getCurrencies().find(c => c[ABBREVIATION] === currency.name);
         const result = this.toCurrencies(currency);

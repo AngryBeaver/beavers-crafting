@@ -3,7 +3,7 @@ import {Settings} from "../Settings.js";
 import {getAbilities, getCurrencies, getSkills} from "../systems/dnd5e.js"
 import {RecipeCompendium} from "./RecipeCompendium.js";
 import {getDataFrom, getItem} from "../helpers/Utility.js";
-import {isAnyOf} from "./AnyOfSheet.js";
+import {AnyOf} from "../AnyOf.js";
 import {getToolConfig} from "./ToolConfig.js";
 
 const recipeSheets: { [key: string]: RecipeSheet } = {};
@@ -20,7 +20,7 @@ export class RecipeSheet {
 
 
     static bind(app, html, data) {
-        if(RecipeCompendium.isRecipe(app.item)){
+        if(Recipe.isRecipe(app.item)){
             if(!recipeSheets[app.id]){
                 recipeSheets[app.id] = new RecipeSheet(app,data);
             }
@@ -199,13 +199,13 @@ export class RecipeSheet {
         ) {
             const entity = await fromUuid(data.uuid);
             if (entity) {
-                if(isAnyOf(entity) && !isIngredient){
+                if(AnyOf.isAnyOf(entity) && !isIngredient){
                     return;
                 }
                 if (isIngredient) {
                     let type = data.type;
                     let uuid = data.uuid;
-                    if(isAnyOf(entity)){
+                    if(AnyOf.isAnyOf(entity)){
                         type = Settings.ANYOF_SUBTYPE;
                         uuid = foundry.utils.randomID();
                     }

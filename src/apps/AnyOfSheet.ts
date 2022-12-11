@@ -2,6 +2,7 @@ import {Settings} from "../Settings.js";
 import {getDataFrom, sanitizeUuid} from "../helpers/Utility.js";
 import {Component} from "../Recipe.js";
 import {RecipeCompendium} from "./RecipeCompendium.js";
+import {AnyOf} from "../AnyOf.js";
 
 const anyOfSheets: { [key: string]: AnyOfSheet } = {};
 
@@ -15,7 +16,7 @@ export class AnyOfSheet {
 
 
     static bind(app, html, data) {
-        if (isAnyOf(app.item)) {
+        if (AnyOf.isAnyOf(app.item)) {
             if (!anyOfSheets[app.id]) {
                 anyOfSheets[app.id] = new AnyOfSheet(app, data);
             }
@@ -93,78 +94,6 @@ export class AnyOfSheet {
             this.checkItem = await fromUuid(data.uuid);
         }
         this.render();
-    }
-
-}
-
-export function isAnyOf(item) {
-    // @ts-ignore
-    return (item?.type === 'loot' && item?.system?.source === Settings.ANYOF_SUBTYPE);
-}
-
-interface AnyOfStoreData {
-    macro: string
-}
-
-export class AnyOf {
-    macro;
-    img;
-    name;
-
-    constructor(item) {
-        const flags = item.flags[Settings.NAMESPACE]?.anyOf;
-        const data = mergeObject(this.defaultData(), flags || {}, {inplace: false});
-        this.macro = data.macro;
-        this.img = item.img;
-        this.name = item.name;
-    }
-
-    defaultData() {
-        return {
-            macro: "",
-        }
-    }
-
-    serialize(): AnyOfStoreData {
-        const serialized = {
-            macro: this.macro,
-        }
-        return serialized;
-    }
-
-    async executeMacro(item): Promise<MacroResult<boolean>> {
-        const AsyncFunction = (async function () {
-        }).constructor;
-        // @ts-ignore
-        const fn = new AsyncFunction("item", this.macro);
-        const result = {
-            value:false,
-            error: undefined
-        }
-        try {
-            result.value = await fn(item);
-        } catch (err) {
-            // @ts-ignore
-            logger.error(err);
-            result.error = err;
-        }
-        return result;
-    }
-
-    async filter(itemList): Promise<ComponentData[]>{
-        const resultList:ComponentData[] = [];
-        for(const item of itemList){
-            const result = await this.executeMacro(item);
-            if(result.value){
-                const same = resultList.filter(component => RecipeCompendium.isSame(item,component))
-                if(same.length > 0){
-                    same[0].quantity = same[0].quantity + item.system?.quantity;
-                }else{
-                    resultList.push(new Component(item,item.uuid,"Item"));
-                }
-            }
-        }
-        return resultList;
     }
 
 }

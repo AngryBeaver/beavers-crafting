@@ -20,10 +20,16 @@ export class Recipe implements RecipeData {
     attendants:{
         [key: string]: Component
     }
+    macro:string
     _trash:{
         ingredients:{};
         results:{};
         attendants:{};
+    }
+
+    static isRecipe(item) {
+        // @ts-ignore
+        return (item?.type === 'loot' && item?.system?.source === Settings.RECIPE_SUBTYPE);
     }
 
     static fromItem(item):Recipe{
@@ -56,6 +62,7 @@ export class Recipe implements RecipeData {
         this.currency = data.currency;
         this.tool = data.tool;
         this.attendants = deserializeComponents(data.attendants || {});
+        this.macro = data.macro || "";
         this._trash = {
             ingredients:{},
             results:{},
@@ -71,7 +78,8 @@ export class Recipe implements RecipeData {
             results: this.serializeResults(),
             currency: this.currency,
             tool: this.tool,
-            attendants: this.serializeAttendants()
+            attendants: this.serializeAttendants(),
+            macro: this.macro
         }
         if(!this.tool){
             serialized["-=tool"] = null;
@@ -150,6 +158,26 @@ export class Recipe implements RecipeData {
     }
     removeTool(){
         delete this.tool;
+    }
+
+    async executeMacro(result:Result): Promise<MacroResult<Result>> {
+        const macroResult: MacroResult<Result> = {
+            value: result
+        }
+        if(this.macro === undefined || this.macro ===""){
+            return macroResult;
+        }
+        const AsyncFunction = (async function () {}).constructor;
+        // @ts-ignore
+        const fn = new AsyncFunction("result", this.macro);
+        try {
+            macroResult.value = await fn(result);
+        } catch (err) {
+            // @ts-ignore
+            logger.error(err);
+            macroResult.error = err;
+        }
+        return macroResult;
     }
 
     async update(){

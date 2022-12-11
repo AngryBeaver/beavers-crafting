@@ -4,7 +4,7 @@ import {Crafting} from "../Crafting.js";
 import {getDataFrom, getItem, sanitizeUuid} from "../helpers/Utility.js";
 import {Settings} from "../Settings.js";
 import {getToolConfig} from "./ToolConfig.js";
-import {AnyOf, isAnyOf} from "./AnyOfSheet.js";
+import {AnyOf} from "../AnyOf.js";
 import {Component, Recipe} from "../Recipe.js";
 
 export class CraftingApp extends Application {
@@ -172,7 +172,7 @@ export class CraftingApp extends Application {
             const key = $(e.currentTarget).data("key");
             getItem(uuid).then(
                 item => {
-                    if(isAnyOf(item)){
+                    if(AnyOf.isAnyOf(item)){
                        return this._onDropAnyOf(new AnyOf(item),key,e);
                     }
                     return;
