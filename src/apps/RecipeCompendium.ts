@@ -3,6 +3,7 @@ import {Component, Recipe} from "../Recipe.js";
 import {Settings} from "../Settings.js";
 import {AnyOf} from "../AnyOf.js";
 import {getItem, sanitizeUuid} from "../helpers/Utility.js";
+import {Result} from "../Result.js";
 
 export class RecipeCompendium {
 
@@ -67,7 +68,7 @@ export class RecipeCompendium {
                 const listOfAnyOfIngredients = Object.values(recipe.ingredients).filter(component => component.type === Settings.ANYOF_SUBTYPE);
                 if (await this.isAnyAnyOfInList(listOfAnyOfIngredients, actor.items)) {                                       //isAvailable or usable ! when any item matches anyOf has the given quantity
                     const listOfIngredientsWithoutAnyOf = Object.values(recipe.ingredients).filter(component => component.type !== Settings.ANYOF_SUBTYPE);
-                    const result = RecipeCompendium.validateRecipeToItemList(listOfIngredientsWithoutAnyOf, actor.items);
+                    const result = RecipeCompendium.validateRecipeToItemList(listOfIngredientsWithoutAnyOf, actor.items, new Result(recipe));
                     await RecipeCompendium.validateTool(recipe,actor.items,result);
                     await RecipeCompendium.validateAttendants(recipe,actor.items,result);
                     if ((filter == FilterType.usable && !result.hasErrors)
@@ -95,20 +96,24 @@ export class RecipeCompendium {
         return true;
     }
 
-    static async validateAttendants(recipe:Recipe,listOfItems,result ?: Result): Promise<Result>{
-        if (!result) result = new DefaultResult();
+    static async validateAttendants(recipe:Recipe,listOfItems,result : ResultData): Promise<ResultData>{
         if( Settings.get(Settings.USE_ATTENDANTS)) {
             for(const attendant  of Object.values(recipe.attendants)){
                 const key = sanitizeUuid(attendant.uuid);
                 const itemChange = RecipeCompendium.findComponentInList(listOfItems, attendant);
                 const remainingQuantity = itemChange.toUpdate["system.quantity"] - attendant.quantity;
-                const isAvailAble = itemChange.toUpdate["system.quantity"] > 0;
+                const isAvailAble = remainingQuantity >= 0;
                 result.attendants[key] = {
                     component: attendant,
                     isAvailable: isAvailAble,
                     difference: remainingQuantity,
                 };
-                if (remainingQuantity < 0) {
+                result.chat.input.required["attendants_"+key] = {
+                    component: attendant,
+                    isAvailable: isAvailAble
+                }
+                if (!isAvailAble) {
+                    result.chat.success = false;
                     result.hasErrors = true;
                 }
             }
@@ -116,50 +121,58 @@ export class RecipeCompendium {
         return result;
     }
 
-    static async validateTool(recipe,listOfItems,result ?: Result): Promise<Result>{
-        if (!result) result = new DefaultResult();
+    static async validateTool(recipe,listOfItems,result : ResultData): Promise<ResultData>{
         if( recipe.tool && Settings.get(Settings.USE_TOOL)) {
             const item = await getItem(recipe.tool);
             const component = new Component(item, item.uuid, "Item");
+            const isAvailable = listOfItems.filter((i) => RecipeCompendium.isSame(i, component)).length > 0;
             result.tool = {
                 component: component,
                 isAvailable: false,
                 difference: 0,
             };
-            result.tool.isAvailable = listOfItems.filter((i) => RecipeCompendium.isSame(i, component)).length > 0;
-            if(!result.tool.isAvailable){
+            result.chat.input.required["tool"] = {
+                component: component,
+                isAvailable: isAvailable
+            }
+            if(!isAvailable){
+                result.chat.success = false;
                 result.hasErrors = true;
             }
         }
         return result;
     }
 
-    static validateRecipeToItemList(listOfIngredients: Component[], listOfItems, result ?: Result): Result {
-        if (!result) result = new DefaultResult();
+    static validateRecipeToItemList(listOfIngredients: Component[], listOfItems, result : ResultData): ResultData {
         let anyIngredientIsAvailable = listOfIngredients.length === 0;
         for (const component of listOfIngredients) {
             const key = sanitizeUuid(component.uuid);
             const itemChange = RecipeCompendium.findComponentInList(listOfItems, component);
             const remainingQuantity = itemChange.toUpdate["system.quantity"] - component.quantity;
-            const isAvailAble = itemChange.toUpdate["system.quantity"] > 0;
+            const isAvailable = remainingQuantity >= 0
             result.ingredients[key] = {
                 component: component,
-                isAvailable: isAvailAble,
+                isAvailable: isAvailable,
                 difference: remainingQuantity,
             };
-            if (isAvailAble) {
-                anyIngredientIsAvailable = isAvailAble;
+            result.chat.input.consumed["ingredients_"+key] = {
+                component: component,
+                isAvailable: isAvailable
             }
-            if (remainingQuantity < 0) {
+            if (isAvailable) {
+                anyIngredientIsAvailable = isAvailable;
+            }
+            if (!isAvailable) {
                 result.hasErrors = true;
+                result.chat.success = false;
             } else {
                 if (remainingQuantity == 0) {
-                    result.changes.items.toDelete.push(itemChange.toUpdate._id);
+                    result.updates.items.toDelete.push(itemChange.toUpdate._id);
                 } else {
                     itemChange.toUpdate["system.quantity"] = remainingQuantity;
-                    result.changes.items.toUpdate.push(itemChange.toUpdate);
+                    result.updates.items.toUpdate.push(itemChange.toUpdate);
                 }
-                result.changes.items.toDelete.push(...itemChange.toDelete);
+                result.updates.items.toDelete.push(...itemChange.toDelete);
             }
         }
         if(result.isAvailable){
@@ -208,23 +221,4 @@ class DefaultItemChange implements ItemChange {
     constructor(component: ComponentData) {
         this.toUpdate._id = component.id;
     }
-
-}
-
-export class DefaultResult implements Result {
-    ingredients = {};
-    currencies = true;
-    attendants = {};
-    changes = {
-        items: {
-            toUpdate: [],
-            toDelete: [],
-            toCreate: []
-        },
-        actor: {},
-    };
-    results = {};
-    hasErrors = false;
-    hasException: false;
-    isAvailable = true;
 }

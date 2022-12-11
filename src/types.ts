@@ -1,74 +1,105 @@
-
-interface Result {
-    changes: {
+interface ResultData {
+    updates: {
         items: {
-            toUpdate:updateItem[],
-            toDelete:string[],
-            toCreate:ComponentData[]
+            toUpdate: updateItem[],
+            toDelete: string[],
+            toCreate: ComponentData[]
         },
         actor: {
             "system.currency"?: Currencies5e;
             [key: string]: any
         }
     }
+    chat: ChatData;
+    recipe?: {
+        ingredients: {
+            [key: string]: boolean;
+        }
+        attendants: {
+            [key: string]: boolean;
+        }
+        tool: boolean;
+        currencies: boolean
+    }
     ingredients: {
-        [key: string]: IngredientResult }
+        [key: string]: IngredientResult
+    }
     results: { [key: string]: ComponentData }
     currencies: boolean;
-    skill?:{
+    skill?: {
         name: string,
         total: number,
         difference: number,
     };
-    tool?:IngredientResult
+    tool?: IngredientResult
     attendants: {
         [key: string]: IngredientResult
     }
-    hasErrors:boolean;
-    hasException:boolean;
-    isAvailable:boolean;
+    hasErrors: boolean;
+    hasException: boolean;
+    isAvailable: boolean;
+}
+
+interface ChatData {
+    name: string,
+    img: string,
+    success: boolean
+    input: {
+        consumed: {
+            [key: string]: ComponentResult
+        }
+        required: {
+            [key: string]: ComponentResult
+        }
+    }
+    output: {
+        [key: string]: ComponentData
+    }
+    skill?: {
+        name: string,
+        total: number,
+        difference: number,
+    }
 }
 
 interface ComponentResult {
     component: ComponentData,
-    isAvailable:boolean,
-    difference: number;
-    consumed: boolean;
+    isAvailable: boolean,
 }
 
 interface IngredientResult {
-    component:ComponentData,
-    isAvailable:boolean,
-    difference:number
+    component: ComponentData,
+    isAvailable: boolean,
+    difference: number
 }
 
 interface ComponentData {
-    id:string;
-    uuid:string;
-    type:string;
-    name:string;
-    img:string;
-    quantity:number;
+    id: string;
+    uuid: string;
+    type: string;
+    name: string;
+    img: string;
+    quantity: number;
     itemType?: string;
 }
 
 interface Skill {
-    name:string;
-    dc:number;
-    consume:boolean;
+    name: string;
+    dc: number;
+    consume: boolean;
 }
 
 interface Currencies5e {
-    pp?:number;
-    gp?:number;
-    ep?:number;
-    sp?:number;
-    cp?:number;
+    pp?: number;
+    gp?: number;
+    ep?: number;
+    sp?: number;
+    cp?: number;
 }
 
 interface Currency {
-    name:string;
-    value:number;
+    name: string;
+    value: number;
 }
 
 interface ItemChange {
@@ -79,12 +110,13 @@ interface ItemChange {
 interface updateItem {
     "_id": string,
     "system.quantity": number,
-    [key:string]: any
+
+    [key: string]: any
 }
 
 interface MacroResult<t> {
-    value:t,
-    error?:Error
+    value: t,
+    error?: Error
 }
 
 interface AnyOfStoreData {
@@ -92,16 +124,16 @@ interface AnyOfStoreData {
 }
 
 interface RecipeData {
-    ingredients:{
+    ingredients: {
         [key: string]: ComponentData
     }
     results: {
         [key: string]: ComponentData
     }
-    skill?:Skill;
-    currency?:Currency;
-    tool?:string;
-    attendants:{
+    skill?: Skill;
+    currency?: Currency;
+    tool?: string;
+    attendants: {
         [key: string]: ComponentData
     },
     macro?: string

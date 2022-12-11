@@ -160,8 +160,8 @@ export class Recipe implements RecipeData {
         delete this.tool;
     }
 
-    async executeMacro(result:Result): Promise<MacroResult<Result>> {
-        const macroResult: MacroResult<Result> = {
+    async executeMacro(result:ResultData): Promise<MacroResult<ResultData>> {
+        const macroResult: MacroResult<ResultData> = {
             value: result
         }
         if(this.macro === undefined || this.macro ===""){

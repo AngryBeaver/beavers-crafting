@@ -6,6 +6,7 @@ import {Settings} from "../Settings.js";
 import {getToolConfig} from "./ToolConfig.js";
 import {AnyOf} from "../AnyOf.js";
 import {Component, Recipe} from "../Recipe.js";
+import {Result} from "../Result.js";
 
 export class CraftingApp extends Application {
     data: {
@@ -64,7 +65,7 @@ export class CraftingApp extends Application {
         if (this.data.recipe === undefined || this._element === null) {
             return;
         }
-        this.data.result = RecipeCompendium.validateRecipeToItemList(Object.values(this.data.recipe.ingredients), this.data.actor.items);
+        this.data.result = RecipeCompendium.validateRecipeToItemList(Object.values(this.data.recipe.ingredients), this.data.actor.items,new Result(this.data.recipe));
         const crafting = await Crafting.from(this.data.actor.id, this.data.recipe.uuid);
         this.data.result = await crafting.checkTool(this.data.result);
         this.data.result = await crafting.checkAttendants(this.data.result);
