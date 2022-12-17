@@ -5,7 +5,7 @@ export async function rollTableToComponents(component, result) {
     let components = [];
     if (!table) {
         ui.notifications.error(game.i18n.localize(`beaversCrafting.crafting-app.errors.tableNotFound`) + component.name);
-        result.hasErrors = true;
+        result.hasError = true;
         result.hasException = true;
         return [];
     }
@@ -26,7 +26,7 @@ export async function rollTableToComponents(component, result) {
             const item = await getItem(uuid)
             if (!item) {
                 ui.notifications.error(game.i18n.localize(`beaversCrafting.crafting-app.errors.tableItemNotFound`) + r.name);
-                result.hasErrors = true;
+                result.hasError = true;
                 result.hasException = true;
                 return [];
             }

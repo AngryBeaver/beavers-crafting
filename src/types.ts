@@ -13,33 +13,33 @@ interface ResultData {
     chat: ChatData;
     precast: PreCastData;
     isAvailable: boolean;
-    hasErrors: boolean;
+    hasError: boolean;
     hasException: boolean;
 }
 
-interface ChatData {
-    name: string,
-    img: string,
-    success: boolean
-    input: {
-        consumed: {
-            [key: string]: ComponentResult
-        }
-        required: {
-            [key: string]: ComponentResult
-        }
-    }
-    output: {
-        [key: string]: ComponentData
-    }
-    skill?: {
-        name: string,
-        total: number,
-        difference: number,
-    }
+type ComponentType = "consumed" | "required" | "output";
+
+interface StackStatus {
+    id: string;
+    quantity: number;
+    status:  "created" | "updated";
 }
 
-interface PreCastData{
+interface ChatData {
+    components:{
+        [key: string]: ComponentResult
+    }
+    name: string;
+    img: string;
+    success: boolean;
+    skill?: {
+        name: string;
+        total: number;
+        difference: number;
+    };
+};
+
+interface PreCastData {
     ingredients: {
         [key: string]: {
             isAvailable: boolean
@@ -51,12 +51,13 @@ interface PreCastData{
         }
     }
     tool?: boolean;
-    currencies?: boolean
-}
+    currencies?: boolean;
+};
 
 interface ComponentResult {
     component: ComponentData,
     isAvailable: boolean,
+    type: ComponentType
 }
 
 interface IngredientResult {
@@ -101,9 +102,7 @@ interface ItemChange {
 
 interface updateItem {
     "_id": string,
-    "system.quantity": number,
-
-    [key: string]: any
+    "system.quantity": number
 }
 
 interface MacroResult<t> {
@@ -130,3 +129,4 @@ interface RecipeData {
     },
     macro?: string
 }
+

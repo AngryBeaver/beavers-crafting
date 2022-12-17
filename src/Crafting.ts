@@ -38,7 +38,7 @@ export class Crafting {
         RecipeCompendium.validateRecipeToItemList(Object.values(this.recipe.ingredients), this.actor.items, result);
         this.checkCurrency(result);
         await this.checkSkill(result);
-        await this.addResults(result);
+        await this.addOutput(result);
         await this.updateActor(result);
         await this._sendToChat(result);
         return result;
@@ -46,7 +46,7 @@ export class Crafting {
 
     async checkSkill(result?: Result): Promise<Result> {
         if (!result) result = new Result(this.recipe,this.actor);
-        if (result.hasErrors) return result;
+        if (result.hasError) return result;
         if (this.recipe.skill) {
             const skillParts = this.recipe.skill.name.split("-")
             if(skillParts[0] === 'ability'){
@@ -60,7 +60,7 @@ export class Crafting {
                 total: this.roll.total
             }
             if (this.roll.total < this.recipe.skill.dc) {
-                result.hasErrors = true;
+                result.hasError = true;
                 result.chat.success = false;
             }
         }
@@ -114,30 +114,40 @@ export class Crafting {
         return result;
     }
 
-    async addResults(result?: Result): Promise<Result> {
+    async addOutput(result?: Result): Promise<Result> {
         if (!result) result = new Result(this.recipe,this.actor);
-        if (result.hasErrors) return result;
+        if (result.hasError) return result;
         const components = await this._getResultComponents(result);
         for (const component of components) {
-            this._addComponentToResult(result, component);
+            result.addComponent("output", component);
         }
         return result;
     }
 
     async updateActor(result: Result) {
         if (!result) result = new Result(this.recipe,this.actor);
-        if (result.hasException || (result.hasErrors && (!this.recipe.skill?.consume ))) return;
+        if (result.hasException || (result.hasError && (!this.recipe.skill?.consume ))) return;
         const createItems: any[] = [];
+        const updateItems: any[] = [];
         for (const component of result.updates.items.toCreate) {
-            if (component.uuid) {
+            if(component.uuid && component.quantity > 0) {
                 const item = await fromUuid(component.uuid);
-                const itemData = item?.toObject();
-                itemData.system.quantity = component.quantity;
-                createItems.push(itemData);
+                if (item !== null) {
+                    const itemData = item.toObject();
+                    itemData.system.quantity = component.quantity;
+                    createItems.push(itemData);
+                }
+            }
+        }
+        for (const update of result.updates.items.toUpdate) {
+            if( update["system.quantity"] > 0) {
+                updateItems.push(update);
+            }else{
+                result.updates.items.toDelete.push(update._id);
             }
         }
         await this.actor.createEmbeddedDocuments("Item", createItems);
-        await this.actor.updateEmbeddedDocuments("Item", result.updates.items.toUpdate);
+        await this.actor.updateEmbeddedDocuments("Item", updateItems);
         await this.actor.deleteEmbeddedDocuments("Item", result.updates.items.toDelete);
         await this.actor.update(result.updates.actor);
         return result;
@@ -155,48 +165,12 @@ export class Crafting {
         })
     }
 
-    _addComponentToResult(result: ResultData, component: ComponentData) {
-        const itemChange = RecipeCompendium.findComponentInList(this.actor.items, component);
-        const isAlreadyOnActor = itemChange.toUpdate["system.quantity"] > 0
-        const isAlreadyUpdated = result.updates.items.toUpdate
-            .filter(x => x._id === itemChange.toUpdate._id).length > 0
-        const isAlreadyCreated = result.updates.items.toCreate
-            .filter(x => x.id === itemChange.toUpdate._id).length > 0
-        const isAlreadyDeleted = result.updates.items.toDelete.includes(itemChange.toUpdate._id)
-
-        if(result.chat.output["result."+component.uuid]){
-            Component.inc(result.chat.output["result."+component.uuid]);
-        }else{
-            result.chat.output["result."+component.uuid] = component;
-        }
-        if (!isAlreadyOnActor) {
-            if(isAlreadyCreated){
-                const creates =  result.updates.items.toCreate.filter(x => x.id === itemChange.toUpdate._id);
-                creates.forEach(x => x.quantity = x.quantity + component.quantity)
-            } else {
-                result.updates.items.toCreate.push(Component.clone(component));
-            }
-        } else {
-            if(isAlreadyDeleted){
-                const deleteIndex = result.updates.items.toDelete.indexOf(itemChange.toUpdate._id);
-                result.updates.items.toDelete.splice(deleteIndex,1);
-            }
-            if(isAlreadyUpdated){
-                const updates = result.updates.items.toUpdate.filter(x => x._id === itemChange.toUpdate._id)
-                updates.forEach(x => x["system.quantity"] = x["system.quantity"] + component.quantity)
-            }else{
-                itemChange.toUpdate["system.quantity"] = itemChange.toUpdate["system.quantity"] + component.quantity
-                result.updates.items.toUpdate.push(itemChange.toUpdate);
-            }
-        }
-    }
-
     async _getResultComponents(result: ResultData): Promise<ComponentData[]> {
         const items = Object.values(this.recipe.results).filter(component => component.type === "Item");
         const tables = Object.values(this.recipe.results).filter(component => component.type === "RollTable");
         for (const component of tables) {
             items.push(...await rollTableToComponents(component, result));
-            if (result.hasErrors) return [];
+            if (result.hasError) return [];
         }
         return items;
     }

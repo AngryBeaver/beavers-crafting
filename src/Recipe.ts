@@ -38,7 +38,7 @@ export class Recipe implements RecipeData {
         return new Recipe(item.uuid,item.id,item.name,item.img,data);
     }
 
-    static fromRecipe(recipe: Recipe):Recipe{
+    static clone(recipe: Recipe):Recipe{
         const data = recipe.serialize();
         return new Recipe(recipe.uuid,recipe.id,recipe.name,recipe.img,data);
     }
@@ -206,6 +206,10 @@ export class Component implements ComponentData {
 
     static clone(component: ComponentData):ComponentData{
         return new Component(component,component.uuid, component.type)
+    }
+
+    static fromItem(entity){
+        return new Component(entity,entity.uuid, "Item");
     }
 
     constructor(entity, uuid, type) {

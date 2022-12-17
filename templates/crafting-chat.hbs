@@ -20,7 +20,8 @@
     <div class="flexrow">
         <div class="left dnd5e">
             <div class="items-list">
-                {{#each data.input.required}}
+                {{#each data.components}}
+                    {{#if (eq type "required")}}
                     <div class="flexrow item" style="background: rgba(0,0,0,0.025)">
                         <div class="item-name flexrow" style="flex:1" title="{{this.component.name}}">
                             <div class="item-image"
@@ -35,8 +36,10 @@
                             {{/if}}
                         </div>
                     </div>
+                    {{/if}}
                 {{/each}}
-                {{#each data.input.consumed}}
+                {{#each data.components}}
+                    {{#if (eq type "consumed")}}
                     <div class="flexrow item">
                         <div class="item-name flexrow" style="flex:1" title="{{this.component.name}}">
                             <div class="item-image"
@@ -51,22 +54,25 @@
                             {{/if}}
                         </div>
                     </div>
+                    {{/if}}
                 {{/each}}
             </div>
         </div>
-        <div class="right">
+        <div class="right dnd5e">
             <div class="results items-list">
                 <div class="title">
                     <div class="name">{{localize "beaversCrafting.recipe.results"}}</div>
                 </div>
-                {{#each data.output}}
+                {{#each data.components}}
+                    {{#if (eq type "output")}}
                     <div class="flexrow item">
-                        <div class="item-name flexrow" style="flex:1" title="{{this.name}}">
+                        <div class="item-name flexrow" style="flex:1" title="{{this.component.name}}">
                             <div class="item-image"
-                                 style="background-image: url('{{this.img}}')"></div>
-                            <h4>{{this.quantity}} {{this.name}}</h4>
+                                 style="background-image: url('{{this.component.img}}')"></div>
+                            <h4>{{this.component.quantity}} {{this.component.name}}</h4>
                         </div>
                     </div>
+                    {{/if}}
                 {{/each}}
             </div>
         </div>

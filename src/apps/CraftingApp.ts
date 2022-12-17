@@ -105,7 +105,7 @@ export class CraftingApp extends Application {
                 .then(crafting => {
                     return crafting.craft();
                 }).then(result => {
-                if (!result.hasErrors) {
+                if (!result.hasError) {
                     this.render();
                 }
             });
@@ -118,7 +118,7 @@ export class CraftingApp extends Application {
         html.find(".sidebar a.item").on("click", (e) => {
             const index = $(e.currentTarget).data().id;
             this.data.index = index;
-            this.data.recipe = this.data.recipes[index];
+            this.data.recipe = Recipe.clone(this.data.recipes[index]);
             html.find(".sidebar a.item.selected").removeClass("selected");
             html.find(".sidebar a.item[data-id =" + index + "]").addClass("selected");
             void this.renderRecipeSheet();
@@ -197,7 +197,7 @@ export class CraftingApp extends Application {
                 const component = new Component(entity, data.uuid, data.type);
                 const nextKey = sanitizeUuid(data.uuid);
                 component.quantity = previousComponent.quantity;
-                this.data.recipe = Recipe.fromRecipe(this.data.recipe);
+                this.data.recipe = Recipe.clone(this.data.recipe);
                 //remove existing ingredient with same id and add quantity;
                 if(this.data.recipe.ingredients[nextKey]){
                     component.quantity = component.quantity + this.data.recipe.ingredients[nextKey].quantity;
