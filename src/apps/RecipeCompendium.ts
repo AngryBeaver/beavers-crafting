@@ -2,7 +2,7 @@
 import {Component, Recipe} from "../Recipe.js";
 import {Settings} from "../Settings.js";
 import {AnyOf} from "../AnyOf.js";
-import {getItem, sanitizeUuid} from "../helpers/Utility.js";
+import {getItem} from "../helpers/Utility.js";
 import {Result} from "../Result.js";
 
 export class RecipeCompendium {
@@ -71,8 +71,8 @@ export class RecipeCompendium {
                     const result = RecipeCompendium.validateRecipeToItemList(listOfIngredientsWithoutAnyOf, actor.items, new Result(recipe,actor));
                     await RecipeCompendium.validateTool(recipe,actor.items,result);
                     await RecipeCompendium.validateAttendants(recipe,actor.items,result);
-                    if ((filter == FilterType.usable && !result.hasError)
-                        || (filter == FilterType.available && result.isAvailable)) {
+                    if ((filter == FilterType.usable && !result.hasError())
+                        || (filter == FilterType.available && result._isAnyConsumedAvailable())) {
                         returnList.push(recipe);
                     }
                 }
@@ -99,22 +99,7 @@ export class RecipeCompendium {
     static async validateAttendants(recipe:Recipe,listOfItems,result : Result): Promise<Result>{
         if( Settings.get(Settings.USE_ATTENDANTS)) {
             for(const attendant  of Object.values(recipe.attendants)){
-                const key = sanitizeUuid(attendant.uuid);
-                const itemChange = RecipeCompendium.findComponentInList(listOfItems, attendant);
-                const remainingQuantity = itemChange.toUpdate["system.quantity"] - attendant.quantity;
-                const isAvailable = remainingQuantity >= 0;
-                result.precast.attendants[key] = {
-                    isAvailable: isAvailable
-                }
-                result.chat.components["attendants_"+key] = {
-                    component: attendant,
-                    isAvailable: isAvailable,
-                    type: "required"
-                }
-                if (!isAvailable) {
-                    result.chat.success = false;
-                    result.hasError = true;
-                }
+                result.updateComponent("required",attendant);
             }
         }
         return result;
@@ -123,37 +108,15 @@ export class RecipeCompendium {
     static async validateTool(recipe,listOfItems,result : Result): Promise<Result>{
         if( recipe.tool && Settings.get(Settings.USE_TOOL)) {
             const item = await getItem(recipe.tool);
-            const component = new Component(item, item.uuid, "Item");
-            const isAvailable = listOfItems.filter((i) => RecipeCompendium.isSame(i, component)).length > 0;
-            result.precast.tool = isAvailable;
-            result.chat.components["tool"] = {
-                component: component,
-                isAvailable: isAvailable,
-                type: "required"
-            }
-            if(!isAvailable){
-                result.chat.success = false;
-                result.hasError = true;
-            }
+            const component = Component.fromEntity(item);
+            result.updateComponent("required",component);
         }
         return result;
     }
 
     static validateRecipeToItemList(listOfIngredients: Component[], listOfItems, result : Result): Result {
-        let anyIngredientIsAvailable = listOfIngredients.length === 0;
         for (const component of listOfIngredients) {
-            const remainingQuantity = result.removeComponent("consumed",component);
-            const key = sanitizeUuid(component.uuid);
-            const isAvailable = remainingQuantity>=0
-            result.precast.ingredients[key] = {
-                isAvailable: isAvailable
-            }
-            if (remainingQuantity>-component.quantity) {
-                anyIngredientIsAvailable = true;
-            }
-        }
-        if(!anyIngredientIsAvailable){
-            result.isAvailable = false;
+            result.updateComponent("consumed",component);
         }
         return result;
     }
@@ -174,9 +137,12 @@ export class RecipeCompendium {
     }
 
     static isSame(item, component: ComponentData) {
+        const type = item.documentName || item.type;
+        const itemType = item.itemType || item.type;
         const isSameName = item.name === component.name;
-        const hasSameItemType = item.documentName==="Item" && item.type === component.itemType;
-        return isSameName && hasSameItemType;
+        const isSameType = type === component.type;
+        const isSameItemType = type === "Item" && itemType === component.itemType;
+        return isSameName && isSameType && isSameItemType;
     }
 
 }

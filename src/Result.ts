@@ -1,188 +1,184 @@
 import {Component, Recipe} from "./Recipe.js";
 import {Exchange} from "./Exchange.js";
 import {RecipeCompendium} from "./apps/RecipeCompendium.js";
-import {sanitizeUuid} from "./helpers/Utility.js";
 
-export class Result implements ResultData {
-    updates: {
-        items: {
-            toUpdate: updateItem[];
-            toDelete: string[];
-            toCreate: ComponentData[]
-        }
-        actor: {
-            "system.currency": Currencies5e;
-            [key: string]: any
-        }
+export class Result implements ResultApi {
+    _actorUpdate = {};
+    _hasException= false;
+    _components: {
+        required: ComponentResults,
+        consumed: ComponentResults,
+        produced: ComponentResults
+    }
+    _skill?: {
+        name: string,
+        dc: number,
+        total: number,
     };
-    chat = new DefaultChatData();
-    precast = new Precast();
-    hasError = false;
-    hasException = false;
-    isAvailable = true;
-    actorItems=[];
+    _currencyResult?: CurrencyResult
+    _chatAddition: {
+        [key: string]:ComponentChatData
+    }
+    _actor: any;
+    _recipe: Recipe;
 
-    constructor(recipe:Recipe, actor ){
-        this.chat.name = recipe.name;
-        this.chat.img = recipe.img;
-        this.updates = {
-            items: {
-                toUpdate:[],
-                toDelete:[],
-                toCreate:[]
-            },
-            actor:{
-                "system.currency": actor.system.currency
+    constructor( recipe: Recipe, actor ){
+        this._components = {
+            required: new ComponentResults(),
+            consumed: new ComponentResults(),
+            produced: new ComponentResults()
+        };
+        this._chatAddition = {};
+        this._actor = actor;
+        this._recipe = recipe;
+    }
+
+    hasError():boolean {
+        let hasError = false;
+        if(this._components.required.hasAnyError()){
+            hasError = true;
+        }
+        if(this._components.consumed.hasAnyError()){
+            hasError = true;
+        }
+        if(this._skill !== undefined){
+            if(this._skill.dc > this._skill.total){
+                hasError = true;
             }
         }
-        this.actorItems = actor.items;
-    }
-
-    updateActorProperty(key,value){
-        this.updates.actor[key] = value;
-    }
-
-    setError(hasError: boolean){
-        this.hasError = hasError;
-        this.chat.success = !hasError;
-    }
-
-    setException(hasException: boolean){
-        this.hasException = hasException;
-    }
-    addChatComponent(key:string, componentResult: ComponentResult){
-        this.chat.components[key] = componentResult;
-    }
-    removeChatComponent(key:string){
-        delete this.chat.components[key];
-    }
-
-    changeCurrency(currency: Currency) {
-        let isAvailable = false;
-        try {
-            this.updates.actor["system.currency"] = Exchange.pay(currency, this.updates.actor["system.currency"]);
-            isAvailable = true;
-        } catch (e) {
+        if(this._currencyResult !== undefined){
+            if(this._currencyResult.hasError ){
+                hasError = true;
+            }
         }
-        this.addChatComponent("currency", {
+        return hasError
+    }
+    _isAnyConsumedAvailable(): boolean {
+       return this._components.consumed.isAnyAvailable();
+    }
+
+    updateActorProperty(key:string,value:any){
+        this._actorUpdate[key]=value;
+    }
+
+    addChatComponent(componentChatData : ComponentChatData) {
+        this._chatAddition["add_"+componentChatData.type+"_"+componentChatData.component.name] = componentChatData;
+    }
+
+    payCurrency(currency: Currency) {
+        this._currencyResult = {...currency,hasError:false};
+        try {
+            this.updateActorProperty("system.currency",Exchange.pay(currency, this._actor.system.currency));
+            this._currencyResult.hasError = false;
+        } catch (e) {
+            this._currencyResult.hasError = true;
+        }
+        this.addChatComponent({
             component: {
                 id: "invalid",
                 uuid: "invalid",
                 type: "Currency",
                 name: currency.name,
                 img: 'icons/commodities/currency/coins-assorted-mix-copper-silver-gold.webp',
-                quantity: currency.value
+                quantity: currency.value*-1
             },
-            isAvailable: isAvailable,
+            hasError: this._currencyResult.hasError,
             type: "consumed"
         });
     }
 
-    removeComponent(type: ComponentType, component: ComponentData) : number {
-        const stackStatus = this._addToStack(component,- component.quantity);
-        const isAvailable = stackStatus.quantity >= 0;
-        const stackKey = sanitizeUuid(stackStatus.id);
-        this.addChatComponent(type+stackKey, {
-            component: component,
-            isAvailable: isAvailable,
-            type: type
-        });
-        if(!isAvailable){
-            this.setError(true);
-        }
-        return stackStatus.quantity;
+    deleteComponent(type: ComponentType, componentData: ComponentData) {
+        this._components[type].deleteComponentResult(componentData);
     }
 
-    _addToStack(component: ComponentData, quantity: number):StackStatus {
-        const itemChange = RecipeCompendium.findComponentInList(this.actorItems, component);
-        const isOnActor = itemChange.toUpdate["system.quantity"] > 0;
-        const updatedItem = this.updates.items.toUpdate
-            .filter(x => x._id === itemChange.toUpdate._id)[0];
-        const createdItem = this.updates.items.toCreate
-            .filter(x => x.id === itemChange.toUpdate._id)[0];
-        if(createdItem !== undefined){
-            return {
-                id: itemChange.toUpdate._id,
-                quantity: createdItem.quantity+quantity,
-                status: "created"
+    updateComponent(type: ComponentType, componentData: ComponentData, fn: (componentResult:ComponentResult,quantity: number)=>void = (componentResult: ComponentResult,quantity:number)=>{
+        componentResult.component.quantity = componentResult.component.quantity + quantity;
+    }):void {
+        let componentResult = this._components[type].findComponentResult(componentData);
+        if(componentResult === undefined){
+            componentResult = new ComponentResult();
+            componentResult.component = Component.clone(componentData);
+            componentResult.component.quantity = 0;
+            const itemChange = RecipeCompendium.findComponentInList(this._actor.items, componentData);
+            componentResult.component.id = itemChange.toUpdate._id;
+            componentResult.originalQuantity = itemChange.toUpdate["system.quantity"];
+            this._components[type].addComponentResult(componentResult);
+        }
+        let userInteraction: UserInteraction = "never";
+        let quantity = componentData.quantity*-1;
+        if(type === "produced"){
+            userInteraction = "onSuccess";
+            quantity = quantity*-1;
+        }
+        if(type === "consumed"){
+            userInteraction = "onSuccess";
+            if(this._recipe.skill?.consume) {
+                userInteraction = "always";
             }
         }
-        if(updatedItem !== undefined){
-            return {
-                id: itemChange.toUpdate._id,
-                quantity: updatedItem["system.quantity"]+quantity,
-                status: "updated"
-            }
-        }
-        if(isOnActor){
-            this.updates.items.toDelete.push(...itemChange.toDelete);
-            itemChange.toUpdate["system.quantity"] = itemChange.toUpdate["system.quantity"]+quantity
-            this.updates.items.toUpdate.push(itemChange.toUpdate);
-            return {
-                id: itemChange.toUpdate._id,
-                quantity: itemChange.toUpdate["system.quantity"],
-                status: "updated"
-            }
-        }
-        const createdComponent = Component.clone(component);
-        createdComponent.quantity = quantity;
-        this.updates.items.toCreate.push(createdComponent);
-        return {
-            id: itemChange.toUpdate._id,
-            quantity: quantity,
-            status: "created"
-        }
+        componentResult.userInteraction=userInteraction;
+        fn(componentResult,quantity);
     }
-
-    addComponent(type: ComponentType, component: ComponentData) : number {
-        // @ts-ignore
-        const stackStatus = this._addToStack(component,component.quantity);
-        const isAvailable = stackStatus.quantity >= 0;
-        const stackKey = sanitizeUuid(stackStatus.id);
-        this.addChatComponent(type+stackKey, {
-            component: component,
-            isAvailable: isAvailable,
-            type: type
-        });
-        return stackStatus.quantity;
-    }
-
 }
 
-class DefaultChatData implements ChatData {
-    name="";
-    img="";
-    success=true;
-    components:{
-        [key: string]: ComponentResult
-    }
-    skill?: {
-        name: string,
-        total: number,
-        difference: number,
-    }
+export class ComponentResults implements ComponentResultsData {
+    _data:ComponentResult[];
     constructor(){
-        this.components = {};
+        this._data = [];
+    }
+    hasAnyError(){
+        for(const componentResult of this._data){
+            if(componentResult.hasError()){
+                return true;
+            }
+        }
+        return false;
+    }
+    isAnyAvailable(){
+        for(const componentResult of this._data){
+            if(componentResult.originalQuantity > 0){
+                return true;
+            }
+        }
+        return this._data.length === 0;
+    }
+    hasError(componentData: ComponentData):boolean {
+        const componentResult = this.findComponentResult(componentData);
+        if (componentResult === undefined) {
+            return false;
+        }
+        return componentResult.hasError()
+    }
+    addComponentResult(componentResult:ComponentResult){
+        this._data.push(componentResult);
+    }
+    findComponentResult(componentData: ComponentData): ComponentResult | undefined {
+        return this._data.find(e => e.component.isSame(componentData));
+    }
+    deleteComponentResult(componentData: ComponentData) {
+        this._data.splice(this._data.findIndex(e => e.component.isSame(componentData)), 1);
     }
 }
 
-class Precast implements PreCastData {
-    ingredients: {
-        [key: string]: {
-            isAvailable: boolean
-        }
+export class ComponentResult implements ComponentResultData {
+    component: Component;
+    originalQuantity: number;
+    userInteraction: UserInteraction;
+
+    static from(componentResultData:ComponentResultData):ComponentResult{
+        const componentResult = new ComponentResult();
+        componentResult.component = Component.clone(componentResultData.component);
+        componentResult.originalQuantity = componentResultData.originalQuantity;
+        componentResult.userInteraction = componentResultData.userInteraction;
+        return componentResult;
     }
-    attendants: {
-        [key: string]: {
-            isAvailable: boolean
-        }
+    hasError():boolean{
+        return this.resultQuantity() < 0;
     }
-    tool?: boolean;
-    currencies?: boolean
-    constructor(){
-        this.attendants = {};
-        this.ingredients = {};
+    isAvailable():boolean{
+        return this.originalQuantity > 0;
+    }
+    resultQuantity():number{
+        return this.originalQuantity+this.component.quantity;
     }
 }
-
-

@@ -1,43 +1,49 @@
-interface ResultData {
-    updates: {
-        items: {
-            toUpdate: updateItem[],
-            toDelete: string[],
-            toCreate: ComponentData[]
-        },
-        actor: {
-            "system.currency"?: Currencies5e;
-            [key: string]: any
-        }
-    }
-    chat: ChatData;
-    precast: PreCastData;
-    isAvailable: boolean;
-    hasError: boolean;
-    hasException: boolean;
+interface ResultApi {
+    hasError: ()=>boolean,
+    addChatComponent: (componentChatData:ComponentChatData)=>void,
+    updateActorProperty:(key:string,value:any)=>void,
+    updateComponent: (type: ComponentType, componentData: ComponentData, fn: (componentResult:ComponentResultData,quantity: number)=>void)=>void,
+    deleteComponent: (type: ComponentType, componentData: ComponentData)=>void,
+    payCurrency: (currency:Currency)=>void
+}
+interface ComponentResultsData {
+    _data: ComponentResultData[];
 }
 
-type ComponentType = "consumed" | "required" | "output";
+interface ComponentResultData {
+    component: ComponentData
+    originalQuantity: number,
+    userInteraction: UserInteraction
+}
+
+type UserInteraction =  "always" | "never" | "onSuccess";
+
+type ComponentType = "consumed" | "required" | "produced";
 
 interface StackStatus {
     id: string;
     quantity: number;
+    originalQuantity: number;
     status:  "created" | "updated";
 }
 
+interface ComponentChatData {
+    component: ComponentData,
+    type: ComponentType,
+    hasError: boolean,
+}
+
 interface ChatData {
-    components:{
-        [key: string]: ComponentResult
-    }
-    name: string;
+    title: string;
     img: string;
+    components:ComponentChatData[]
     success: boolean;
     skill?: {
-        name: string;
-        total: number;
-        difference: number;
-    };
-};
+        name: string,
+        dc: number,
+        total: number,
+    }
+}
 
 interface PreCastData {
     ingredients: {
@@ -52,12 +58,6 @@ interface PreCastData {
     }
     tool?: boolean;
     currencies?: boolean;
-};
-
-interface ComponentResult {
-    component: ComponentData,
-    isAvailable: boolean,
-    type: ComponentType
 }
 
 interface IngredientResult {
@@ -91,16 +91,20 @@ interface Currencies5e {
 }
 
 interface Currency {
-    name: string;
+    name: "pp"|"gp"|"ep"|"sp"|"cp";
     value: number;
+}
+
+interface CurrencyResult extends Currency{
+    hasError: boolean;
 }
 
 interface ItemChange {
     toDelete: string[];
-    toUpdate: updateItem;
+    toUpdate: UpdateItem;
 }
 
-interface updateItem {
+interface UpdateItem {
     "_id": string,
     "system.quantity": number
 }

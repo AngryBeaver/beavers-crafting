@@ -1,7 +1,6 @@
 import {Recipe} from "../Recipe.js";
 import {Settings} from "../Settings.js";
 import {getAbilities, getCurrencies, getSkills} from "../systems/dnd5e.js"
-import {RecipeCompendium} from "./RecipeCompendium.js";
 import {getDataFrom, getItem} from "../helpers/Utility.js";
 import {AnyOf} from "../AnyOf.js";
 import {getToolConfig} from "./ToolConfig.js";
@@ -95,7 +94,8 @@ export class RecipeSheet {
         let template = await renderTemplate('modules/beavers-crafting/templates/recipe-sheet.hbs',{
             main: main,
             active: this.sheet.active,
-            advanced: "test"
+            advanced: "test",
+            recipe: this.recipe
         });
         this.recipeElement.find('.recipe').remove();
         this.recipeElement.append(template);

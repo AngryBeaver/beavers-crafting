@@ -17,7 +17,7 @@ export class CraftingApp extends Application {
         filterItems:{},
         recipe?:Recipe,
         content?,
-        result?,
+        result?:Result,
     };
 
     constructor(actor, options: any = {}) {
@@ -67,8 +67,8 @@ export class CraftingApp extends Application {
         }
         this.data.result = RecipeCompendium.validateRecipeToItemList(Object.values(this.data.recipe.ingredients), this.data.actor.items,new Result(this.data.recipe,this.data.actor));
         const crafting = await Crafting.from(this.data.actor.id, this.data.recipe.uuid);
-        this.data.result = await crafting.checkTool(this.data.result);
-        this.data.result = await crafting.checkAttendants(this.data.result);
+        await crafting.checkTool(this.data.result);
+        await crafting.checkAttendants(this.data.result);
         this.data.content = await renderTemplate('modules/beavers-crafting/templates/recipe-main.hbs',
             {
                 recipe: this.data.recipe,
@@ -76,7 +76,7 @@ export class CraftingApp extends Application {
                 skills: getSkills(),
                 abilities: getAbilities(),
                 editable: false,
-                precast: this.data.result.precast,
+                precast: await this.getPrecastFromResult(this.data.result,this.data.recipe),
                 displayResults:Settings.get(Settings.DISPLAY_RESULTS),
                 displayIngredients:Settings.get(Settings.DISPLAY_RESULTS),
                 tools: await getToolConfig(),
@@ -226,6 +226,33 @@ export class CraftingApp extends Application {
 
             this.render();
         }
+    }
+
+    async getPrecastFromResult(result: Result, recipe: Recipe): Promise<PreCastData>{
+        const preCastData:PreCastData = {
+            attendants: {},
+            currencies: !result._currencyResult?.hasError,
+            ingredients: {},
+            tool: false,
+        }
+        for(const key in recipe.ingredients){
+            const component = recipe.ingredients[key];
+            preCastData.ingredients[key]={
+                isAvailable: !result._components.consumed.hasError(component)
+            }
+        }
+        for(const key in recipe.attendants){
+            const component = recipe.attendants[key];
+            preCastData.attendants[key]={
+                isAvailable: !result._components.required.hasError(component)
+            }
+        }
+        if(Settings.get(Settings.USE_TOOL) && recipe.tool){
+            const item = await getItem(recipe.tool);
+            const component = Component.fromEntity(item);
+            preCastData.tool = !result._components.required.hasError(component)
+        }
+        return preCastData;
     }
 }
 

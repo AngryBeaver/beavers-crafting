@@ -2,6 +2,7 @@ import {Settings} from "./Settings.js";
 import {DefaultCurrency} from "./Exchange.js";
 import {getItem, sanitizeUuid} from "./helpers/Utility.js";
 import {getToolConfig} from "./apps/ToolConfig.js";
+import {Result} from "./Result.js";
 
 export class Recipe implements RecipeData {
     uuid:string;
@@ -90,6 +91,9 @@ export class Recipe implements RecipeData {
         if(!this.currency){
             serialized["-=currency"] = null;
         }
+        if(!this.macro){
+            serialized["-=macro"] = null;
+        }
         return serialized;
     }
 
@@ -160,8 +164,8 @@ export class Recipe implements RecipeData {
         delete this.tool;
     }
 
-    async executeMacro(result:ResultData): Promise<MacroResult<ResultData>> {
-        const macroResult: MacroResult<ResultData> = {
+    async executeMacro(recipeData: RecipeData, result:Result, actor): Promise<MacroResult<Result>> {
+        const macroResult: MacroResult<Result> = {
             value: result
         }
         if(this.macro === undefined || this.macro ===""){
@@ -169,9 +173,9 @@ export class Recipe implements RecipeData {
         }
         const AsyncFunction = (async function () {}).constructor;
         // @ts-ignore
-        const fn = new AsyncFunction("result", this.macro);
+        const fn = new AsyncFunction("result","actor","recipeData", this.macro);
         try {
-            macroResult.value = await fn(result);
+            macroResult.value = await fn(result, actor, recipeData);
         } catch (err) {
             // @ts-ignore
             logger.error(err);
@@ -204,12 +208,12 @@ export class Component implements ComponentData {
     type: string;
     itemType?: string;
 
-    static clone(component: ComponentData):ComponentData{
+    static clone(component: ComponentData):Component{
         return new Component(component,component.uuid, component.type)
     }
 
-    static fromItem(entity){
-        return new Component(entity,entity.uuid, "Item");
+    static fromEntity(entity): Component{
+        return new Component(entity,entity.uuid, entity.documentName);
     }
 
     constructor(entity, uuid, type) {
@@ -230,6 +234,15 @@ export class Component implements ComponentData {
 
     async getEntity(){
         return getItem(this.uuid);
+    }
+
+    isSame(entity) {
+        const type = entity.documentName || entity.type;
+        const itemType = entity.itemType || entity.type;
+        const isSameName = entity.name === this.name;
+        const isSameType = type === this.type;
+        const isSameItemType = type === "Item" && itemType === this.itemType;
+        return isSameName && isSameType && isSameItemType;
     }
 
     static inc(component: ComponentData){

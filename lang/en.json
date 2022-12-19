@@ -15,7 +15,10 @@
       "dropItem": "drop item",
       "currency": "Cost",
       "consumeOnFailedSaveHint": "Consumes Cost on failed Skill check",
-      "attendants": "Attendants"
+      "attendants": "Attendants",
+      "macro":{
+        "button": "save"
+      }
     },
     "anyOf": {
       "dropItem": "drop item",

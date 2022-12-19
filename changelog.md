@@ -1,4 +1,16 @@
 # Changelog
+## 1.0.x macros
+### 1.0.0 feature macros
+You can now use macros to customize your recipes further see see [RecipeMacro](https://github.com/AngryBeaver/beavers-crafting/blob/main/macros.md)
+You also will find a handful examples solving some user feature requests. 
+### 1.0.0 refactored stable
+As internal Data is now public available via macro this needed to get refactored in an easy to use and possibly on most parts stable interface leading to version 1.0.0.
+Plz note that the internal code is massive refactored basically rewritten hopefully i covered everything to work the same as before, but keep an eye out maybe i missed something.
+
+Hopefully the only difference for the users are 
+- chat is now displaying negative quantity on consumed components.
+- skillCheck is done regardless of failed components -> because macro can lately decide to fix fails or fail success runs.
+
 ## 0.7.x attendants
 ### 0.7.1 update: identity check
 !Breaking Change!

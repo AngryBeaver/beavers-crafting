@@ -20,14 +20,14 @@
                                 {{#unless editable}}disabled{{/unless}} class="tool-selection">
                             {{#select recipe.tool}}
                                 {{#each tools}}
-                                    <option value="{{this.uuid}}"/>
+                                    <option value="{{this.uuid}}">
                                         {{this.name}}</option>
                                 {{/each}}
                             {{/select}}
                         </select>
-                        {{#if precast}}
+                        {{#if result}}
                             <div class="action result flexrow">
-                                {{#if precast.tool.isAvailable }}
+                                {{#if precast.tool }}
                                     <i class="fas fa-check"></i>
                                 {{else}}
                                     <i class="fas fa-times"></i>

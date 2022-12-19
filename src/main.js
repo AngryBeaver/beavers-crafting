@@ -4,6 +4,7 @@ import {Settings} from './Settings.js';
 import {Crafting} from "./Crafting.js";
 import {RecipeCompendium} from "./apps/RecipeCompendium.js";
 import {AnyOfSheet} from "./apps/AnyOfSheet.js";
+import {Component, Recipe} from "./Recipe.js";
 
 Hooks.once('init', async function () {
 
@@ -42,6 +43,8 @@ Hooks.once('init', async function () {
     if(!game[Settings.NAMESPACE])game[Settings.NAMESPACE]={};
     game[Settings.NAMESPACE].Crafting = Crafting;
     game[Settings.NAMESPACE].RecipeCompendium = RecipeCompendium;
+    game[Settings.NAMESPACE].Component = Component;
+    game[Settings.NAMESPACE].Recipe = Recipe;
     game[Settings.NAMESPACE].itemTypeMigration = itemTypeMigration;
 });
 

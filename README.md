@@ -7,7 +7,6 @@ With this module you can create recipes to craft items. E.g. a bunch of mushroom
 
 #### possible breaking change! 0.7.1 release
 see changelog.md for details.
-
 ## Features
 ![img.gif](pictures/video.gif)
 ### Loot subtype Recipe
@@ -20,9 +19,9 @@ Default is "Create New Item" obviously you need to adapt if you have a different
 ![img.png](pictures/configure.png)
 
 #### attendants: optional (0.7.x)
-you may add an attendant the crafting process requires but is not consumed.
+you may add an attendant the crafting process requires but is not consumed. (default disabled)
 #### tool: optional (0.5.x)
-you may add a tool the crafting process requires.
+you may add a tool the crafting process requires. (default disabled)
 #### cost: 
 you may add costs to the crafting process
 #### Ingredients:
@@ -34,6 +33,9 @@ you can enable that costs and ingredients are also payed when the check failed.
 You may add Items or RollTable via drag and drop as result.
 The result is the outcome of a successfull crafting process.
 If you add a RollTable you will get quantity amount of rolls on that table not one roll quantity of times.
+#### advanced Tab:
+Advanced user may use the optional recipe macro that gets executed during the crafting process.
+see[RecipeMacro](https://github.com/AngryBeaver/beavers-crafting/blob/main/macros.md)
 
 #### Usage
 - When you create recipes be carfully from where you pull your results/ingredients items. The recipes do not store an item but a reference to the item.
@@ -42,7 +44,8 @@ If you add a RollTable you will get quantity amount of rolls on that table not o
 - You can pull items from compendium (preferred). This way your recipe can be exported/imported to other worlds as long as those worlds have the same compendiums.
 
 ### Crafting
-You can start a crafting process by clicking on a recipe in your inventar
+You can start a crafting process by clicking on a recipe in your inventory 
+or open the recipe Compendium
 
 #### Recipe Compendium
 ![img.png](pictures/img.png)
@@ -51,6 +54,7 @@ You can start a crafting process by clicking on a recipe in your inventar
 - list all recipes that you have permission to see for all items in your world (not compendium)
   - filter available: only those that you have at least one ingredient of any quantity of.
   - filter useable: only those that you have all ingredients in required quantity of.
+  - filter own : only those that you personally have in your inventory
   - filter by item: only those recipes that uses all items in the filter regardless of quantity.
 - you can display details for a Recipe:
   - it will display you an uneditable recipe and shows you which ingredients are missing.
@@ -60,26 +64,6 @@ You can start a crafting process by clicking on a recipe in your inventar
 ![img.png](pictures/result.png)
 
 You will see a chat message with your result
-
-### Compendiums
-This module comes with some example compendiums.
-#### Ingredients
-![img.png](pictures/ingredients.png)
-
-You do not need to import those just drag and drop them into your recipes or use the recipe compendium.
-#### Potions
-![img.png](pictures/potions.png)
-
-You do not need to import those just drag and drop them into your recipes or use the recipe compendium.
-#### RandomTable
-![img.png](pictures/table.png)
-
-You do not need to import those just drag and drop them into your recipes or use the recipe compendium.
-#### Recipes
-![img.png](pictures/recipes.png)
-
-You need to import them and then grant permission to the users you want to have access to it.
-The recipecompendium will only show the recipes the user has access to.
 
 ### AnyOf
 AnyOf is an Item that is intended to be used as ingredient to create recipes that do not need a specific ingredient but any ingredient of... e.g. specific type.
@@ -106,6 +90,26 @@ When you use a recipe with AnyOf you can customize it and by doing so define wha
 - when you reselect the recipe it will remove your customization and start over with anyOf Items again.
 - none customized AnyOf ingredients will consume a random fitting ingredient of your inventory.
 
+### Compendiums
+This module comes with some example compendiums.
+#### Ingredients
+![img.png](pictures/ingredients.png)
+
+You do not need to import those just drag and drop them into your recipes or use the recipe compendium.
+#### Potions
+![img.png](pictures/potions.png)
+
+You do not need to import those just drag and drop them into your recipes or use the recipe compendium.
+#### RandomTable
+![img.png](pictures/table.png)
+
+You do not need to import those just drag and drop them into your recipes or use the recipe compendium.
+#### Recipes
+![img.png](pictures/recipes.png)
+
+You need to import them and then grant permission to the users you want to have access to it.
+The recipecompendium will only show the recipes the user has access to.
+
 ### Settings
 - You can enable or disable attendants for recipes feature 0.7.x default it is disabled.
 
@@ -115,8 +119,10 @@ When you use a recipe with AnyOf you can customize it and by doing so define wha
 - You can configure the tool list your recipes can select from. 
 (however if you do you might risk incompatibility to others, if the list is missing some default dnd5e tools tell me so)
 
-## latest features:
+## Latest features:
 have a look at the changelog.md
+### 1.0.x optional macro
+you can further customize your recipes with any additions that are not natively supported for recipes. see [Macros](#Macros)
 ### 0.7.x optional attendants
 you recipe can now depend on attendants that are required in the craft process but are not consumed. like class, race, background, tools etc...
 ### 0.6.x customized AnyOf
@@ -132,33 +138,6 @@ breaking change 0.2.x -> 0.3.x
 ### 0.2.x rollTable result
 you now can produce a random Potion.
 breaking change 0.1.x -> 0.2.x
-
-
-## Upcoming Changes
-### "any" of ingredient (initial 0.3.x, cusomized 0.6.x)
-I want to create recipes with "any" xxx e.g. (weapon,mushroom,etc) therefor i may need some new fields in recipe or a new subtype ingredient
-- 0.3.0
-currently it will only take randomly from avaiable items on actor in required quantity.
-- 0.6.0 customized "anyOf"
-- 
-the precast is wrong it always shows that AnyOf is not available.
-
-### results should include rollTables (done 0.2.x)
-I want to create a random potion.
-### macro
-I want to be able to add macros to recipes.
-giving them more flexibility e.g. get damage on certain recipes where you failed your check.
-### ingredients/potions/recipes package (done 0.4.x)
-The identity of ingredients works best when the item originates from compendium
-- I want a compendium package with lots of garbage items (mushrooms etc. that you can drop as loot)
-- I want a compendium package with various potions (dnd5e is so borring here)
-- I want a compendium package with recipes using the above two as a starter package for other creators.
-### hooks for the crafting process
-Once the process is stabilized
-- I want to create hooks to make live easier for other 
-developer that invent recipe packages that needed a little special extra 
-- or developers that might extend specials to this module
-
 
 ## Notes
 ### Currency reorder
