@@ -122,7 +122,7 @@ The recipecompendium will only show the recipes the user has access to.
 ## Latest features:
 have a look at the changelog.md
 ### 1.0.x optional macro
-you can further customize your recipes with any additions that are not natively supported for recipes. see [Macros](#Macros)
+you can further customize your recipes with any additions that are not natively supported for recipes. see [RecipeMacro](https://github.com/AngryBeaver/beavers-crafting/blob/main/macros.md)
 ### 0.7.x optional attendants
 you recipe can now depend on attendants that are required in the craft process but are not consumed. like class, race, background, tools etc...
 ### 0.6.x customized AnyOf
