@@ -91,7 +91,7 @@ multiple calls to the same component will accumulate changes.
 parameter:
 - type: [ComponentType](https://github.com/AngryBeaver/beavers-crafting/blob/main/src/types.ts) is used to define default behaviour
 - componentData: [ComponentData](https://github.com/AngryBeaver/beavers-crafting/blob/main/src/types.ts)
-````json
+````
 {
   //needed to hand this item to the actor when its an output item
   uuid: string,
@@ -112,7 +112,7 @@ parameter:
   - quantity: the type adjusted quantity e.g. for "consumed" components it is negative.
 
 The default implementation of fn will add the adjusted quantity to the result. If you write your own method your can manipulate componentResult
-````json
+````
 {
   //a duplicate of the orginal component holding the accumulated adjusted quantity e.g. consumed are negative
   component: ComponentData,
