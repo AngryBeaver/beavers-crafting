@@ -1,4 +1,4 @@
-import {getCurrencies} from "./systems/dnd5e.js";
+import {System} from "./systems/System.js";
 
 export const ABBREVIATION = "abbreviation";
 export const CONVERSION = "conversion";
@@ -19,8 +19,12 @@ export class Exchange {
         return this.toHighestCurrencies(exchangeCurrencies);
     }
 
+    static getCurrencies(){
+        return new System().getCurrencies();
+    }
+
     static fixCurrencies(currencies){
-        getCurrencies().forEach(c => {
+        this.getCurrencies().forEach(c => {
             if (Number.isNaN(currencies[ABBREVIATION])) {
                 currencies[ABBREVIATION] = 0;
             }
@@ -29,7 +33,7 @@ export class Exchange {
 
     static toCurrencies(currency:Currency):Currencies5e {
         let currencies = {};
-        getCurrencies().forEach(c => {
+        this.getCurrencies().forEach(c => {
             if (currency.name === c[ABBREVIATION]) {
                 currencies[c[ABBREVIATION]] = currency.value;
             } else {
@@ -40,11 +44,11 @@ export class Exchange {
     }
 
     static toLowestCurrency(currencies):Currency {
-        let highestCurrency = getCurrencies().find(c => !c[CONVERSION]);
+        let highestCurrency = this.getCurrencies().find(c => !c[CONVERSION]);
         let transform = 0;
         while (true) {
             transform = transform + currencies[highestCurrency[ABBREVIATION]];
-            let nextHighestCurrency = getCurrencies().find(c => c[CONVERSION]?.into === highestCurrency[ABBREVIATION]);
+            let nextHighestCurrency = this.getCurrencies().find(c => c[CONVERSION]?.into === highestCurrency[ABBREVIATION]);
             if (!nextHighestCurrency) {
                 break;
             }
@@ -59,13 +63,13 @@ export class Exchange {
 
     static toHighestCurrencies(currencies):Currencies5e {
         let currency = this.toLowestCurrency(currencies);
-        let lowestCurrency = getCurrencies().find(c => c[ABBREVIATION] === currency.name);
+        let lowestCurrency = this.getCurrencies().find(c => c[ABBREVIATION] === currency.name);
         const result = this.toCurrencies(currency);
         while (true) {
             if (!lowestCurrency[CONVERSION]?.each) {
                 break;
             }
-            let nextCurrency = getCurrencies().find(c => c[ABBREVIATION] === lowestCurrency[CONVERSION].into);
+            let nextCurrency = this.getCurrencies().find(c => c[ABBREVIATION] === lowestCurrency[CONVERSION].into);
             const rest = (result[lowestCurrency[ABBREVIATION]] % lowestCurrency[CONVERSION].each);
             const next = Math.floor(result[lowestCurrency[ABBREVIATION]]/lowestCurrency[CONVERSION].each);
             result[lowestCurrency[ABBREVIATION]] = rest;

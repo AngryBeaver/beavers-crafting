@@ -1,4 +1,3 @@
-import {getAbilities, getCurrencies, getSkills} from "../systems/dnd5e.js";
 import {FilterType, RecipeCompendium} from "./RecipeCompendium.js";
 import {Crafting} from "../Crafting.js";
 import {getDataFrom, getItem, sanitizeUuid} from "../helpers/Utility.js";
@@ -7,6 +6,7 @@ import {getToolConfig} from "./ToolConfig.js";
 import {AnyOf} from "../AnyOf.js";
 import {Component, Recipe} from "../Recipe.js";
 import {Result} from "../Result.js";
+import {System} from "../systems/System.js";
 
 export class CraftingApp extends Application {
     data: {
@@ -29,7 +29,9 @@ export class CraftingApp extends Application {
             index: 0,
             filterItems: {}
         };
-
+        if(this.element.length > 0){
+            this.bringToTop();
+        }
     }
 
     static get defaultOptions() {
@@ -62,7 +64,7 @@ export class CraftingApp extends Application {
     }
 
     async renderRecipeSheet() {
-        if (this.data.recipe === undefined || this._element === null) {
+        if (this.data.recipe === undefined || this.element === null) {
             return;
         }
         this.data.result = RecipeCompendium.validateRecipeToItemList(Object.values(this.data.recipe.ingredients), this.data.actor.items,new Result(this.data.recipe,this.data.actor));
@@ -72,9 +74,9 @@ export class CraftingApp extends Application {
         this.data.content = await renderTemplate('modules/beavers-crafting/templates/recipe-main.hbs',
             {
                 recipe: this.data.recipe,
-                currencies: getCurrencies(),
-                skills: getSkills(),
-                abilities: getAbilities(),
+                currencies: new System().getCurrencies(),
+                skills: new System().getSkills(),
+                abilities: new System().getAbilities(),
                 editable: false,
                 precast: await this.getPrecastFromResult(this.data.result,this.data.recipe),
                 displayResults:Settings.get(Settings.DISPLAY_RESULTS),
@@ -83,9 +85,9 @@ export class CraftingApp extends Application {
                 useTool: Settings.get(Settings.USE_TOOL),
                 useAttendants: Settings.get(Settings.USE_ATTENDANTS)
             });
-        this._element.find(".sheet-body").empty();
-        this._element.find(".sheet-body").append(this.data.content);
-        this.activateRecipeSheetListener(this._element);
+        this.element.find(".sheet-body").empty();
+        this.element.find(".sheet-body").append(this.data.content);
+        this.activateRecipeSheetListener(this.element);
     }
 
     activateListeners(html) {

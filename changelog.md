@@ -1,4 +1,18 @@
 # Changelog
+## 2.0.0 time to craft
+### 2.0.0 breaking change: extract potions module
+the example components have changed to an extra module. Previous imported recipes won't work anymore as the resource has moved. You need to import the new recipse from 
+Beaver's Potions. If you had created own recipes with the example potions referenced from compendium you also have to recreate those recipes and reference the new compendium.
+
+Why: 
+- those potions are dnd5e only and needed a legal term from wizzards of the costs.
+- those potions have a lot of dnd5e module dependencies and beavers-crafting is currently developed in a direction to maybe allow another system at somepoint.
+- there might be people that just wanted potions content without crafting.
+### 2.0.1 fix: rerender Recipe Compendium
+fixed: when the recipes button is pressed while the window is somewhere open the window will does not popup to front and also does render blank content.
+### 2.1.0 feature: Crafting Tab on Actor
+
+
 ## 1.0.x macros
 ### 1.0.0 feature macros
 You can now use macros to customize your recipes further see see [RecipeMacro](https://github.com/AngryBeaver/beavers-crafting/blob/main/macros.md)

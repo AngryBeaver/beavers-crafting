@@ -5,6 +5,8 @@ import {Crafting} from "./Crafting.js";
 import {RecipeCompendium} from "./apps/RecipeCompendium.js";
 import {AnyOfSheet} from "./apps/AnyOfSheet.js";
 import {Component, Recipe} from "./Recipe.js";
+import {Helper} from "./helpers/Helper.js";
+import {ActorSheetTab} from "./apps/ActorSheetTab.js";
 
 Hooks.once('init', async function () {
 
@@ -45,6 +47,9 @@ Hooks.once('init', async function () {
     game[Settings.NAMESPACE].RecipeCompendium = RecipeCompendium;
     game[Settings.NAMESPACE].Component = Component;
     game[Settings.NAMESPACE].Recipe = Recipe;
+    if(game instanceof Game) {
+        game[Settings.NAMESPACE].Helper = new Helper(game);
+    }
     game[Settings.NAMESPACE].itemTypeMigration = itemTypeMigration;
 });
 
@@ -65,6 +70,10 @@ Hooks.on("getActorSheetHeaderButtons", (app, buttons) => {
         icon: "fas fa-scroll",
         onclick: () => new CraftingApp(app.object).render(true)
     });
+});
+
+Hooks.on("renderActorSheet", (app, html, data)=>{
+    new ActorSheetTab(app, html, data);
 });
 
 //Recipe remap use action
