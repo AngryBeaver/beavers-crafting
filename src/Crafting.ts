@@ -4,6 +4,7 @@ import {RecipeCompendium} from "./apps/RecipeCompendium.js";
 import {getItem} from "./helpers/Utility.js";
 import {AnyOf} from "./AnyOf.js";
 import {ComponentResult, Result} from "./Result.js";
+import {getSystem} from "./helpers/Helper.js";
 
 export class Crafting {
     recipe: Recipe;
@@ -110,6 +111,7 @@ export class Crafting {
         if (this.recipe.currency) {
             result.payCurrency(this.recipe.currency);
         }
+
         return result;
     }
 
@@ -199,6 +201,11 @@ export class Crafting {
         await this.actor.updateEmbeddedDocuments("Item", sanitizedUpdateItems);
         await this.actor.deleteEmbeddedDocuments("Item", deleteItems);
         await this.actor.update(result._actorUpdate);
+        if(result._currencyResult !== undefined){
+            const currencies = {};
+            currencies[result._currencyResult.name] = result._currencyResult.value;
+            await getSystem().actorCurrencies_pay(this.actor,currencies)
+        }
         return result;
     }
 

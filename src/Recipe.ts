@@ -1,5 +1,4 @@
 import {Settings} from "./Settings.js";
-import {DefaultCurrency} from "./Exchange.js";
 import {getItem, sanitizeUuid} from "./helpers/Utility.js";
 import {getToolConfig} from "./apps/ToolConfig.js";
 import {Result} from "./Result.js";
@@ -254,4 +253,9 @@ class DefaultSkill implements DefaultSkill{
     name:string;
     dc:number= 8;
     consume:boolean=true;
+}
+
+class DefaultCurrency implements Currency {
+    name = "gp"
+    value = 5;
 }

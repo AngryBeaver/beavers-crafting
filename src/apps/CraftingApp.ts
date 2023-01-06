@@ -6,7 +6,7 @@ import {getToolConfig} from "./ToolConfig.js";
 import {AnyOf} from "../AnyOf.js";
 import {Component, Recipe} from "../Recipe.js";
 import {Result} from "../Result.js";
-import {System} from "../systems/System.js";
+import {getSystem} from "../helpers/Helper.js";
 
 export class CraftingApp extends Application {
     data: {
@@ -74,9 +74,9 @@ export class CraftingApp extends Application {
         this.data.content = await renderTemplate('modules/beavers-crafting/templates/recipe-main.hbs',
             {
                 recipe: this.data.recipe,
-                currencies: new System().getCurrencies(),
-                skills: new System().getSkills(),
-                abilities: new System().getAbilities(),
+                currencies: getSystem().getSystemCurrencies(),
+                skills: getSystem().getSkills(),
+                abilities: getSystem().getAbilities(),
                 editable: false,
                 precast: await this.getPrecastFromResult(this.data.result,this.data.recipe),
                 displayResults:Settings.get(Settings.DISPLAY_RESULTS),

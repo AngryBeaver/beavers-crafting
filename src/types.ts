@@ -82,16 +82,22 @@ interface Skill {
     consume: boolean;
 }
 
-interface Currencies5e {
-    pp?: number;
-    gp?: number;
-    ep?: number;
-    sp?: number;
-    cp?: number;
+interface Currencies {
+    [name:string]:number
+}
+
+interface SystemCurrencies {
+    [name:string]:SystemCurrency
+}
+
+interface SystemCurrency {
+    name: string,
+    label: string,
+    factor: number,
 }
 
 interface Currency {
-    name: "pp"|"gp"|"ep"|"sp"|"cp";
+    name: string;
     value: number;
 }
 

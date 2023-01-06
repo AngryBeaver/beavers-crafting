@@ -1,4 +1,5 @@
 import {Document} from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/abstract/module.mjs";
+import {Dnd5e} from "../systems/Dnd5e.js";
 
 export class Helper{
 
@@ -7,6 +8,8 @@ export class Helper{
     constructor(game: Game){
         this.game = game;
     }
+
+
 
     async getDocument(uuid) {
         const parts = uuid.split(".");
@@ -21,4 +24,11 @@ export class Helper{
             return await fromUuid(uuid);
         }
     }
+}
+
+export function getSystem() {
+    if (game["system"].id === "dnd5e") {
+        return new Dnd5e();
+    }
+    throw Error("System is not supported");
 }

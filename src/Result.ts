@@ -1,6 +1,6 @@
 import {Component, Recipe} from "./Recipe.js";
-import {Exchange} from "./Exchange.js";
 import {RecipeCompendium} from "./apps/RecipeCompendium.js";
+import {getSystem} from "./helpers/Helper.js";
 
 export class Result implements ResultApi {
     _actorUpdate = {};
@@ -66,19 +66,17 @@ export class Result implements ResultApi {
     }
 
     payCurrency(currency: Currency) {
+        const system = getSystem();
         this._currencyResult = {...currency,hasError:false};
-        try {
-            this.updateActorProperty("system.currency",Exchange.pay(currency, this._actor.system.currency));
-            this._currencyResult.hasError = false;
-        } catch (e) {
-            this._currencyResult.hasError = true;
-        }
+        const currencies = {};
+        currencies[currency.name] = currency.value;
+        this._currencyResult.hasError = system.actorCurrencies_canPay(this._actor, currencies);
         this.addChatComponent({
             component: {
                 id: "invalid",
                 uuid: "invalid",
                 type: "Currency",
-                name: currency.name,
+                name: system.getSystemCurrencies()[currency.name]?.label,
                 img: 'icons/commodities/currency/coins-assorted-mix-copper-silver-gold.webp',
                 quantity: currency.value*-1
             },
