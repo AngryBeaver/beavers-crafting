@@ -7,7 +7,8 @@
         "name": "Name",
         "status": "Status",
         "add": "+ Add",
-        "ingredients": "Ingredients"
+        "input": "input",
+        "output": "output"
       }
     },
     "inventory": {
@@ -71,6 +72,10 @@
         "name": "Configure tools available",
         "hint": "Configure list of tools that are available in tool dropdown when creating recipes",
         "label": "configure"
+      },
+      "addHeaderLink": {
+        "name": "Add Recipe Link on ActorSheet Header",
+        "hint": "Too many modules polute the Header area of sheets, in some worlds i have problems to find a blank space to drag."
       }
     },
     "tool-config": {

@@ -2,7 +2,7 @@
     "title": "Beaver's Crafting System",
     "description": "A Crafting Module for DnD",
     "id": "beavers-crafting",
-    "version": "1.0.1",
+    "version": "2.1.2",
     "authors": [
       {
         "name": "angryBeaver",
@@ -15,8 +15,6 @@
         "name": "English",
         "path": "lang/en.json"
       }
-    ],
-    "scripts": [
     ],
     "esmodules": [
       "src/main.js"
@@ -45,17 +43,7 @@
         "compatibility": {
           "verified": "2.0.0"
         }
-      }],
-      "requires": [
-        {
-          "id": "beavers-potions",
-          "type": "module",
-          "manifest": "https://github.com/AngryBeaver/beavers-potions/releases/latest/download/module.json",
-          "compatibility": {
-            "verified": "1.0.7"
-          }
-        }
-      ]
+      }]
     },
     "compatibility": {
       "minimum": "10",

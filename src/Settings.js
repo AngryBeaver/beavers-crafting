@@ -6,6 +6,7 @@ export class Settings {
     static CREATE_ITEM_TITLE = "createItemTitle";
     static DISPLAY_RESULTS = "displayResults";
     static DISPLAY_INGREDIENTS = "displayIngredients";
+    static ADD_HEADER_LINK = "addHeaderLink";
     static USE_TOOL = "useTool";
     static USE_ATTENDANTS = "useAttendants";
     static TOOL_CONFIG_BUTTON= "toolConfigButton";
@@ -23,6 +24,14 @@ export class Settings {
             default: "Create New Item",
             requiresReload: true,
             type: String,
+        });
+        game.settings.register(this.NAMESPACE, this.ADD_HEADER_LINK, {
+            name: game.i18n.localize('beaversCrafting.settings.addHeaderLink.name'),
+            hint: game.i18n.localize('beaversCrafting.settings.addHeaderLink.hint'),
+            scope: "world",
+            config: true,
+            default: false,
+            type: Boolean,
         });
         game.settings.register(this.NAMESPACE, this.USE_TOOL, {
             name: game.i18n.localize('beaversCrafting.settings.useTool.name'),

@@ -2,9 +2,11 @@ import {Component, Recipe} from "./Recipe.js";
 import {RecipeCompendium} from "./apps/RecipeCompendium.js";
 import {getSystem} from "./helpers/Helper.js";
 
-export class Result implements ResultApi {
-    _actorUpdate = {};
-    _hasException= false;
+export class Result implements ResultApi, ResultData {
+    _actorUpdate:{
+        [key:string]: string
+    }
+    _hasException: boolean;
     _components: {
         required: ComponentResults,
         consumed: ComponentResults,
@@ -20,17 +22,80 @@ export class Result implements ResultApi {
         [key: string]:ComponentChatData
     }
     _actor: any;
-    _recipe: Recipe;
+    _recipe: RecipeData;
 
-    constructor( recipe: Recipe, actor ){
+    static from(recipe: Recipe, actor): Result{
+        const resultData:ResultData = {
+            _actorUpdate: {},
+            _hasException: false,
+            _components: {
+                required: {
+                    _data:[]
+                },
+                consumed: {
+                    _data:[]
+                },
+                produced: {
+                    _data:[]
+                }
+            },
+            _chatAddition:{},
+            _recipe: recipe.serialize()
+        }
+        return new Result(resultData,actor);
+    }
+
+    constructor( resultData: ResultData, actor){
+        this._actorUpdate = resultData._actorUpdate;
+        this._hasException = resultData._hasException;
         this._components = {
             required: new ComponentResults(),
             consumed: new ComponentResults(),
             produced: new ComponentResults()
-        };
-        this._chatAddition = {};
+        }
+        if(resultData._skill){
+            this._skill =resultData._skill;
+        }
+        if(resultData._currencyResult){
+            this._currencyResult = resultData._currencyResult;
+        }
+        this._chatAddition = resultData._chatAddition;
+        this._recipe = resultData._recipe;
         this._actor = actor;
-        this._recipe = recipe;
+        resultData._components.consumed._data.forEach(componentResultData=>{
+            this._components.consumed.addComponentResult(
+                ComponentResult.from(componentResultData)
+            );
+        });
+        resultData._components.required._data.forEach(componentResultData=>{
+            this._components.required.addComponentResult(
+                ComponentResult.from(componentResultData)
+            );
+        });
+        resultData._components.produced._data.forEach(componentResultData=>{
+            this._components.produced.addComponentResult(
+                ComponentResult.from(componentResultData)
+            );
+        });
+    }
+
+    serialize() {
+        const serialized = {
+            _actorUpdate: this._actorUpdate,
+            _hasException: this._hasException,
+            _components: this._components,
+            _skill: this._skill,
+            _currencyResult: this._currencyResult,
+            _chatAddition: this._chatAddition,
+            _recipe: this._recipe,
+        }
+        if(this._currencyResult === undefined){
+            serialized["-=_currencyResult"]
+        }
+        if(!this._skill){
+            serialized["-=_skill"] = null;
+        }
+        return serialized;
     }
 
     hasError():boolean {

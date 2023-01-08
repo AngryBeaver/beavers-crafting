@@ -6,73 +6,106 @@ import {AnyOf} from "./AnyOf.js";
 import {ComponentResult, Result} from "./Result.js";
 import {getSystem} from "./helpers/Helper.js";
 
-export class Crafting {
+export class Crafting implements CraftingData{
+    uuid: string;
+    name: string;
+    img: string;
+    startAt: number;
+    endAt: number;
+    result: Result;
     recipe: Recipe;
     actor;
-    item;
-    roll;
 
-    constructor(actor, recipe: Recipe) {
-        this.recipe = recipe;
+    constructor(craftingData: CraftingData,actor) {
+        this.uuid = craftingData.uuid || actor.uuid+".Crafting."+randomID();
+        this.startAt = game["time"].worldTime;
+        this.endAt = 0;
+        this.name = craftingData.name;
+        this.img = craftingData.img;
+        this.recipe = new Recipe("invalid","invalid",craftingData.name,craftingData.img,craftingData.recipe);
+        this.result = new Result(craftingData.result,actor);
         this.actor = actor;
+    }
+
+    serialize():CraftingData{
+        return {
+            uuid: this.uuid,
+            name: this.name,
+            img: this.img,
+            startAt: this.startAt,
+            endAt: this.endAt,
+            result: this.result.serialize(),
+            recipe: this.recipe.serialize(),
+        }
+    }
+
+    static fromActorRecipe(actor, recipe: Recipe) {
+        const craftingData = {
+            name: recipe.name,
+            img: recipe.img,
+            startAt: 0,
+            endAt: 0,
+            result: Result.from(recipe,actor),
+            recipe: recipe
+        }
+        return new Crafting(craftingData, actor);
     }
 
     static async fromRecipe(actorId, recipe: Recipe) {
         const actor = await fromUuid("Actor." + actorId);
-        return new Crafting(actor, recipe);
+        return Crafting.fromActorRecipe(actor,recipe);
     }
 
     static fromOwned(item): Crafting {
-        return new Crafting(item.parent, Recipe.fromItem(item));
+        return Crafting.fromActorRecipe(item.parent, Recipe.fromItem(item));
     }
 
-    static async from(actorId, uuid): Promise<Crafting> {
+    static async from(actorId, uuid:string): Promise<Crafting> {
         const item = await fromUuid(uuid);
         return Crafting.fromRecipe(actorId, Recipe.fromItem(item));
     }
 
-    async craft(): Promise<Result> {
-        const result = await this.checkTool();
-        await this.checkAttendants(result);
+    async craft() {
+        await this.checkTool();
+        await this.checkAttendants();
         await this.evaluateAnyOf();
-        RecipeCompendium.validateRecipeToItemList(Object.values(this.recipe.ingredients), this.actor.items, result);
-        this.checkCurrency(result);
-        await this.checkSkill(result);
-        await this.addOutput(result);
-        await this.executeMacro(result);
-        await this.updateActor(result);
-        await this._sendToChat(result);
-        return result;
+        RecipeCompendium.validateRecipeToItemList(Object.values(this.recipe.ingredients), this.actor.items, this.result);
+        this.checkCurrency();
+        await this.checkSkill();
+        await this.addOutput();
+        await this.executeMacro();
+        await this.updateActor();
+        await this._sendToChat();
+        this.end();
+        await this._addToActor();
+        return this.result;
     }
 
-    async checkSkill(result?: Result): Promise<Result> {
-        if (!result) result = new Result(this.recipe, this.actor);
+    async checkSkill() {
         if (this.recipe.skill) {
             const skillParts = this.recipe.skill.name.split("-")
             let skillName = skillParts[0];
+            let roll;
             if (skillParts[0] === 'ability') {
                 skillName = skillParts[1];
-                this.roll = await this.actor.rollAbilityTest(skillParts[1], {"chatMessage": false});
+                roll = await this.actor.rollAbilityTest(skillParts[1], {"chatMessage": false});
             } else {
-                this.roll = await this.actor.rollSkill(this.recipe.skill.name, {"chatMessage": false});
+                roll = await this.actor.rollSkill(this.recipe.skill.name, {"chatMessage": false});
             }
-            result._skill = {
+            this.result._skill = {
                 dc: this.recipe.skill.dc,
                 name: skillName,
-                total: this.roll.total
+                total: roll.total
             }
         }
-        return result;
     }
 
-    async checkTool(result?: Result): Promise<Result> {
-        if (!result) result = new Result(this.recipe, this.actor);
-        return await RecipeCompendium.validateTool(this.recipe, this.actor.items, result);
+    async checkTool() {
+        await RecipeCompendium.validateTool(this.recipe, this.actor.items, this.result);
     }
 
-    async checkAttendants(result?: Result): Promise<Result> {
-        if (!result) result = new Result(this.recipe, this.actor);
-        return await RecipeCompendium.validateAttendants(this.recipe, this.actor.items, result);
+    async checkAttendants(){
+        await RecipeCompendium.validateAttendants(this.recipe, this.actor.items, this.result);
     }
 
     async evaluateAnyOf() {
@@ -106,42 +139,33 @@ export class Crafting {
         });
     }
 
-    checkCurrency(result?: Result): Result {
-        if (!result) result = new Result(this.recipe, this.actor);
+    checkCurrency() {
         if (this.recipe.currency) {
-            result.payCurrency(this.recipe.currency);
+            this.result.payCurrency(this.recipe.currency);
         }
-
-        return result;
     }
 
-    async addOutput(result?: Result): Promise<Result> {
-        if (!result) result = new Result(this.recipe, this.actor);
-        const components = await this._getResultComponents(result);
+    async addOutput(){
+        const components = await this._getResultComponents(this.result);
         for (const component of components) {
-            result.updateComponent("produced", component);
+            this.result.updateComponent("produced", component);
         }
-        return result;
     }
 
-    async executeMacro(result: Result) {
-        if (!result) result = new Result(this.recipe, this.actor);
-        const macroResult = await this.recipe.executeMacro(this.recipe.serialize(), result, this.actor);
+    async executeMacro() {
+        const macroResult = await this.recipe.executeMacro(this.recipe.serialize(), this.result, this.actor);
         if (macroResult.error !== undefined) {
             // @ts-ignore
             ui.notifications.error("Beavers Crafting | recipe Error see logs")
             console.error("Beavers Crafting | recipe Error:", macroResult.error);
-            result._hasException = true;
-            return result;
-        } else {
-            return result;
+            this.result._hasException = true;
         }
     }
 
-    async updateActor(result: Result) {
-        if (!result) result = new Result(this.recipe, this.actor);
-        if (result._hasException) return result;
-        const hasError = result.hasError();
+    async updateActor() {
+        if (this.result._hasException) return ;
+        const result = this.result;
+        const hasError = this.result.hasError();
         const createItems: any[] = [];
         const updateItems: UpdateItem[] = [];
         const deleteItems: string[] = [];
@@ -152,21 +176,23 @@ export class Crafting {
             const isToCreate = itemChange.toUpdate["system.quantity"] === 0;
             let isFirstStack = false;
             if (isToCreate) {
-                let itemData = createItems.find(i => i.uuid === componentResult.component.uuid);
-                if (itemData === undefined) {
-                    isFirstStack = true;
-                    const item = await fromUuid(componentResult.component.uuid);
-                    if (item === null) {
-                        // @ts-ignore
-                        ui.notifications.error("Beavers Crafting | can not create Item " + component.name + " from " + component.uuid);
-                        result._hasException = true;
-                        return;
+                if(componentResult.component.quantity > 0) {
+                    let itemData = createItems.find(i => i.uuid === componentResult.component.uuid);
+                    if (itemData === undefined) {
+                        isFirstStack = true;
+                        const item = await fromUuid(componentResult.component.uuid);
+                        if (item === null) {
+                            // @ts-ignore
+                            ui.notifications.error("Beavers Crafting | can not create Item " + component.name + " from " + component.uuid);
+                            result._hasException = true;
+                            return;
+                        }
+                        itemData = item.toObject();
+                        itemData["system.quantity"] = componentResult.originalQuantity;
+                        createItems.push(itemData);
                     }
-                    itemData = item.toObject();
-                    itemData["system.quantity"] = componentResult.originalQuantity;
-                    createItems.push(itemData);
+                    itemData["system.quantity"] = itemData["system.quantity"] + componentResult.component.quantity;
                 }
-                itemData["system.quantity"] = itemData["system.quantity"] + componentResult.component.quantity;
             } else {
                 let updateItem: UpdateItem | undefined = updateItems.find(i => i._id === itemChange.toUpdate._id);
                 if (updateItem === undefined) {
@@ -181,7 +207,7 @@ export class Crafting {
             }
         }
 
-        for (const componentResult of result._components.consumed._data) {
+        for (const componentResult of this.result._components.consumed._data) {
             if (componentResult.userInteraction === "always" || (componentResult.userInteraction === "onSuccess" && !hasError)) {
                 await addItemChange(componentResult);
             }
@@ -191,7 +217,16 @@ export class Crafting {
                 await addItemChange(componentResult);
             }
         }
-        if (result._hasException) return result;
+        if(result._currencyResult !== undefined){
+            try {
+                const currencies = {};
+                currencies[result._currencyResult.name] = result._currencyResult.value;
+                await getSystem().actorCurrencies_pay(this.actor, currencies)
+            }catch(e){
+                result._hasException = true;
+            }
+        }
+        if (result._hasException) return ;
         const sanitizedCreateItems = createItems.filter(i => i["system.quantity"] > 0);
         const sanitizedUpdateItems = updateItems.filter(i => i["system.quantity"] > 0);
         for (const deleteUpdates of updateItems.filter(i => i["system.quantity"] <= 0)) {
@@ -201,35 +236,27 @@ export class Crafting {
         await this.actor.updateEmbeddedDocuments("Item", sanitizedUpdateItems);
         await this.actor.deleteEmbeddedDocuments("Item", deleteItems);
         await this.actor.update(result._actorUpdate);
-        if(result._currencyResult !== undefined){
-            const currencies = {};
-            currencies[result._currencyResult.name] = result._currencyResult.value;
-            await getSystem().actorCurrencies_pay(this.actor,currencies)
-        }
-        return result;
+
     }
 
-
-    async _sendToChat(result: Result) {
-        if (result._hasException) return;
-        console.log(result);
+    getChatData(): ChatData{
         const components: ComponentChatData[] = [];
-        const hasError = result.hasError();
-        for (const componentResult of result._components.required._data) {
+        const hasError = this.result.hasError();
+        for (const componentResult of this.result._components.required._data) {
             components.push({
                 component: componentResult.component,
                 hasError: componentResult.hasError(),
                 type: "required"
             })
         }
-        for (const componentResult of result._components.consumed._data) {
+        for (const componentResult of this.result._components.consumed._data) {
             components.push({
                 component: componentResult.component,
                 hasError: componentResult.hasError(),
                 type: "consumed"
             })
         }
-        for (const componentResult of result._components.produced._data) {
+        for (const componentResult of this.result._components.produced._data) {
             if (componentResult.userInteraction === "always" || (componentResult.userInteraction === "onSuccess" && !hasError)) {
                 components.push({
                     component: componentResult.component,
@@ -238,17 +265,22 @@ export class Crafting {
                 })
             }
         }
-        components.push(...Object.values(result._chatAddition));
-        const chatData: ChatData = {
+        components.push(...Object.values(this.result._chatAddition));
+        return {
             title: this.recipe.name,
             img: this.recipe.img,
-            success: !result.hasError(),
-            skill: result._skill,
+            success: !this.result.hasError(),
+            skill: this.result._skill,
             components: components,
         }
+    }
+
+
+    async _sendToChat() {
+        if (this.result._hasException) return;
         let content = await renderTemplate(`modules/${Settings.NAMESPACE}/templates/crafting-chat.hbs`,
             {
-                data: chatData,
+                data: this.getChatData(),
             })
         content = TextEditor.enrichHTML(content);
         await ChatMessage.create({
@@ -256,6 +288,19 @@ export class Crafting {
             speaker: {actor: this.actor.id},
         })
     }
+    async _addToActor(){
+        const uuid = this.uuid.replace(/\./g, '-')
+        const update = {
+            flags:{
+                "beavers-crafting":{
+                    crafting:{}
+                }
+            }
+        };
+        update.flags["beavers-crafting"].crafting[uuid] = this.serialize();
+        await this.actor.update(update);
+    }
+
 
     async _getResultComponents(result: Result): Promise<ComponentData[]> {
         const items = Object.values(this.recipe.results).filter(component => component.type === "Item");
@@ -300,6 +345,10 @@ export class Crafting {
             }
         }
         return components;
+    }
+
+    end(){
+        this.endAt = game["time"].worldTime;
     }
 
 

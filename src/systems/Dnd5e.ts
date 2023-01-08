@@ -43,10 +43,10 @@ export class Dnd5e extends System {
     });
 
     actorSheet_addTab = (id: string, tabHeader: string, tabBody: JQuery, html) => {
-        const tabs = $(html).find(".sheet-navigation.tabs");
-        const body = $(html).find(".sheet-body");
+        const tabs = $(html).find('.tabs[data-group="primary"]');
         const tabItem = $('<a class="item" data-tab="' + id + '">' + tabHeader + '</a>');
         tabs.append(tabItem);
+        const body = $(html).find(".sheet-body");
         const tabContent = $('<div class="tab ' + id + '" data-group="primary" data-tab="' + id + '"></div>');
         body.append(tabContent);
         tabContent.append(tabBody);

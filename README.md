@@ -5,13 +5,12 @@ With this module you can create recipes to craft items. E.g. a bunch of mushroom
 ![Foundry System](https://img.shields.io/endpoint?url=https%3A%2F%2Ffoundryshields.com%2Fsystem%3FnameType%3Draw%26showVersion%3D1%26style%3Dflat%26url%3Dhttps%3A%2F%2Fraw.githubusercontent.com%2FAngryBeaver%2Fbeavers-crafting%2Fmain%2Fmodule.json)
 ![Download Count](https://img.shields.io/github/downloads/AngryBeaver/beavers-crafting/total?color=bright-green)
 
-#### possible breaking change! 0.7.1 release
-see changelog.md for details.
+<!> breaking change 1.x -> 2.x see [Changelog](https://github.com/AngryBeaver/beavers-crafting/blob/main/changelog.md)
+
 ## Features
 ![img.gif](pictures/video.gif)
 ### Loot subtype Recipe
 ![img.png](pictures/newItem.png)
-
 For this to work you must go to your settings and enter the name of the create Item Dialog.
 Default is "Create New Item" obviously you need to adapt if you have a different language.
 
@@ -38,17 +37,23 @@ Advanced user may use the optional recipe macro that gets executed during the cr
 see[RecipeMacro](https://github.com/AngryBeaver/beavers-crafting/blob/main/macros.md)
 
 #### Usage
-- When you create recipes be carfully from where you pull your results/ingredients items. The recipes do not store an item but a reference to the item.
+- When you create recipes be carefully from where you pull your results/ingredients items. The recipes do not store an item but a reference to the item.
 - Do not pull items from actor !
 - You might pull items form your imported world items, if you do your recipe will work perfectly within your world. You can manipulate your items afterward the recipe always refers to the actual item.
 - You can pull items from compendium (preferred). This way your recipe can be exported/imported to other worlds as long as those worlds have the same compendiums.
 
 ### Crafting
-You can start a crafting process by clicking on a recipe in your inventory 
-or open the recipe Compendium
+You can start a crafting process on the crafting tab of your Charsheet (new 2.x)
+![img.png](pictures/craftingTab.png)
+
+Here you can see the results of all previous crafts you did or add a new crafting which will open the recipe Compendium.
+Alternatively you can enable Header Buttons in the configuration to open up the recipeCompendium (deprecated 2.x)
+
+![img.png](pictures/img.png)
+
+Or can start a crafting process by clicking on a recipe in your inventory (deprecated 2.x)
 
 #### Recipe Compendium
-![img.png](pictures/img.png)
 ![img.png](pictures/crafting.png)
 
 - list all recipes that you have permission to see for all items in your world (not compendium)
@@ -90,25 +95,23 @@ When you use a recipe with AnyOf you can customize it and by doing so define wha
 - when you reselect the recipe it will remove your customization and start over with anyOf Items again.
 - none customized AnyOf ingredients will consume a random fitting ingredient of your inventory.
 
-### Compendiums
-This module comes with some example compendiums.
-#### Ingredients
+## Examples
+The easiest way to get started with this module is with some examples.
+
+### Ingredients
+This module provides a compendium for some example Ingredients, that can be used with your recipes.
+
 ![img.png](pictures/ingredients.png)
 
-You do not need to import those just drag and drop them into your recipes or use the recipe compendium.
-#### Potions
-![img.png](pictures/potions.png)
+### Recipes
+You can find some example recipes for potions in the companion module beavers-potions
+- Install companion module [Beavers-potions](https://github.com/AngryBeaver/beavers-potions)
+- import the recipes into your world 
+- grant permission to the users you want to have access to it.
 
-You do not need to import those just drag and drop them into your recipes or use the recipe compendium.
-#### RandomTable
-![img.png](pictures/table.png)
-
-You do not need to import those just drag and drop them into your recipes or use the recipe compendium.
-#### Recipes
 ![img.png](pictures/recipes.png)
 
-You need to import them and then grant permission to the users you want to have access to it.
-The recipecompendium will only show the recipes the user has access to.
+Every Character will now have access to 50+ recipes to brew potions.
 
 ### Settings
 - You can enable or disable attendants for recipes feature 0.7.x default it is disabled.
@@ -121,6 +124,10 @@ The recipecompendium will only show the recipes the user has access to.
 
 ## Latest features:
 have a look at the changelog.md
+### 2.1.x actorSheetTab
+Crafting is now a tab on ActorSheet that shows the history of your crafting processes.
+### 2.0.x extract potions module
+The example components have moved to an extra module.
 ### 1.0.x optional macro
 you can further customize your recipes with any additions that are not natively supported for recipes. see [RecipeMacro](https://github.com/AngryBeaver/beavers-crafting/blob/main/macros.md)
 ### 0.7.x optional attendants

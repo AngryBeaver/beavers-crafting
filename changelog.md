@@ -1,16 +1,31 @@
 # Changelog
-## 2.0.0 time to craft
+## 2.0.x crafting tab on actor
 ### 2.0.0 breaking change: extract potions module
-the example components have changed to an extra module. Previous imported recipes won't work anymore as the resource has moved. You need to import the new recipse from 
-Beaver's Potions. If you had created own recipes with the example potions referenced from compendium you also have to recreate those recipes and reference the new compendium.
+The example components have moved to an extra module. 
+#### why
+- potions are dnd5e only and needed a legal term from wizzards of the costs.
+- potions have a lot of dnd5e module dependencies and beavers-crafting is currently developed in a direction to maybe allow another system at somepoint.
+- some people just wanted potions content without crafting or crafting without potions.
+#### breaking:
+Previous imported recipes won't work anymore as the resource has moved.
 
-Why: 
-- those potions are dnd5e only and needed a legal term from wizzards of the costs.
-- those potions have a lot of dnd5e module dependencies and beavers-crafting is currently developed in a direction to maybe allow another system at somepoint.
-- there might be people that just wanted potions content without crafting.
+-> You need to import the latest recipse from Beaver's Potions. 
+
+Own recipes that produc the example potions referenced from compendium will not work anymore.
+
+-> delete old potion in recipe and reference new compendium.
 ### 2.0.1 fix: rerender Recipe Compendium
 fixed: when the recipes button is pressed while the window is somewhere open the window will does not popup to front and also does render blank content.
-### 2.1.0 feature: Crafting Tab on Actor
+### 2.1.0 feature: Crafting tab on actor
+Crafting is now a tab on ActorSheet that shows the history of your crafting processes.
+Crafting process can now be serialized and deserialized and thus be stored next to the actor initiating the craft process.
+This is the core implementation that will allow future features like time to craft and crafting as downtime process with multiple checks. 
+
+### 2.1.1 fix: referenced ingredients
+fixed: when you do not have given ingredient crafting required the ingredient reference to be valid.
+### 2.1.2 fix: dnd5e dependent money exchange.
+add: system independent money exchange, any system may be implement against an interface.
+add: dnd5e exchange implementation.
 
 
 ## 1.0.x macros

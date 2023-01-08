@@ -6,6 +6,39 @@ interface ResultApi {
     deleteComponent: (type: ComponentType, componentData: ComponentData)=>void,
     payCurrency: (currency:Currency)=>void
 }
+
+interface ResultData {
+    _actorUpdate:{
+        [key:string]: string
+    };
+    _hasException:boolean;
+    _components: {
+        required: ComponentResultsData,
+        consumed: ComponentResultsData,
+        produced: ComponentResultsData
+    }
+    _skill?: {
+        name: string,
+        dc: number,
+        total: number,
+    };
+    _currencyResult?: CurrencyResult
+    _chatAddition: {
+        [key: string]:ComponentChatData
+    }
+    _recipe: RecipeData;
+}
+
+interface CraftingData {
+    uuid?: string,
+    name: string,
+    img: string,
+    startAt: number,
+    endAt: number,
+    result: ResultData
+    recipe: RecipeData
+}
+
 interface ComponentResultsData {
     _data: ComponentResultData[];
 }

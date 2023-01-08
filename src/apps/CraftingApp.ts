@@ -67,10 +67,11 @@ export class CraftingApp extends Application {
         if (this.data.recipe === undefined || this.element === null) {
             return;
         }
-        this.data.result = RecipeCompendium.validateRecipeToItemList(Object.values(this.data.recipe.ingredients), this.data.actor.items,new Result(this.data.recipe,this.data.actor));
         const crafting = await Crafting.from(this.data.actor.id, this.data.recipe.uuid);
-        await crafting.checkTool(this.data.result);
-        await crafting.checkAttendants(this.data.result);
+        RecipeCompendium.validateRecipeToItemList(Object.values(this.data.recipe.ingredients), this.data.actor.items,crafting.result);
+        await crafting.checkTool();
+        await crafting.checkAttendants();
+        this.data.result = crafting.result;
         this.data.content = await renderTemplate('modules/beavers-crafting/templates/recipe-main.hbs',
             {
                 recipe: this.data.recipe,
@@ -107,10 +108,8 @@ export class CraftingApp extends Application {
                 .then(crafting => {
                     return crafting.craft();
                 }).then(result => {
-                if (!result.hasError) {
                     this.render();
-                }
-            });
+                });
         });
         html.find(".header .drop-area .item").on("click", (e) => {
             const uuid = $(e.currentTarget).data("id");

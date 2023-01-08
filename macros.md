@@ -72,7 +72,7 @@ parameter:
 
 ````javascript
 interface Currency {
-  name: "pp"|"gp"|"ep"|"sp"|"cp";
+  name: string; //Dnd5e "pp"|"gp"|"ep"|"sp"|"cp"
   value: number;
 }
 ````

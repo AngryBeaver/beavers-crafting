@@ -244,3 +244,11 @@
     margin: 0px 5px 10px;
     flex:0 0 30px;
 }
+
+
+.beavers-crafting .crafting-item-img{
+    background-size: contain;
+    margin: 5px;
+    width:20px;
+    height:20px;
+}

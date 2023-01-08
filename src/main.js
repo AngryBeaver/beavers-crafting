@@ -59,17 +59,19 @@ Hooks.on("ready",async function () {
         //I created the first breaking change,while I am still in version 0 and users are informed that there might be breaking changes I ship out a migration script.
         //I think I soon should move this module out of develop phase version 0. I already start counting the internal major version.
         await game[Settings.NAMESPACE].itemTypeMigration();
-        Settings.set(Settings.MAJOR_VERSION,1);
     }
+    Settings.set(Settings.MAJOR_VERSION,2);
 });
 
 Hooks.on("getActorSheetHeaderButtons", (app, buttons) => {
-    buttons.unshift({
-        label: "beaversCrafting.actorLink",
-        class: "beaversCrafting",
-        icon: "fas fa-scroll",
-        onclick: () => new CraftingApp(app.object).render(true)
-    });
+    if(Settings.get(Settings.ADD_HEADER_LINK)) {
+        buttons.unshift({
+            label: "beaversCrafting.actorLink",
+            class: "beaversCrafting",
+            icon: "fas fa-scroll",
+            onclick: () => new CraftingApp(app.object).render(true)
+        });
+    }
 });
 
 Hooks.on("renderActorSheet", (app, html, data)=>{
