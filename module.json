@@ -1,8 +1,8 @@
 {
-    "title": "Beaver's Crafting System",
+    "title": "Beaver's Crafting Module",
     "description": "A Crafting Module for DnD",
     "id": "beavers-crafting",
-    "version": "2.2.0",
+    "version": "2.2.1",
     "authors": [
       {
         "name": "angryBeaver",
