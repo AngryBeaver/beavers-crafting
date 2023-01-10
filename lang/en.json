@@ -7,12 +7,12 @@
         "name": "Name",
         "status": "Status",
         "add": "+ Add",
-        "input": "input",
-        "output": "output"
+        "input": "Resources",
+        "output": "Results"
       }
     },
     "inventory": {
-      "type" : "Type",
+      "type": "Type",
       "title": "Inventory"
     },
     "recipe": {
@@ -26,7 +26,7 @@
       "currency": "Cost",
       "consumeOnFailedSaveHint": "Consumes Cost on failed Skill check",
       "attendants": "Attendants",
-      "macro":{
+      "macro": {
         "button": "save"
       }
     },
@@ -74,8 +74,16 @@
         "label": "configure"
       },
       "addHeaderLink": {
-        "name": "Add Recipe Link on ActorSheet Header",
-        "hint": "Too many modules polute the Header area of sheets, in some worlds i have problems to find a blank space to drag."
+        "name": "ActorSheetLink",
+        "hint": "This will add a recipe link on the ActorSheet. Optional since 2.0.x as too many modules polute the Header area of sheets, in some worlds i have problems to find a blank space to drag."
+      },
+      "timeToCraft": {
+        "name": "TimeToCraft",
+        "hint": "TimeToCraft is used to track the time a crafting process needed. Instantly will not use any time and will instantly finish the process. Interaction will process when the user interacts with the process.",
+        "choices": {
+          "instantly": "instantly",
+          "interaction": "interaction"
+        }
       }
     },
     "tool-config": {

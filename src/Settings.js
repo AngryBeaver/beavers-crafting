@@ -7,6 +7,7 @@ export class Settings {
     static DISPLAY_RESULTS = "displayResults";
     static DISPLAY_INGREDIENTS = "displayIngredients";
     static ADD_HEADER_LINK = "addHeaderLink";
+    static TIME_TO_CRAFT = "addHeaderLink";
     static USE_TOOL = "useTool";
     static USE_ATTENDANTS = "useAttendants";
     static TOOL_CONFIG_BUTTON= "toolConfigButton";
@@ -32,6 +33,18 @@ export class Settings {
             config: true,
             default: false,
             type: Boolean,
+        });
+        game.settings.register(this.NAMESPACE, this.TIME_TO_CRAFT, {
+            name: game.i18n.localize('beaversCrafting.settings.timeToCraft.name'),
+            hint: game.i18n.localize('beaversCrafting.settings.timeToCraft.hint'),
+            scope: "world",
+            config: true,
+            default: "interaction",
+            type: String,
+            choices: {
+                instantly:game.i18n.localize('beaversCrafting.settings.timeToCraft.choices.instantly'),
+                interaction:game.i18n.localize('beaversCrafting.settings.timeToCraft.choices.interaction'),
+            }
         });
         game.settings.register(this.NAMESPACE, this.USE_TOOL, {
             name: game.i18n.localize('beaversCrafting.settings.useTool.name'),

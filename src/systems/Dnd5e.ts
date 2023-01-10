@@ -52,8 +52,8 @@ export class Dnd5e extends System {
         tabContent.append(tabBody);
     };
 
-    actorCurrencies_get = (actor: Actor): Currencies => actor["system"].currency;
-    actorCurrencies_pay = async (actor: Actor, currencies: Currencies): Promise<void> => {
+    actorCurrencies_get = (actor): Currencies => actor["system"].currency;
+    actorCurrencies_pay = async (actor, currencies: Currencies): Promise<void> => {
        const result = this._actorCurrencies_subtractToLowestCurrency(actor,currencies);
        if(result < 0){
           throw new Error("You can not afford this");

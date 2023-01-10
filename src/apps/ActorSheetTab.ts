@@ -8,6 +8,9 @@ export class ActorSheetTab {
     html;
     data;
     system:System;
+    craftingList:{
+        [key:string]:Crafting
+    } = {};
 
     constructor(app, html, data){
         this.app = app;
@@ -21,14 +24,15 @@ export class ActorSheetTab {
 
     async init() {
         const tab = game["i18n"].localize("beaversCrafting.actorSheet.tab");
-        const craftingList = this.app.actor.flags["beavers-crafting"]?.crafting || {};
+        const flag = this.app.actor.flags["beavers-crafting"]?.crafting || {};
         const chatList = {};
-        for(const [x,y] of Object.entries(craftingList)){
+        for(const [x,y] of Object.entries(flag)){
             const craftingData = (y as CraftingData);
             const crafting = new Crafting(craftingData,this.app.actor);
+            this.craftingList[x] = crafting;
             chatList[x] = crafting.getChatData();
         }
-        const tabBody = $(await renderTemplate('modules/beavers-crafting/templates/actor-sheet-tab.hbs', {craftingList:craftingList,chatList:chatList}));
+        const tabBody = $(await renderTemplate('modules/beavers-crafting/templates/actor-sheet-tab.hbs', {craftingList:this.craftingList,chatList:chatList}));
         this.system.actorSheet_addTab("crafting", tab, tabBody, this.html);
         this.activateListeners(tabBody);
     }
@@ -48,6 +52,12 @@ export class ActorSheetTab {
             const flags = {}
             flags["beavers-crafting.crafting.-="+id] = null;
             void this.app.actor.update({flags:flags});
+        });
+        tabBody.find(".advanceCrafting").on("click",(e)=>{
+            const id = (e.target.dataset.id as string);
+            void this.craftingList[id].endCrafting().then(()=>{
+                this.app.render();
+            });
         });
         this.html.find('.tabs[data-group="primary"]').click(e => {
             this.app.activeTab = e.target.dataset.tab;

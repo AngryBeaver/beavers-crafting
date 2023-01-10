@@ -108,7 +108,7 @@ export class CraftingApp extends Application {
                 .then(crafting => {
                     return crafting.craft();
                 }).then(result => {
-                    this.render();
+                    this.close();
                 });
         });
         html.find(".header .drop-area .item").on("click", (e) => {

@@ -22,7 +22,7 @@ interface ResultData {
         dc: number,
         total: number,
     };
-    _currencyResult?: CurrencyResult
+    _currencyResult?: CurrencyResultData
     _chatAddition: {
         [key: string]:ComponentChatData
     }
@@ -44,33 +44,28 @@ interface ComponentResultsData {
 }
 
 interface ComponentResultData {
-    component: ComponentData
+    component: ComponentData,
     originalQuantity: number,
     userInteraction: UserInteraction
+    isProcessed: boolean,
 }
 
 type UserInteraction =  "always" | "never" | "onSuccess";
 
 type ComponentType = "consumed" | "required" | "produced";
 
-interface StackStatus {
-    id: string;
-    quantity: number;
-    originalQuantity: number;
-    status:  "created" | "updated";
-}
-
 interface ComponentChatData {
     component: ComponentData,
     type: ComponentType,
     hasError: boolean,
+    isProcessed: boolean,
 }
 
 interface ChatData {
     title: string;
     img: string;
     components:ComponentChatData[]
-    success: boolean;
+    status: string;
     skill?: {
         name: string,
         dc: number,
@@ -91,12 +86,6 @@ interface PreCastData {
     }
     tool?: boolean;
     currencies?: boolean;
-}
-
-interface IngredientResult {
-    component: ComponentData,
-    isAvailable: boolean,
-    difference: number
 }
 
 interface ComponentData {
@@ -134,8 +123,9 @@ interface Currency {
     value: number;
 }
 
-interface CurrencyResult extends Currency{
+interface CurrencyResultData extends Currency{
     hasError: boolean;
+    isConsumed: boolean
 }
 
 interface ItemChange {
@@ -172,4 +162,8 @@ interface RecipeData {
     },
     macro?: string
 }
-
+interface ItemChanges {
+    create:any[],
+    update:UpdateItem[],
+    delete:string[]
+}

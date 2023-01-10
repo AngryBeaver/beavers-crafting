@@ -6,10 +6,12 @@
             <div class="dice-roll">
                 <div class="dice-total flexrow" style="flex:1;padding:2px;margin-top:5px">
                     <span class="total">{{data.skill.total}}</span>
-                    {{#if data.success}}
-                        <i class="fas fa-check" style="color:#468847"></i>
+                    {{#if (eq data.status "success") }}
+                        <i class="fas fa-check" style="color:darkgreen"></i>
+                    {{else if (eq data.status "error") }}
+                        <i class="fas fa-times" style="color:darkred"></i>
                     {{else}}
-                        <i class="fas fa-times" style="color:#b94a48"></i>
+                        <i class="fa-regular fa-box-open" style="font-size:small"></i>
                     {{/if}}
                 </div>
             </div>

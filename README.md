@@ -46,7 +46,15 @@ see[RecipeMacro](https://github.com/AngryBeaver/beavers-crafting/blob/main/macro
 You can start a crafting process on the crafting tab of your Charsheet (new 2.x)
 ![img.png](pictures/craftingTab.png)
 
-Here you can see the results of all previous crafts you did or add a new crafting which will open the recipe Compendium.
+Here you can see all crafting process you are acutally in or that are completed.
+#### +add
+you can add a new crafting process by clicking on +Add,  which will open the recipe Compendium.
+#### timeToCraft
+When you have configured TimeToCraft to interaction. Your crafting process will start by locking the resources needed.
+You then can click in the status field to finalize the crafting process. 
+This will grant your results and maybe unlocks your resources if they are not consumed in the process.
+
+
 Alternatively you can enable Header Buttons in the configuration to open up the recipeCompendium (deprecated 2.x)
 
 ![img.png](pictures/img.png)
@@ -124,6 +132,8 @@ Every Character will now have access to 50+ recipes to brew potions.
 
 ## Latest features:
 have a look at the changelog.md
+### 2.2.x timeToCraft
+Crafting is now a process that can be started and finalized
 ### 2.1.x actorSheetTab
 Crafting is now a tab on ActorSheet that shows the history of your crafting processes.
 ### 2.0.x extract potions module

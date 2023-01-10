@@ -6,7 +6,7 @@ import {AnyOf} from "./AnyOf.js";
 import {ComponentResult, Result} from "./Result.js";
 import {getSystem} from "./helpers/Helper.js";
 
-export class Crafting implements CraftingData{
+export class Crafting implements CraftingData {
     uuid: string;
     name: string;
     img: string;
@@ -16,18 +16,18 @@ export class Crafting implements CraftingData{
     recipe: Recipe;
     actor;
 
-    constructor(craftingData: CraftingData,actor) {
-        this.uuid = craftingData.uuid || actor.uuid+".Crafting."+randomID();
-        this.startAt = game["time"].worldTime;
-        this.endAt = 0;
+    constructor(craftingData: CraftingData, actor) {
+        this.uuid = craftingData.uuid || actor.uuid + ".Crafting." + randomID();
+        this.startAt = craftingData.startAt;
+        this.endAt = craftingData.endAt
         this.name = craftingData.name;
         this.img = craftingData.img;
-        this.recipe = new Recipe("invalid","invalid",craftingData.name,craftingData.img,craftingData.recipe);
-        this.result = new Result(craftingData.result,actor);
+        this.recipe = new Recipe("invalid", "invalid", craftingData.name, craftingData.img, craftingData.recipe);
+        this.result = new Result(craftingData.result, actor);
         this.actor = actor;
     }
 
-    serialize():CraftingData{
+    serialize(): CraftingData {
         return {
             uuid: this.uuid,
             name: this.name,
@@ -43,9 +43,9 @@ export class Crafting implements CraftingData{
         const craftingData = {
             name: recipe.name,
             img: recipe.img,
-            startAt: 0,
+            startAt: game["time"].worldTime,
             endAt: 0,
-            result: Result.from(recipe,actor),
+            result: Result.from(recipe, actor),
             recipe: recipe
         }
         return new Crafting(craftingData, actor);
@@ -53,32 +53,53 @@ export class Crafting implements CraftingData{
 
     static async fromRecipe(actorId, recipe: Recipe) {
         const actor = await fromUuid("Actor." + actorId);
-        return Crafting.fromActorRecipe(actor,recipe);
+        return Crafting.fromActorRecipe(actor, recipe);
     }
 
     static fromOwned(item): Crafting {
         return Crafting.fromActorRecipe(item.parent, Recipe.fromItem(item));
     }
 
-    static async from(actorId, uuid:string): Promise<Crafting> {
+    static async from(actorId, uuid: string): Promise<Crafting> {
         const item = await fromUuid(uuid);
         return Crafting.fromRecipe(actorId, Recipe.fromItem(item));
     }
 
-    async craft() {
+    async startCrafting() {
         await this.checkTool();
         await this.checkAttendants();
         await this.evaluateAnyOf();
         RecipeCompendium.validateRecipeToItemList(Object.values(this.recipe.ingredients), this.actor.items, this.result);
-        this.checkCurrency();
-        await this.checkSkill();
+        await this.checkCurrency();
         await this.addOutput();
         await this.executeMacro();
-        await this.updateActor();
-        await this._sendToChat();
-        this.end();
+        await this.processInput();
         await this._addToActor();
         return this.result;
+    }
+
+    async endCrafting() {
+        await this.checkSkill();
+        await this.processAll();
+        this.end();
+        await this._sendToChat();
+        await this._addToActor();
+        return this.result;
+    }
+
+    async craft() {
+        await this.startCrafting();
+        if(Settings.get(Settings.TIME_TO_CRAFT) === "instantly"){
+            await this.endCrafting();
+        }
+        if(Settings.get(Settings.TIME_TO_CRAFT) === "interaction"){
+            this.actor.sheet.activeTab = "crafting";
+            await this.actor.sheet.render(true);
+            this.actor.sheet.bringToTop();
+
+        }
+        return this.result;
+
     }
 
     async checkSkill() {
@@ -88,9 +109,9 @@ export class Crafting implements CraftingData{
             let roll;
             if (skillParts[0] === 'ability') {
                 skillName = skillParts[1];
-                roll = await this.actor.rollAbilityTest(skillParts[1], {"chatMessage": false});
+                roll = await this.actor.rollAbilityTest(skillParts[1]);
             } else {
-                roll = await this.actor.rollSkill(this.recipe.skill.name, {"chatMessage": false});
+                roll = await this.actor.rollSkill(this.recipe.skill.name);
             }
             this.result._skill = {
                 dc: this.recipe.skill.dc,
@@ -104,7 +125,7 @@ export class Crafting implements CraftingData{
         await RecipeCompendium.validateTool(this.recipe, this.actor.items, this.result);
     }
 
-    async checkAttendants(){
+    async checkAttendants() {
         await RecipeCompendium.validateAttendants(this.recipe, this.actor.items, this.result);
     }
 
@@ -139,13 +160,13 @@ export class Crafting implements CraftingData{
         });
     }
 
-    checkCurrency() {
+    async checkCurrency() {
         if (this.recipe.currency) {
-            this.result.payCurrency(this.recipe.currency);
+            await this.result.payCurrency(this.recipe.currency);
         }
     }
 
-    async addOutput(){
+    async addOutput() {
         const components = await this._getResultComponents(this.result);
         for (const component of components) {
             this.result.updateComponent("produced", component);
@@ -162,98 +183,177 @@ export class Crafting implements CraftingData{
         }
     }
 
-    async updateActor() {
-        if (this.result._hasException) return ;
-        const result = this.result;
-        const hasError = this.result.hasError();
-        const createItems: any[] = [];
-        const updateItems: UpdateItem[] = [];
-        const deleteItems: string[] = [];
-        const actorItems = this.actor.items;
-
-        async function addItemChange(componentResult: ComponentResult) {
-            const itemChange = RecipeCompendium.findComponentInList(actorItems, componentResult.component);
-            const isToCreate = itemChange.toUpdate["system.quantity"] === 0;
-            let isFirstStack = false;
-            if (isToCreate) {
-                if(componentResult.component.quantity > 0) {
-                    let itemData = createItems.find(i => i.uuid === componentResult.component.uuid);
-                    if (itemData === undefined) {
-                        isFirstStack = true;
-                        const item = await fromUuid(componentResult.component.uuid);
-                        if (item === null) {
-                            // @ts-ignore
-                            ui.notifications.error("Beavers Crafting | can not create Item " + component.name + " from " + component.uuid);
-                            result._hasException = true;
-                            return;
-                        }
-                        itemData = item.toObject();
-                        itemData["system.quantity"] = componentResult.originalQuantity;
-                        createItems.push(itemData);
-                    }
-                    itemData["system.quantity"] = itemData["system.quantity"] + componentResult.component.quantity;
-                }
-            } else {
-                let updateItem: UpdateItem | undefined = updateItems.find(i => i._id === itemChange.toUpdate._id);
-                if (updateItem === undefined) {
-                    isFirstStack = true;
-                    updateItem = itemChange.toUpdate;
-                    updateItems.push(itemChange.toUpdate);
-                }
-                updateItem["system.quantity"] = updateItem["system.quantity"] + componentResult.component.quantity;
-            }
-            if (isFirstStack) {
-                deleteItems.push(...itemChange.toDelete);
+    async processInput() {
+        if (this.result._hasException) return;
+        const items: ItemChanges = {
+            create: [],
+            update: [],
+            delete: []
+        };
+        this.actor = await fromUuid(this.actor.uuid); //refresh Actor
+        for (const componentResult of this.result._components.required._data) {
+            if (componentResult.userInteraction !== "never") {
+                await this._addItemChange(componentResult, items);
             }
         }
-
         for (const componentResult of this.result._components.consumed._data) {
-            if (componentResult.userInteraction === "always" || (componentResult.userInteraction === "onSuccess" && !hasError)) {
-                await addItemChange(componentResult);
+            if (componentResult.userInteraction !== "never") {
+                await this._addItemChange(componentResult, items);
             }
         }
-        for (const componentResult of result._components.produced._data) {
-            if (componentResult.userInteraction === "always" || (componentResult.userInteraction === "onSuccess" && !hasError)) {
-                await addItemChange(componentResult);
-            }
-        }
-        if(result._currencyResult !== undefined){
-            try {
-                const currencies = {};
-                currencies[result._currencyResult.name] = result._currencyResult.value;
-                await getSystem().actorCurrencies_pay(this.actor, currencies)
-            }catch(e){
-                result._hasException = true;
-            }
-        }
-        if (result._hasException) return ;
-        const sanitizedCreateItems = createItems.filter(i => i["system.quantity"] > 0);
-        const sanitizedUpdateItems = updateItems.filter(i => i["system.quantity"] > 0);
-        for (const deleteUpdates of updateItems.filter(i => i["system.quantity"] <= 0)) {
-            deleteItems.push(deleteUpdates._id);
+        if (this.result._hasException) return;
+        const sanitizedCreateItems = items.create.filter(i => i["system.quantity"] > 0);
+        const sanitizedUpdateItems = items.update.filter(i => i["system.quantity"] > 0);
+        for (const deleteUpdates of items.update.filter(i => i["system.quantity"] <= 0)) {
+            items.delete.push(deleteUpdates._id);
         }
         await this.actor.createEmbeddedDocuments("Item", sanitizedCreateItems);
         await this.actor.updateEmbeddedDocuments("Item", sanitizedUpdateItems);
-        await this.actor.deleteEmbeddedDocuments("Item", deleteItems);
-        await this.actor.update(result._actorUpdate);
-
+        await this.actor.deleteEmbeddedDocuments("Item", items.delete);
+        this.actor = await fromUuid(this.actor.uuid);
+        for (const componentResult of this.result._components.consumed._data) {
+            if (componentResult.userInteraction !== "never") {
+                componentResult.setProcessed(true);
+            }
+        }
+        for (const componentResult of this.result._components.required._data) {
+            if (componentResult.userInteraction !== "never") {
+                componentResult.setProcessed(true);
+            }
+        }
     }
 
-    getChatData(): ChatData{
+    async _addItemChange(componentResult: ComponentResult, items: ItemChanges, revert: boolean = false) {
+        if ((componentResult.isProcessed && !revert) || (!componentResult.isProcessed && revert )){
+            return;
+        }
+        const component = Component.clone(componentResult.component);
+        if (revert) {
+            component.quantity = component.quantity * -1;
+        }
+        const itemChange = RecipeCompendium.findComponentInList(this.actor.items, component);
+        const isToCreate = itemChange.toUpdate["system.quantity"] === 0;
+        let isFirstStack = false;
+        if (isToCreate) {
+            if (component.quantity > 0) {
+                let itemData = items.create.find(i => i.uuid === component.uuid);
+                if (itemData === undefined) {
+                    isFirstStack = true;
+                    const item = await fromUuid(component.uuid);
+                    if (item === null) {
+                        // @ts-ignore
+                        ui.notifications.error("Beavers Crafting | can not create Item " + component.name + " from " + component.uuid);
+                        this.result._hasException = true;
+                        return;
+                    }
+                    itemData = item.toObject();
+                    itemData["system.quantity"] = 0;
+                    items.create.push(itemData);
+                }
+                itemData["system.quantity"] = itemData["system.quantity"] + component.quantity;
+            }
+        } else {
+            let updateItem: UpdateItem | undefined = items.update.find(i => i._id === itemChange.toUpdate._id);
+            if (updateItem === undefined) {
+                isFirstStack = true;
+                updateItem = itemChange.toUpdate;
+                items.update.push(itemChange.toUpdate);
+            }
+            updateItem["system.quantity"] = updateItem["system.quantity"] + component.quantity;
+        }
+        if (isFirstStack) {
+            items.delete.push(...itemChange.toDelete);
+        }
+        return items;
+    }
+
+
+    async processAll() {
+        if (this.result._hasException) return;
+        const items: ItemChanges = {
+            create: [],
+            update: [],
+            delete: []
+        };
+        this.actor = await fromUuid(this.actor.uuid); //refresh Actor
+        for (const componentResult of this.result._components.required._data) {
+            if (componentResult.userInteraction === "always" || (componentResult.userInteraction === "onSuccess" && !this.result.hasError())) {
+                await this._addItemChange(componentResult, items);
+            } else {
+                await this._addItemChange(componentResult, items, true);
+            }
+        }
+        for (const componentResult of this.result._components.consumed._data) {
+            if (componentResult.userInteraction === "always" || (componentResult.userInteraction === "onSuccess" && !this.result.hasError())) {
+                await this._addItemChange(componentResult, items);
+            } else {
+                await this._addItemChange(componentResult, items, true);
+            }
+        }
+        for (const componentResult of this.result._components.produced._data) {
+            if (componentResult.userInteraction === "always" || (componentResult.userInteraction === "onSuccess" && !this.result.hasError())) {
+                await this._addItemChange(componentResult, items);
+            } else {
+                await this._addItemChange(componentResult, items, true);
+            }
+        }
+        if (this.result._currencyResult !== undefined) {
+            if (!this.recipe.skill?.consume && this.result.hasError()) {
+                this.result.revertPayedCurrency();
+            }
+        }
+        if (this.result._hasException) return;
+        const sanitizedCreateItems = items.create.filter(i => i["system.quantity"] > 0);
+        const sanitizedUpdateItems = items.update.filter(i => i["system.quantity"] > 0);
+        for (const deleteUpdates of items.update.filter(i => i["system.quantity"] <= 0)) {
+            items.delete.push(deleteUpdates._id);
+        }
+        await this.actor.createEmbeddedDocuments("Item", sanitizedCreateItems);
+        await this.actor.updateEmbeddedDocuments("Item", sanitizedUpdateItems);
+        await this.actor.deleteEmbeddedDocuments("Item", items.delete);
+        if(!this.result.hasError()){
+            await this.actor.update(this.result._actorUpdate);
+        }
+        for (const componentResult of this.result._components.consumed._data) {
+            if (componentResult.userInteraction === "always" || (componentResult.userInteraction === "onSuccess" && !this.result.hasError())) {
+                componentResult.setProcessed(true);
+            } else {
+                componentResult.setProcessed(false);
+            }
+        }
+        for (const componentResult of this.result._components.required._data) {
+            if (componentResult.userInteraction === "always" || (componentResult.userInteraction === "onSuccess" && !this.result.hasError())) {
+                componentResult.setProcessed(true);
+            } else {
+                componentResult.setProcessed(false);
+            }
+        }
+        for (const componentResult of this.result._components.produced._data) {
+            if (componentResult.userInteraction === "always" || (componentResult.userInteraction === "onSuccess" && !this.result.hasError())) {
+                componentResult.setProcessed(true);
+            } else {
+                componentResult.setProcessed(false);
+            }
+        }
+    }
+
+    getChatData(): ChatData {
         const components: ComponentChatData[] = [];
         const hasError = this.result.hasError();
         for (const componentResult of this.result._components.required._data) {
             components.push({
                 component: componentResult.component,
                 hasError: componentResult.hasError(),
-                type: "required"
+                type: "required",
+                isProcessed: componentResult.isProcessed
             })
         }
         for (const componentResult of this.result._components.consumed._data) {
             components.push({
                 component: componentResult.component,
                 hasError: componentResult.hasError(),
-                type: "consumed"
+                type: "consumed",
+                isProcessed: componentResult.isProcessed
             })
         }
         for (const componentResult of this.result._components.produced._data) {
@@ -261,15 +361,39 @@ export class Crafting implements CraftingData{
                 components.push({
                     component: componentResult.component,
                     hasError: componentResult.hasError(),
-                    type: "produced"
+                    type: "produced",
+                    isProcessed: componentResult.isProcessed
                 })
             }
         }
-        components.push(...Object.values(this.result._chatAddition));
+        components.push(...Object.values(this.result._chatAddition).filter(s=>s.component.type !== "Currency"));
+
+        if(this.result._currencyResult) {
+            components.push({
+                component: {
+                    id: "invalid",
+                    uuid: "invalid",
+                    type: "Currency",
+                    name: getSystem().getSystemCurrencies()[this.result._currencyResult.name]?.label,
+                    img: 'icons/commodities/currency/coins-assorted-mix-copper-silver-gold.webp',
+                    quantity: this.result._currencyResult.value * -1
+                },
+                hasError: this.result._currencyResult.hasError,
+                type: "consumed",
+                isProcessed: this.result._currencyResult.isConsumed,
+            });
+        }
+
+        let status = "active";
+        if(this.result.hasError()){
+            status = "error";
+        }else if(this.endAt > 0){
+            status = "success";
+        }
         return {
             title: this.recipe.name,
             img: this.recipe.img,
-            success: !this.result.hasError(),
+            status: status,
             skill: this.result._skill,
             components: components,
         }
@@ -288,12 +412,13 @@ export class Crafting implements CraftingData{
             speaker: {actor: this.actor.id},
         })
     }
-    async _addToActor(){
+
+    async _addToActor() {
         const uuid = this.uuid.replace(/\./g, '-')
         const update = {
-            flags:{
-                "beavers-crafting":{
-                    crafting:{}
+            flags: {
+                "beavers-crafting": {
+                    crafting: {}
                 }
             }
         };
@@ -347,7 +472,7 @@ export class Crafting implements CraftingData{
         return components;
     }
 
-    end(){
+    end() {
         this.endAt = game["time"].worldTime;
     }
 

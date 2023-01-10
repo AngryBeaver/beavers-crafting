@@ -1,5 +1,37 @@
 # Changelog
-## 2.0.x crafting tab on actor
+## 2.2.x feature: Time To Craft
+### 2.2.0 feature: Time To Craft
+Crafting becomes a process that you start when clicking on the RecipeCompendium.
+The crafting process starts by consuming all resources and fireing up the advanced macro but without granting the results.
+When you decide the time to craft is ready you can process the crafting by clicking on the status of the process.
+Now the skill check if any is executed and the crafting might end in success or fail. You will get your results and locked resources are freed up if the crafting process allows so.
+
+You can configure the timeToCraft behaviour in the settings section.
+Interaction is default it will start the process and waits until you finish the process with your action.
+Instantly will switch back to previous mode. you can craft with one click instantly.
+
+#### Time To Craft vs world time automation
+E.g. you start the recipe and when the worldtime is advanced by an amount given in the recipe, the crafting completes.
+
+In this first draft I decided against this! As crafting is a downtime activity and passing time does not automatically mean you spend the time on crafting, you might sleep or run for you live from monsters, who knows.
+
+
+## 2.1.x feature: Crafting tab on actor
+### 2.1.2 fix: dnd5e dependent money exchange.
+add: system independent money exchange, any system may be implement against an interface.
+add: dnd5e exchange implementation.
+
+### 2.1.1 fix: referenced ingredients
+fixed: when you do not have given ingredient crafting required the ingredient reference to be valid.
+
+### 2.1.0 feature: Crafting tab on actor
+Crafting is now a tab on ActorSheet that shows the history of your crafting processes.
+Crafting process can now be serialized and deserialized and thus be stored next to the actor initiating the craft process.
+This is the core implementation that will allow future features like time to craft and crafting as downtime process with multiple checks.
+
+## 2.0.x breaking change: extract potions module
+### 2.0.1 fix: rerender Recipe Compendium
+fixed: when the recipes button is pressed while the window is somewhere open the window will does not popup to front and also does render blank content.
 ### 2.0.0 breaking change: extract potions module
 The example components have moved to an extra module. 
 #### why
@@ -14,18 +46,6 @@ Previous imported recipes won't work anymore as the resource has moved.
 Own recipes that produc the example potions referenced from compendium will not work anymore.
 
 -> delete old potion in recipe and reference new compendium.
-### 2.0.1 fix: rerender Recipe Compendium
-fixed: when the recipes button is pressed while the window is somewhere open the window will does not popup to front and also does render blank content.
-### 2.1.0 feature: Crafting tab on actor
-Crafting is now a tab on ActorSheet that shows the history of your crafting processes.
-Crafting process can now be serialized and deserialized and thus be stored next to the actor initiating the craft process.
-This is the core implementation that will allow future features like time to craft and crafting as downtime process with multiple checks. 
-
-### 2.1.1 fix: referenced ingredients
-fixed: when you do not have given ingredient crafting required the ingredient reference to be valid.
-### 2.1.2 fix: dnd5e dependent money exchange.
-add: system independent money exchange, any system may be implement against an interface.
-add: dnd5e exchange implementation.
 
 
 ## 1.0.x macros

@@ -252,3 +252,28 @@
     width:20px;
     height:20px;
 }
+
+.beavers-crafting .processing{
+    background-image: repeating-linear-gradient(
+            -45deg,
+            hsl(400,90%,50%) 0%,  /* orange */
+            hsl(400,90%,50%) 4%,
+            hsl(120,0%,50%,0%) 4%,   /* grau */
+            hsl(120,0%,50%,0%) 8%,  /* grau */
+            hsl(400,90%,50%) 8%,  /* orange */
+            hsl(400,90%,50%) 12%,
+            hsl(120,0%,50%,0%) 12%,   /* grau */
+            hsl(120,0%,50%,0%) 16%  /* grau */
+    );
+    animation-name: beavers-crafting-diagonal;
+    animation-duration: 40s;
+    animation-direction: reverse;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+    background-size: 400% 100%;
+}
+
+@keyframes beavers-crafting-diagonal {
+    0% {background-position: 0% 50%}
+    100% {background-position: 95% 50%}
+}
