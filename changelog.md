@@ -1,6 +1,9 @@
 # Changelog
 ## 2.2.x feature: Time To Craft
-### 2.2.2 fix worldtime is zero
+### 2.2.2 workaround for ready set roll
+This fix should work for the current version of ready set roll 1.3.14.
+Might break at any other version ! a request for more robust interface has been made:
+### 2.2.1 fix worldtime is zero
 Crafting does not become success when the worldtime is not advancecd.
 Sadly I could not automatically fix old crafting processes without breaking unfinished crafting processes.
 ### 2.2.0 feature: Time To Craft

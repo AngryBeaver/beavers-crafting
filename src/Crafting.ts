@@ -116,10 +116,17 @@ export class Crafting implements CraftingData {
             } else {
                 roll = await this.actor.rollSkill(this.recipe.skill.name);
             }
+            let resultValue = roll.total
+            if(resultValue === undefined){
+                if(roll.fields !== undefined && roll.fields[2] !== undefined ){
+                    resultValue =  roll.fields[2][1]?.roll?.total;
+                }
+            }
+
             this.result._skill = {
                 dc: this.recipe.skill.dc,
                 name: skillName,
-                total: roll.total
+                total: resultValue
             }
         }
     }
