@@ -1,6 +1,13 @@
 export abstract class System {
-    abstract getSkills: () => any;
-    abstract getAbilities: () => any;
+
+    abstract getSkills: () => {
+        id:string,
+        label:string
+    }[];
+    abstract getAbilities: () => {
+        id:string,
+        label:string
+    }[];
     /**
      * whatever your system currency is, you need to cast it down to SystemCurrencies interface
      * You should order the Object properties from highest to lowest.
@@ -10,7 +17,7 @@ export abstract class System {
      * This is used to add a tab with and id and a tabHeader name to a system actor sheet.
      * Html is the actorSheetHtml that is about to get extended and tabBody is the tabBody that will be underneath the tab.
      */
-    abstract actorSheet_addTab: (id: string, tabHeader: string, tabBody: JQuery, html) => void;
+    abstract actorSheet_addTab: (id: string, tabName: string, tabBody: JQuery, html) => void;
     /**
      * whatever your actor currency is, you need to cast it down to Currencies interface
      */
@@ -24,6 +31,9 @@ export abstract class System {
     actorCurrencies_canPay(actor: Actor, currencies: Currencies): boolean {
         return this._actorCurrencies_subtractToLowestCurrency(actor,currencies) < 0;
     }
+
+    abstract actorRollSkill: (actor:Actor, skill) => Promise<Roll>
+    abstract actorRollAbility:(actor:Actor, ability) => Promise<Roll>
 
     _actorCurrencies_subtractToLowestCurrency(actor: Actor, currencies: Currencies){
         const systemCurrencies = this.getSystemCurrencies();

@@ -2,7 +2,7 @@
     "title": "Beaver's Crafting Module",
     "description": "A Crafting Module for DnD",
     "id": "beavers-crafting",
-    "version": "2.2.1",
+    "version": "2.3.0",
     "authors": [
       {
         "name": "angryBeaver",
@@ -29,6 +29,7 @@
         "name": "ingredients",
         "path": "./packs/ingredients.db",
         "module": "beavers-crafting",
+        "system": "dnd5e",
         "type": "Item",
         "private": false
       }
@@ -37,13 +38,7 @@
     "manifest": "https://github.com/AngryBeaver/beavers-crafting/releases/latest/download/module.json",
     "download": "https://github.com/AngryBeaver/beavers-crafting/releases/latest/download/beavers-crafting.zip",
     "relationships": {
-      "systems": [{
-        "id": "dnd5e",
-        "type": "system",
-        "compatibility": {
-          "verified": "2.0.0"
-        }
-      }]
+      "systems": []
     },
     "compatibility": {
       "minimum": "10",

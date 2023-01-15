@@ -1,5 +1,6 @@
 import {Document} from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/abstract/module.mjs";
 import {Dnd5e} from "../systems/Dnd5e.js";
+import {Pf2e} from "../systems/Pf2e.js";
 
 export class Helper{
 
@@ -29,6 +30,9 @@ export class Helper{
 export function getSystem() {
     if (game["system"].id === "dnd5e") {
         return new Dnd5e();
+    }
+    if (game["system"].id === "pf2e") {
+        return new Pf2e();
     }
     throw Error("System is not supported");
 }

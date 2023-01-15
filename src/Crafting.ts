@@ -93,7 +93,7 @@ export class Crafting implements CraftingData {
             await this.endCrafting();
         }
         if(Settings.get(Settings.TIME_TO_CRAFT) === "interaction"){
-            this.actor.sheet.activeTab = "crafting";
+            this.actor.sheet.activeTab = Settings.ACTOR_TAB_ID;
             await this.actor.sheet.render(true);
             this.actor.sheet.bringToTop();
 
@@ -109,9 +109,9 @@ export class Crafting implements CraftingData {
             let roll;
             if (skillParts[0] === 'ability') {
                 skillName = skillParts[1];
-                roll = await this.actor.rollAbilityTest(skillParts[1]);
+                roll = await getSystem().actorRollAbility(this.actor,skillParts[1]);
             } else {
-                roll = await this.actor.rollSkill(this.recipe.skill.name);
+                roll = await getSystem().actorRollSkill(this.actor,this.recipe.skill.name);
             }
             this.result._skill = {
                 dc: this.recipe.skill.dc,

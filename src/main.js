@@ -1,6 +1,6 @@
 import {CraftingApp} from './apps/CraftingApp.js';
 import {RecipeSheet} from './apps/RecipeSheet.js';
-import {Settings} from './Settings.js';
+import {Settings, getSystemSetting} from './Settings.js';
 import {Crafting} from "./Crafting.js";
 import {RecipeCompendium} from "./apps/RecipeCompendium.js";
 import {AnyOfSheet} from "./apps/AnyOfSheet.js";
@@ -87,7 +87,7 @@ Hooks.on(`dnd5e.preUseItem`, (item, config, options) => {
 });
 
 //SubTypeSheet
-Hooks.on(`renderItemSheet5e`, (app, html, data) => {
+Hooks.on(`renderItemSheet`, (app, html, data) => {
     RecipeSheet.bind(app, html, data);
     AnyOfSheet.bind(app,html,data);
 });
@@ -95,13 +95,11 @@ Hooks.on(`renderItemSheet5e`, (app, html, data) => {
 
 //add Subtype to create Item
 Hooks.on("preCreateItem", (doc, createData, options, user) => {
-    if (createData.subtype && createData.subtype === 'recipe' &&
-        !foundry.utils.hasProperty(createData, "system.source")) {
-        doc.updateSource({"system.source": Settings.RECIPE_SUBTYPE,"img":"icons/sundries/scrolls/scroll-worn-tan.webp"});
+    if (createData.flags["beavers-crafting"]?.subtype === 'recipe' ) {
+        doc.updateSource({"flags.beavers-crafting.subtype": Settings.RECIPE_SUBTYPE,"img":"icons/sundries/scrolls/scroll-worn-tan.webp"});
     }
-    if (createData.subtype && createData.subtype === 'anyOf' &&
-        !foundry.utils.hasProperty(createData, "system.source")) {
-        doc.updateSource({"system.source": Settings.ANYOF_SUBTYPE,"img":"modules/beavers-crafting/icons/anyOf.png"});
+    if (createData.flags["beavers-crafting"]?.subtype === 'anyOf' ) {
+        doc.updateSource({"flags.beavers-crafting.subtype": Settings.ANYOF_SUBTYPE,"img":"modules/beavers-crafting/icons/anyOf.png"});
     }
 });
 
@@ -113,10 +111,12 @@ Hooks.on("renderDialog", (app, html, content) => {
         if (html[0].localName !== "div") {
             html = $(html[0].parentElement.parentElement);
         }
-        html.find("select[name='type']").append("<option value='loot'>📜Recipe📜</option>");
-        html.find("select[name='type']").append("<option value='loot'>❔AnyOf❔</option>");
+        const itemType = getSystemSetting().itemType;
+
+        html.find("select[name='type']").append("<option value='"+itemType+"'>📜Recipe📜</option>");
+        html.find("select[name='type']").append("<option value='"+itemType+"'>❔AnyOf❔</option>");
         if (html.find("input.subtype").length === 0) {
-            html.find("form").append('<input class="subtype" name="subtype" style="display:none" value="">');
+            html.find("form").append('<input class="subtype" name="flags.beavers-crafting.subtype" style="display:none" value="">');
         }
         html.find("select[name='type']").on("change", function () {
             const name = $(this).find("option:selected").text();

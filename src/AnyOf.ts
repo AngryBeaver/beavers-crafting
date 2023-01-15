@@ -1,4 +1,4 @@
-import {Settings} from "./Settings.js";
+import {Settings,getSystemSetting} from "./Settings.js";
 import {RecipeCompendium} from "./apps/RecipeCompendium.js";
 import {Component} from "./Recipe.js";
 
@@ -10,7 +10,12 @@ export class AnyOf {
 
     static isAnyOf(item) {
         // @ts-ignore
-        return (item?.type === 'loot' && item?.system?.source === Settings.ANYOF_SUBTYPE);
+        return (
+            item?.type === getSystemSetting().itemType && (
+                item?.system?.source === Settings.ANYOF_SUBTYPE ||
+                item?.flags["beavers-crafting"]?.subtype === Settings.ANYOF_SUBTYPE
+            )
+        );
     }
 
     constructor(item) {

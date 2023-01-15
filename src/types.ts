@@ -116,6 +116,7 @@ interface SystemCurrency {
     name: string,
     label: string,
     factor: number,
+    data?: any
 }
 
 interface Currency {

@@ -1,18 +1,18 @@
-<div class="sheet recipe" style="height:100%">
+<div class="flexcol recipe" style="height:100%">
     <nav class="tabs" data-group="primary" style="flex:0 20px">
         <a class="item {{#if (eq active "main")}}active{{/if}}" data-tab="main">Main</a>
         <a class="item {{#if (eq active "advanced")}}active{{/if}}" data-tab="advanced">Advanced</a>
     </nav>
     <section>
-        <div class="tab main {{#if (eq active "main")}}active{{/if}}" data-tab="main" data-group="primary">
+        <div style="padding:0px" class="tab main {{#if (eq active "main")}}active{{/if}}" data-tab="main" data-group="primary">
             {{{main}}}
         </div>
-        <div class="tab advanced {{#if (eq active "advanced")}}active{{/if}}" data-tab="advanced" data-group="primary">
+        <div style="padding:0px" class="tab advanced {{#if (eq active "advanced")}}active{{/if}}" data-tab="advanced" data-group="primary">
             <div class="flexcol" style="height:100%" >
                 <textarea placeholder="your code here...&#10;available vars: result, actor, recipeData"
               {{#if editable}}disabled{{/if}}
               name="flags.beavers-crafting.recipe.macro">{{recipe.macro}}</textarea>
-                <button style="flex:0">{{localize "beaversCrafting.recipe.macro.button"}}</button>
+                <button style="flex:0;width:inherit">{{localize "beaversCrafting.recipe.macro.button"}}</button>
             </div>
         </div>
     </section>

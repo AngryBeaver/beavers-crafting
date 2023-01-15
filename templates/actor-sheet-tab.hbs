@@ -1,154 +1,153 @@
-<div class="beavers-crafting">
-    <table class="crafting-tab">
-        <thead>
-        <tr>
-            <th style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;border-left: 1px solid var(--color-border-light-tertiary);">{{localize
-                    "beaversCrafting.actorSheet.table.name"}}</th>
-            <th style="width:200px">{{localize "beaversCrafting.actorSheet.table.input"}}</th>
-            <th style="width:200px">{{localize "beaversCrafting.actorSheet.table.output"}}</th>
-            <th style="width:80px">{{localize "beaversCrafting.actorSheet.table.status"}}</th>
-            <th style="width:50px;border-right: 1px solid var(--color-border-light-tertiary);"><a
-                    class="addCrafting">{{localize "beaversCrafting.actorSheet.table.add"}}</a></th>
-        </tr>
-        </thead>
-        <tbody>
-        {{#each craftingList}}
-            <tr style="border-top: 1px solid var(--color-border-light-tertiary);">
-                <td style="border-left: 1px solid var(--color-border-light-tertiary);">
-                    <div style="display:flex; line-height:30px;">
-                        <div class="crafting-item-img" style="background-image: url('{{this.img}}')"></div>
-                        {{this.name}}
+<div class="beavers-crafting actor-tab" style="overflow:auto">
+    <div class="flexcol" style="min-width:470px">
+        <div class="flexrow header">
+            <div class="name">{{localize "beaversCrafting.actorSheet.table.name"}}</div>
+            <div class="resource" style="flex:0 150px">{{localize "beaversCrafting.actorSheet.table.input"}}</div>
+            <div class="result" style="flex:0 150px">{{localize "beaversCrafting.actorSheet.table.output"}}</div>
+            <div class="status" style="flex:0 70px">{{localize "beaversCrafting.actorSheet.table.status"}}</div>
+            <div class="option" style="flex:0 50px">
+                <a class="addCrafting">{{localize "beaversCrafting.actorSheet.table.add"}}</a>
+            </div>
+        </div>
+    </div>
+    <div class="flexcol" style="border-top: 1px solid var(--color-border-light-tertiary);">
+    {{#each craftingList}}
+        <div class="flexrow" style="border-bottom: 1px solid var(--color-border-light-tertiary);">
+            <div style="overflow:hidden; border-left: 1px solid var(--color-border-light-tertiary);">
+                <div style="overflow:hidden;height:30px; text-overflow:ellipsis; white-space:nowrap">
+                    <div class="crafting-item-img" style="text-overflow:ellipsis; white-space:nowrap;background-repeat:no-repeat;width:100%;text-indent:25px;line-height:20px;overflow:hidden;display:inline-block;background-image: url('{{this.img}}')">
+                       {{this.name}}
                     </div>
-                </td>
-                <td style="border-left: 1px solid var(--color-border-light-tertiary);border-right: 1px solid var(--color-border-light-tertiary);">
-                    {{#with (lookup ../chatList @key) as |chatData|}}
-                        {{#each chatData.components}}
-                            {{#if (eq type "required")}}
-                                <div style="margin:0 5px;padding:1px 0;display: flex;flex-direction: row;flex-wrap: wrap;justify-content: flex-start;">
-                                    <div style="flex:1;display:flex" title="{{this.component.name}}">
-                                        <div class="crafting-item-img"
-                                             style="margin: 0 5px 0 0px;background-image: url('{{this.component.img}}')"></div>
-                                        <span style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{this.component.quantity}} {{this.component.name}}</span>
-                                    </div>
-                                    <div style="flex: 0 0 20px;line-height: 20px;text-align: center;">
-                                        {{#if this.hasError }}
-                                            <i class="fas fa-times" style="color:darkred"></i>
-                                        {{else}}
-                                            {{#if this.isProcessed }}
-                                                {{#if (eq ../status "active") }}
-                                                    <i class="fas fa-locked" style="color:orange"></i>
-                                                {{else}}
-                                                    <i class="fas fa-check" style="color:darkgreen"></i>
-                                                {{/if}}
-                                            {{/if}}
-                                        {{/if}}
-                                    </div>
-                                </div>
-                            {{/if}}
-                        {{/each}}
-                        {{#each chatData.components}}
-                            {{#if (eq type "consumed")}}
-                                <div style="margin:0 5px;padding:1px 0;display: flex;flex-direction: row;flex-wrap: wrap;justify-content: flex-start;">
-                                    <div style="flex:1;display:flex" title="{{this.component.name}}">
-                                        <div class="crafting-item-img"
-                                             style="margin: 0 5px 0 0px;background-image: url('{{this.component.img}}')"></div>
-                                        <span style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{this.component.quantity}} {{this.component.name}}</span>
-                                    </div>
-                                    <div style="flex: 0 0 20px;line-height: 20px;text-align: center;">
-                                        {{#if this.hasError }}
-                                            <i class="fas fa-times" style="color:darkred"></i>
-                                        {{else}}
-                                            {{#if this.isProcessed }}
-                                                {{#if (eq ../status "active") }}
-                                                    <i class="fa-regular fa-lock" style="color:orange"></i>
-                                                {{else}}
-                                                    <i class="fas fa-check" style="color:darkgreen"></i>
-                                                {{/if}}
-                                            {{/if}}
-                                        {{/if}}
-                                    </div>
-                                </div>
-                            {{/if}}
-                        {{/each}}
-                    {{/with}}
-                </td>
-                <td style="border-left: 1px solid var(--color-border-light-tertiary);">
-                    {{#with (lookup ../chatList @key) as |chatData|}}
-                        {{#each chatData.components}}
-                            {{#if (eq type "produced")}}
-                                <div style="margin:0 5px;padding:1px 0;display: flex;flex-direction: row;flex-wrap: wrap;justify-content: flex-start;">
-                                    <div style="flex:1;display:flex" title="{{this.component.name}}">
-                                        <div class="crafting-item-img"
-                                             style="margin: 0 5px 0 0px;background-image: url('{{this.component.img}}')"></div>
-                                        <span style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{this.component.quantity}} {{this.component.name}}</span>
-                                    </div>
-                                    <div style="flex: 0 0 20px;line-height: 20px;text-align: center;">
-                                        {{#if this.hasError }}
-                                            <i class="fas fa-times" style="color:darkred"></i>
-                                        {{else}}
-                                            {{#if (eq ../status "active") }}
-                                                <i class="fa-regular fa-box-open"
-                                                   style="color:orange;font-size:small"></i>
-                                            {{else}}
-                                                {{#if this.isProcessed }}
-                                                    <i class="fas fa-check" style="color:darkgreen"></i>
-                                                {{/if}}
-                                            {{/if}}
-                                        {{/if}}
-                                    </div>
-                                </div>
-                            {{/if}}
-                        {{/each}}
-                    {{/with}}
-                </td>
-            <td style="border-left: 1px solid var(--color-border-light-tertiary);">
+                </div>
+            </div>
+            <div class="resource flexrow" style="border-left: 1px solid var(--color-border-light-tertiary);border-right: 1px solid var(--color-border-light-tertiary);">
                 {{#with (lookup ../chatList @key) as |chatData|}}
-                    <div style="margin:0 5px;padding:1px 0;display: flex;flex-direction: row;flex-wrap: wrap;justify-content: flex-start;">
-                        <div style="flex:1; height: 20px;text-align: center;line-height: 20px;border: 1px solid var(--color-border-light-2);border-radius: 3px;box-shadow: 0 0 2px #fff inset;word-break: break-all;">
-                            {{#if (eq this.status "success") }}
-                                <div class="error"
-                                     style="background-color: darkgreen;margin: 2px;height: 14px;line-height: 14px;color: white;">
-                                    100%
+                    {{#each chatData.components}}
+                        {{#if (eq type "required")}}
+                            <div style="margin:0 5px;padding:1px 0;display: flex;flex-direction: row;flex-wrap: wrap;justify-content: flex-start;">
+                                <div style="flex:1;display:flex" title="{{this.component.name}}">
+                                    <div class="crafting-item-img"
+                                         style="margin: 0 5px 0 0px;background-image: url('{{this.component.img}}')"></div>
+                                    <span style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{this.component.quantity}} {{this.component.name}}</span>
                                 </div>
-                            {{else if (eq this.status "error") }}
-                                <div class="error"
-                                     style="background-color: darkred;margin: 2px;height: 14px;line-height: 14px;color: white;">
-                                    100%
+                                <div style="flex: 0 0 20px;line-height: 20px;text-align: center;">
+                                    {{#if this.hasError }}
+                                        <i class="fas fa-times" style="color:darkred"></i>
+                                    {{else}}
+                                        {{#if this.isProcessed }}
+                                            {{#if (eq ../status "active") }}
+                                                <i class="fas fa-locked" style="color:orange"></i>
+                                            {{else}}
+                                                <i class="fas fa-check" style="color:darkgreen"></i>
+                                            {{/if}}
+                                        {{/if}}
+                                    {{/if}}
                                 </div>
-                            {{else}}
-                                0%
-                            {{/if}}
-                        </div>
+                            </div>
+                        {{/if}}
+                    {{/each}}
+                    {{#each chatData.components}}
+                        {{#if (eq type "consumed")}}
+                            <div style="margin:0 5px;padding:1px 0;display: flex;flex-direction: row;flex-wrap: wrap;justify-content: flex-start;">
+                                <div style="flex:1;display:flex" title="{{this.component.name}}">
+                                    <div class="crafting-item-img"
+                                         style="margin: 0 5px 0 0px;background-image: url('{{this.component.img}}')"></div>
+                                    <span style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{this.component.quantity}} {{this.component.name}}</span>
+                                </div>
+                                <div style="flex: 0 0 20px;line-height: 20px;text-align: center;">
+                                    {{#if this.hasError }}
+                                        <i class="fas fa-times" style="color:darkred"></i>
+                                    {{else}}
+                                        {{#if this.isProcessed }}
+                                            {{#if (eq ../status "active") }}
+                                                <i class="fa-regular fa-lock" style="color:orange"></i>
+                                            {{else}}
+                                                <i class="fas fa-check" style="color:darkgreen"></i>
+                                            {{/if}}
+                                        {{/if}}
+                                    {{/if}}
+                                </div>
+                            </div>
+                        {{/if}}
+                    {{/each}}
+                {{/with}}
+            </div>
+            <div class="result flexrow">
+                {{#with (lookup ../chatList @key) as |chatData|}}
+                    {{#each chatData.components}}
+                        {{#if (eq type "produced")}}
+                            <div style="margin:0 5px;padding:1px 0;display: flex;flex-direction: row;flex-wrap: wrap;justify-content: flex-start;">
+                                <div style="flex:1;display:flex" title="{{this.component.name}}">
+                                    <div class="crafting-item-img"
+                                         style="margin: 0 5px 0 0px;background-image: url('{{this.component.img}}')"></div>
+                                    <span style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{this.component.quantity}} {{this.component.name}}</span>
+                                </div>
+                                <div style="flex: 0 0 20px;line-height: 20px;text-align: center;">
+                                    {{#if this.hasError }}
+                                        <i class="fas fa-times" style="color:darkred"></i>
+                                    {{else}}
+                                        {{#if (eq ../status "active") }}
+                                            <i class="fa-regular fa-box-open"
+                                               style="color:orange;font-size:small"></i>
+                                        {{else}}
+                                            {{#if this.isProcessed }}
+                                                <i class="fas fa-check" style="color:darkgreen"></i>
+                                            {{/if}}
+                                        {{/if}}
+                                    {{/if}}
+                                </div>
+                            </div>
+                        {{/if}}
+                    {{/each}}
+                {{/with}}
+            </div>
+            <div class="status flexcol" style="justify-content: center; border-left: 1px solid var(--color-border-light-tertiary);">
+            {{#with (lookup ../chatList @key) as |chatData|}}
+                <div style="margin:0 5px;padding:1px 0;display: flex;flex-direction: row;flex-wrap: wrap;justify-content: flex-start;">
+                    <div style="flex:1; height: 20px;text-align: center;line-height: 20px;border: 1px solid var(--color-border-light-2);border-radius: 3px;box-shadow: 0 0 2px #fff inset;word-break: break-all;">
+                        {{#if (eq this.status "success") }}
+                            <div class="error"
+                                 style="background-color: darkgreen;margin: 2px;height: 14px;line-height: 14px;color: white;">
+                                100%
+                            </div>
+                        {{else if (eq this.status "error") }}
+                            <div class="error"
+                                 style="background-color: darkred;margin: 2px;height: 14px;line-height: 14px;color: white;">
+                                100%
+                            </div>
+                        {{else}}
+                            0%
+                        {{/if}}
                     </div>
-                    {{#if this.skill.total}}
+                </div>
+                {{#if this.skill.total}}
                     <div class="dice-roll"
                          style="margin:auto;width:60px;padding:1px 0;display: flex;flex-direction: row;flex-wrap: wrap;justify-content: flex-start;">
-                            <div class="dice-total" style="flex: 0 0 60px;line-height: 20px;text-align: center;">
-                                {{this.skill.total}}
-                                {{#if (eq this.status "success") }}
-                                    <i class="fas fa-check" style="color:darkgreen"></i>
-                                {{else if (eq this.status "error") }}
-                                    <i class="fas fa-times" style="color:darkred"></i>
-                                {{/if}}
-                            </div>
+                        <div class="dice-total" style="flex: 0 0 60px;line-height: 20px;text-align: center;">
+                            {{this.skill.total}}
+                            {{#if (eq this.status "success") }}
+                                <i class="fas fa-check" style="color:darkgreen"></i>
+                            {{else if (eq this.status "error") }}
+                                <i class="fas fa-times" style="color:darkred"></i>
+                            {{/if}}
                         </div>
-                    {{/if}}
-                    {{#if (eq this.status "active") }}
+                    </div>
+                {{/if}}
+                {{#if (eq this.status "active") }}
                     <div style="flex:1; text-align: center;">
                         <button class="advanceCrafting" style="width: 60px;height: 26px;line-height: 26px;margin: 1px;padding: 0px" data-id="{{@key}}">
                             <i class="fas fa-forward-step" data-id="{{@key}}"></i>
                         </button>
                     </div>
-                    {{/if}}
-                </td>
-                {{/with}}
-                <td style="text-align:right;padding: 0px 5px;border-left: 1px solid var(--color-border-light-tertiary);border-right: 1px solid var(--color-border-light-tertiary);">
-                    <a class="removeCrafting">
-                        <i class="fas fa-trash" data-id="{{@key}}"></i>
-                    </a>
-                </td>
-            </tr>
-        {{/each}}
-        </tbody>
-    </table>
+                {{/if}}
+            </div>
+            {{/with}}
+            <div class="option flexrow" style="text-align:right;padding: 0px 5px;border-left: 1px solid var(--color-border-light-tertiary);border-right: 1px solid var(--color-border-light-tertiary);">
+                <a class="removeCrafting">
+                    <i class="fas fa-trash" data-id="{{@key}}"></i>
+                </a>
+            </div>
+        </div>
+    {{/each}}
+    </div>
 </div>

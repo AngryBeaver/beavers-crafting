@@ -1,7 +1,7 @@
 import {FilterType, RecipeCompendium} from "./RecipeCompendium.js";
 import {Crafting} from "../Crafting.js";
 import {getDataFrom, getItem, sanitizeUuid} from "../helpers/Utility.js";
-import {Settings} from "../Settings.js";
+import {getSystemSetting, Settings} from "../Settings.js";
 import {getToolConfig} from "./ToolConfig.js";
 import {AnyOf} from "../AnyOf.js";
 import {Component, Recipe} from "../Recipe.js";
@@ -77,7 +77,7 @@ export class CraftingApp extends Application {
                 recipe: this.data.recipe,
                 currencies: getSystem().getSystemCurrencies(),
                 skills: getSystem().getSkills(),
-                abilities: getSystem().getAbilities(),
+                abilities: getSystemSetting().useAttributes?getSystem().getAbilities():[],
                 editable: false,
                 precast: await this.getPrecastFromResult(this.data.result,this.data.recipe),
                 displayResults:Settings.get(Settings.DISPLAY_RESULTS),

@@ -5,7 +5,7 @@
                 <div class="flexrow header">
                     <div class="name">{{localize "beaversCrafting.recipe.tools"}}</div>
                     {{#if editable}}
-                        <div class="action">
+                        <div class="action flexrow">
                             {{#unless recipe.tool}}
                                 <a class="item-control item-add">
                                     <i class="fas fa-plus"></i>
@@ -35,8 +35,8 @@
                             </div>
                         {{/if}}
                         {{#if editable}}
-                            <div class="action">
-                                <a class="item-control item-delete">
+                            <div class="action flexrow">
+                                <a class="item-delete">
                                     <i class="fas fa-trash"></i>
                                 </a>
                             </div>
@@ -47,7 +47,7 @@
         {{/if}}
         {{#if useAttendants}}
             <div class="attendants items-list">
-                <div class="flexrow item header">
+                <div class="flexrow header">
                     <div class="name">{{localize "beaversCrafting.recipe.attendants"}}</div>
                     {{#if editable}}
                         <div class="action">-</div>
@@ -58,7 +58,7 @@
                         <div class="item-name flexrow {{#if ../displayIngredients}}clickable{{/if}}"
                              data-id="{{this.uuid}}" data-key="{{@key}}">
                             <div class="item-image" style="background-image: url('{{this.img}}')"></div>
-                            <h4>{{this.name}}</h4>
+                            <span>{{this.name}}</span>
                         </div>
                         <div class="action flexrow">
                             {{#if ../precast}}
@@ -72,8 +72,8 @@
                             {{/if}}
                         </div>
                         {{#if ../editable}}
-                            <div class="action">
-                                <a class="item-control item-delete">
+                            <div class="action flexrow">
+                                <a class="item-delete">
                                     <i class="fas fa-trash" data-id="{{@key}}"></i>
                                 </a>
                             </div>
@@ -92,9 +92,9 @@
                 <div class="name">{{localize "beaversCrafting.recipe.currency"}}</div>
                 <div class="attribute">{{localize "beaversCrafting.recipe.quantity"}}</div>
                 {{#if editable}}
-                    <div class="action">
+                    <div class="action flexrow">
                         {{#unless recipe.currency}}
-                            <a class="item-control item-add">
+                            <a class="item-add">
                                 <i class="fas fa-plus"></i>
                             </a>
                         {{/unless}}
@@ -102,7 +102,7 @@
                 {{/if}}
             </div>
             {{#if recipe.currency}}
-                <div class="flexrow">
+                <div class="flexrow item">
                     <select {{#unless editable}}disabled{{/unless}}
                             name="flags.beavers-crafting.recipe.currency.name" class="name">
                         {{#select recipe.currency.name}}
@@ -117,8 +117,8 @@
                            step="any"
                            value="{{recipe.currency.value}}"/>
                     {{#if editable}}
-                        <div class="action">
-                            <a class="item-control item-delete">
+                        <div class="action flexrow">
+                            <a class="item-delete">
                                 <i class="fas fa-trash"></i>
                             </a>
                         </div>
@@ -127,7 +127,7 @@
             {{/if}}
         </div>
         <div class="ingredients items-list">
-            <div class="flexrow item header">
+            <div class="flexrow header">
                 <div class="name">{{localize "beaversCrafting.recipe.ingredients"}}</div>
                 <div class="attribute">{{localize "beaversCrafting.recipe.quantity"}}</div>
                 {{#if editable}}
@@ -139,7 +139,7 @@
                     <div class="item-name flexrow {{#if ../displayIngredients}}clickable{{/if}}"
                          data-id="{{this.uuid}}" data-key="{{@key}}">
                         <div class="item-image" style="background-image: url('{{this.img}}')"></div>
-                        <h4>{{this.name}}</h4>
+                        <span>{{this.name}}</span>
                     </div>
                     <div class="attribute flexrow">
                         <input {{#unless ../editable}}disabled{{/unless}}
@@ -157,8 +157,8 @@
                         {{/if}}
                     </div>
                     {{#if ../editable}}
-                        <div class="action">
-                            <a class="item-control item-delete">
+                        <div class="action flexrow">
+                            <a class="item-delete">
                                 <i class="fas fa-trash" data-id="{{@key}}"></i>
                             </a>
                         </div>
@@ -178,9 +178,9 @@
                 <div class="name">{{localize "beaversCrafting.recipe.skills"}}</div>
                 <div class="attribute">{{localize "beaversCrafting.recipe.dc"}}</div>
                 {{#if editable}}
-                    <div class="action">
+                    <div class="action flexrow">
                         {{#unless recipe.skill}}
-                            <a class="item-control item-add">
+                            <a class="item-add">
                                 <i class="fas fa-plus"></i>
                             </a>
                         {{/unless}}
@@ -188,7 +188,7 @@
                 {{/if}}
             </div>
             {{#if recipe.skill}}
-                <div class="flexrow">
+                <div class="flexrow item">
                     <select {{#unless editable}}disabled{{/unless}}
                             name="flags.beavers-crafting.recipe.skill.name" class="name">
                         {{#select recipe.skill.name}}
@@ -212,8 +212,8 @@
                                name="flags.beavers-crafting.recipe.skill.consume">
                     </div>
                     {{#if editable}}
-                        <div class="action">
-                            <a class="item-control item-delete">
+                        <div class="action flexrow">
+                            <a class="item-delete">
                                 <i class="fas fa-trash"></i>
                             </a>
                         </div>
@@ -222,7 +222,7 @@
             {{/if}}
         </div>
         <div class="results items-list">
-            <div class="flexrow item header">
+            <div class="flexrow header">
                 <div class="name">{{localize "beaversCrafting.recipe.results"}}</div>
                 <div class="attribute">{{localize "beaversCrafting.recipe.quantity"}}</div>
                 {{#if editable}}
@@ -234,7 +234,7 @@
                     <div class="item-name flexrow {{#if ../displayResults}}clickable{{/if}}"
                          data-id="{{this.uuid}}">
                         <div class="item-image" style="background-image: url('{{this.img}}')"></div>
-                        <h4>{{this.name}}</h4>
+                        <span>{{this.name}}</span>
                     </div>
                     <input {{#unless ../editable}}disabled{{/unless}}
                            name="flags.beavers-crafting.recipe.results.{{@key}}.quantity" class="attribute"

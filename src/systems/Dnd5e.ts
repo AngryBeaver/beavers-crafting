@@ -2,16 +2,13 @@ import {System} from "./System.js";
 
 export class Dnd5e extends System {
 
-    getCurrencies = () => Object.entries(game["dnd5e"].config.currencies).map(currency => currency[1]);
-
-
     getSkills = () => Object.entries(game["dnd5e"].config.skills).map(skills => {
         // @ts-ignore
         return {id: skills[0], ...skills[1]};
     });
 
     getAbilities = () => Object.entries(game["dnd5e"].config.abilities).map(ab => {
-        return {id: "ability-" + ab[0], label: ab[1]};
+        return {id: "ability-" + ab[0], label: ab[1]+""};
     });
 
     getSystemCurrencies = (): SystemCurrencies => ({
@@ -42,9 +39,9 @@ export class Dnd5e extends System {
         },
     });
 
-    actorSheet_addTab = (id: string, tabHeader: string, tabBody: JQuery, html) => {
+    actorSheet_addTab = (id: string, tabName: string, tabBody: JQuery, html) => {
         const tabs = $(html).find('.tabs[data-group="primary"]');
-        const tabItem = $('<a class="item" data-tab="' + id + '">' + tabHeader + '</a>');
+        const tabItem = $('<a class="item" data-tab="' + id + '">' + tabName + '</a>');
         tabs.append(tabItem);
         const body = $(html).find(".sheet-body");
         const tabContent = $('<div class="tab ' + id + '" data-group="primary" data-tab="' + id + '"></div>');
@@ -61,6 +58,14 @@ export class Dnd5e extends System {
        const resultCurrencies = this._actorCurrencies_lowestCurrencyToCurrencies(result);
        await actor.update({system:{currency:resultCurrencies}});
     };
+
+    actorRollSkill= async (actor, skill) => {
+        return await actor.rollSkill(skill);
+    }
+
+    actorRollAbility= async (actor, ability) =>{
+        return await actor.rollAbilityTest(ability);
+    }
 
 
 }
