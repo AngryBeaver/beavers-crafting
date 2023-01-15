@@ -12,6 +12,7 @@ export class Crafting implements CraftingData {
     img: string;
     startAt: number;
     endAt: number;
+    isFinished?: boolean;
     result: Result;
     recipe: Recipe;
     actor;
@@ -20,6 +21,7 @@ export class Crafting implements CraftingData {
         this.uuid = craftingData.uuid || actor.uuid + ".Crafting." + randomID();
         this.startAt = craftingData.startAt;
         this.endAt = craftingData.endAt
+        this.isFinished = craftingData.isFinished;
         this.name = craftingData.name;
         this.img = craftingData.img;
         this.recipe = new Recipe("invalid", "invalid", craftingData.name, craftingData.img, craftingData.recipe);
@@ -36,6 +38,7 @@ export class Crafting implements CraftingData {
             endAt: this.endAt,
             result: this.result.serialize(),
             recipe: this.recipe.serialize(),
+            isFinished: this.isFinished
         }
     }
 
@@ -113,10 +116,17 @@ export class Crafting implements CraftingData {
             } else {
                 roll = await getSystem().actorRollSkill(this.actor,this.recipe.skill.name);
             }
+            let resultValue = roll.total
+            if(resultValue === undefined){
+                if(roll.fields !== undefined && roll.fields[2] !== undefined ){
+                    resultValue =  roll.fields[2][1]?.roll?.total;
+                }
+            }
+
             this.result._skill = {
                 dc: this.recipe.skill.dc,
                 name: skillName,
-                total: roll.total
+                total: resultValue
             }
         }
     }
@@ -387,7 +397,7 @@ export class Crafting implements CraftingData {
         let status = "active";
         if(this.result.hasError()){
             status = "error";
-        }else if(this.endAt > 0){
+        }else if(this.endAt > 0 || this.isFinished){
             status = "success";
         }
         return {
@@ -473,6 +483,7 @@ export class Crafting implements CraftingData {
     }
 
     end() {
+        this.isFinished = true;
         this.endAt = game["time"].worldTime;
     }
 
