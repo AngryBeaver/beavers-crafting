@@ -2,6 +2,7 @@
 ## 2.2.x feature: Time To Craft
 ### 2.2.2 fix worldtime is zero
 Crafting does not become success when the worldtime is not advancecd.
+Sadly I could not automatically fix old crafting processes without breaking unfinished crafting processes.
 ### 2.2.0 feature: Time To Craft
 Crafting becomes a process that you start when clicking on the RecipeCompendium.
 The crafting process starts by consuming all resources and fireing up the advanced macro but without granting the results.
