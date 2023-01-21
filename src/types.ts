@@ -89,24 +89,10 @@ interface PreCastData {
     currencies?: boolean;
 }
 
-interface ComponentData {
-    id: string;
-    uuid: string;
-    type: string;
-    name: string;
-    img: string;
-    quantity: number;
-    itemType?: string;
-}
-
 interface Skill {
     name: string;
     dc: number;
     consume: boolean;
-}
-
-interface Currencies {
-    [name:string]:number
 }
 
 interface SystemCurrencies {

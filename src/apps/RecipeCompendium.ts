@@ -1,5 +1,5 @@
 //the firstdraft implementation will be kept simple stupid and not performant at all.
-import {Component, Recipe} from "../Recipe.js";
+import {Recipe} from "../Recipe.js";
 import {Settings} from "../Settings.js";
 import {AnyOf} from "../AnyOf.js";
 import {getItem} from "../helpers/Utility.js";
@@ -32,8 +32,9 @@ export class RecipeCompendium {
             const listOfIngredientsWithoutAnyOf = Object.values(recipe.ingredients).filter(component => component.type !== Settings.ANYOF_SUBTYPE);
             let countItems = 0;
             itemLoop: for(const item of items) {
+                const itemComponent = beaversSystemInterface.componentFromEntity(item);
                 for (const component of listOfIngredientsWithoutAnyOf) {
-                    if (this.isSame(item, component)) {
+                    if (component.isSame(itemComponent)) {
                         countItems++;
                         continue itemLoop;
                     }
@@ -108,7 +109,7 @@ export class RecipeCompendium {
     static async validateTool(recipe,listOfItems,result : Result): Promise<Result>{
         if( recipe.tool && Settings.get(Settings.USE_TOOL)) {
             const item = await getItem(recipe.tool);
-            const component = Component.fromEntity(item);
+            const component = beaversSystemInterface.componentFromEntity(item);
             result.updateComponent("required",component);
         }
         return result;
@@ -124,13 +125,14 @@ export class RecipeCompendium {
     static findComponentInList(listOfItems, component: ComponentData): ItemChange {
         const itemChange = new DefaultItemChange(component);
         listOfItems.forEach((i) => {
-            if (this.isSame(i, component)) {
+            const componentItem = beaversSystemInterface.componentFromEntity(i);
+            if (componentItem.isSame(component)) {
                 if (itemChange.toUpdate["system.quantity"] == 0) {
                     itemChange.toUpdate._id = i.id;
                 } else {
                     itemChange.toDelete.push(i.id);
                 }
-                itemChange.toUpdate["system.quantity"] = itemChange.toUpdate["system.quantity"] + (i.system?.quantity || 1);
+                itemChange.toUpdate["system.quantity"] = itemChange.toUpdate["system.quantity"] + (componentItem.quantity);
             }
         });
         return itemChange;

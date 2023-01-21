@@ -1,4 +1,4 @@
-import {Component, Recipe} from "./Recipe.js";
+import { Recipe} from "./Recipe.js";
 import {RecipeCompendium} from "./apps/RecipeCompendium.js";
 import {getSystem} from "./helpers/Helper.js";
 
@@ -171,7 +171,7 @@ export class Result implements ResultApi, ResultData {
         let componentResult = this._components[type].findComponentResult(componentData);
         if (componentResult === undefined) {
             componentResult = new ComponentResult();
-            componentResult.component = Component.clone(componentData);
+            componentResult.component = beaversSystemInterface.componentCreate(componentData);
             componentResult.component.quantity = 0;
             componentResult.isProcessed = false;
             const itemChange = RecipeCompendium.findComponentInList(this._actor.items, componentData);
@@ -250,7 +250,7 @@ export class ComponentResult implements ComponentResultData {
 
     static from(componentResultData: ComponentResultData): ComponentResult {
         const componentResult = new ComponentResult();
-        componentResult.component = Component.clone(componentResultData.component);
+        componentResult.component = beaversSystemInterface.componentCreate(componentResultData.component);
         componentResult.originalQuantity = componentResultData.originalQuantity;
         componentResult.userInteraction = componentResultData.userInteraction;
         componentResult.isProcessed = componentResultData.isProcessed;

@@ -1,4 +1,4 @@
-import {Component, Recipe} from "./Recipe.js";
+import {Recipe} from "./Recipe.js";
 import {Settings} from "./Settings.js";
 import {RecipeCompendium} from "./apps/RecipeCompendium.js";
 import {getItem} from "./helpers/Utility.js";
@@ -237,7 +237,7 @@ export class Crafting implements CraftingData {
         if ((componentResult.isProcessed && !revert) || (!componentResult.isProcessed && revert )){
             return;
         }
-        const component = Component.clone(componentResult.component);
+        const component = beaversSystemInterface.componentCreate(componentResult.component);
         if (revert) {
             component.quantity = component.quantity * -1;
         }
@@ -276,7 +276,6 @@ export class Crafting implements CraftingData {
         }
         return items;
     }
-
 
     async processAll() {
         if (this.result._hasException) return;
@@ -409,7 +408,6 @@ export class Crafting implements CraftingData {
         }
     }
 
-
     async _sendToChat() {
         if (this.result._hasException) return;
         let content = await renderTemplate(`modules/${Settings.NAMESPACE}/templates/crafting-chat.hbs`,
@@ -435,7 +433,6 @@ export class Crafting implements CraftingData {
         update.flags["beavers-crafting"].crafting[uuid] = this.serialize();
         await this.actor.update(update);
     }
-
 
     async _getResultComponents(result: Result): Promise<ComponentData[]> {
         const items = Object.values(this.recipe.results).filter(component => component.type === "Item");
@@ -476,7 +473,7 @@ export class Crafting implements CraftingData {
                     result._hasException = true;
                     return [];
                 }
-                components.push(new Component(item, item.uuid, r.documentCollection));
+                components.push(beaversSystemInterface.componentFromEntity(item));
             }
         }
         return components;

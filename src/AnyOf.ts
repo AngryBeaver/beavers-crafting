@@ -1,6 +1,5 @@
 import {Settings,getSystemSetting} from "./Settings.js";
 import {RecipeCompendium} from "./apps/RecipeCompendium.js";
-import {Component} from "./Recipe.js";
 
 export class AnyOf {
     macro;
@@ -62,12 +61,13 @@ export class AnyOf {
         const resultList:ComponentData[] = [];
         for(const item of itemList){
             const result = await this.executeMacro(item);
+            const componentItem = beaversSystemInterface.componentFromEntity(item);
             if(result.value){
-                const same = resultList.filter(component => RecipeCompendium.isSame(item,component))
+                const same = resultList.filter(component => componentItem.isSame(component))
                 if(same.length > 0){
-                    same[0].quantity = same[0].quantity + item.system?.quantity;
+                    same[0].quantity = same[0].quantity + componentItem.quantity;
                 }else{
-                    resultList.push(new Component(item,item.uuid,"Item"));
+                    resultList.push(componentItem);
                 }
             }
         }

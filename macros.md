@@ -224,6 +224,6 @@ if(!result.hasError()){
 you can transform a real Item into a Component by using:
 ````javascript
 const entity // real item e.g. fromUuid(uuid) 
-const component = game['beavers-crafting'].Component.fromEntity(entity);
+const component = game["beavers-system-interface"].system.createComponent(entity);
 ````
 

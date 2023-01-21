@@ -1,5 +1,5 @@
 import {Settings,getSystemSetting} from "./Settings.js";
-import {getItem, sanitizeUuid} from "./helpers/Utility.js";
+import {sanitizeUuid} from "./helpers/Utility.js";
 import {getToolConfig} from "./apps/ToolConfig.js";
 import {Result} from "./Result.js";
 
@@ -52,7 +52,7 @@ export class Recipe implements RecipeData {
             const result = {};
             for (const key in map) {
                 const component = map[key];
-                result[key] = new Component(component, component.uuid, component.type);
+                result[key] = beaversSystemInterface.componentCreate(component);
             }
             return result;
         }
@@ -116,9 +116,9 @@ export class Recipe implements RecipeData {
     addAttendant(entity, uuid, type) {
         const uuidS = sanitizeUuid(uuid);
         if (!this.attendants[uuidS]) {
-            this.attendants[uuidS] = new Component(entity, uuid, type);
+            this.attendants[uuidS] = beaversSystemInterface.componentCreate({...entity,uuid:uuid,type:type});
         } else {
-            this.attendants[uuidS].inc();
+            this.attendants[uuidS].quantity = this.attendants[uuidS].quantity+1;
         }
     }
 
@@ -130,9 +130,9 @@ export class Recipe implements RecipeData {
     addIngredient(entity, uuid, type) {
         const uuidS = sanitizeUuid(uuid);
         if (!this.ingredients[uuidS]) {
-            this.ingredients[uuidS] = new Component(entity, uuid, type);
+            this.ingredients[uuidS] = beaversSystemInterface.componentCreate({...entity,uuid:uuid,type:type});
         } else {
-            this.ingredients[uuidS].inc();
+            this.ingredients[uuidS].quantity = this.ingredients[uuidS].quantity+1;
         }
     }
 
@@ -144,9 +144,9 @@ export class Recipe implements RecipeData {
     addResult(entity, uuid, type) {
         const uuidS = sanitizeUuid(uuid);
         if (!this.results[uuidS]) {
-            this.results[uuidS] = new Component(entity, uuid, type);
+            this.results[uuidS] = beaversSystemInterface.componentCreate({...entity,uuid:uuid,type:type});
         } else {
-            this.results[uuidS].inc();
+            this.results[uuidS].quantity = this.results[uuidS].quantity+1;
         }
     }
 
@@ -214,57 +214,6 @@ export class Recipe implements RecipeData {
         }
     }
 
-}
-
-export class Component implements ComponentData {
-    id: string;
-    img: string;
-    name: string;
-    quantity: number;
-    uuid: string;
-    type: string;
-    itemType?: string;
-
-    static clone(component: ComponentData): Component {
-        return new Component(component, component.uuid, component.type)
-    }
-
-    static fromEntity(entity): Component {
-        return new Component(entity, entity.uuid, entity.documentName);
-    }
-
-    constructor(entity, uuid, type) {
-        this.id = entity.id;
-        this.uuid = entity.uuid;
-        this.type = type;
-        if (type === "Item") {
-            this.itemType = entity.itemType || (entity.type === "Item" ? undefined : entity.type);
-        }
-        this.name = entity.name;
-        this.img = entity.img;
-        this.quantity = entity.system?.quantity || entity.quantity || 1;
-    }
-
-    inc() {
-        this.quantity = this.quantity + 1;
-    }
-
-    async getEntity() {
-        return getItem(this.uuid);
-    }
-
-    isSame(entity) {
-        const type = entity.documentName || entity.type;
-        const itemType = entity.itemType || entity.type;
-        const isSameName = entity.name === this.name;
-        const isSameType = type === this.type;
-        const isSameItemType = type === "Item" && itemType === this.itemType;
-        return isSameName && isSameType && isSameItemType;
-    }
-
-    static inc(component: ComponentData) {
-        component.quantity = component.quantity + 1;
-    }
 }
 
 class DefaultSkill implements DefaultSkill {

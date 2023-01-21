@@ -4,7 +4,7 @@ import {getDataFrom, getItem, sanitizeUuid} from "../helpers/Utility.js";
 import {getSystemSetting, Settings} from "../Settings.js";
 import {getToolConfig} from "./ToolConfig.js";
 import {AnyOf} from "../AnyOf.js";
-import {Component, Recipe} from "../Recipe.js";
+import {Recipe} from "../Recipe.js";
 import {Result} from "../Result.js";
 import {getSystem} from "../helpers/Helper.js";
 
@@ -195,7 +195,7 @@ export class CraftingApp extends Application {
             let result = await anyOf.executeMacro(entity);
             if(result.value) {
                 const previousComponent = this.data.recipe.ingredients[key];
-                const component = new Component(entity, data.uuid, data.type);
+                const component = beaversSystemInterface.componentFromEntity(entity);
                 const nextKey = sanitizeUuid(data.uuid);
                 component.quantity = previousComponent.quantity;
                 this.data.recipe = Recipe.clone(this.data.recipe);
@@ -250,7 +250,7 @@ export class CraftingApp extends Application {
         }
         if(Settings.get(Settings.USE_TOOL) && recipe.tool){
             const item = await getItem(recipe.tool);
-            const component = Component.fromEntity(item);
+            const component = beaversSystemInterface.componentFromEntity(item);
             preCastData.tool = !result._components.required.hasError(component)
         }
         return preCastData;

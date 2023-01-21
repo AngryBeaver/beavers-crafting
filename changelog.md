@@ -1,4 +1,8 @@
 # Changelog
+todo
+fix beavers recipe compendium name split into second line.
+
+
 ## 2.2.x feature: Time To Craft
 ### 2.2.2 workaround for ready set roll
 This fix should work for the current version of ready set roll 1.3.14.

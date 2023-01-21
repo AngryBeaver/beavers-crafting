@@ -4,9 +4,10 @@ import {Settings, getSystemSetting} from './Settings.js';
 import {Crafting} from "./Crafting.js";
 import {RecipeCompendium} from "./apps/RecipeCompendium.js";
 import {AnyOfSheet} from "./apps/AnyOfSheet.js";
-import {Component, Recipe} from "./Recipe.js";
+import {Recipe} from "./Recipe.js";
 import {Helper} from "./helpers/Helper.js";
 import {ActorSheetTab} from "./apps/ActorSheetTab.js";
+import {Dnd5e} from "./Dnd5e.js";
 
 Hooks.once('init', async function () {
 
@@ -45,12 +46,15 @@ Hooks.once('init', async function () {
     if(!game[Settings.NAMESPACE])game[Settings.NAMESPACE]={};
     game[Settings.NAMESPACE].Crafting = Crafting;
     game[Settings.NAMESPACE].RecipeCompendium = RecipeCompendium;
-    game[Settings.NAMESPACE].Component = Component;
     game[Settings.NAMESPACE].Recipe = Recipe;
     if(game instanceof Game) {
         game[Settings.NAMESPACE].Helper = new Helper(game);
     }
     game[Settings.NAMESPACE].itemTypeMigration = itemTypeMigration;
+});
+
+Hooks.on("BeaversSystemInterfaceLoaded", async function(){
+    beaversSystemInterface.register(new Dnd5e());
 });
 
 Hooks.on("ready",async function () {
