@@ -311,7 +311,7 @@
     margin: auto;
 }
 
-.beavers-crafting .actor-tab .header{
+.beavers-crafting.actor-tab .header{
     background-color: dimgrey;
     color: white;
     text-shadow: 1px 1px var(--color-shadow-dark);
@@ -321,12 +321,12 @@
     text-align: center;
  }
 
-.beavers-crafting .actor-tab .scale{
+.beavers-crafting.actor-tab .scale{
     flex:1 0 150px;
 }
-.beavers-crafting .actor-tab .status{
+.beavers-crafting.actor-tab .status{
     flex:0 0 80px
 }
-.beavers-crafting .actor-tab .option{
+.beavers-crafting.actor-tab .option{
     flex:0 0 50px
 }

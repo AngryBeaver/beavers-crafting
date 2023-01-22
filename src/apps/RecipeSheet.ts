@@ -3,7 +3,6 @@ import {getSystemSetting, Settings} from "../Settings.js";
 import {getDataFrom, getItem} from "../helpers/Utility.js";
 import {AnyOf} from "../AnyOf.js";
 import {getToolConfig} from "./ToolConfig.js";
-import {getSystem} from "../helpers/Helper.js";
 
 const recipeSheets: { [key: string]: RecipeSheet } = {};
 
@@ -81,9 +80,9 @@ export class RecipeSheet {
         let main = await renderTemplate('modules/beavers-crafting/templates/recipe-main.hbs',
             {
                 recipe: this.recipe,
-                currencies: getSystem().getSystemCurrencies(),
-                skills: getSystem().getSkills(),
-                abilities: getSystemSetting().useAttributes?getSystem().getAbilities():[],
+                currencies: beaversSystemInterface.configCurrencies,
+                skills: beaversSystemInterface.configSkills,
+                abilities: getSystemSetting().useAttributes?beaversSystemInterface.configAbilities:[],
                 editable:this.editable,
                 displayResults:Settings.get(Settings.DISPLAY_RESULTS),
                 displayIngredients:Settings.get(Settings.DISPLAY_RESULTS),

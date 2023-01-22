@@ -1,4 +1,3 @@
-//the firstdraft implementation will be kept simple stupid and not performant at all.
 import {Recipe} from "../Recipe.js";
 import {Settings} from "../Settings.js";
 import {AnyOf} from "../AnyOf.js";
@@ -122,31 +121,6 @@ export class RecipeCompendium {
         return result;
     }
 
-    static findComponentInList(listOfItems, component: ComponentData): ItemChange {
-        const itemChange = new DefaultItemChange(component);
-        listOfItems.forEach((i) => {
-            const componentItem = beaversSystemInterface.componentFromEntity(i);
-            if (componentItem.isSame(component)) {
-                if (itemChange.toUpdate["system.quantity"] == 0) {
-                    itemChange.toUpdate._id = i.id;
-                } else {
-                    itemChange.toDelete.push(i.id);
-                }
-                itemChange.toUpdate["system.quantity"] = itemChange.toUpdate["system.quantity"] + (componentItem.quantity);
-            }
-        });
-        return itemChange;
-    }
-
-    static isSame(item, component: ComponentData) {
-        const type = item.documentName || item.type;
-        const itemType = item.itemType || item.type;
-        const isSameName = item.name === component.name;
-        const isSameType = type === component.type;
-        const isSameItemType = type === "Item" && itemType === component.itemType;
-        return isSameName && isSameType && isSameItemType;
-    }
-
 }
 
 export enum FilterType {
@@ -154,16 +128,4 @@ export enum FilterType {
     available,
     all,
     own
-}
-
-class DefaultItemChange implements ItemChange {
-    toDelete: any[] = [];
-    toUpdate = {
-        "_id": "",
-        "system.quantity": 0
-    };
-
-    constructor(component: ComponentData) {
-        this.toUpdate._id = component.id;
-    }
 }

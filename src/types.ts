@@ -95,17 +95,6 @@ interface Skill {
     consume: boolean;
 }
 
-interface SystemCurrencies {
-    [name:string]:SystemCurrency
-}
-
-interface SystemCurrency {
-    name: string,
-    label: string,
-    factor: number,
-    data?: any
-}
-
 interface Currency {
     name: string;
     value: number;
@@ -114,16 +103,6 @@ interface Currency {
 interface CurrencyResultData extends Currency{
     hasError: boolean;
     isConsumed: boolean
-}
-
-interface ItemChange {
-    toDelete: string[];
-    toUpdate: UpdateItem;
-}
-
-interface UpdateItem {
-    "_id": string,
-    "system.quantity": number
 }
 
 interface MacroResult<t> {
@@ -149,9 +128,4 @@ interface RecipeData {
         [key: string]: ComponentData
     },
     macro?: string
-}
-interface ItemChanges {
-    create:any[],
-    update:UpdateItem[],
-    delete:string[]
 }

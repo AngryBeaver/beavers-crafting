@@ -4,7 +4,6 @@ import {RecipeCompendium} from "./apps/RecipeCompendium.js";
 import {getItem} from "./helpers/Utility.js";
 import {AnyOf} from "./AnyOf.js";
 import {ComponentResult, Result} from "./Result.js";
-import {getSystem} from "./helpers/Helper.js";
 
 export class Crafting implements CraftingData {
     uuid: string;
@@ -112,9 +111,9 @@ export class Crafting implements CraftingData {
             let roll;
             if (skillParts[0] === 'ability') {
                 skillName = skillParts[1];
-                roll = await getSystem().actorRollAbility(this.actor,skillParts[1]);
+                roll = await beaversSystemInterface.actorRollAbility(this.actor,skillParts[1]);
             } else {
-                roll = await getSystem().actorRollSkill(this.actor,this.recipe.skill.name);
+                roll = await beaversSystemInterface.actorRollSkill(this.actor,this.recipe.skill.name);
             }
             let resultValue = roll.total
             if(resultValue === undefined){
@@ -195,31 +194,25 @@ export class Crafting implements CraftingData {
 
     async processInput() {
         if (this.result._hasException) return;
-        const items: ItemChanges = {
-            create: [],
-            update: [],
-            delete: []
-        };
         this.actor = await fromUuid(this.actor.uuid); //refresh Actor
+        const componentList: Component[] = [];
         for (const componentResult of this.result._components.required._data) {
+            const component = beaversSystemInterface.componentCreate(componentResult.component);
             if (componentResult.userInteraction !== "never") {
-                await this._addItemChange(componentResult, items);
+                componentList.push(component);
             }
         }
         for (const componentResult of this.result._components.consumed._data) {
+            const component = beaversSystemInterface.componentCreate(componentResult.component);
             if (componentResult.userInteraction !== "never") {
-                await this._addItemChange(componentResult, items);
+                componentList.push(component);
             }
         }
-        if (this.result._hasException) return;
-        const sanitizedCreateItems = items.create.filter(i => i["system.quantity"] > 0);
-        const sanitizedUpdateItems = items.update.filter(i => i["system.quantity"] > 0);
-        for (const deleteUpdates of items.update.filter(i => i["system.quantity"] <= 0)) {
-            items.delete.push(deleteUpdates._id);
+        const result = await beaversSystemInterface.actorAddComponentList(this.actor,componentList);
+        if(!result){
+            this.result._hasException = true;
+            return;
         }
-        await this.actor.createEmbeddedDocuments("Item", sanitizedCreateItems);
-        await this.actor.updateEmbeddedDocuments("Item", sanitizedUpdateItems);
-        await this.actor.deleteEmbeddedDocuments("Item", items.delete);
         this.actor = await fromUuid(this.actor.uuid);
         for (const componentResult of this.result._components.consumed._data) {
             if (componentResult.userInteraction !== "never") {
@@ -233,77 +226,47 @@ export class Crafting implements CraftingData {
         }
     }
 
-    async _addItemChange(componentResult: ComponentResult, items: ItemChanges, revert: boolean = false) {
-        if ((componentResult.isProcessed && !revert) || (!componentResult.isProcessed && revert )){
-            return;
-        }
-        const component = beaversSystemInterface.componentCreate(componentResult.component);
-        if (revert) {
-            component.quantity = component.quantity * -1;
-        }
-        const itemChange = RecipeCompendium.findComponentInList(this.actor.items, component);
-        const isToCreate = itemChange.toUpdate["system.quantity"] === 0;
-        let isFirstStack = false;
-        if (isToCreate) {
-            if (component.quantity > 0) {
-                let itemData = items.create.find(i => i.uuid === component.uuid);
-                if (itemData === undefined) {
-                    isFirstStack = true;
-                    const item = await fromUuid(component.uuid);
-                    if (item === null) {
-                        // @ts-ignore
-                        ui.notifications.error("Beavers Crafting | can not create Item " + component.name + " from " + component.uuid);
-                        this.result._hasException = true;
-                        return;
-                    }
-                    itemData = item.toObject();
-                    itemData["system.quantity"] = 0;
-                    items.create.push(itemData);
-                }
-                itemData["system.quantity"] = itemData["system.quantity"] + component.quantity;
-            }
-        } else {
-            let updateItem: UpdateItem | undefined = items.update.find(i => i._id === itemChange.toUpdate._id);
-            if (updateItem === undefined) {
-                isFirstStack = true;
-                updateItem = itemChange.toUpdate;
-                items.update.push(itemChange.toUpdate);
-            }
-            updateItem["system.quantity"] = updateItem["system.quantity"] + component.quantity;
-        }
-        if (isFirstStack) {
-            items.delete.push(...itemChange.toDelete);
-        }
-        return items;
-    }
-
     async processAll() {
         if (this.result._hasException) return;
-        const items: ItemChanges = {
-            create: [],
-            update: [],
-            delete: []
-        };
         this.actor = await fromUuid(this.actor.uuid); //refresh Actor
+        const componentList: Component[] = [];
         for (const componentResult of this.result._components.required._data) {
+            const component = beaversSystemInterface.componentCreate(componentResult.component);
             if (componentResult.userInteraction === "always" || (componentResult.userInteraction === "onSuccess" && !this.result.hasError())) {
-                await this._addItemChange(componentResult, items);
+                if (!componentResult.isProcessed){
+                    componentList.push(component);
+                }
             } else {
-                await this._addItemChange(componentResult, items, true);
+                if (componentResult.isProcessed) {
+                    component.quantity = component.quantity * -1;
+                    componentList.push(component);
+                }
             }
         }
         for (const componentResult of this.result._components.consumed._data) {
+            const component = beaversSystemInterface.componentCreate(componentResult.component);
             if (componentResult.userInteraction === "always" || (componentResult.userInteraction === "onSuccess" && !this.result.hasError())) {
-                await this._addItemChange(componentResult, items);
+                if (!componentResult.isProcessed){
+                    componentList.push(component);
+                }
             } else {
-                await this._addItemChange(componentResult, items, true);
+                if (componentResult.isProcessed) {
+                    component.quantity = component.quantity * -1;
+                    componentList.push(component);
+                }
             }
         }
         for (const componentResult of this.result._components.produced._data) {
+            const component = beaversSystemInterface.componentCreate(componentResult.component);
             if (componentResult.userInteraction === "always" || (componentResult.userInteraction === "onSuccess" && !this.result.hasError())) {
-                await this._addItemChange(componentResult, items);
+                if (!componentResult.isProcessed){
+                    componentList.push(component);
+                }
             } else {
-                await this._addItemChange(componentResult, items, true);
+                if (componentResult.isProcessed) {
+                    component.quantity = component.quantity * -1;
+                    componentList.push(component);
+                }
             }
         }
         if (this.result._currencyResult !== undefined) {
@@ -311,15 +274,11 @@ export class Crafting implements CraftingData {
                 this.result.revertPayedCurrency();
             }
         }
-        if (this.result._hasException) return;
-        const sanitizedCreateItems = items.create.filter(i => i["system.quantity"] > 0);
-        const sanitizedUpdateItems = items.update.filter(i => i["system.quantity"] > 0);
-        for (const deleteUpdates of items.update.filter(i => i["system.quantity"] <= 0)) {
-            items.delete.push(deleteUpdates._id);
+        const result = await beaversSystemInterface.actorAddComponentList(this.actor,componentList);
+        if(!result){
+            this.result._hasException = true;
+            return;
         }
-        await this.actor.createEmbeddedDocuments("Item", sanitizedCreateItems);
-        await this.actor.updateEmbeddedDocuments("Item", sanitizedUpdateItems);
-        await this.actor.deleteEmbeddedDocuments("Item", items.delete);
         if(!this.result.hasError()){
             await this.actor.update(this.result._actorUpdate);
         }
@@ -383,7 +342,7 @@ export class Crafting implements CraftingData {
                     id: "invalid",
                     uuid: "invalid",
                     type: "Currency",
-                    name: getSystem().getSystemCurrencies()[this.result._currencyResult.name]?.label,
+                    name: beaversSystemInterface.configCurrencies[this.result._currencyResult.name]?.label,
                     img: 'icons/commodities/currency/coins-assorted-mix-copper-silver-gold.webp',
                     quantity: this.result._currencyResult.value * -1
                 },

@@ -148,7 +148,7 @@ export function getSystemSetting() {
                 "Compendium.dnd5e.items.6rocoBx5jdzG1QQH",
             ],
             hasTool: true,
-            useAttributes: true
+            useAbilities: true
         }
     }
     if (game["system"].id === "pf2e") {
@@ -156,7 +156,7 @@ export function getSystemSetting() {
             itemType: "treasure",
             toolConfig: [],
             hasTool: false,
-            useAttributes: false
+            useAbilities: false
 
         }
     }

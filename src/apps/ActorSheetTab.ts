@@ -1,6 +1,4 @@
-import {System} from "../systems/System.js";
 import {CraftingApp} from "./CraftingApp.js";
-import {getSystem} from "../helpers/Helper.js";
 import {Crafting} from "../Crafting.js";
 import {Settings} from "../Settings.js";
 
@@ -17,14 +15,13 @@ export class ActorSheetTab {
         this.app = app;
         this.html = html;
         this.data = data;
-        this.system = getSystem();
         void this.init().then(()=>{
             this.activateTab()
         });
     }
 
     async init() {
-        const tab = game["i18n"].localize("beaversCrafting.actorSheet.tab");
+        const label = game["i18n"].localize("beaversCrafting.actorSheet.tab");
         const flag = this.app.actor.flags["beavers-crafting"]?.crafting || {};
         const chatList = {};
         for(const [x,y] of Object.entries(flag)){
@@ -34,7 +31,7 @@ export class ActorSheetTab {
             chatList[x] = crafting.getChatData();
         }
         const tabBody = $(await renderTemplate('modules/beavers-crafting/templates/actor-sheet-tab.hbs', {craftingList:this.craftingList,chatList:chatList}));
-        this.system.actorSheet_addTab(Settings.ACTOR_TAB_ID, tab, tabBody, this.html);
+        beaversSystemInterface.actorSheetAddTab(this.app, this.html, this.data.actor, { id: Settings.ACTOR_TAB_ID, label: label, html: "<i class=\"fas fa-scroll\"/>" }, tabBody);
         this.activateListeners(tabBody);
     }
 

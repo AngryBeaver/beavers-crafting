@@ -39,7 +39,7 @@ export class Dnd5e implements SystemApi {
         const tabItem = $('<a class="item" data-tab="' + tabData.id + '">' + tabData.label + '</a>');
         tabs.append(tabItem);
         const body = $(html).find(".sheet-body");
-        const tabContent = $('<div class="tab ' + tabData.id + '" data-group="primary" data-tab="' + tabData.label + '"></div>');
+        const tabContent = $('<div class="tab" data-group="primary" data-tab="' + tabData.id + '"></div>');
         body.append(tabContent);
         tabContent.append(tabBody);
     }
@@ -117,12 +117,12 @@ export class Dnd5e implements SystemApi {
         return isSameName && isSameType && isSameItemType;
     };
 
-    itemGetPrice(item): string {
-        return item.system.price;
+    get itemPriceAttribute(): string {
+        return "system.price";
     }
 
-    itemGetQuantity(item): number {
-        return item.system.quantity;
+    get itemQuantityAttribute(): string {
+        return "system.quantity";
     }
 
     itemListAddComponentList(itemList: any[], componentList: ComponentData[]): ComponentData[] {
