@@ -87,6 +87,14 @@ export class Dnd5e implements SystemApi {
             }
         ]
     }
+
+    get configCanRollAbility():boolean {
+        return true;
+    }
+    get configLootItemType(): string {
+        return "loot";
+    }
+
     get componentDefaultData() {
         return {
             id: "invalid",
@@ -105,7 +113,7 @@ export class Dnd5e implements SystemApi {
             img: entity.img,
             name: entity.name,
             type : entity.documentName,
-            quantity: entity.system.quantity | 1,
+            quantity: entity.system.quantity || 1,
             itemType: entity.documentName === "Item" ? entity.type : undefined,
         }
         return this.parent.componentCreate(data);

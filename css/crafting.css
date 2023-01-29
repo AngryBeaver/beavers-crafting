@@ -3,12 +3,11 @@
 }
 
 .beavers-crafting .recipe .header{
-    height: 30px;
+    line-height:20px;
     margin: 5px 0;
     align-items: center;
     background: rgba(0, 0, 0, 0.05);
     border: 2px groove #eeede0;
-    font-weight: bold;
     color: #7a7971;
     font-weight: 700;
     font-size: 16px;
@@ -95,12 +94,7 @@
 .beavers-crafting.chat .header .fas{
     line-height:24px;
 }
-.beavers-crafting .item .fa-times{
-    color:#b94a48
-}
-.beavers-crafting .item .fa-check{
-    color:#468847
-}
+
 .beavers-crafting.chat .item-image{
     height:30px;
     flex:0 0 30px;
@@ -250,6 +244,13 @@
     height:20px;
 }
 
+.beavers-crafting .recipe .crafting-item-img{
+    background-size: contain;
+    margin: 5px;
+    width:30px;
+    height:30px;
+}
+
 .beavers-crafting .processing{
     background-image: repeating-linear-gradient(
             -45deg,
@@ -322,11 +323,18 @@
  }
 
 .beavers-crafting.actor-tab .scale{
-    flex:1 0 150px;
+    flex:1 0 100px;
 }
 .beavers-crafting.actor-tab .status{
     flex:0 0 80px
 }
 .beavers-crafting.actor-tab .option{
-    flex:0 0 50px
+    flex:0 0 30px;
+}
+
+.beavers-crafting .fa-times{
+    color:#b94a48
+}
+.beavers-crafting .fa-check{
+    color:#468847
 }

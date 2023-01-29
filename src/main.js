@@ -1,28 +1,26 @@
 import {CraftingApp} from './apps/CraftingApp.js';
 import {RecipeSheet} from './apps/RecipeSheet.js';
-import {Settings, getSystemSetting} from './Settings.js';
+import {Settings} from './Settings.js';
 import {Crafting} from "./Crafting.js";
 import {RecipeCompendium} from "./apps/RecipeCompendium.js";
 import {AnyOfSheet} from "./apps/AnyOfSheet.js";
 import {Recipe} from "./Recipe.js";
 import {ActorSheetTab} from "./apps/ActorSheetTab.js";
 import {Dnd5e} from "./Dnd5e.js";
+import {Pf2e} from "./Pf2e.js";
 
 
 Hooks.on("BeaversSystemInterfaceLoaded", async function(){
     beaversSystemInterface.addModule("beavers-crafting");
     beaversSystemInterface.register(new Dnd5e());
+    beaversSystemInterface.register(new Pf2e());
 });
 
-Hooks.on("ready",async function () {
-    const version = Settings.get(Settings.MAJOR_VERSION);
-    if(!version || version<=0){
-        //I created the first breaking change,while I am still in version 0 and users are informed that there might be breaking changes I ship out a migration script.
-        //I think I soon should move this module out of develop phase version 0. I already start counting the internal major version.
-        await game[Settings.NAMESPACE].itemTypeMigration();
+Hooks.on("ready", async function(){
+    if(beaversSystemInterface == null){
+        ui.notifications.error("Beavers Crafting | misses module Beavers System Interface");
     }
-    Settings.set(Settings.MAJOR_VERSION,2);
-});
+})
 
 Hooks.once("BeaversSystemInterfaceReady", async function(){
     async function itemTypeMigration(){
@@ -62,6 +60,14 @@ Hooks.once("BeaversSystemInterfaceReady", async function(){
     game[Settings.NAMESPACE].RecipeCompendium = RecipeCompendium;
     game[Settings.NAMESPACE].Recipe = Recipe;
     game[Settings.NAMESPACE].itemTypeMigration = itemTypeMigration;
+
+    const version = Settings.get(Settings.MAJOR_VERSION);
+    if(!version || version<=0){
+        //I created the first breaking change,while I am still in version 0 and users are informed that there might be breaking changes I ship out a migration script.
+        //I think I soon should move this module out of develop phase version 0. I already start counting the internal major version.
+        await game[Settings.NAMESPACE].itemTypeMigration();
+    }
+    Settings.set(Settings.MAJOR_VERSION,2);
 
 
 
@@ -113,7 +119,7 @@ Hooks.once("BeaversSystemInterfaceReady", async function(){
             if (html[0].localName !== "div") {
                 html = $(html[0].parentElement.parentElement);
             }
-            const itemType = getSystemSetting().itemType;
+            const itemType = beaversSystemInterface.configLootItemType;
 
             html.find("select[name='type']").append("<option value='"+itemType+"'>📜Recipe📜</option>");
             html.find("select[name='type']").append("<option value='"+itemType+"'>❔AnyOf❔</option>");

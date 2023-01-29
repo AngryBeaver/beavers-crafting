@@ -51,7 +51,7 @@ export class Settings {
             name: game.i18n.localize('beaversCrafting.settings.useTool.name'),
             hint: game.i18n.localize('beaversCrafting.settings.useTool.hint'),
             scope: "world",
-            config: getSystemSetting.hasTool,
+            config: getSystemSetting().hasTool,
             default: false,
             requiresReload: true,
             type: Boolean,
@@ -94,7 +94,7 @@ export class Settings {
             default: getSystemSetting().toolConfig,
             type: Object
         });
-        if (getSystemSetting.hasTool) {
+        if (getSystemSetting().hasTool) {
             game.settings.registerMenu(this.NAMESPACE, this.TOOL_CONFIG_BUTTON, {
                 name: game.i18n.localize('beaversCrafting.settings.toolButton.name'),
                 label: game.i18n.localize("beaversCrafting.settings.toolButton.label"),
@@ -119,7 +119,6 @@ export class Settings {
 export function getSystemSetting() {
     if (game["system"].id === "dnd5e") {
         return {
-            itemType: "loot",
             toolConfig: [
                 "Compendium.dnd5e.items.8NS6MSOdXtUqD7Ib",
                 "Compendium.dnd5e.items.rTbVrNcwApnuTz5E",
@@ -148,17 +147,10 @@ export function getSystemSetting() {
                 "Compendium.dnd5e.items.6rocoBx5jdzG1QQH",
             ],
             hasTool: true,
-            useAbilities: true
         }
     }
-    if (game["system"].id === "pf2e") {
-        return {
-            itemType: "treasure",
-            toolConfig: [],
-            hasTool: false,
-            useAbilities: false
-
-        }
+    return {
+        toolConfig: [],
+        hasTool: false,
     }
-    throw Error("System is not supported");
 }

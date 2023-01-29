@@ -1,4 +1,4 @@
-import {Settings,getSystemSetting} from "./Settings.js";
+import {Settings} from "./Settings.js";
 import {sanitizeUuid} from "./helpers/Utility.js";
 import {getToolConfig} from "./apps/ToolConfig.js";
 import {Result} from "./Result.js";
@@ -29,7 +29,7 @@ export class Recipe implements RecipeData {
 
     static isRecipe(item) {
         // @ts-ignore
-        return (item?.type === getSystemSetting().itemType && (
+        return (item?.type === beaversSystemInterface.configLootItemType && (
                 item?.system?.source === Settings.RECIPE_SUBTYPE ||
                 item?.flags["beavers-crafting"]?.subtype === Settings.RECIPE_SUBTYPE
             )

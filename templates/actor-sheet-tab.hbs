@@ -6,7 +6,7 @@
             <div class="scale" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{localize "beaversCrafting.actorSheet.table.output"}}</div>
             <div class="status" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{localize "beaversCrafting.actorSheet.table.status"}}</div>
             <div class="option" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">
-                <a class="addCrafting">{{localize "beaversCrafting.actorSheet.table.add"}}</a>
+                <a class="addCrafting"><i class="fa-solid fa-circle-plus"></i></a>
             </div>
         </div>
     {{#each craftingList}}
@@ -21,7 +21,7 @@
                 {{#with (lookup ../chatList @key) as |chatData|}}
                     {{#each chatData.components}}
                         {{#if (eq type "required")}}
-                            <div class="flexrow" style="margin:0 5px;padding:1px 0;">
+                            <div class="flexrow" style="flex:0;margin:0 5px;padding:1px 0;">
                                 <div class="crafting-item-img" style="flex:0 0 auto;margin: 0 5px 0 0px;background-image: url('{{this.component.img}}')"></div>
                                 <span style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{this.component.quantity}} {{this.component.name}}</span>
                                 <div style="flex: 0 0 auto; width:20px; line-height: 20px;text-align: center;">
@@ -42,7 +42,7 @@
                     {{/each}}
                     {{#each chatData.components}}
                         {{#if (eq type "consumed")}}
-                            <div class="flexrow" style="margin:0 5px;padding:1px 0;">
+                            <div class="flexrow" style="flex:0;margin:0 5px;padding:1px 0;">
                                 <div class="crafting-item-img" style="flex:0 0 auto;margin: 0 5px 0 0px;background-image: url('{{this.component.img}}')"></div>
                                 <span style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{this.component.quantity}} {{this.component.name}}</span>
                                 <div style="flex: 0 0 auto;width:20px;line-height: 20px;text-align: center;">
@@ -67,7 +67,7 @@
                 {{#with (lookup ../chatList @key) as |chatData|}}
                     {{#each chatData.components}}
                         {{#if (eq type "produced")}}
-                            <div class="flexrow" style="margin:0 5px;padding:1px 0">
+                            <div class="flexrow" style="flex:0;margin:0 5px;padding:1px 0">
                                 <div class="crafting-item-img" style="flex: 0 0 auto;margin: 0 5px 0 0px;background-image: url('{{this.component.img}}')"></div>
                                 <span style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{this.component.quantity}} {{this.component.name}}</span>
                                 <div style="flex: 0 0 auto;width:20px;line-height: 20px;text-align: center;">
@@ -130,8 +130,8 @@
                 {{/if}}
             </div>
             {{/with}}
-            <div class="option flexcol" style="text-align:right;padding: 0px 5px;border-left: 1px solid var(--color-border-light-tertiary);">
-                <a class="removeCrafting">
+            <div class="option flexcol" style="justify-content:center;text-align:center;padding: 0px 5px;border-left: 1px solid var(--color-border-light-tertiary);">
+                <a class="removeCrafting" style="flex:20px 0 0">
                     <i class="fas fa-trash" data-id="{{@key}}"></i>
                 </a>
             </div>

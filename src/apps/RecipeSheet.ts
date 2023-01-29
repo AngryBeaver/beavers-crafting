@@ -1,5 +1,5 @@
 import {Recipe} from "../Recipe.js";
-import {getSystemSetting, Settings} from "../Settings.js";
+import {Settings} from "../Settings.js";
 import {getDataFrom, getItem} from "../helpers/Utility.js";
 import {AnyOf} from "../AnyOf.js";
 import {getToolConfig} from "./ToolConfig.js";
@@ -82,7 +82,7 @@ export class RecipeSheet {
                 recipe: this.recipe,
                 currencies: beaversSystemInterface.configCurrencies,
                 skills: beaversSystemInterface.configSkills,
-                abilities: getSystemSetting().useAttributes?beaversSystemInterface.configAbilities:[],
+                abilities: beaversSystemInterface.configCanRollAbility?beaversSystemInterface.configAbilities:[],
                 editable:this.editable,
                 displayResults:Settings.get(Settings.DISPLAY_RESULTS),
                 displayIngredients:Settings.get(Settings.DISPLAY_RESULTS),

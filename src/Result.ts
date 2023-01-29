@@ -309,7 +309,7 @@ export class CurrencyResult implements CurrencyResultData {
                 currencies[this.name] = currencies[this.name]*-1;
             }
             try {
-                await beaversSystemInterface.actorAddCurrencies(actor, currencies);
+                const couldPay = await beaversSystemInterface.actorAddCurrencies(actor, currencies);
                 this.isConsumed = !revert;
             }catch (e){
                 console.error("Beavers Crafting | currency Error:", e);

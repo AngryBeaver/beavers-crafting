@@ -6,7 +6,6 @@
       "table": {
         "name": "Name",
         "status": "Status",
-        "add": "+ Add",
         "input": "Resources",
         "output": "Results"
       }

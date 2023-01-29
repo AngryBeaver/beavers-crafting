@@ -337,15 +337,17 @@ export class Crafting implements CraftingData {
         components.push(...Object.values(this.result._chatAddition).filter(s=>s.component.type !== "Currency"));
 
         if(this.result._currencyResult) {
+            const confCurrency = beaversSystemInterface.configCurrencies.find(c=>c.id===this.result._currencyResult?.name);
+            const component = {
+                id: "invalid",
+                uuid: "invalid",
+                type: "Currency",
+                name: confCurrency.label,
+                img: 'icons/commodities/currency/coins-assorted-mix-copper-silver-gold.webp',
+                quantity: this.result._currencyResult.value * -1
+            };
             components.push({
-                component: {
-                    id: "invalid",
-                    uuid: "invalid",
-                    type: "Currency",
-                    name: beaversSystemInterface.configCurrencies[this.result._currencyResult.name]?.label,
-                    img: 'icons/commodities/currency/coins-assorted-mix-copper-silver-gold.webp',
-                    quantity: this.result._currencyResult.value * -1
-                },
+                component: component,
                 hasError: this.result._currencyResult.hasError,
                 type: "consumed",
                 isProcessed: this.result._currencyResult.isConsumed,
