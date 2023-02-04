@@ -324,7 +324,9 @@
 
 .beavers-crafting.actor-tab .scale{
     flex:1 0 100px;
+    width:100px;
 }
+
 .beavers-crafting.actor-tab .status{
     flex:0 0 80px
 }

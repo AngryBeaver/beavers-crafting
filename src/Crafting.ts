@@ -208,8 +208,11 @@ export class Crafting implements CraftingData {
                 componentList.push(component);
             }
         }
-        const result = await beaversSystemInterface.actorAddComponentList(this.actor,componentList);
-        if(!result){
+        try{
+            await beaversSystemInterface.actorComponentListAdd(this.actor,componentList);
+        }catch(e){
+            // @ts-ignore
+            ui.notifications.error(e.message)
             this.result._hasException = true;
             return;
         }
@@ -274,8 +277,11 @@ export class Crafting implements CraftingData {
                 this.result.revertPayedCurrency();
             }
         }
-        const result = await beaversSystemInterface.actorAddComponentList(this.actor,componentList);
-        if(!result){
+        try{
+            await beaversSystemInterface.actorComponentListAdd(this.actor,componentList);
+        }catch(e){
+            // @ts-ignore
+            ui.notifications.error(e.message)
             this.result._hasException = true;
             return;
         }
@@ -337,15 +343,14 @@ export class Crafting implements CraftingData {
         components.push(...Object.values(this.result._chatAddition).filter(s=>s.component.type !== "Currency"));
 
         if(this.result._currencyResult) {
-            const confCurrency = beaversSystemInterface.configCurrencies.find(c=>c.id===this.result._currencyResult?.name);
-            const component = {
-                id: "invalid",
-                uuid: "invalid",
-                type: "Currency",
-                name: confCurrency.label,
-                img: 'icons/commodities/currency/coins-assorted-mix-copper-silver-gold.webp',
-                quantity: this.result._currencyResult.value * -1
-            };
+            const configCurrency = beaversSystemInterface.configCurrencies.find(c=>c.id===this.result._currencyResult?.name);
+            const component = configCurrency?.component?configCurrency.component:beaversSystemInterface.componentCreate(
+                {
+                    type:"Currency",
+                    name:configCurrency?.label,
+                    img:'icons/commodities/currency/coins-assorted-mix-copper-silver-gold.webp'
+                });
+            component.quantity = this.result._currencyResult.value * -1;
             components.push({
                 component: component,
                 hasError: this.result._currencyResult.hasError,

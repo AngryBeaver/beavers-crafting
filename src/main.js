@@ -6,23 +6,20 @@ import {RecipeCompendium} from "./apps/RecipeCompendium.js";
 import {AnyOfSheet} from "./apps/AnyOfSheet.js";
 import {Recipe} from "./Recipe.js";
 import {ActorSheetTab} from "./apps/ActorSheetTab.js";
-import {Dnd5e} from "./Dnd5e.js";
+import {Dnd5e} from "../../bsa-dnd5e/src/Dnd5e.ts";
 import {Pf2e} from "./Pf2e.js";
 
 
-Hooks.on("BeaversSystemInterfaceLoaded", async function(){
+Hooks.on("beavers-system-interface.init", async function(){
     beaversSystemInterface.addModule("beavers-crafting");
-    beaversSystemInterface.register(new Dnd5e());
-    beaversSystemInterface.register(new Pf2e());
 });
-
 Hooks.on("ready", async function(){
-    if(beaversSystemInterface == null){
-        ui.notifications.error("Beavers Crafting | misses module Beavers System Interface");
+    if(window.beaversSystemInterface === undefined){
+        ui.notifications.error("Beavers Crafting | missing module Beavers System Interface", {permanent:true});
     }
 })
 
-Hooks.once("BeaversSystemInterfaceReady", async function(){
+Hooks.once("beavers-system-interface.ready", async function(){
     async function itemTypeMigration(){
         async function addItemType(component){
             if(component.type === "Item") {

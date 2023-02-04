@@ -21,9 +21,9 @@
                 {{#with (lookup ../chatList @key) as |chatData|}}
                     {{#each chatData.components}}
                         {{#if (eq type "required")}}
-                            <div class="flexrow" style="flex:0;margin:0 5px;padding:1px 0;">
+                            <div class="flexrow" style="flex:0;background: rgba(0,0,0,0.025);margin:0 5px;padding:1px 0;">
                                 <div class="crafting-item-img" style="flex:0 0 auto;margin: 0 5px 0 0px;background-image: url('{{this.component.img}}')"></div>
-                                <span style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{this.component.quantity}} {{this.component.name}}</span>
+                                <span style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{this.component.name}}</span>
                                 <div style="flex: 0 0 auto; width:20px; line-height: 20px;text-align: center;">
                                     {{#if this.hasError }}
                                         <i class="fas fa-times" style="color:darkred"></i>
