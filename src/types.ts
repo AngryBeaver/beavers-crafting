@@ -89,34 +89,10 @@ interface PreCastData {
     currencies?: boolean;
 }
 
-interface ComponentData {
-    id: string;
-    uuid: string;
-    type: string;
-    name: string;
-    img: string;
-    quantity: number;
-    itemType?: string;
-}
-
 interface Skill {
     name: string;
     dc: number;
     consume: boolean;
-}
-
-interface Currencies {
-    [name:string]:number
-}
-
-interface SystemCurrencies {
-    [name:string]:SystemCurrency
-}
-
-interface SystemCurrency {
-    name: string,
-    label: string,
-    factor: number,
 }
 
 interface Currency {
@@ -127,16 +103,6 @@ interface Currency {
 interface CurrencyResultData extends Currency{
     hasError: boolean;
     isConsumed: boolean
-}
-
-interface ItemChange {
-    toDelete: string[];
-    toUpdate: UpdateItem;
-}
-
-interface UpdateItem {
-    "_id": string,
-    "system.quantity": number
 }
 
 interface MacroResult<t> {
@@ -162,9 +128,4 @@ interface RecipeData {
         [key: string]: ComponentData
     },
     macro?: string
-}
-interface ItemChanges {
-    create:any[],
-    update:UpdateItem[],
-    delete:string[]
 }

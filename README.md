@@ -5,7 +5,8 @@ With this module you can create recipes to craft items. E.g. a bunch of mushroom
 ![Foundry System](https://img.shields.io/endpoint?url=https%3A%2F%2Ffoundryshields.com%2Fsystem%3FnameType%3Draw%26showVersion%3D1%26style%3Dflat%26url%3Dhttps%3A%2F%2Fraw.githubusercontent.com%2FAngryBeaver%2Fbeavers-crafting%2Fmain%2Fmodule.json)
 ![Download Count](https://img.shields.io/github/downloads/AngryBeaver/beavers-crafting/total?color=bright-green)
 
-<!> breaking change 1.x -> 2.x see [Changelog](https://github.com/AngryBeaver/beavers-crafting/blob/main/changelog.md)
+This module is now system independent.
+⚠️This module now depends on other modules to work, you need to enable them ⚠️ [Changelog](https://github.com/AngryBeaver/beavers-crafting/blob/main/changelog.md)
 
 ## Features
 ![img.gif](pictures/video.gif)

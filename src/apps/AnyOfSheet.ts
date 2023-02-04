@@ -1,7 +1,4 @@
-import {Settings} from "../Settings.js";
-import {getDataFrom, sanitizeUuid} from "../helpers/Utility.js";
-import {Component} from "../Recipe.js";
-import {RecipeCompendium} from "./RecipeCompendium.js";
+import {getDataFrom} from "../helpers/Utility.js";
 import {AnyOf} from "../AnyOf.js";
 
 const anyOfSheets: { [key: string]: AnyOfSheet } = {};

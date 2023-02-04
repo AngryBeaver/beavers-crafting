@@ -3,7 +3,6 @@ import {Settings} from "../Settings.js";
 import {getDataFrom, getItem} from "../helpers/Utility.js";
 import {AnyOf} from "../AnyOf.js";
 import {getToolConfig} from "./ToolConfig.js";
-import {getSystem} from "../helpers/Helper.js";
 
 const recipeSheets: { [key: string]: RecipeSheet } = {};
 
@@ -17,7 +16,6 @@ export class RecipeSheet {
         active:string
     }
 
-
     static bind(app, html, data) {
         if(Recipe.isRecipe(app.item)){
             if(!recipeSheets[app.id]){
@@ -25,7 +23,8 @@ export class RecipeSheet {
             }
             recipeSheets[app.id].init(html);
             app.options.height = 500;
-            app.setPosition({height:app.options.height});
+            app.options.width = 700;
+            app.setPosition({height:app.options.height,width:app.options.width});
             app._onResize = (e)=>{
                 app.options.height = app.position.height;
                 app.options.width = app.position.width;
@@ -81,9 +80,9 @@ export class RecipeSheet {
         let main = await renderTemplate('modules/beavers-crafting/templates/recipe-main.hbs',
             {
                 recipe: this.recipe,
-                currencies: getSystem().getSystemCurrencies(),
-                skills: getSystem().getSkills(),
-                abilities: getSystem().getAbilities(),
+                currencies: beaversSystemInterface.configCurrencies,
+                skills: beaversSystemInterface.configSkills,
+                abilities: beaversSystemInterface.configCanRollAbility?beaversSystemInterface.configAbilities:[],
                 editable:this.editable,
                 displayResults:Settings.get(Settings.DISPLAY_RESULTS),
                 displayIngredients:Settings.get(Settings.DISPLAY_RESULTS),

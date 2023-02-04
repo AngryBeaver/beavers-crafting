@@ -1,4 +1,19 @@
 # Changelog
+## 2.3.x feature system independent
+⚠️This module now depends on other modules to work, you need to enable them ⚠️
+
+This module can now run on multiple systems. 
+It is implemented against [Beaver's System Interface](https://github.com/AngryBeaver/beavers-system-interface),
+so this module does not have any code to run on your system.
+
+In order to make this module work on your system, all you need is a tiny bsa-x implementation that maps the interface to your system.
+You can write your own or use [existing once](https://github.com/AngryBeaver/beavers-system-interface/wiki/BSA-x-links) others have written.
+I start of providing one for [dnd5e](https://github.com/AngryBeaver/bsa-dnd5e) and one for [pf2e](https://github.com/AngryBeaver/bsa-pf2e).
+
+Those adaptions are pretty simple and small but needs some insights about the system. 
+So my hope is those playing in a system knowing it can write their own adaptions without me who has no idea about that system.
+If not you at least now have this module in pf2e as well.
+
 ## 2.2.x feature: Time To Craft
 ### 2.2.2 workaround for ready set roll
 This fix should work for the current version of ready set roll 1.3.14.

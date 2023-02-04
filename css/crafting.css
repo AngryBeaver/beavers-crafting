@@ -3,12 +3,11 @@
 }
 
 .beavers-crafting .recipe .header{
-    height: 28px;
+    line-height:20px;
     margin: 5px 0;
     align-items: center;
     background: rgba(0, 0, 0, 0.05);
     border: 2px groove #eeede0;
-    font-weight: bold;
     color: #7a7971;
     font-weight: 700;
     font-size: 16px;
@@ -34,11 +33,6 @@
     flex: 0 0 56px;
 }
 
-.beavers-crafting .recipe .action{
-    flex: 0 0 30px;
-    border-left: 1px solid #c9c7b8;
-    padding-left:5px;
-}
 .beavers-crafting .recipe input[type="checkbox"]{
     flex:0 0 15px;
     width:15px;
@@ -63,6 +57,8 @@
     /* Border */
     border: 1px dashed #ffffff;
     border-radius: 0.25rem;
+    font-family: 'Gelasio';
+    color:white;
 }
 
 .beavers-crafting.chat .header {
@@ -98,12 +94,7 @@
 .beavers-crafting.chat .header .fas{
     line-height:24px;
 }
-.beavers-crafting .item .fa-times{
-    color:#b94a48
-}
-.beavers-crafting .item .fa-check{
-    color:#468847
-}
+
 .beavers-crafting.chat .item-image{
     height:30px;
     flex:0 0 30px;
@@ -253,6 +244,13 @@
     height:20px;
 }
 
+.beavers-crafting .recipe .crafting-item-img{
+    background-size: contain;
+    margin: 5px;
+    width:30px;
+    height:30px;
+}
+
 .beavers-crafting .processing{
     background-image: repeating-linear-gradient(
             -45deg,
@@ -276,4 +274,69 @@
 @keyframes beavers-crafting-diagonal {
     0% {background-position: 0% 50%}
     100% {background-position: 95% 50%}
+}
+
+.beavers-crafting .flexrow {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+.beavers-crafting .item .item-image {
+    height: 26px;
+    flex:0 26px;
+    border-radius: 2px;
+    background-size: contain;
+    margin:2px;
+}
+.beavers-crafting .item  {
+    height: 30px;
+}
+.beavers-crafting .item .item-name {
+    line-height: 30px;
+    font-size: small;
+    font-style: italic;
+}
+
+.beavers-crafting .item .action, .beavers-crafting .header .action{
+    flex: 0 0 30px;
+    border-left: 1px solid #c9c7b8;
+    justify-content: right;
+}
+.beavers-crafting .item .action a, .beavers-crafting .header .action a{
+    flex: 0;
+    margin: auto;
+}
+.beavers-crafting select {
+    margin: auto;
+}
+
+.beavers-crafting.actor-tab .header{
+    background-color: dimgrey;
+    color: white;
+    text-shadow: 1px 1px var(--color-shadow-dark);
+    font-weight: bold;
+    flex: 30px;
+    line-height: 30px;
+    text-align: center;
+ }
+
+.beavers-crafting.actor-tab .scale{
+    flex:1 0 100px;
+    width:100px;
+}
+
+.beavers-crafting.actor-tab .status{
+    flex:0 0 80px
+}
+.beavers-crafting.actor-tab .option{
+    flex:0 0 30px;
+}
+
+.beavers-crafting .fa-times{
+    color:#b94a48
+}
+.beavers-crafting .fa-check{
+    color:#468847
 }

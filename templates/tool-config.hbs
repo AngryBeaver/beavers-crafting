@@ -1,15 +1,15 @@
 <form class="items-list" autocomplete="off">
-    <div class="flexrow item">
+    <div class="flexrow">
         {{localize "beaversCrafting.tool-config.warn"}}
     </div>
     {{#each tools}}
         <div class="flexrow item">
             <div class="item-name flexrow clickable" data-id="{{this.uuid}}">
                 <div class="item-image" style="background-image: url('{{this.img}}')"></div>
-                <h4>{{this.name}}</h4>
+                <span>{{this.name}}</span>
             </div>
             <div class="action">
-                <a class="item-control item-delete">
+                <a class="item-delete">
                     <i class="fas fa-trash" data-id="{{@key}}"></i>
                 </a>
             </div>

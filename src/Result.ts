@@ -1,6 +1,5 @@
-import {Component, Recipe} from "./Recipe.js";
+import { Recipe} from "./Recipe.js";
 import {RecipeCompendium} from "./apps/RecipeCompendium.js";
-import {getSystem} from "./helpers/Helper.js";
 
 export class Result implements ResultApi, ResultData {
     _actorUpdate: {
@@ -133,7 +132,6 @@ export class Result implements ResultApi, ResultData {
     }
 
     async payCurrency(currency: Currency) {
-        const system = getSystem();
         if(this._currencyResult?.isConsumed){
             void await this._currencyResult.pay(this._actor,true)
         }
@@ -142,18 +140,24 @@ export class Result implements ResultApi, ResultData {
     }
 
     async revertPayedCurrency() {
-        const system = getSystem();
-        if(this._currencyResult?.isConsumed) {
-            void await this._currencyResult.pay(this._actor, true)
+        if(this._currencyResult== undefined){
+            return;
+        }
+        if(this._currencyResult.isConsumed) {
+            const name = this._currencyResult.name;
+            const configCurrency = beaversSystemInterface.configCurrencies.find(c=>c.id===name);
+            void await this._currencyResult.pay(this._actor, true);
+            const component = configCurrency?.component?configCurrency.component:beaversSystemInterface.componentCreate(
+                {
+                    type:"Currency",
+                    name:configCurrency?.label,
+                    img:'icons/commodities/currency/coins-assorted-mix-copper-silver-gold.webp'
+                });
+            component.quantity = this._currencyResult.value * -1
+
+
             this.addChatComponent({
-                component: {
-                    id: "invalid",
-                    uuid: "invalid",
-                    type: "Currency",
-                    name: system.getSystemCurrencies()[this._currencyResult.name]?.label,
-                    img: 'icons/commodities/currency/coins-assorted-mix-copper-silver-gold.webp',
-                    quantity: this._currencyResult.value * -1
-                },
+                component: component,
                 hasError: this._currencyResult.hasError,
                 type: "consumed",
                 isProcessed: false,
@@ -171,12 +175,11 @@ export class Result implements ResultApi, ResultData {
         let componentResult = this._components[type].findComponentResult(componentData);
         if (componentResult === undefined) {
             componentResult = new ComponentResult();
-            componentResult.component = Component.clone(componentData);
+            const actorFindings = beaversSystemInterface.itemListComponentFind(this._actor.items,componentData);
+            componentResult.component = beaversSystemInterface.componentCreate(componentData);
+            componentResult.originalQuantity = actorFindings.quantity;
             componentResult.component.quantity = 0;
             componentResult.isProcessed = false;
-            const itemChange = RecipeCompendium.findComponentInList(this._actor.items, componentData);
-            componentResult.component.id = itemChange.toUpdate._id;
-            componentResult.originalQuantity = itemChange.toUpdate["system.quantity"];
             this._components[type].addComponentResult(componentResult);
         }
         let userInteraction: UserInteraction = "never";
@@ -250,7 +253,7 @@ export class ComponentResult implements ComponentResultData {
 
     static from(componentResultData: ComponentResultData): ComponentResult {
         const componentResult = new ComponentResult();
-        componentResult.component = Component.clone(componentResultData.component);
+        componentResult.component = beaversSystemInterface.componentCreate(componentResultData.component);
         componentResult.originalQuantity = componentResultData.originalQuantity;
         componentResult.userInteraction = componentResultData.userInteraction;
         componentResult.isProcessed = componentResultData.isProcessed;
@@ -309,12 +312,12 @@ export class CurrencyResult implements CurrencyResultData {
     async pay(actor,revert:boolean= false) {
         if ((!this.isConsumed && !revert) || (revert && this.isConsumed)) {
             const currencies = {};
-            currencies[this.name] = this.value;
+            currencies[this.name] = this.value*-1;
             if(revert){
                 currencies[this.name] = currencies[this.name]*-1;
             }
             try {
-                await getSystem().actorCurrencies_pay(actor, currencies);
+                await beaversSystemInterface.actorCurrenciesAdd(actor, currencies);
                 this.isConsumed = !revert;
             }catch (e){
                 console.error("Beavers Crafting | currency Error:", e);

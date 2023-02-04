@@ -15,21 +15,18 @@
                     {{/if}}
                 </div>
             </div>
-
         </div>
-
     </div>
     <div class="flexrow">
-        <div class="left dnd5e">
-            <div class="items-list">
-                {{#each data.components}}
-                    {{#if (eq type "required")}}
-                    <div class="flexrow item" style="background: rgba(0,0,0,0.025)">
-                        <div class="item-name flexrow" style="flex:1" title="{{this.component.name}}">
-                            <div class="item-image"
-                                 style="background-image: url('{{this.component.img}}')"></div>
-                            <h4>{{this.component.name}}</h4>
-                        </div>
+        <div class="left flexcol">
+            {{#each data.components}}
+                {{#if (eq type "required")}}
+                    <div class="flexrow" style="flex:0; background: rgba(0,0,0,0.025)">
+                        <div class="crafting-item-img"
+                             style="flex:0 0 auto;margin: 0 5px 0 0px;background-image: url('{{this.component.img}}')"
+                             data-id="{{this.component.uuid}}"></div>
+                        <span style="line-height:20px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{this.component.name}}</span>
+
                         <div class="action" style="flex:0 0 10px;padding:0px 5px">
                             {{#if this.hasError }}
                                 <i class="fas fa-times"></i>
@@ -38,16 +35,16 @@
                             {{/if}}
                         </div>
                     </div>
-                    {{/if}}
-                {{/each}}
-                {{#each data.components}}
-                    {{#if (eq type "consumed")}}
-                    <div class="flexrow item">
-                        <div class="item-name flexrow" style="flex:1" title="{{this.component.name}}">
-                            <div class="item-image"
-                                 style="background-image: url('{{this.component.img}}')"></div>
-                            <h4>{{this.component.quantity}} {{this.component.name}}</h4>
-                        </div>
+                {{/if}}
+            {{/each}}
+            {{#each data.components}}
+                {{#if (eq type "consumed")}}
+                    <div class="flexrow" style="flex:0;">
+                        <div class="crafting-item-img"
+                             style="flex:0 0 auto;margin: 0 5px 0 0px;background-image: url('{{this.component.img}}')"
+                             data-id="{{this.component.uuid}}"></div>
+                        <span style="line-height:20px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{this.component.quantity}} {{this.component.name}}</span>
+
                         <div class="action" style="flex:0 0 10px;padding:0px 5px">
                             {{#if this.hasError }}
                                 <i class="fas fa-times"></i>
@@ -56,27 +53,27 @@
                             {{/if}}
                         </div>
                     </div>
-                    {{/if}}
-                {{/each}}
-            </div>
+                {{/if}}
+            {{/each}}
         </div>
-        <div class="right dnd5e">
-            <div class="results items-list">
+        <div class="right flexcol">
+            <div class="results">
                 <div class="title">
                     <div class="name">{{localize "beaversCrafting.recipe.results"}}</div>
                 </div>
-                {{#each data.components}}
-                    {{#if (eq type "produced")}}
-                    <div class="flexrow item">
-                        <div class="item-name flexrow" style="flex:1" title="{{this.component.name}}">
-                            <div class="item-image"
-                                 style="background-image: url('{{this.component.img}}')"></div>
-                            <h4>{{this.component.quantity}} {{this.component.name}}</h4>
+            </div>
+            {{#each data.components}}
+                {{#if (eq type "produced")}}
+                    <div class="flexrow" style="flex:0;">
+                        <div class="flexrow">
+                            <div class="crafting-item-img"
+                                 style="flex:0 0 auto;margin: 0 5px 0 0px;background-image: url('{{this.component.img}}')"
+                                 data-id="{{this.component.uuid}}"></div>
+                            <span style="line-height:20px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{this.component.quantity}} {{this.component.name}}</span>
                         </div>
                     </div>
-                    {{/if}}
-                {{/each}}
-            </div>
+                {{/if}}
+            {{/each}}
         </div>
     </div>
 </div>
