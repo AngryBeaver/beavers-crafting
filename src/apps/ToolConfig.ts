@@ -99,6 +99,6 @@ async function _setToolConfig(){
 }
 async function _addToolConfig(uuid){
     const item = await getItem(uuid);
-    const component = beaversSystemInterface.componentCreate({...item,type:"Tool"});
+    const component = beaversSystemInterface.componentFromEntity(item);
     components.push(component);
 }

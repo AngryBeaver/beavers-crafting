@@ -1,5 +1,7 @@
 # Changelog
 ## 2.3.x feature system independent
+## 2.3.2 fix tools
+fixed: using tools was completely broken.
 ## 2.3.1 bug pulling items from compendium
 fixed: when dropping items from compendium they no longer have an itemType thus they will not be detected correctly as equal to any item on actor.
 
