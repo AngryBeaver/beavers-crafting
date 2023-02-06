@@ -116,7 +116,9 @@ export class Recipe implements RecipeData {
     addAttendant(entity, uuid, type) {
         const uuidS = sanitizeUuid(uuid);
         if (!this.attendants[uuidS]) {
-            this.attendants[uuidS] = beaversSystemInterface.componentCreate({...entity,uuid:uuid,type:type});
+            this.attendants[uuidS] = beaversSystemInterface.componentFromEntity(entity);
+            this.attendants[uuidS].uuid = uuid;
+            this.attendants[uuidS].type = type;
         } else {
             this.attendants[uuidS].quantity = this.attendants[uuidS].quantity+1;
         }
@@ -130,7 +132,9 @@ export class Recipe implements RecipeData {
     addIngredient(entity, uuid, type) {
         const uuidS = sanitizeUuid(uuid);
         if (!this.ingredients[uuidS]) {
-            this.ingredients[uuidS] = beaversSystemInterface.componentCreate({...entity,uuid:uuid,type:type});
+            this.ingredients[uuidS] = beaversSystemInterface.componentFromEntity(entity);
+            this.ingredients[uuidS].uuid = uuid;
+            this.ingredients[uuidS].type = type;
         } else {
             this.ingredients[uuidS].quantity = this.ingredients[uuidS].quantity+1;
         }
@@ -144,7 +148,9 @@ export class Recipe implements RecipeData {
     addResult(entity, uuid, type) {
         const uuidS = sanitizeUuid(uuid);
         if (!this.results[uuidS]) {
-            this.results[uuidS] = beaversSystemInterface.componentCreate({...entity,uuid:uuid,type:type});
+            this.results[uuidS] = beaversSystemInterface.componentFromEntity(entity);
+            this.results[uuidS].uuid = uuid;
+            this.results[uuidS].type = type;
         } else {
             this.results[uuidS].quantity = this.results[uuidS].quantity+1;
         }

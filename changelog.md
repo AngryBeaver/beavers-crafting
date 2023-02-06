@@ -1,5 +1,11 @@
 # Changelog
 ## 2.3.x feature system independent
+## 2.3.1 bug pulling items from compendium
+fixed: when dropping items from compendium they no longer have an itemType thus they will not be detected correctly as equal to any item on actor.
+
+fixed: when one recipe refers to an item no longer in this world you could not open the compendium browser
+## 2.3.0 feature system independent
+
 ⚠️This module now depends on other modules to work, you need to enable them ⚠️
 
 This module can now run on multiple systems. 
