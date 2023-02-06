@@ -85,11 +85,16 @@ export class RecipeCompendium {
     static async isAnyAnyOfInList(listOfAnyOfIngredients: Component[], listOfItems) {
         for (const component of listOfAnyOfIngredients) {
             if (component.type === Settings.ANYOF_SUBTYPE) {
-                const item = await component.getEntity();
-                const anyOf = new AnyOf(item);
-                const results = await anyOf.filter(listOfItems);
-                if (results.filter(c => c.quantity >= component.quantity).length == 0) {
-                    return false;
+                try {
+                    const item = await component.getEntity();
+                    const anyOf = new AnyOf(item);
+                    const results = await anyOf.filter(listOfItems);
+                    if (results.filter(c => c.quantity >= component.quantity).length == 0) {
+                        return false;
+                    }
+                }catch(error)
+                {
+                    console.warn(error);
                 }
             }
         }
