@@ -198,17 +198,18 @@ export class RecipeSheet {
         ) {
             const entity = await fromUuid(data.uuid);
             if (entity) {
-                if(AnyOf.isAnyOf(entity) && !isIngredient){
+                const isAnyOf = AnyOf.isAnyOf(entity)
+                if(isAnyOf && !isIngredient){
                     return;
                 }
                 if (isIngredient) {
                     let type = data.type;
-                    let uuid = data.uuid;
+                    let keyid = data.uuid;
                     if(AnyOf.isAnyOf(entity)){
                         type = Settings.ANYOF_SUBTYPE;
-                        uuid = foundry.utils.randomID();
+                        keyid = foundry.utils.randomID();
                     }
-                    this.recipe.addIngredient(entity, uuid,type);
+                    this.recipe.addIngredient(entity, keyid,type);
                 }
                 if (isResult) {
                     this.recipe.addResult(entity, data.uuid, data.type);
