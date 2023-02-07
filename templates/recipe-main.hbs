@@ -134,7 +134,7 @@
                 {{/if}}
             </div>
             {{#each recipe.ingredients}}
-                <div class="flexrow" style="margin:0 5px;padding:1px 0;">
+                <div class="flexrow" style="margin:0 5px;padding:1px 0;" data-key="{{@key}}" data-id="{{this.uuid}}">
                     <div class="crafting-item-img {{#if ../displayIngredients}}clickable{{/if}}" style="flex:0 0 auto;margin: 0 5px 0 0px;background-image: url('{{this.img}}')" data-id="{{this.uuid}}" data-key="{{@key}}"></div>
                     <span style="line-height:30px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{this.name}}</span>
                     <div style="flex: 0 0 auto; width:60px; line-height: 30px;text-align: center;">
@@ -230,7 +230,7 @@
                 {{/if}}
             </div>
             {{#each recipe.results}}
-                <div class="flexrow" style="margin:0 5px;padding:1px 0;">
+                <div class="flexrow" style="margin:0 5px;padding:1px 0;" data-key="{{@key}}" data-id="{{this.uuid}}">
                     <div class="crafting-item-img {{#if ../displayResults}}clickable{{/if}}" style="flex:0 0 auto;margin: 0 5px 0 0px;background-image: url('{{this.img}}')" data-id="{{this.uuid}}" data-key="{{@key}}"></div>
                     <span style="line-height:30px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{this.name}}</span>
                     <div style="flex: 0 0 auto; width:60px; line-height: 30px;text-align: center;">

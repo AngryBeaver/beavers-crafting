@@ -127,13 +127,13 @@ export class CraftingApp extends Application {
     }
 
     activateRecipeSheetListener(html) {
-        html.find('.results .item-name').on("click",e=>{
+        html.find('.results .flexrow').on("click",e=>{
             const uuid = $(e.currentTarget).data("id");
             if(Settings.get(Settings.DISPLAY_RESULTS)) {
                 getItem(uuid).then(i=>i.sheet._render(true));
             }
         });
-        html.find('.ingredients .item-name').on("click",e=>{
+        html.find('.ingredients .flexrow').on("click",e=>{
             const uuid = $(e.currentTarget).data("id");
             if(Settings.get(Settings.DISPLAY_INGREDIENTS)) {
                 getItem(uuid).then(i=>i.sheet._render(true));
@@ -144,7 +144,7 @@ export class CraftingApp extends Application {
 
     addDragDrop(html) {
         const dropFilter = new DragDrop({
-            dropSelector: '.drop-area, .ingredients .item-name',
+            dropSelector: '.drop-area, .ingredients .flexrow',
             permissions: {
                 dragstart: this._canDragStart.bind(this),
                 drop: this._canDragDrop.bind(this)
@@ -167,8 +167,8 @@ export class CraftingApp extends Application {
         if(isFilterDrop){
             return this._onDropFilter(e);
         }
-        const isIngredient = $(e.target).parent("item");
-        if(isIngredient){
+        const uuid = $(e.currentTarget).data("id");
+        if(uuid != undefined){
             const uuid = $(e.currentTarget).data("id");
             const key = $(e.currentTarget).data("key");
             getItem(uuid).then(

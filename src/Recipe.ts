@@ -139,6 +139,14 @@ export class Recipe implements RecipeData {
             this.ingredients[uuidS].quantity = this.ingredients[uuidS].quantity+1;
         }
     }
+    addIngredientComponent(component) {
+        const uuidS = sanitizeUuid(component.uuid);
+        if (!this.ingredients[uuidS]) {
+            this.ingredients[uuidS] = component;
+        } else {
+            this.ingredients[uuidS].quantity = this.ingredients[uuidS].quantity+1;
+        }
+    }
 
     removeIngredient(uuidS) {
         delete this.ingredients[uuidS];

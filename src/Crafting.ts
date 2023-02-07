@@ -140,7 +140,7 @@ export class Crafting implements CraftingData {
 
     async evaluateAnyOf() {
         const toDelete: string[] = [];
-        const toAdd: ComponentData[] = [];
+        const toAdd: Component[] = [];
         for (const [key, component] of Object.entries(this.recipe.ingredients)) {
             if (component.type === Settings.ANYOF_SUBTYPE) {
                 const item = await component.getEntity();
@@ -165,7 +165,7 @@ export class Crafting implements CraftingData {
         }
         toDelete.forEach(k => this.recipe.removeIngredient(k));
         toAdd.forEach(component => {
-            this.recipe.addIngredient(component, component.uuid, component.type)
+            this.recipe.addIngredientComponent(component)
         });
     }
 
