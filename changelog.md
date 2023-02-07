@@ -1,7 +1,10 @@
 # Changelog
 ## 2.3.x feature system independent
+## 2.3.4 anyOf bugs
+fixed: dropping anyOf in recipes no longer is detected as anyOf
 ## 2.3.3 anyOf bugs
 fixed: dropping items on an anyOf ingredient does no longer work.
+
 fixed: evaluated anyOf items are incorrectly detected as non matching to the actor.
 ## 2.3.2 fix tools
 fixed: using tools was completely broken.
