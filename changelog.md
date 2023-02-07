@@ -1,5 +1,8 @@
 # Changelog
 ## 2.3.x feature system independent
+## 2.3.3 anyOf bugs
+fixed: dropping items on an anyOf ingredient does no longer work.
+fixed: evaluated anyOf items are incorrectly detected as non matching to the actor.
 ## 2.3.2 fix tools
 fixed: using tools was completely broken.
 (jfi: tools are deprecated in favour of attendants dnd5e only)
