@@ -1,6 +1,5 @@
 import {Settings} from "./Settings.js";
 import {RecipeCompendium} from "./apps/RecipeCompendium.js";
-import {Component} from "./Recipe.js";
 
 export class AnyOf {
     macro;
@@ -10,7 +9,12 @@ export class AnyOf {
 
     static isAnyOf(item) {
         // @ts-ignore
-        return (item?.type === 'loot' && item?.system?.source === Settings.ANYOF_SUBTYPE);
+        return (
+            item?.type === beaversSystemInterface.configLootItemType && (
+                item?.system?.source === Settings.ANYOF_SUBTYPE ||
+                item?.flags["beavers-crafting"]?.subtype === Settings.ANYOF_SUBTYPE
+            )
+        );
     }
 
     constructor(item) {
@@ -53,16 +57,17 @@ export class AnyOf {
         return result;
     }
 
-    async filter(itemList): Promise<ComponentData[]>{
-        const resultList:ComponentData[] = [];
+    async filter(itemList): Promise<Component[]>{
+        const resultList:Component[] = [];
         for(const item of itemList){
             const result = await this.executeMacro(item);
+            const componentItem = beaversSystemInterface.componentFromEntity(item);
             if(result.value){
-                const same = resultList.filter(component => RecipeCompendium.isSame(item,component))
+                const same = resultList.filter(component => componentItem.isSame(component))
                 if(same.length > 0){
-                    same[0].quantity = same[0].quantity + item.system?.quantity;
+                    same[0].quantity = same[0].quantity + componentItem.quantity;
                 }else{
-                    resultList.push(new Component(item,item.uuid,"Item"));
+                    resultList.push(componentItem);
                 }
             }
         }

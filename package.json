@@ -1,7 +1,7 @@
 {
 	"name": "beavers-crafting",
 	"title": "Beaver's Crafting",
-	"version": "2.2.2",
+	"version": "2.3.4",
 	"description": "Crafting",
 	"devDir": "C:\\Users\\Riess\\AppData\\Local\\FoundryVTT\\Data\\modules",
 	"main": "src/main.js",
@@ -23,6 +23,7 @@
 		"printWidth": 120
 	},
 	"devDependencies": {
+		"beavers-system-interface": "^1.0.6",
 		"@ethaks/fvtt-quench": "^0.6.0",
 		"@league-of-foundry-developers/foundry-vtt-types": "^0.8.8-9",
 		"@types/jest": "^27.4.1",

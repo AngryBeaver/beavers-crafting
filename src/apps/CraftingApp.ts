@@ -4,9 +4,8 @@ import {getDataFrom, getItem, sanitizeUuid} from "../helpers/Utility.js";
 import {Settings} from "../Settings.js";
 import {getToolConfig} from "./ToolConfig.js";
 import {AnyOf} from "../AnyOf.js";
-import {Component, Recipe} from "../Recipe.js";
+import {Recipe} from "../Recipe.js";
 import {Result} from "../Result.js";
-import {getSystem} from "../helpers/Helper.js";
 
 export class CraftingApp extends Application {
     data: {
@@ -75,9 +74,9 @@ export class CraftingApp extends Application {
         this.data.content = await renderTemplate('modules/beavers-crafting/templates/recipe-main.hbs',
             {
                 recipe: this.data.recipe,
-                currencies: getSystem().getSystemCurrencies(),
-                skills: getSystem().getSkills(),
-                abilities: getSystem().getAbilities(),
+                currencies: beaversSystemInterface.configCurrencies,
+                skills: beaversSystemInterface.configSkills,
+                abilities: beaversSystemInterface.configCanRollAbility?beaversSystemInterface.configAbilities:[],
                 editable: false,
                 precast: await this.getPrecastFromResult(this.data.result,this.data.recipe),
                 displayResults:Settings.get(Settings.DISPLAY_RESULTS),
@@ -128,13 +127,13 @@ export class CraftingApp extends Application {
     }
 
     activateRecipeSheetListener(html) {
-        html.find('.results .item-name').on("click",e=>{
+        html.find('.results .flexrow').on("click",e=>{
             const uuid = $(e.currentTarget).data("id");
             if(Settings.get(Settings.DISPLAY_RESULTS)) {
                 getItem(uuid).then(i=>i.sheet._render(true));
             }
         });
-        html.find('.ingredients .item-name').on("click",e=>{
+        html.find('.ingredients .flexrow').on("click",e=>{
             const uuid = $(e.currentTarget).data("id");
             if(Settings.get(Settings.DISPLAY_INGREDIENTS)) {
                 getItem(uuid).then(i=>i.sheet._render(true));
@@ -145,7 +144,7 @@ export class CraftingApp extends Application {
 
     addDragDrop(html) {
         const dropFilter = new DragDrop({
-            dropSelector: '.drop-area, .ingredients .item-name',
+            dropSelector: '.drop-area, .ingredients .flexrow',
             permissions: {
                 dragstart: this._canDragStart.bind(this),
                 drop: this._canDragDrop.bind(this)
@@ -168,8 +167,8 @@ export class CraftingApp extends Application {
         if(isFilterDrop){
             return this._onDropFilter(e);
         }
-        const isIngredient = $(e.target).parent("item");
-        if(isIngredient){
+        const uuid = $(e.currentTarget).data("id");
+        if(uuid != undefined){
             const uuid = $(e.currentTarget).data("id");
             const key = $(e.currentTarget).data("key");
             getItem(uuid).then(
@@ -195,7 +194,7 @@ export class CraftingApp extends Application {
             let result = await anyOf.executeMacro(entity);
             if(result.value) {
                 const previousComponent = this.data.recipe.ingredients[key];
-                const component = new Component(entity, data.uuid, data.type);
+                const component = beaversSystemInterface.componentFromEntity(entity);
                 const nextKey = sanitizeUuid(data.uuid);
                 component.quantity = previousComponent.quantity;
                 this.data.recipe = Recipe.clone(this.data.recipe);
@@ -250,7 +249,7 @@ export class CraftingApp extends Application {
         }
         if(Settings.get(Settings.USE_TOOL) && recipe.tool){
             const item = await getItem(recipe.tool);
-            const component = Component.fromEntity(item);
+            const component = beaversSystemInterface.componentFromEntity(item);
             preCastData.tool = !result._components.required.hasError(component)
         }
         return preCastData;

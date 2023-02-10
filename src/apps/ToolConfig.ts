@@ -1,4 +1,3 @@
-import {Component} from "../Recipe.js";
 import {Settings} from "../Settings.js";
 import {getDataFrom, getItem} from "../helpers/Utility.js";
 
@@ -100,6 +99,6 @@ async function _setToolConfig(){
 }
 async function _addToolConfig(uuid){
     const item = await getItem(uuid);
-    const component = new Component(item, uuid, "Tool");
+    const component = beaversSystemInterface.componentFromEntity(item);
     components.push(component);
 }

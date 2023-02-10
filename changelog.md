@@ -1,10 +1,40 @@
 # Changelog
+## 2.3.x feature system independent
+## 2.3.4 anyOf bugs
+fixed: dropping anyOf in recipes no longer is detected as anyOf
+## 2.3.3 anyOf bugs
+fixed: dropping items on an anyOf ingredient does no longer work.
+
+fixed: evaluated anyOf items are incorrectly detected as non matching to the actor.
+## 2.3.2 fix tools
+fixed: using tools was completely broken.
+(jfi: tools are deprecated in favour of attendants dnd5e only)
+## 2.3.1 bug pulling items from compendium
+fixed: when dropping items from compendium they no longer have an itemType thus they will not be detected correctly as equal to any item on actor.
+
+fixed: when one recipe refers to an item no longer in this world you could not open the compendium browser
+## 2.3.0 feature system independent
+
+⚠️This module now depends on other modules to work, you need to enable them ⚠️
+
+This module can now run on multiple systems. 
+It is implemented against [Beaver's System Interface](https://github.com/AngryBeaver/beavers-system-interface),
+so this module does not have any code to run on your system.
+
+In order to make this module work on your system, all you need is a tiny bsa-x implementation that maps the interface to your system.
+You can write your own or use [existing once](https://github.com/AngryBeaver/beavers-system-interface/wiki/BSA-x-links) others have written.
+I start of providing one for [dnd5e](https://github.com/AngryBeaver/bsa-dnd5e) and one for [pf2e](https://github.com/AngryBeaver/bsa-pf2e).
+
+Those adaptions are pretty simple and small but needs some insights about the system. 
+So my hope is those playing in a system knowing it can write their own adaptions without me who has no idea about that system.
+If not you at least now have this module in pf2e as well.
+
 ## 2.2.x feature: Time To Craft
 ### 2.2.2 workaround for ready set roll
 This fix should work for the current version of ready set roll 1.3.14.
 Might break at any other version ! a request for more robust interface has been made:
 ### 2.2.1 fix worldtime is zero
-Crafting does not become success when the worldtime is not advancecd.
+Crafting does not become success when the worldtime is zero.
 Sadly I could not automatically fix old crafting processes without breaking unfinished crafting processes.
 ### 2.2.0 feature: Time To Craft
 Crafting becomes a process that you start when clicking on the RecipeCompendium.
