@@ -7,7 +7,7 @@ export class Settings {
     static DISPLAY_RESULTS = "displayResults";
     static DISPLAY_INGREDIENTS = "displayIngredients";
     static ADD_HEADER_LINK = "addHeaderLink";
-    static TIME_TO_CRAFT = "addHeaderLink";
+    static TIME_TO_CRAFT = "timeToCraft";
     static USE_TOOL = "useTool";
     static USE_ATTENDANTS = "useAttendants";
     static TOOL_CONFIG_BUTTON = "toolConfigButton";
