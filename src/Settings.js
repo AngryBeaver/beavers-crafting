@@ -33,6 +33,7 @@ export class Settings {
             scope: "world",
             config: true,
             default: false,
+            requiresReload: true,
             type: Boolean,
         });
         game.settings.register(this.NAMESPACE, this.TIME_TO_CRAFT, {

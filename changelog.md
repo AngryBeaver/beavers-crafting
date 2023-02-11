@@ -1,5 +1,7 @@
 # Changelog
 ## 2.3.x feature system independent
+## 2.3.5 anyOf bugs
+fixed: reacitvate Setting for disable actor header link "📜Recipes"
 ## 2.3.4 anyOf bugs
 fixed: dropping anyOf in recipes no longer is detected as anyOf
 ## 2.3.3 anyOf bugs

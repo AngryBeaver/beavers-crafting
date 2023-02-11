@@ -6,8 +6,6 @@ import {RecipeCompendium} from "./apps/RecipeCompendium.js";
 import {AnyOfSheet} from "./apps/AnyOfSheet.js";
 import {Recipe} from "./Recipe.js";
 import {ActorSheetTab} from "./apps/ActorSheetTab.js";
-import {Dnd5e} from "../../bsa-dnd5e/src/Dnd5e.ts";
-import {Pf2e} from "./Pf2e.js";
 
 
 Hooks.on("beavers-system-interface.init", async function(){
