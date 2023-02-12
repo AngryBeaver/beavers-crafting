@@ -22,6 +22,10 @@ interface ResultData {
         dc: number,
         total: number,
     };
+    _tests?: {
+        hits: number,
+        fails: number,
+    }
     _currencyResult?: CurrencyResultData
     _chatAddition: {
         [key: string]:ComponentChatData
@@ -89,6 +93,27 @@ interface PreCastData {
     currencies?: boolean;
 }
 
+interface Tests {
+    fails: number,
+    consume: boolean,
+    ands: {
+        [key: number]: TestAnd,
+    }
+}
+
+interface TestAnd {
+    hits: number,
+    ors: {
+        [key: number]: TestOr,
+    }
+}
+
+interface TestOr {
+    check: number,
+    type: string,
+    uuid: string
+}
+
 interface Skill {
     name: string;
     dc: number;
@@ -121,6 +146,7 @@ interface RecipeData {
     results: {
         [key: string]: ComponentData
     }
+    tests?: Tests;
     skill?: Skill;
     currency?: Currency;
     tool?: string;

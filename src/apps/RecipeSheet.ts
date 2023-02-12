@@ -162,19 +162,35 @@ export class RecipeSheet {
             this.recipe.addCurrency();
             this.update();
         });
-        this.recipeElement.find('.results .item-name').on("click",e=>{
+        this.recipeElement.find('.tests .testAnd .item-add').click(e=>{
+            this.recipe.addTestAnd();
+            this.update();
+        });
+        this.recipeElement.find('.tests .testOr .item-add').click(e=>{
+            const and = $(e.currentTarget).data("and");
+            this.recipe.addTestOr(and);
+            this.update();
+        });
+        this.recipeElement.find('.tests .item-delete').click(e=>{
+            const and = $(e.currentTarget).data("and");
+            const or = $(e.currentTarget).data("or");
+            this.recipe.removeTestOr(and,or);
+            this.update();
+        });
+
+        this.recipeElement.find('.results .crafting-item-img').on("click",e=>{
             const uuid = $(e.currentTarget).data("id");
             if(Settings.get(Settings.DISPLAY_RESULTS)) {
                 getItem(uuid).then(i=>i.sheet._render(true));
             }
         });
-        this.recipeElement.find('.ingredients .item-name').on("click",e=>{
+        this.recipeElement.find('.ingredients .crafting-item-img').on("click",e=>{
             const uuid = $(e.currentTarget).data("id");
             if(Settings.get(Settings.DISPLAY_INGREDIENTS)) {
                 getItem(uuid).then(i=>i.sheet._render(true));
             }
         });
-        this.recipeElement.find('.attendants .item-name').on("click",e=>{
+        this.recipeElement.find('.attendants .crafting-item-img').on("click",e=>{
             const uuid = $(e.currentTarget).data("id");
             if(Settings.get(Settings.DISPLAY_INGREDIENTS)) {
                 getItem(uuid).then(i=>i.sheet._render(true));

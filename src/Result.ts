@@ -16,6 +16,10 @@ export class Result implements ResultApi, ResultData {
         dc: number,
         total: number,
     };
+    _tests?: {
+        hits:number,
+        fails: number,
+    }
     _currencyResult?: CurrencyResult
     _chatAddition: {
         [key: string]: ComponentChatData
@@ -84,6 +88,7 @@ export class Result implements ResultApi, ResultData {
             _hasException: this._hasException,
             _components: this._components,
             _skill: this._skill,
+            _tests:this._tests,
             _chatAddition: this._chatAddition,
             _recipe: this._recipe,
         }
@@ -94,6 +99,9 @@ export class Result implements ResultApi, ResultData {
         }
         if (!this._skill) {
             serialized["-=_skill"] = null;
+        }
+        if (!this._tests) {
+            serialized["-=_tests"] = null;
         }
         return serialized;
     }
@@ -129,6 +137,14 @@ export class Result implements ResultApi, ResultData {
 
     addChatComponent(componentChatData: ComponentChatData) {
         this._chatAddition["add_" + componentChatData.type + "_" + componentChatData.component.name] = componentChatData;
+    }
+
+    updateTests(hits:number, fails:number=0){
+        if(!this._tests){
+            this._tests = {hits:0,fails:0};
+        }
+        this._tests.hits +=hits;
+        this._tests.fails +=fails;
     }
 
     async payCurrency(currency: Currency) {

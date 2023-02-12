@@ -6,6 +6,7 @@ import {RecipeCompendium} from "./apps/RecipeCompendium.js";
 import {AnyOfSheet} from "./apps/AnyOfSheet.js";
 import {Recipe} from "./Recipe.js";
 import {ActorSheetTab} from "./apps/ActorSheetTab.js";
+import {itemTypeMigration} from "./migration.js";
 
 
 Hooks.on("beavers-system-interface.init", async function(){
@@ -18,37 +19,6 @@ Hooks.on("ready", async function(){
 })
 
 Hooks.once("beavers-system-interface.ready", async function(){
-    async function itemTypeMigration(){
-        async function addItemType(component){
-            if(component.type === "Item") {
-                const entity = await component.getEntity();
-                component.itemType = entity.type;
-            }
-        }
-        async function migrateRecipe(recipe){
-            for(const key in recipe.attendants){
-                await addItemType(recipe.attendants[key]);
-            }
-            for(const key in recipe.ingredients){
-                await addItemType(recipe.ingredients[key]);
-            }
-            for(const key in recipe.results){
-                await addItemType(recipe.results[key]);
-            }
-            await recipe.update();
-        }
-        ui.notifications.info("Beavers Crafting | migration: items");
-        for(const recipe of game[Settings.NAMESPACE].RecipeCompendium.getAllItems()){
-            await migrateRecipe(recipe);
-        }
-        ui.notifications.info("Beavers Crafting | migration: actors");
-        for (const actor of game.actors){
-            for(const recipe of game[Settings.NAMESPACE].RecipeCompendium.getForActor(actor)){
-                await migrateRecipe(recipe);
-            }
-        }
-        ui.notifications.info("Beavers Crafting | migration: done");
-    }
     Settings.init();
     if(!game[Settings.NAMESPACE])game[Settings.NAMESPACE]={};
     game[Settings.NAMESPACE].Crafting = Crafting;
@@ -57,14 +27,10 @@ Hooks.once("beavers-system-interface.ready", async function(){
     game[Settings.NAMESPACE].itemTypeMigration = itemTypeMigration;
 
     const version = Settings.get(Settings.MAJOR_VERSION);
-    if(!version || version<=0){
-        //I created the first breaking change,while I am still in version 0 and users are informed that there might be breaking changes I ship out a migration script.
-        //I think I soon should move this module out of develop phase version 0. I already start counting the internal major version.
-        await game[Settings.NAMESPACE].itemTypeMigration();
+    if(version == 2){
+        //await game[Settings.NAMESPACE]();
     }
     Settings.set(Settings.MAJOR_VERSION,2);
-
-
 
     Hooks.on("getActorSheetHeaderButtons", (app, buttons) => {
         if(Settings.get(Settings.ADD_HEADER_LINK)) {

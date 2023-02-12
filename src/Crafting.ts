@@ -104,6 +104,12 @@ export class Crafting implements CraftingData {
 
     }
 
+    async checkTests(){
+        if (this.recipe.tests) {
+
+        }
+    }
+
     async checkSkill() {
         if (this.recipe.skill) {
             const skillParts = this.recipe.skill.name.split("-")
