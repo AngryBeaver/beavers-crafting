@@ -3,13 +3,15 @@ import {Settings} from "./Settings.js";
 import {RecipeCompendium} from "./apps/RecipeCompendium.js";
 import {getItem} from "./helpers/Utility.js";
 import {AnyOf} from "./AnyOf.js";
-import {ComponentResult, Result} from "./Result.js";
+import {Result} from "./Result.js";
+import {TestHandler} from "./TestHandler.js";
 
 export class Crafting implements CraftingData {
     uuid: string;
     name: string;
     img: string;
     startAt: number;
+    lastAt: number;
     endAt: number;
     isFinished?: boolean;
     result: Result;
@@ -20,6 +22,7 @@ export class Crafting implements CraftingData {
         this.uuid = craftingData.uuid || actor.uuid + ".Crafting." + randomID();
         this.startAt = craftingData.startAt;
         this.endAt = craftingData.endAt
+        this.lastAt = craftingData.lastAt | craftingData.startAt;
         this.isFinished = craftingData.isFinished;
         this.name = craftingData.name;
         this.img = craftingData.img;
@@ -34,6 +37,7 @@ export class Crafting implements CraftingData {
             name: this.name,
             img: this.img,
             startAt: this.startAt,
+            lastAt: this.lastAt,
             endAt: this.endAt,
             result: this.result.serialize(),
             recipe: this.recipe.serialize(),
@@ -46,6 +50,7 @@ export class Crafting implements CraftingData {
             name: recipe.name,
             img: recipe.img,
             startAt: game["time"].worldTime,
+            lastAt:  game["time"].worldTime,
             endAt: 0,
             result: Result.from(recipe, actor),
             recipe: recipe
@@ -80,6 +85,13 @@ export class Crafting implements CraftingData {
         return this.result;
     }
 
+    async continueCrafting() {
+        const moreChecks = await this.checkTests();
+        if(moreChecks === false){
+            this.endCrafting()
+        }
+    }
+
     async endCrafting() {
         await this.checkSkill();
         await this.processAll();
@@ -92,6 +104,10 @@ export class Crafting implements CraftingData {
     async craft() {
         await this.startCrafting();
         if(Settings.get(Settings.TIME_TO_CRAFT) === "instantly"){
+            let moreChecks = await this.checkTests();
+            while(moreChecks){
+                moreChecks = await this.checkTests();
+            }
             await this.endCrafting();
         }
         if(Settings.get(Settings.TIME_TO_CRAFT) === "interaction"){
@@ -104,10 +120,20 @@ export class Crafting implements CraftingData {
 
     }
 
+    /**
+     * returns true if there are further tests.
+     */
     async checkTests(){
         if (this.recipe.tests) {
-
+            const testHandler = new TestHandler(this.recipe.tests,this.result,this.actor);
+            if(testHandler.hasAdditionalTests()){
+                await testHandler.test();
+                this.lastAt = game["time"].worldTime;
+                await this._addToActor();
+            }
+            return testHandler.hasAdditionalTests();
         }
+        return false;
     }
 
     async checkSkill() {
@@ -122,10 +148,11 @@ export class Crafting implements CraftingData {
                 roll = await beaversSystemInterface.actorRollSkill(this.actor,this.recipe.skill.name);
             }
             let resultValue = roll.total
-            if(resultValue === undefined){
-                if(roll.fields !== undefined && roll.fields[2] !== undefined ){
-                    resultValue =  roll.fields[2][1]?.roll?.total;
-                }
+
+            if(roll.total >= this.recipe.skill.dc){
+                this.result.updateTests(1,0);
+            }else{
+                this.result.updateTests(0,1);
             }
 
             this.result._skill = {
@@ -365,17 +392,37 @@ export class Crafting implements CraftingData {
             });
         }
 
+
+        const tests = {maxHits:1,maxFails:1,hits:0,fails:0,hitPer:0,failPer:0}
+        if(this.recipe.tests){
+            TestHandler.initialize(this.result,this.recipe.tests);
+            tests.maxHits = this.result._tests.maxHits;
+            tests.maxFails = this.result._tests.maxFails;
+            tests.hits = this.result._tests.hits;
+            tests.fails = this.result._tests.fails;
+            if(tests.maxFails > 0){
+                tests.failPer = Math.round(tests.fails*100/tests.maxFails);
+            }
+            if(tests.maxHits > 0){
+                tests.hitPer = Math.round(tests.hits*100/tests.maxHits);
+            }
+        }
+
         let status = "active";
         if(this.result.hasError()){
             status = "error";
+            tests.failPer = 100;
         }else if(this.endAt > 0 || this.isFinished){
             status = "success";
+            tests.hitPer = 100;
         }
+
         return {
             title: this.recipe.name,
             img: this.recipe.img,
             status: status,
             skill: this.result._skill,
+            tests:tests,
             components: components,
         }
     }

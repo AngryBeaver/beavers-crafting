@@ -229,26 +229,40 @@
                             {{#each this.ors}}
                                 <div class="flexcol" style="border-bottom:1px solid grey;margin-bottom:4px">
                                     <div class="flexrow" style="flex-wrap:nowrap">
-                                        <select {{#unless ../../editable}}disabled{{/unless}}
-                                                name="flags.beavers-crafting.recipe.tests.ands.{{@../key}}.ors.{{@key}}.uuid">
-                                            {{#select this.uuid}}
-                                                {{#if (eq this.type "skill")}}
+                                        {{#if (eq this.type "skill")}}
+                                            <select {{#unless ../../editable}}disabled{{/unless}}
+                                                    name="flags.beavers-crafting.recipe.tests.ands.{{@../key}}.ors.{{@key}}.uuid">
+                                                {{#select this.uuid}}
                                                     {{#each ../../skills}}
                                                         <option value="{{this.id}}">{{this.label}}</option>
                                                     {{/each}}
-                                                {{/if}}
-                                                {{#if (eq this.type "ability")}}
+                                                {{/select}}
+                                            </select>
+                                        {{/if}}
+                                        {{#if (eq this.type "ability")}}
+                                            <select {{#unless ../../editable}}disabled{{/unless}}
+                                                    name="flags.beavers-crafting.recipe.tests.ands.{{@../key}}.ors.{{@key}}.uuid">
+                                                {{#select this.uuid}}
                                                     {{#each ../../abilities}}
                                                         <option value="{{this.id}}">{{this.label}}</option>
                                                     {{/each}}
-                                                {{/if}}
-                                                {{#if (eq this.type "tool")}}
+                                                {{/select}}
+                                            </select>
+                                        {{/if}}
+                                        {{#if (eq this.type "tool")}}
+                                            <select {{#unless ../../editable}}disabled{{/unless}}
+                                                    name="flags.beavers-crafting.recipe.tests.ands.{{@../key}}.ors.{{@key}}.uuid">
+                                                {{#select this.uuid}}
                                                     {{#each ../../tools}}
                                                         <option value="{{this.uuid}}">{{this.name}}</option>
                                                     {{/each}}
-                                                {{/if}}
-                                            {{/select}}
-                                        </select>
+                                                {{/select}}
+                                            </select>
+                                        {{/if}}
+
+                                        {{#if (eq this.type "hit")}}
+
+                                        {{else}}
                                         <div class="attribute flexrow" style="line-height:20px">
                                             {{localize "beaversCrafting.recipe.tests.dc"}}:
                                             <input {{#unless ../../editable}}disabled{{/unless}}
@@ -257,6 +271,7 @@
                                                    step="any"
                                                    value="{{this.check}}"/>
                                         </div>
+                                        {{/if}}
                                     </div>
                                     <div class="flexrow" style="flex-wrap:nowrap">
                                         <div class="flexrow">
@@ -267,6 +282,7 @@
                                                     <option value="skill">Skill</option>
                                                     <option value="ability">Ability</option>
                                                     <option value="tool">Tool</option>
+                                                    <option value="hit">hit step</option>
                                                 {{/select}}
                                             </select>
                                         </div>
@@ -285,6 +301,7 @@
                 {{/each}}
             {{/if}}
         </div>
+        {{#if recipe.skill}}
         <div class="skills flexcol">
             <div class="flexrow header">
                 <div class="name">{{localize "beaversCrafting.recipe.skills"}}</div>
@@ -335,6 +352,7 @@
                 </div>
             {{/if}}
         </div>
+        {{/if}}
         <div class="results flexcol">
             <div class="flexrow header">
                 <div class="name">{{localize "beaversCrafting.recipe.results"}}</div>

@@ -25,6 +25,8 @@ interface ResultData {
     _tests?: {
         hits: number,
         fails: number,
+        maxFails:number,
+        maxHits: number
     }
     _currencyResult?: CurrencyResultData
     _chatAddition: {
@@ -38,6 +40,7 @@ interface CraftingData {
     name: string,
     img: string,
     startAt: number,
+    lastAt: number,
     endAt: number,
     result: ResultData
     recipe: RecipeData
@@ -59,6 +62,8 @@ type UserInteraction =  "always" | "never" | "onSuccess";
 
 type ComponentType = "consumed" | "required" | "produced";
 
+type TestType = "skill" | "tool" | "ability" | "hit";
+
 interface ComponentChatData {
     component: ComponentData,
     type: ComponentType,
@@ -75,6 +80,14 @@ interface ChatData {
         name: string,
         dc: number,
         total: number,
+    }
+    tests:{
+        maxHits:number,
+        maxFails:number,
+        hits:number,
+        fails:number,
+        hitPer:number,
+        failPer:number
     }
 }
 
@@ -110,7 +123,7 @@ interface TestAnd {
 
 interface TestOr {
     check: number,
-    type: string,
+    type: TestType,
     uuid: string
 }
 

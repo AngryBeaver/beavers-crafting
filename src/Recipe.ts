@@ -2,6 +2,7 @@ import {Settings} from "./Settings.js";
 import {sanitizeUuid} from "./helpers/Utility.js";
 import {getToolConfig} from "./apps/ToolConfig.js";
 import {Result} from "./Result.js";
+import {recipeSkillToTests} from "./migration.js";
 
 export class Recipe implements RecipeData {
     uuid: string;
@@ -128,7 +129,7 @@ export class Recipe implements RecipeData {
     }
     serializeTests() {
         if(this.tests != undefined){
-            const serialized = {...this.tests};
+            const serialized =  {fails:this.tests.fails,consume:this.tests.consume,ands:this.tests.ands};
             const ands = {...this.tests.ands, ...this._trash.tests.ands}
             Object.keys(ands).forEach(key=>{
                 if(this._trash.tests.ors[key] !== undefined){
@@ -195,6 +196,12 @@ export class Recipe implements RecipeData {
     }
 
     addTestAnd() {
+        if(this.skill){
+            // @ts-ignore
+            recipeSkillToTests(this);
+            return;
+
+        }
         if(this.tests == undefined){
             this.tests = new DefaultTest();
         }else{
@@ -298,7 +305,7 @@ export class Recipe implements RecipeData {
 
 }
 
-class DefaultTest implements Tests {
+export class DefaultTest implements Tests {
     fails:number =1;
     consume: boolean = true;
     ands={
@@ -313,7 +320,7 @@ class DefaultAndTest implements TestAnd {
 }
 class DefaultOrTest implements TestOr{
     check:number=8;
-    type="skill"
+    type:TestType="skill"
     uuid=""
 }
 

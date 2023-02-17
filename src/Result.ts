@@ -1,5 +1,4 @@
 import { Recipe} from "./Recipe.js";
-import {RecipeCompendium} from "./apps/RecipeCompendium.js";
 
 export class Result implements ResultApi, ResultData {
     _actorUpdate: {
@@ -16,9 +15,11 @@ export class Result implements ResultApi, ResultData {
         dc: number,
         total: number,
     };
-    _tests?: {
+    _tests: {
         hits:number,
         fails: number,
+        maxHits: number,
+        maxFails: number
     }
     _currencyResult?: CurrencyResult
     _chatAddition: {
@@ -55,6 +56,9 @@ export class Result implements ResultApi, ResultData {
             required: new ComponentResults(),
             consumed: new ComponentResults(),
             produced: new ComponentResults()
+        }
+        if (resultData._tests) {
+            this._tests = resultData._tests;
         }
         if (resultData._skill) {
             this._skill = resultData._skill;
@@ -114,6 +118,9 @@ export class Result implements ResultApi, ResultData {
         if (this._components.consumed.hasAnyError()) {
             hasError = true;
         }
+        if(this._testHasError()){
+            hasError = true;
+        }
         if (this._skill !== undefined) {
             if (this._skill.dc > this._skill.total) {
                 hasError = true;
@@ -125,6 +132,15 @@ export class Result implements ResultApi, ResultData {
             }
         }
         return hasError
+    }
+
+    _testHasError(){
+        if(this._tests !== undefined){
+            if(this._tests.maxFails > 0 && this._tests.maxFails <= this._tests.fails){
+                return true;
+            }
+        }
+        return false;
     }
 
     _isAnyConsumedAvailable(): boolean {
@@ -139,9 +155,17 @@ export class Result implements ResultApi, ResultData {
         this._chatAddition["add_" + componentChatData.type + "_" + componentChatData.component.name] = componentChatData;
     }
 
+    _initTests(maxHits: number, maxFails: number){
+        if(!this._tests){
+            this._tests = {hits:0,fails:0,maxHits:1,maxFails:1};
+        }
+        this._tests.maxHits=maxHits;
+        this._tests.maxFails=maxFails;
+    }
+
     updateTests(hits:number, fails:number=0){
         if(!this._tests){
-            this._tests = {hits:0,fails:0};
+            this._initTests(1,1);
         }
         this._tests.hits +=hits;
         this._tests.fails +=fails;
@@ -170,8 +194,6 @@ export class Result implements ResultApi, ResultData {
                     img:'icons/commodities/currency/coins-assorted-mix-copper-silver-gold.webp'
                 });
             component.quantity = this._currencyResult.value * -1
-
-
             this.addChatComponent({
                 component: component,
                 hasError: this._currencyResult.hasError,

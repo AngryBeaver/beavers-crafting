@@ -6,7 +6,7 @@ import {RecipeCompendium} from "./apps/RecipeCompendium.js";
 import {AnyOfSheet} from "./apps/AnyOfSheet.js";
 import {Recipe} from "./Recipe.js";
 import {ActorSheetTab} from "./apps/ActorSheetTab.js";
-import {itemTypeMigration} from "./migration.js";
+import {itemTypeMigration, migrateRecipeSkillToTests} from "./migration.js";
 
 
 Hooks.on("beavers-system-interface.init", async function(){
@@ -24,7 +24,8 @@ Hooks.once("beavers-system-interface.ready", async function(){
     game[Settings.NAMESPACE].Crafting = Crafting;
     game[Settings.NAMESPACE].RecipeCompendium = RecipeCompendium;
     game[Settings.NAMESPACE].Recipe = Recipe;
-    game[Settings.NAMESPACE].itemTypeMigration = itemTypeMigration;
+    game[Settings.NAMESPACE].migrateRecipeAddItemType = itemTypeMigration;
+    game[Settings.NAMESPACE].migrateRecipeSkillToTests= migrateRecipeSkillToTests;
 
     const version = Settings.get(Settings.MAJOR_VERSION);
     if(version == 2){
