@@ -52,7 +52,7 @@ export class Settings {
             name: game.i18n.localize('beaversCrafting.settings.useTool.name'),
             hint: game.i18n.localize('beaversCrafting.settings.useTool.hint'),
             scope: "world",
-            config: getSystemSetting().hasTool,
+            config: false,
             default: false,
             requiresReload: true,
             type: Boolean,

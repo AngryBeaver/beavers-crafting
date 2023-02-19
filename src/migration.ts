@@ -40,25 +40,75 @@ export async function migrateRecipeSkillToTests() {
 
     ui.notifications?.info("Beavers Crafting | migration: items");
     for (const recipe of game[Settings.NAMESPACE].RecipeCompendium.getAllItems()) {
-         recipeSkillToTests(recipe);
-        await recipe.update();
+        try {
+            recipeSkillToTests(recipe);
+            await recipe.update();
+        } catch (e) {
+            ui.notifications?.warn("Beavers Crafting |" + e);
+        }
     }
     ui.notifications?.info("Beavers Crafting | migration: actors");
     for (const actor of game["actors"]) {
         for (const recipe of game[Settings.NAMESPACE].RecipeCompendium.getForActor(actor)) {
-             recipeSkillToTests(recipe);
-            await recipe.update();
+            try {
+                recipeSkillToTests(recipe);
+                await recipe.update();
+            } catch (e) {
+                ui.notifications?.warn("Beavers Crafting |" + e);
+            }
         }
-        const flag = this.app.actor.flags["beavers-crafting"]?.crafting || {};
+        const flag = actor.flags["beavers-crafting"]?.crafting || {};
         for (const [x, y] of Object.entries(flag)) {
-            const craftingData = (y as CraftingData);
-            const crafting = new Crafting(craftingData, this.app.actor);
-             recipeSkillToTests(crafting.recipe);
-             recipeSkillToTests(crafting.result._recipe);
-            await crafting._addToActor()
+            try {
+                const craftingData = (y as CraftingData);
+                const crafting = new Crafting(craftingData, actor);
+                recipeSkillToTests(crafting.recipe);
+                recipeSkillToTests(crafting.result._recipe);
+                await crafting._addToActor()
+            } catch (e) {
+                ui.notifications?.warn("Beavers Crafting |" + e);
+            }
         }
-        ui.notifications?.info("Beavers Crafting | migration: done");
     }
+    ui.notifications?.info("Beavers Crafting | migration: done");
+}
+
+export async function migrateDeprecateTools() {
+
+    ui.notifications?.info("Beavers Crafting | migration: items");
+    for (const recipe of game[Settings.NAMESPACE].RecipeCompendium.getAllItems()) {
+        try {
+            await toolToAttendant(recipe);
+            await recipe.update();
+        } catch (e) {
+            ui.notifications?.warn("Beavers Crafting |" + e);
+        }
+    }
+    ui.notifications?.info("Beavers Crafting | migration: actors");
+    for (const actor of game["actors"]) {
+        for (const recipe of game[Settings.NAMESPACE].RecipeCompendium.getForActor(actor)) {
+            try {
+                await toolToAttendant(recipe);
+                await recipe.update();
+            } catch (e) {
+                ui.notifications?.warn("Beavers Crafting |" + e);
+            }
+        }
+        const flag = actor.flags["beavers-crafting"]?.crafting || {};
+        for (const [x, y] of Object.entries(flag)) {
+            try {
+                const craftingData = (y as CraftingData);
+                const crafting = new Crafting(craftingData, actor);
+                await toolToAttendant(crafting.recipe);
+                const resultRecipe = new Recipe("invalid", "invalid", "invalid", "invalid", crafting.result._recipe);
+                await toolToAttendant(resultRecipe);
+                await crafting._addToActor()
+            } catch (e) {
+                ui.notifications?.warn("Beavers Crafting |" + e);
+            }
+        }
+    }
+    ui.notifications?.info("Beavers Crafting | migration: done");
 }
 
 export function recipeSkillToTests(recipe: RecipeData) {
@@ -80,7 +130,15 @@ export function recipeSkillToTests(recipe: RecipeData) {
             }
         }
         delete recipe.skill;
-        recipe["-=skill"]=null;
+        recipe["-=skill"] = null;
+    }
+}
+
+export async function toolToAttendant(recipe: Recipe) {
+    if (recipe.tool != undefined) {
+        const item = await beaversSystemInterface.uuidToDocument(recipe.tool);
+        recipe.addAttendant(item, item.uuid, item.type);
+        recipe.removeTool();
     }
 }
 

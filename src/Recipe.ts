@@ -200,7 +200,6 @@ export class Recipe implements RecipeData {
             // @ts-ignore
             recipeSkillToTests(this);
             return;
-
         }
         if(this.tests == undefined){
             this.tests = new DefaultTest();
