@@ -149,8 +149,8 @@ There are up to 4 types of TestOptions.
 - tool check
 - fixed hit
   - just progress without any check.
-you can add multiple times the same type of TestOption.
 
+You can add multiple times the same type of TestOption for example to choose from diffrent skills.
 Your Recipe can fail if you reach the specified "fails" default is 1. If you set the fails to 0 your recipe can never fail.
 You can also specify if your costs will get consumed when your recipe fails.
 ### 2.3.x system independent
