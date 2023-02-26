@@ -136,7 +136,7 @@ Every Character will now have access to 50+ recipes to brew potions.
 
 ## Latest features:
 have a look at the changelog.md
-### 3.0.0 progress tracking and multiple tests
+### 3.0.x progress tracking and multiple tests
 This module now enables tracking of your progress through a series of tests.
 While you can track your crafting this features enables a new purpose of this module.
 
