@@ -1,5 +1,12 @@
 # Beaver's Crafting Module
-With this module you can create recipes to craft items. E.g. a bunch of mushrooms to brew a potion. Specifically you can use it for crafting, brewing, harvesting, mining, fabricating, gathering specific or random items by optionally consuming ingredients and money and optionally requireing features, tools, classes, backgrounds and skill checks. 
+With this module you can create recipes to craft items. E.g. a bunch of mushrooms to brew a potion.
+Since 3.x you can now also progress and track any downtime activities.
+You can use it for crafting, brewing, harvesting, mining, fabricating, gathering, running skillchallenges, track downtime activities, progress quests ...
+- optionally granting specific or random items on success
+- optionally consuming ingredients and money 
+- optionally requireing features, tools, classes, backgrounds
+- optionally tracking your progress by optionally testing (skills, tools, abilities) or just advanceing it.
+
 
 ![Foundry Core Compatible Version](https://img.shields.io/endpoint?url=https%3A%2F%2Ffoundryshields.com%2Fversion%3Fstyle%3Dflat%26url%3Dhttps%3A%2F%2Fgithub.com%2FAngryBeaver%2Fbeavers-crafting%2Freleases%2Flatest%2Fdownload%2Fmodule.json)
 ![Foundry System](https://img.shields.io/endpoint?url=https%3A%2F%2Ffoundryshields.com%2Fsystem%3FnameType%3Draw%26showVersion%3D1%26style%3Dflat%26url%3Dhttps%3A%2F%2Fraw.githubusercontent.com%2FAngryBeaver%2Fbeavers-crafting%2Fmain%2Fmodule.json)
@@ -134,6 +141,7 @@ This module now enables tracking of your progress through a series of tests.
 While you can track your crafting this features enables a new purpose of this module.
 
 This module allows now also for tracking any downtime activity, running skillchallenges or quests.
+Everything is modelled by Recipes so a SkillChallenge or Quest is also only a Recipe
 
 ![img.png](pictures/skillchallenge.png)
 
@@ -145,8 +153,8 @@ In ech TestSection you need to hit a given amount of successes specified by "hit
 Each TestSection consist of one or more TestOption you can add as choice .
 There are up to 4 types of TestOptions.
 - skill check
-- ability check
-- tool check
+- ability check (not sure how to model this in pf2e (help wanted! bsa-pf2e module))
+- tool check (not sure how to model this in pf2e (help wanted! bsa-pf2e module))
 - fixed hit
   - just progress without any check.
 
