@@ -143,8 +143,6 @@ While you can track your crafting this features enables a new purpose of this mo
 This module allows now also for tracking any downtime activity, running skillchallenges or quests.
 Everything is modelled by Recipes so a SkillChallenge or Quest is also only a Recipe
 
-![img.png](pictures/skillchallenge.png)
-
 ![img.png](pictures/skillchallenge2.png)
  
 Recipe can have Tests consisting of one or more TestSections.
@@ -161,6 +159,14 @@ There are up to 4 types of TestOptions.
 You can add multiple times the same type of TestOption for example to choose from diffrent skills.
 Your Recipe can fail if you reach the specified "fails" default is 1. If you set the fails to 0 your recipe can never fail.
 You can also specify if your costs will get consumed when your recipe fails.
+
+![img.png](pictures/skillchallenge.png)
+
+meaning:
+- you need 3 success in:insight skill dc 8 or forgery kit dc 8 
+- and thereafter 2 success in history
+- before you have 3 fails overall.
+
 ### 2.3.x system independent
 this module can now run on multiple systems, 
 it uses a unified system interface and an adaption layer module for the specific system to work though.
