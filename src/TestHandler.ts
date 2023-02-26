@@ -1,6 +1,5 @@
 import {Result} from "./Result.js";
-import {SelectDialog} from "./apps/SelectDialog.js";
-
+import {getToolConfig} from "./apps/ToolConfig.js";
 
 
 export class TestHandler{
@@ -102,7 +101,7 @@ export class TestHandler{
             throw Error("actor does not have this tool");
         }
         const actorItem = await beaversSystemInterface.uuidToDocument(actorComponent.uuid);
-        let roll = await beaversSystemInterface.actorRollItem(this.actor, actorItem);
+        let roll = await beaversSystemInterface.actorRollTool(this.actor, actorItem);
         if(roll != undefined && roll.total >= testOr.check){
             return true;
         }
@@ -114,10 +113,41 @@ export class TestHandler{
     async selectTestChoice():Promise<TestOr>{
         const choices = {};
         const testAnd = this.getCurrentTestAnd();
+        //fix name for tool uuid !
+
+
         for(const [id,or] of  Object.entries(testAnd.ors)){
-            choices[id] = {text:or.type+"."+or.uuid+"."+or.check};
+            if(or.type === "skill"){
+                beaversSystemInterface.configSkills.forEach(skill=>{
+                    if(skill.id === or.uuid){
+                        choices[id] = {text:skill.label+":"+or.check};
+                        return;
+                    }
+                });
+            }
+            if(or.type === "ability"){
+                beaversSystemInterface.configAbilities.forEach(ability=>{
+                    if(ability.id === or.uuid){
+                        choices[id] = {text:ability.label+":"+or.check};
+                        return;
+                    }
+                });
+            }
+            if(or.type === "tool"){
+                const tools = await getToolConfig();
+                tools.forEach(tool=>{
+                    if(tool.uuid === or.uuid){
+                        choices[id] = {text:tool.name+":"+or.check,img:tool.img};
+                        return;
+                    }
+                });
+            }
+            if(or.type === "hit"){
+                choices[id] = {text:"hit step"};
+            }
+
         }
-        const choice = parseInt(await SelectDialog.str({choices:choices}));
+        const choice = parseInt(await beaversSystemInterface.uiDialogSelect({choices:choices}));
         return testAnd.ors[choice];
     }
 

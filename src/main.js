@@ -7,6 +7,7 @@ import {AnyOfSheet} from "./apps/AnyOfSheet.js";
 import {Recipe} from "./Recipe.js";
 import {ActorSheetTab} from "./apps/ActorSheetTab.js";
 import {itemTypeMigration, migrateDeprecateTools, migrateRecipeSkillToTests} from "./migration.js";
+import {getToolConfig} from "./apps/ToolConfig";
 
 
 Hooks.on("beavers-system-interface.init", async function(){
@@ -33,7 +34,6 @@ Hooks.once("beavers-system-interface.ready", async function(){
         await migrateDeprecateTools();
         await migrateRecipeSkillToTests();
         Settings.set(Settings.USE_TOOL,false);
-        //await game[Settings.NAMESPACE]();
     }
     Settings.set(Settings.MAJOR_VERSION,3);
 

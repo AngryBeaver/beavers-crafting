@@ -1,8 +1,0 @@
-<div>
-<select style="width:100%;flex:0;height:20px;">
-    <option disabled selected value="">{{localize "beaversCrafting.select-dialog.preselection"}}</option>
-    {{#each choices}}
-        <option value="{{@key}}" {{#unless this.img}}style="background-image:url('{{this.img}}');background-repeat:no-repeat;background-size:20px 20px;text-indent:22px"{{/unless}}>{{this.text}}</option>
-    {{/each}}
-</select>
-</div>

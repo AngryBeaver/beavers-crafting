@@ -1,5 +1,5 @@
 import {Recipe} from "../Recipe.js";
-import {Settings} from "../Settings.js";
+import {getSystemSetting, Settings} from "../Settings.js";
 import {getDataFrom, getItem} from "../helpers/Utility.js";
 import {AnyOf} from "../AnyOf.js";
 import {getToolConfig} from "./ToolConfig.js";
@@ -77,18 +77,25 @@ export class RecipeSheet {
     }
 
     async render(){
+        const tools = await getToolConfig();
+        const toolChoices = {};
+        tools.forEach(tool=>{
+            toolChoices[tool.uuid]={text:tool.name,img:tool.img};
+        })
         let main = await renderTemplate('modules/beavers-crafting/templates/recipe-main.hbs',
             {
                 recipe: this.recipe,
                 currencies: beaversSystemInterface.configCurrencies,
                 skills: beaversSystemInterface.configSkills,
                 abilities: beaversSystemInterface.configCanRollAbility?beaversSystemInterface.configAbilities:[],
+                tools: tools,
+                toolChoices: toolChoices,
                 editable:this.editable,
                 displayResults:Settings.get(Settings.DISPLAY_RESULTS),
                 displayIngredients:Settings.get(Settings.DISPLAY_RESULTS),
-                tools: await getToolConfig(),
-                useTool: Settings.get(Settings.USE_TOOL),
-                useAttendants: Settings.get(Settings.USE_ATTENDANTS)
+                useAttendants: Settings.get(Settings.USE_ATTENDANTS),
+                canRollTool:getSystemSetting().hasTool,
+                canRollAbility:beaversSystemInterface.configCanRollAbility,
             });
         let template = await renderTemplate('modules/beavers-crafting/templates/recipe-sheet.hbs',{
             main: main,

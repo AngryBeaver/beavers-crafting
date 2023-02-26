@@ -1,6 +1,6 @@
 <div class="sheet flexrow recipe">
     <div class="left">
-        {{#if useTool}}
+        {{#if recipe.tool}}
             <div class="tools flexcol">
                 <div class="flexrow header">
                     <div class="name">{{localize "beaversCrafting.recipe.tools"}}</div>
@@ -250,27 +250,31 @@
                                             </select>
                                         {{/if}}
                                         {{#if (eq this.type "tool")}}
-                                            <select {{#unless ../../editable}}disabled{{/unless}}
-                                                    name="flags.beavers-crafting.recipe.tests.ands.{{@../key}}.ors.{{@key}}.uuid">
-                                                {{#select this.uuid}}
-                                                    {{#each ../../tools}}
-                                                        <option value="{{this.uuid}}">{{this.name}}</option>
-                                                    {{/each}}
-                                                {{/select}}
-                                            </select>
+                                            <beavers-selection>
+                                                <select {{#unless ../../editable}}disabled{{/unless}}
+                                                        name="flags.beavers-crafting.recipe.tests.ands.{{@../key}}.ors.{{@key}}.uuid">
+                                                    {{#select this.uuid}}
+                                                        {{#each ../../tools}}
+                                                            <option value="{{this.uuid}}" img="{{this.img}}">
+                                                                {{this.name}}
+                                                            </option>
+                                                        {{/each}}
+                                                    {{/select}}
+                                                </select>
+                                            </beavers-selection>
                                         {{/if}}
 
                                         {{#if (eq this.type "hit")}}
 
                                         {{else}}
-                                        <div class="attribute flexrow" style="line-height:20px">
-                                            {{localize "beaversCrafting.recipe.tests.dc"}}:
-                                            <input {{#unless ../../editable}}disabled{{/unless}}
-                                                   name="flags.beavers-crafting.recipe.tests.ands.{{@../key}}.ors.{{@key}}.check"
-                                                   type="number"
-                                                   step="any"
-                                                   value="{{this.check}}"/>
-                                        </div>
+                                            <div class="attribute flexrow" style="line-height:20px">
+                                                {{localize "beaversCrafting.recipe.tests.dc"}}:
+                                                <input {{#unless ../../editable}}disabled{{/unless}}
+                                                       name="flags.beavers-crafting.recipe.tests.ands.{{@../key}}.ors.{{@key}}.check"
+                                                       type="number"
+                                                       step="any"
+                                                       value="{{this.check}}"/>
+                                            </div>
                                         {{/if}}
                                     </div>
                                     <div class="flexrow" style="flex-wrap:nowrap">
@@ -278,10 +282,11 @@
                                             <select {{#unless ../../editable}}disabled{{/unless}}
                                                     name="flags.beavers-crafting.recipe.tests.ands.{{@../key}}.ors.{{@key}}.type">
                                                 {{#select this.type}}
-                                                    <option value="todo">todo fix hardcoded</option>
                                                     <option value="skill">Skill</option>
-                                                    <option value="ability">Ability</option>
-                                                    <option value="tool">Tool</option>
+                                                    {{#if ../../canRollAbility}}
+                                                        <option value="ability">Ability</option>{{/if}}
+                                                    {{#if ../../canRollTool}}
+                                                        <option value="tool">Tool</option>{{/if}}
                                                     <option value="hit">hit step</option>
                                                 {{/select}}
                                             </select>
@@ -302,56 +307,56 @@
             {{/if}}
         </div>
         {{#if recipe.skill}}
-        <div class="skills flexcol">
-            <div class="flexrow header">
-                <div class="name">{{localize "beaversCrafting.recipe.skills"}}</div>
-                <div class="attribute">{{localize "beaversCrafting.recipe.dc"}}</div>
-                {{#if editable}}
-                    <div class="action flexrow">
-                        {{#unless recipe.skill}}
-                            <a class="item-add">
-                                <i class="fas fa-plus"></i>
-                            </a>
-                        {{/unless}}
-                    </div>
-                {{/if}}
-            </div>
-            {{#if recipe.skill}}
-                <div class="flexrow">
-                    <select {{#unless editable}}disabled{{/unless}}
-                            name="flags.beavers-crafting.recipe.skill.name" class="name">
-                        {{#select recipe.skill.name}}
-                            {{#each skills}}
-                                <option value="{{this.id}}">{{this.label}}</option>
-                            {{/each}}
-                            {{#if (gt abilities.length 0)}}
-                                <option disabled>── Abilities ──</option>
-                            {{/if}}
-                            {{#each abilities}}
-                                <option value="ability-{{this.id}}">{{this.label}}</option>
-                            {{/each}}
-                        {{/select}}
-                    </select>
-                    <div class="attribute flexrow">
-                        <input {{#unless editable}}disabled{{/unless}}
-                               name="flags.beavers-crafting.recipe.skill.dc" type="number"
-                               step="any"
-                               value="{{recipe.skill.dc}}"/>
-                        <input title="{{localize "beaversCrafting.recipe.consumeOnFailedSaveHint"}}"
-                               type="checkbox" {{#unless editable}}disabled{{/unless}}
-                            {{#if recipe.skill.consume}}checked{{/if}}
-                               name="flags.beavers-crafting.recipe.skill.consume">
-                    </div>
+            <div class="skills flexcol">
+                <div class="flexrow header">
+                    <div class="name">{{localize "beaversCrafting.recipe.skills"}}</div>
+                    <div class="attribute">{{localize "beaversCrafting.recipe.dc"}}</div>
                     {{#if editable}}
-                        <div style="flex: 0 0 auto; width:20px; line-height: 30px;text-align: center;">
-                            <a class="item-delete">
-                                <i class="fas fa-trash"></i>
-                            </a>
+                        <div class="action flexrow">
+                            {{#unless recipe.skill}}
+                                <a class="item-add">
+                                    <i class="fas fa-plus"></i>
+                                </a>
+                            {{/unless}}
                         </div>
                     {{/if}}
                 </div>
-            {{/if}}
-        </div>
+                {{#if recipe.skill}}
+                    <div class="flexrow">
+                        <select {{#unless editable}}disabled{{/unless}}
+                                name="flags.beavers-crafting.recipe.skill.name" class="name">
+                            {{#select recipe.skill.name}}
+                                {{#each skills}}
+                                    <option value="{{this.id}}">{{this.label}}</option>
+                                {{/each}}
+                                {{#if (gt abilities.length 0)}}
+                                    <option disabled>── Abilities ──</option>
+                                {{/if}}
+                                {{#each abilities}}
+                                    <option value="ability-{{this.id}}">{{this.label}}</option>
+                                {{/each}}
+                            {{/select}}
+                        </select>
+                        <div class="attribute flexrow">
+                            <input {{#unless editable}}disabled{{/unless}}
+                                   name="flags.beavers-crafting.recipe.skill.dc" type="number"
+                                   step="any"
+                                   value="{{recipe.skill.dc}}"/>
+                            <input title="{{localize "beaversCrafting.recipe.consumeOnFailedSaveHint"}}"
+                                   type="checkbox" {{#unless editable}}disabled{{/unless}}
+                                {{#if recipe.skill.consume}}checked{{/if}}
+                                   name="flags.beavers-crafting.recipe.skill.consume">
+                        </div>
+                        {{#if editable}}
+                            <div style="flex: 0 0 auto; width:20px; line-height: 30px;text-align: center;">
+                                <a class="item-delete">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        {{/if}}
+                    </div>
+                {{/if}}
+            </div>
         {{/if}}
         <div class="results flexcol">
             <div class="flexrow header">
