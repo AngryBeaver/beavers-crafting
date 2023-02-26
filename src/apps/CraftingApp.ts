@@ -37,14 +37,14 @@ export class CraftingApp extends Application {
         return mergeObject(super.defaultOptions, {
             // @ts-ignore
             title: game.i18n.localize(`beaversCrafting.crafting-app.title`),
-            width: 560,
-            height: 400,
+            width: 700,
+            height: 450,
             template: "modules/beavers-crafting/templates/crafting-app.hbs",
             closeOnSubmit: true,
             submitOnClose: true,
             submitOnChange: true,
             resizable: true,
-            classes: ["dnd5e", "sheet", "beavers-crafting","crafting-app"],
+            classes: ["sheet", "beavers-crafting","crafting-app"],
             popOut: true,
             id: 'beavers-crafting'
         });

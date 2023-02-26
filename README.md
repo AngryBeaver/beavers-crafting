@@ -1,12 +1,17 @@
 # Beaver's Crafting Module
-With this module you can create recipes to craft items. E.g. a bunch of mushrooms to brew a potion. Specifically you can use it for crafting, brewing, harvesting, mining, fabricating, gathering specific or random items by optionally consuming ingredients and money and optionally requireing features, tools, classes, backgrounds and skill checks. 
+With this module you can create recipes to craft items. E.g. a bunch of mushrooms to brew a potion.
+Since 3.x you can now also progress and track any downtime activities.
+You can use it for crafting, brewing, harvesting, mining, fabricating, gathering, running skillchallenges, track downtime activities, progress quests ...
+- optionally granting specific or random items on success
+- optionally consuming ingredients and money 
+- optionally requireing features, tools, classes, backgrounds
+- optionally tracking your progress by optionally testing (skills, tools, abilities) or just advanceing it.
+
 
 ![Foundry Core Compatible Version](https://img.shields.io/endpoint?url=https%3A%2F%2Ffoundryshields.com%2Fversion%3Fstyle%3Dflat%26url%3Dhttps%3A%2F%2Fgithub.com%2FAngryBeaver%2Fbeavers-crafting%2Freleases%2Flatest%2Fdownload%2Fmodule.json)
 ![Foundry System](https://img.shields.io/endpoint?url=https%3A%2F%2Ffoundryshields.com%2Fsystem%3FnameType%3Draw%26showVersion%3D1%26style%3Dflat%26url%3Dhttps%3A%2F%2Fraw.githubusercontent.com%2FAngryBeaver%2Fbeavers-crafting%2Fmain%2Fmodule.json)
 ![Download Count](https://img.shields.io/github/downloads/AngryBeaver/beavers-crafting/total?color=bright-green)
 
-This module is now system independent.
-⚠️This module now depends on other modules to work, you need to enable them ⚠️ [Changelog](https://github.com/AngryBeaver/beavers-crafting/blob/main/changelog.md)
 
 ## Features
 ![img.gif](pictures/video.gif)
@@ -20,15 +25,14 @@ Default is "Create New Item" obviously you need to adapt if you have a different
 
 #### attendants: optional (0.7.x)
 you may add an attendant the crafting process requires but is not consumed. (default disabled)
-#### tool: optional (0.5.x)
-you may add a tool the crafting process requires. (default disabled)
 #### cost: 
 you may add costs to the crafting process
 #### Ingredients:
 You may add Items via drag and drop as Ingredients.
-#### skill: 
-you may add a skill that is required in the crafting process.
-you can enable that costs and ingredients are also payed when the check failed.
+#### tests: (3.0.x)
+you may add tests that are required in the crafting process.
+You can enable that costs and ingredients are also consumed when you fail your progress.
+You fail your progress if you miss equally often then a specified amount of "fails".
 #### results:
 You may add Items or RollTable via drag and drop as result.
 The result is the outcome of a successfull crafting process.
@@ -54,7 +58,6 @@ you can add a new crafting process by clicking on +Add,  which will open the rec
 When you have configured TimeToCraft to interaction. Your crafting process will start by locking the resources needed.
 You then can click in the status field to finalize the crafting process. 
 This will grant your results and maybe unlocks your resources if they are not consumed in the process.
-
 
 Alternatively you can enable Header Buttons in the configuration to open up the recipeCompendium (deprecated 2.x)
 
@@ -133,6 +136,40 @@ Every Character will now have access to 50+ recipes to brew potions.
 
 ## Latest features:
 have a look at the changelog.md
+### 3.0.0 progress tracking and multiple tests
+This module now enables tracking of your progress through a series of tests.
+While you can track your crafting this features enables a new purpose of this module.
+
+This module allows now also for tracking any downtime activity, running skillchallenges or quests.
+Everything is modelled by Recipes so a SkillChallenge or Quest is also only a Recipe
+
+![img.png](pictures/skillchallenge2.png)
+ 
+Recipe can have Tests consisting of one or more TestSections.
+In ech TestSection you need to hit a given amount of successes specified by "hits" in the TestSection default is 1.
+
+Each TestSection consist of one or more TestOption you can add as choice .
+There are up to 4 types of TestOptions.
+- skill check
+- ability check (not sure how to model this in pf2e (help wanted! bsa-pf2e module))
+- tool check (not sure how to model this in pf2e (help wanted! bsa-pf2e module))
+- fixed hit
+  - just progress without any check.
+
+You can add multiple times the same type of TestOption for example to choose from diffrent skills.
+Your Recipe can fail if you reach the specified "fails" default is 1. If you set the fails to 0 your recipe can never fail.
+You can also specify if your costs will get consumed when your recipe fails.
+
+![img.png](pictures/skillchallenge.png)
+
+meaning:
+- you need 3 success in:insight skill dc 8 or forgery kit dc 8 
+- and thereafter 2 success in history
+- before you have 3 fails overall.
+
+### 2.3.x system independent
+this module can now run on multiple systems, 
+it uses a unified system interface and an adaption layer module for the specific system to work though.
 ### 2.2.x timeToCraft
 Crafting is now a process that can be started and finalized
 ### 2.1.x actorSheetTab

@@ -2,16 +2,33 @@
     <div class="flexrow header">
         <div class="image" style="background-image: url('{{data.img}}')"></div>
         <div style="flex:1"> {{data.title}}</div>
-        <div class="flexrow" style="flex:0 0 60px;height:30px">
-            <div class="dice-roll">
-                <div class="dice-total flexrow" style="flex:1;padding:2px;margin-top:5px">
-                    <span class="total">{{data.skill.total}}</span>
-                    {{#if (eq data.status "success") }}
-                        <i class="fas fa-check" style="color:darkgreen"></i>
+        <div class="flexcol" style="justify-content: center;flex:0 0 80px;font-weight:100">
+            <div class="flexrow"
+                 style="flex:0 0 auto;display: flex;flex-direction: row;flex-wrap: wrap;justify-content: flex-start; ">
+                <div class="flexrow" style="margin:auto">
+                    {{#if (not (eq data.status "error"))}}
+                        <div style="line-height:14px;text-align:center;width:100%;height:18px;margin:1px; padding:2px;
+                                border-radius:5px; border:1px solid darkgreen;">
+                            <div style="text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;color:white;width:100%;height:100%;background: linear-gradient(to right, darkgreen {{data.tests.hitPer}}%, transparent 0);">{{data.tests.hitPer}}
+                                %
+                            </div>
+                        </div>
+                    {{/if}}
+                    {{#if (not (eq data.status "success"))}}
+                        <div style="line-height:14px;text-align:center;width:100%;height:18px;margin:1px; padding:2px; border-radius:5px;border:1px solid darkred;">
+                            <div style="text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;color:white;width:100%;height:100%;background: linear-gradient(to right, darkred {{data.tests.failPer}}%, transparent 0)">{{data.tests.failPer}}
+                                %
+                            </div>
+                        </div>
+                    {{/if}}
+                </div>
+                <div style="flex:0;margin:auto 5px">
+                    {{#if (eq data.status "active") }}
+                        <i class="fas fa-forward-step" style="width:13px; text-align:center;"></i>
+                    {{else if (eq data.status "success") }}
+                        <i class="fas fa-check" style="width:13px; text-align:center;color:darkgreen"></i>
                     {{else if (eq data.status "error") }}
-                        <i class="fas fa-times" style="color:darkred"></i>
-                    {{else}}
-                        <i class="fa-regular fa-box-open" style="font-size:small"></i>
+                        <i class="fas fa-times" style="width:13px; text-align:center;color:darkred"></i>
                     {{/if}}
                 </div>
             </div>

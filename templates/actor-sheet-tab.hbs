@@ -1,28 +1,44 @@
 <div class="beavers-crafting actor-tab" style="overflow:auto">
-    <div class="flexcol" style="min-width:470px;border-left: 1px solid var(--color-border-light-tertiary);border-right: 1px solid var(--color-border-light-tertiary);">
-        <div class="flexrow header" style="flex-wrap:nowrap;border-bottom: 1px solid var(--color-border-light-tertiary);">
+    <div class="flexcol"
+         style="min-width:470px;border-left: 1px solid var(--color-border-light-tertiary);border-right: 1px solid var(--color-border-light-tertiary);">
+        <div class="flexrow header"
+             style="flex-wrap:nowrap;border-bottom: 1px solid var(--color-border-light-tertiary);">
             <div class="scale">{{localize "beaversCrafting.actorSheet.table.name"}}</div>
-            <div class="scale" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{localize "beaversCrafting.actorSheet.table.input"}}</div>
-            <div class="scale" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{localize "beaversCrafting.actorSheet.table.output"}}</div>
-            <div class="status" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{localize "beaversCrafting.actorSheet.table.status"}}</div>
+            <div class="scale" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{localize
+                    "beaversCrafting.actorSheet.table.input"}}</div>
+            <div class="scale" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{localize
+                    "beaversCrafting.actorSheet.table.output"}}</div>
+            <div class="status" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{localize
+                    "beaversCrafting.actorSheet.table.status"}}</div>
             <div class="option" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">
                 <a class="addCrafting"><i class="fa-solid fa-circle-plus"></i></a>
             </div>
         </div>
-    {{#each craftingList}}
-        <div class="flexrow" style="flex-wrap:nowrap;border-bottom: 1px solid var(--color-border-light-tertiary);">
-            <div class="scale flexcol">
-            <div class="flexrow" style="margin:0 5px;padding:1px 0;">
-                <div class="crafting-item-img" style="flex:0 0 auto;margin: 0 5px 0 0px;background-image: url('{{this.img}}')"></div>
-                <span style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{this.name}}</span>
-            </div>
-            </div>
-            <div class="scale flexcol" style="border-left: 1px solid var(--color-border-light-tertiary);border-right: 1px solid var(--color-border-light-tertiary);">
-                {{#with (lookup ../chatList @key) as |chatData|}}
+        {{#each chatList as |chatData| }}
+            <div class="flexrow"
+                 style="flex-wrap:nowrap;border-bottom: 1px solid var(--color-border-light-tertiary);">
+                <div class="scale flexcol" style="overflow:hidden;text-overflow: ellipsis;">
+                    {{#if (eq chatData.status "active")}}
+                        <a class="crafting-rollIcon advanceCrafting"
+                           style="flex:auto 0 0;height:40px;text-indent:42px; margin:auto 5px;padding:1px 0;line-height:40px;background-repeat:no-repeat; background-size:40px 40px; background-image: url('{{this.img}}')"
+                           data-id="{{@key}}">
+                            <span style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{this.title}}</span>
+                        </a>
+                    {{else}}
+                        <div class="crafting-rollIcon"
+                             style="flex:auto 0 0;height:40px;text-indent:42px; margin:auto 5px;padding:1px 0;line-height:40px;background-repeat:no-repeat; background-size:40px 40px; background-image: url('{{this.img}}')">
+                            <span style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{this.title}}</span>
+                        </div>
+                    {{/if}}
+                </div>
+                <div class="scale flexcol"
+                     style="border-left: 1px solid var(--color-border-light-tertiary);border-right: 1px solid var(--color-border-light-tertiary);">
                     {{#each chatData.components}}
                         {{#if (eq type "required")}}
-                            <div class="flexrow" style="flex:0;background: rgba(0,0,0,0.025);margin:0 5px;padding:1px 0;">
-                                <div class="crafting-item-img" style="flex:0 0 auto;margin: 0 5px 0 0px;background-image: url('{{this.component.img}}')"></div>
+                            <div class="flexrow"
+                                 style="flex:0;background: rgba(0,0,0,0.025);margin:0 5px;padding:1px 0;">
+                                <div class="crafting-item-img"
+                                     style="flex:0 0 auto;margin: 0 5px 0 0px;background-image: url('{{this.component.img}}')"></div>
                                 <span style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{this.component.name}}</span>
                                 <div style="flex: 0 0 auto; width:20px; line-height: 20px;text-align: center;">
                                     {{#if this.hasError }}
@@ -43,7 +59,8 @@
                     {{#each chatData.components}}
                         {{#if (eq type "consumed")}}
                             <div class="flexrow" style="flex:0;margin:0 5px;padding:1px 0;">
-                                <div class="crafting-item-img" style="flex:0 0 auto;margin: 0 5px 0 0px;background-image: url('{{this.component.img}}')"></div>
+                                <div class="crafting-item-img"
+                                     style="flex:0 0 auto;margin: 0 5px 0 0px;background-image: url('{{this.component.img}}')"></div>
                                 <span style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{this.component.quantity}} {{this.component.name}}</span>
                                 <div style="flex: 0 0 auto;width:20px;line-height: 20px;text-align: center;">
                                     {{#if this.hasError }}
@@ -61,14 +78,13 @@
                             </div>
                         {{/if}}
                     {{/each}}
-                {{/with}}
-            </div>
-            <div class="scale flexcol">
-                {{#with (lookup ../chatList @key) as |chatData|}}
+                </div>
+                <div class="scale flexcol">
                     {{#each chatData.components}}
                         {{#if (eq type "produced")}}
                             <div class="flexrow" style="flex:0;margin:0 5px;padding:1px 0">
-                                <div class="crafting-item-img" style="flex: 0 0 auto;margin: 0 5px 0 0px;background-image: url('{{this.component.img}}')"></div>
+                                <div class="crafting-item-img"
+                                     style="flex: 0 0 auto;margin: 0 5px 0 0px;background-image: url('{{this.component.img}}')"></div>
                                 <span style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{this.component.quantity}} {{this.component.name}}</span>
                                 <div style="flex: 0 0 auto;width:20px;line-height: 20px;text-align: center;">
                                     {{#if this.hasError }}
@@ -87,55 +103,44 @@
                             </div>
                         {{/if}}
                     {{/each}}
-                {{/with}}
-            </div>
-            <div class="status flexcol" style="justify-content: center; border-left: 1px solid var(--color-border-light-tertiary);">
-            {{#with (lookup ../chatList @key) as |chatData|}}
-                <div style="flex:0 0 auto;height: 20px; margin:0 5px;padding:1px 0;">
-                    <div style="height: 20px;text-align: center;line-height: 20px;border: 1px solid var(--color-border-light-2);border-radius: 3px;box-shadow: 0 0 2px #fff inset;word-break: break-all;">
-                        {{#if (eq this.status "success") }}
-                            <div class="error"
-                                 style="background-color: darkgreen;margin: 2px;height: 14px;line-height: 14px;color: white;">
-                                100%
-                            </div>
-                        {{else if (eq this.status "error") }}
-                            <div class="error"
-                                 style="background-color: darkred;margin: 2px;height: 14px;line-height: 14px;color: white;">
-                                100%
-                            </div>
-                        {{else}}
-                            0%
-                        {{/if}}
-                    </div>
                 </div>
-                {{#if this.skill.total}}
-                    <div class="dice-roll"
-                         style="flex:0 0 auto; margin:auto;width:60px;padding:5px 0;display: flex;flex-direction: row;flex-wrap: wrap;justify-content: flex-start;">
-                        <div class="dice-total" style="flex: 0 0 60px;line-height: 20px;text-align: center;">
-                            {{this.skill.total}}
-                            {{#if (eq this.status "success") }}
-                                <i class="fas fa-check" style="color:darkgreen"></i>
-                            {{else if (eq this.status "error") }}
-                                <i class="fas fa-times" style="color:darkred"></i>
+                <div class="status flexcol"
+                     style="justify-content: center; border-left: 1px solid var(--color-border-light-tertiary);">
+                    <{{#if (eq this.status "active") }}a{{else}}div{{/if}} class="flexrow advanceCrafting"
+                         style="flex:0 0 auto;display: flex;flex-direction: row;flex-wrap: wrap;justify-content: flex-start; " data-id="{{@key}}">
+                        <div>{{#if (not (eq this.status "error"))}}
+                            <div style="line-height:14px;text-align:center;width:100%;height:18px;margin:1px; padding:2px; border-radius:5px; border:1px solid darkgreen;">
+                                <div style="text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;color:white;width:100%;height:100%;background: linear-gradient(to right, darkgreen {{this.tests.hitPer}}%, transparent 0);">{{this.tests.hitPer}}
+                                    %
+                                </div>
+                            </div>
+                        {{/if}}
+                            {{#if (not (eq this.status "success"))}}
+                                <div style="line-height:14px;text-align:center;width:100%;height:18px;margin:1px; padding:2px; border-radius:5px;border:1px solid darkred;">
+                                    <div style="text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;color:white;width:100%;height:100%;background: linear-gradient(to right, darkred {{this.tests.failPer}}%, transparent 0)">{{this.tests.failPer}}
+                                        %
+                                    </div>
+                                </div>
                             {{/if}}
                         </div>
-                    </div>
-                {{/if}}
-                {{#if (eq this.status "active") }}
-                    <div style="flex:1; text-align: center;padding:5px 0px;">
-                        <button class="advanceCrafting" style="width: 60px;height: 26px;line-height: 26px;margin: 1px;padding:0px" data-id="{{@key}}">
-                            <i class="fas fa-forward-step" data-id="{{@key}}"></i>
-                        </button>
-                    </div>
-                {{/if}}
+                        <div style="flex:0;margin:auto 5px">
+                            {{#if (eq this.status "active") }}
+                                <i class="fas fa-forward-step" style="width:13px; text-align:center;" data-id="{{@key}}"></i>
+                            {{else if (eq this.status "success") }}
+                                <i class="fas fa-check" style="width:13px; text-align:center;color:darkgreen"></i>
+                            {{else if (eq this.status "error") }}
+                                <i class="fas fa-times" style="width:13px; text-align:center;color:darkred"></i>
+                            {{/if}}
+                        </div>
+                    </{{#if (eq this.status "active") }}a{{else}}div{{/if}}>
+                </div>
+                <div class="option flexcol"
+                     style="justify-content:center;text-align:center;padding: 0px 5px;border-left: 1px solid var(--color-border-light-tertiary);">
+                    <a class="removeCrafting" style="flex:20px 0 0">
+                        <i class="fas fa-trash" data-id="{{@key}}"></i>
+                    </a>
+                </div>
             </div>
-            {{/with}}
-            <div class="option flexcol" style="justify-content:center;text-align:center;padding: 0px 5px;border-left: 1px solid var(--color-border-light-tertiary);">
-                <a class="removeCrafting" style="flex:20px 0 0">
-                    <i class="fas fa-trash" data-id="{{@key}}"></i>
-                </a>
-            </div>
-        </div>
-    {{/each}}
+        {{/each}}
     </div>
 </div>

@@ -18,6 +18,19 @@
       "ingredients": "Ingredients",
       "quantity": "Quantity",
       "skills": "Skill",
+      "tests": {
+        "tests": "Tests",
+        "test": "test",
+        "hits": "hits",
+        "hitsHint": "success checks needed before this test is successfully",
+        "fails": "fails",
+        "failsHint": "failed checks before crafting fails",
+        "dc": "dc",
+        "consume": "consume",
+        "consumeHint": "consumes cost on failed tests",
+        "andTestHint": "add additional Test",
+        "orTestHint": "add alternative Test"
+      },
       "tools": "Tool",
       "dc": "DC",
       "results": "Results",
@@ -36,6 +49,10 @@
     },
     "component": {
       "warning": "Your controlled Actor does not have an item named "
+    },
+    "select-dialog": {
+      "title": "Choose",
+      "preselection": "choose"
     },
     "crafting-app": {
       "title": "Beaver's Recipe Compendium",

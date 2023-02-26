@@ -52,8 +52,8 @@ export class ActorSheetTab {
             void this.app.actor.update({flags:flags});
         });
         tabBody.find(".advanceCrafting").on("click",(e)=>{
-            const id = (e.target.dataset.id as string);
-            void this.craftingList[id].endCrafting().then(()=>{
+            const id = (e.currentTarget.dataset.id as string);
+            void this.craftingList[id].continueCrafting().then(()=>{
                 this.app.render();
             });
         });

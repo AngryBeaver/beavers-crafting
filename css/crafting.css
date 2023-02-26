@@ -237,6 +237,10 @@
 }
 
 
+.beavers-crafting a.crafting-rollIcon:hover{
+    background-image:url("../../../icons/svg/d20-black.svg") !important;
+}
+
 .beavers-crafting .crafting-item-img{
     background-size: contain;
     margin: 5px;
@@ -245,8 +249,6 @@
 }
 
 .beavers-crafting .recipe .crafting-item-img{
-    background-size: contain;
-    margin: 5px;
     width:30px;
     height:30px;
 }

@@ -2,6 +2,7 @@ import {Settings} from "./Settings.js";
 import {sanitizeUuid} from "./helpers/Utility.js";
 import {getToolConfig} from "./apps/ToolConfig.js";
 import {Result} from "./Result.js";
+import {recipeSkillToTests} from "./migration.js";
 
 export class Recipe implements RecipeData {
     uuid: string;
@@ -14,6 +15,7 @@ export class Recipe implements RecipeData {
     results: {
         [key: string]: Component
     }
+    tests?: Tests;
     skill?: Skill;
     currency?: Currency;
     tool?: string;
@@ -25,6 +27,10 @@ export class Recipe implements RecipeData {
         ingredients: {};
         results: {};
         attendants: {};
+        tests: {
+            ands:{},
+            ors:{}
+        };
     }
 
     static isRecipe(item) {
@@ -64,6 +70,7 @@ export class Recipe implements RecipeData {
         this.ingredients = deserializeComponents(data.ingredients || {});
         this.results = deserializeComponents(data.results || {});
         this.skill = data.skill;
+        this.tests = data.tests;
         this.currency = data.currency;
         this.tool = data.tool;
         this.attendants = deserializeComponents(data.attendants || {});
@@ -71,7 +78,11 @@ export class Recipe implements RecipeData {
         this._trash = {
             ingredients: {},
             results: {},
-            attendants: {}
+            attendants: {},
+            tests: {
+                ands:{},
+                ors:{},
+            }
         };
 
     }
@@ -80,6 +91,7 @@ export class Recipe implements RecipeData {
         const serialized = {
             ingredients: this.serializeIngredients(),
             skill: this.skill,
+            tests: this.serializeTests(),
             results: this.serializeResults(),
             currency: this.currency,
             tool: this.tool,
@@ -91,6 +103,9 @@ export class Recipe implements RecipeData {
         }
         if (!this.skill) {
             serialized["-=skill"] = null;
+        }
+        if (!this.tests) {
+            serialized["-=tests"] = null;
         }
         if (!this.currency) {
             serialized["-=currency"] = null;
@@ -111,6 +126,20 @@ export class Recipe implements RecipeData {
 
     serializeResults() {
         return {...this.results, ...this._trash.results}
+    }
+    serializeTests() {
+        if(this.tests != undefined){
+            const serialized =  {fails:this.tests.fails,consume:this.tests.consume,ands:this.tests.ands};
+            const ands = {...this.tests.ands, ...this._trash.tests.ands}
+            Object.keys(ands).forEach(key=>{
+                if(this._trash.tests.ors[key] !== undefined){
+                    ands[key].ors = {...ands[key].ors,...this._trash.tests.ors[key]}
+                }
+            })
+            serialized.ands = ands;
+            return serialized;
+        }
+        return undefined;
     }
 
     addAttendant(entity, keyId, type) {
@@ -166,6 +195,50 @@ export class Recipe implements RecipeData {
         this._trash.results["-=" + uuidS] = null;
     }
 
+    addTestAnd() {
+        if(this.skill){
+            // @ts-ignore
+            recipeSkillToTests(this);
+            return;
+        }
+        if(this.tests == undefined){
+            this.tests = new DefaultTest();
+        }else{
+            const sorted = Object.keys(this.tests).sort();
+            // @ts-ignore
+            const nextId = sorted[sorted.length-1]-1+2;
+            this.tests.ands[nextId] = new DefaultAndTest;
+        }
+    }
+
+    addTestOr(and) {
+        if(this.tests?.ands[and] != undefined){
+            const sorted = Object.keys(this.tests?.ands[and].ors).sort();
+            // @ts-ignore
+            const nextId = sorted[sorted.length-1]-1+2;
+            this.tests.ands[and].ors[nextId] = new DefaultOrTest();
+        }
+    }
+
+    removeTestOr(and,or){
+        if(this.tests?.ands[and]?.ors[or] != undefined){
+            if(Object.keys(this.tests?.ands[and]?.ors).length <= 1) {
+                if(Object.keys(this.tests?.ands).length <= 1) {
+                    this.tests = undefined;
+                }else{
+                    delete this.tests.ands[and];
+                    this._trash.tests.ands["-="+and] = null;
+                }
+            }else{
+                delete this.tests.ands[and].ors[or];
+                if( this._trash.tests.ors[and] == undefined){
+                    this._trash.tests.ors[and] = {};
+                }
+                this._trash.tests.ors[and]["-="+or] = null;
+            }
+        }
+    }
+
     addSkill() {
         this.skill = new DefaultSkill();
     }
@@ -213,9 +286,13 @@ export class Recipe implements RecipeData {
     }
 
     async update() {
+        await this.updateData(this.serialize());
+    }
+
+    async updateData(data){
         const flags = {};
         flags[Settings.NAMESPACE] = {
-            recipe: this.serialize()
+            recipe: data
         };
         const item = await fromUuid(this.uuid);
         if (item?.update !== undefined) {
@@ -227,7 +304,26 @@ export class Recipe implements RecipeData {
 
 }
 
-class DefaultSkill implements DefaultSkill {
+export class DefaultTest implements Tests {
+    fails:number =1;
+    consume: boolean = true;
+    ands={
+        1: new DefaultAndTest()
+    }
+}
+class DefaultAndTest implements TestAnd {
+    hits:number=1;
+    ors={
+        1: new DefaultOrTest
+    };
+}
+class DefaultOrTest implements TestOr{
+    check:number=8;
+    type:TestType="skill"
+    uuid=""
+}
+
+class DefaultSkill implements Skill {
     name: string;
     dc: number = 8;
     consume: boolean = true;

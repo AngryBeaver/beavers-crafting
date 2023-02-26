@@ -22,6 +22,12 @@ interface ResultData {
         dc: number,
         total: number,
     };
+    _tests?: {
+        hits: number,
+        fails: number,
+        maxFails:number,
+        maxHits: number
+    }
     _currencyResult?: CurrencyResultData
     _chatAddition: {
         [key: string]:ComponentChatData
@@ -34,6 +40,7 @@ interface CraftingData {
     name: string,
     img: string,
     startAt: number,
+    lastAt: number,
     endAt: number,
     result: ResultData
     recipe: RecipeData
@@ -55,6 +62,8 @@ type UserInteraction =  "always" | "never" | "onSuccess";
 
 type ComponentType = "consumed" | "required" | "produced";
 
+type TestType = "skill" | "tool" | "ability" | "hit";
+
 interface ComponentChatData {
     component: ComponentData,
     type: ComponentType,
@@ -72,6 +81,14 @@ interface ChatData {
         dc: number,
         total: number,
     }
+    tests:{
+        maxHits:number,
+        maxFails:number,
+        hits:number,
+        fails:number,
+        hitPer:number,
+        failPer:number
+    }
 }
 
 interface PreCastData {
@@ -87,6 +104,27 @@ interface PreCastData {
     }
     tool?: boolean;
     currencies?: boolean;
+}
+
+interface Tests {
+    fails: number,
+    consume: boolean,
+    ands: {
+        [key: number]: TestAnd,
+    }
+}
+
+interface TestAnd {
+    hits: number,
+    ors: {
+        [key: number]: TestOr,
+    }
+}
+
+interface TestOr {
+    check: number,
+    type: TestType,
+    uuid: string
 }
 
 interface Skill {
@@ -121,6 +159,7 @@ interface RecipeData {
     results: {
         [key: string]: ComponentData
     }
+    tests?: Tests;
     skill?: Skill;
     currency?: Currency;
     tool?: string;
