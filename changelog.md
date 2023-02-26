@@ -14,6 +14,8 @@ game["beavers-crafting"].migrateDeprecateTools();
 ````
 After installing, it first all your recipes will get migrated automatically.
 If you have created compendiums with recipes you need to import them then run the migrationscripts manually and export them again.
+- useTool is now removed was deprecated since 0.7.x and is now integrated into tests.
+
 ## 2.3.x feature system independent
 ## 2.3.5 anyOf bugs
 fixed: reacitvate Setting for disable actor header link "📜Recipes"
