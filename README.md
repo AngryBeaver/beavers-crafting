@@ -1,7 +1,7 @@
 # Beaver's Crafting Module
 With this module you can create recipes to craft items. E.g. a bunch of mushrooms to brew a potion.
-You can use it for crafting, brewing, harvesting, mining, fabricating, gathering, running skillchallenges, track downtime activities, progress quests.
-for:
+
+You can use it for:
  - crafting, brewing, harvesting, mining, farbicating, gathering
  - skillChallenges
  - tracking downtime activities
