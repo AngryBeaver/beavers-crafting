@@ -1,4 +1,7 @@
 # Changelog
+## 3.0.1 v11 support
+- enables support for v11
+
 ## 3.0.x progress tracking and multiple tests
 - This module now enables tracking of your progress through a series of tests.
 - You can now specify a tool roll test in dnd5e.

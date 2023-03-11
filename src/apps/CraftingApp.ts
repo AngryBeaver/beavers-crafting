@@ -1,6 +1,6 @@
 import {FilterType, RecipeCompendium} from "./RecipeCompendium.js";
 import {Crafting} from "../Crafting.js";
-import {getDataFrom, getItem, sanitizeUuid} from "../helpers/Utility.js";
+import {getDataFrom, sanitizeUuid} from "../helpers/Utility.js";
 import {Settings} from "../Settings.js";
 import {getToolConfig} from "./ToolConfig.js";
 import {AnyOf} from "../AnyOf.js";
@@ -130,13 +130,13 @@ export class CraftingApp extends Application {
         html.find('.results .flexrow').on("click",e=>{
             const uuid = $(e.currentTarget).data("id");
             if(Settings.get(Settings.DISPLAY_RESULTS)) {
-                getItem(uuid).then(i=>i.sheet._render(true));
+                beaversSystemInterface.uuidToDocument(uuid).then(i=>i.sheet._render(true));
             }
         });
         html.find('.ingredients .flexrow').on("click",e=>{
             const uuid = $(e.currentTarget).data("id");
             if(Settings.get(Settings.DISPLAY_INGREDIENTS)) {
-                getItem(uuid).then(i=>i.sheet._render(true));
+                beaversSystemInterface.uuidToDocument(uuid).then(i=>i.sheet._render(true));
             }
         });
         this.addDragDrop(html);
@@ -171,7 +171,7 @@ export class CraftingApp extends Application {
         if(uuid != undefined){
             const uuid = $(e.currentTarget).data("id");
             const key = $(e.currentTarget).data("key");
-            getItem(uuid).then(
+            beaversSystemInterface.uuidToDocument(uuid).then(
                 item => {
                     if(AnyOf.isAnyOf(item)){
                        return this._onDropAnyOf(new AnyOf(item),key,e);
@@ -248,7 +248,7 @@ export class CraftingApp extends Application {
             }
         }
         if(Settings.get(Settings.USE_TOOL) && recipe.tool){
-            const item = await getItem(recipe.tool);
+            const item = await beaversSystemInterface.uuidToDocument(recipe.tool);
             const component = beaversSystemInterface.componentFromEntity(item);
             preCastData.tool = !result._components.required.hasError(component)
         }
