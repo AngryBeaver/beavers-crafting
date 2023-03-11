@@ -1,7 +1,12 @@
 # Beaver's Crafting Module
 With this module you can create recipes to craft items. E.g. a bunch of mushrooms to brew a potion.
-Since 3.x you can now also progress and track any downtime activities.
-You can use it for crafting, brewing, harvesting, mining, fabricating, gathering, running skillchallenges, track downtime activities, progress quests ...
+You can use it for crafting, brewing, harvesting, mining, fabricating, gathering, running skillchallenges, track downtime activities, progress quests.
+for:
+ - crafting, brewing, harvesting, mining, farbicating, gathering
+ - skillChallenges
+ - tracking downtime activities
+ - progressing quests
+by:
 - optionally granting specific or random items on success
 - optionally consuming ingredients and money 
 - optionally requireing features, tools, classes, backgrounds
