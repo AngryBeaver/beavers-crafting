@@ -2,7 +2,7 @@
     "title": "Beaver's Crafting Module",
     "description": "A Crafting Module for DnD",
     "id": "beavers-crafting",
-    "version": "3.0.0",
+    "version": "3.0.1",
     "authors": [
       {
         "name": "angryBeaver",
@@ -44,7 +44,7 @@
           "type": "module",
           "manifest": "https://github.com/AngryBeaver/beavers-system-interface/releases/latest/download/module.json",
           "compatibility": {
-            "verified": "1.0.5"
+            "verified": "1.1.0"
           }
         },
         {
@@ -52,7 +52,7 @@
           "type": "module",
           "manifest": "https://github.com/AngryBeaver/bsa-dnd5e/releases/latest/download/module.json",
           "compatibility": {
-            "verified": "1.0.0"
+            "verified": "1.0.1"
           }
         },
         {
@@ -67,6 +67,6 @@
     },
     "compatibility": {
       "minimum": "10",
-      "verified": "10"
+      "verified": "11"
     }
   }

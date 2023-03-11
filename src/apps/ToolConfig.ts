@@ -1,5 +1,5 @@
 import {Settings} from "../Settings.js";
-import {getDataFrom, getItem} from "../helpers/Utility.js";
+import {getDataFrom} from "../helpers/Utility.js";
 
 const components:ComponentData[] = [];
 
@@ -98,7 +98,7 @@ async function _setToolConfig(){
     }
 }
 async function _addToolConfig(uuid){
-    const item = await getItem(uuid);
+    const item = await beaversSystemInterface.uuidToDocument(uuid);
     const component = beaversSystemInterface.componentFromEntity(item);
     components.push(component);
 }

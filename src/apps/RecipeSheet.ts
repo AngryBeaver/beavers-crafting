@@ -1,6 +1,6 @@
 import {Recipe} from "../Recipe.js";
 import {getSystemSetting, Settings} from "../Settings.js";
-import {getDataFrom, getItem} from "../helpers/Utility.js";
+import {getDataFrom} from "../helpers/Utility.js";
 import {AnyOf} from "../AnyOf.js";
 import {getToolConfig} from "./ToolConfig.js";
 
@@ -188,19 +188,19 @@ export class RecipeSheet {
         this.recipeElement.find('.results .crafting-item-img').on("click",e=>{
             const uuid = $(e.currentTarget).data("id");
             if(Settings.get(Settings.DISPLAY_RESULTS)) {
-                getItem(uuid).then(i=>i.sheet._render(true));
+                beaversSystemInterface.uuidToDocument(uuid).then(i=>i.sheet._render(true));
             }
         });
         this.recipeElement.find('.ingredients .crafting-item-img').on("click",e=>{
             const uuid = $(e.currentTarget).data("id");
             if(Settings.get(Settings.DISPLAY_INGREDIENTS)) {
-                getItem(uuid).then(i=>i.sheet._render(true));
+                beaversSystemInterface.uuidToDocument(uuid).then(i=>i.sheet._render(true));
             }
         });
         this.recipeElement.find('.attendants .crafting-item-img').on("click",e=>{
             const uuid = $(e.currentTarget).data("id");
             if(Settings.get(Settings.DISPLAY_INGREDIENTS)) {
-                getItem(uuid).then(i=>i.sheet._render(true));
+                beaversSystemInterface.uuidToDocument(uuid).then(i=>i.sheet._render(true));
             }
         });
     }

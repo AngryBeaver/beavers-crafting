@@ -1,7 +1,6 @@
 import {Recipe} from "./Recipe.js";
 import {Settings} from "./Settings.js";
 import {RecipeCompendium} from "./apps/RecipeCompendium.js";
-import {getItem} from "./helpers/Utility.js";
 import {AnyOf} from "./AnyOf.js";
 import {Result} from "./Result.js";
 import {TestHandler} from "./TestHandler.js";
@@ -463,7 +462,7 @@ export class Crafting implements CraftingData {
     }
 
     async _rollTableToComponents(component: Component, result: Result) {
-        const table = await getItem(component.uuid);
+        const table = await beaversSystemInterface.uuidToDocument(component.uuid);
         let components: Component[] = [];
         if (!table) {
             // @ts-ignore
@@ -485,7 +484,7 @@ export class Crafting implements CraftingData {
                     }
                     uuid = "Compendium." + uuid;
                 }
-                const item = await getItem(uuid)
+                const item = await beaversSystemInterface.uuidToDocument(uuid)
                 if (!item) {
                     // @ts-ignore
                     ui.notifications.error(game.i18n.localize(`beaversCrafting.crafting-app.errors.tableItemNotFound`) + r.name);

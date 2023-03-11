@@ -1,7 +1,6 @@
 import {Recipe} from "../Recipe.js";
 import {Settings} from "../Settings.js";
 import {AnyOf} from "../AnyOf.js";
-import {getItem} from "../helpers/Utility.js";
 import {Result} from "../Result.js";
 
 export class RecipeCompendium {
@@ -112,7 +111,7 @@ export class RecipeCompendium {
 
     static async validateTool(recipe,listOfItems,result : Result): Promise<Result>{
         if( recipe.tool && Settings.get(Settings.USE_TOOL)) {
-            const item = await getItem(recipe.tool);
+            const item = await beaversSystemInterface.uuidToDocument(recipe.tool);
             const component = beaversSystemInterface.componentFromEntity(item);
             result.updateComponent("required",component);
         }
