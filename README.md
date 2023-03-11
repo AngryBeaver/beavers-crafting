@@ -6,6 +6,7 @@ for:
  - skillChallenges
  - tracking downtime activities
  - progressing quests
+ 
 by:
 - optionally granting specific or random items on success
 - optionally consuming ingredients and money 
