@@ -45,12 +45,23 @@
                 {{/if}}
             </div>
         {{/if}}
+        <div class="attendants flexcol">
+            <div class="flexrow header">
+                <div class="name">{{localize "beaversCrafting.recipe.folder"}}</div>
+                {{#if editable}}
+                    <div class="action"><i style="width:16px;display:block;margin:auto" class="fa-regular fa-circle-info" title="{{localize "beaversCrafting.recipe.folderHint"}}"></i></div>
+                {{/if}}
+            </div>
+            {{#if editable}}
+                <input type="text" name="flags.beavers-crafting.recipe.folder" placeholder="" />
+            {{/if}}
+        </div>
         {{#if useAttendants}}
             <div class="attendants flexcol">
                 <div class="flexrow header">
                     <div class="name">{{localize "beaversCrafting.recipe.attendants"}}</div>
                     {{#if editable}}
-                        <div class="action">-</div>
+                        <div class="action"></div>
                     {{/if}}
                 </div>
                 {{#each recipe.attendants}}
@@ -132,7 +143,7 @@
                 <div class="name">{{localize "beaversCrafting.recipe.ingredients"}}</div>
                 <div class="attribute">{{localize "beaversCrafting.recipe.quantity"}}</div>
                 {{#if editable}}
-                    <div class="action">-</div>
+                    <div class="action"></div>
                 {{/if}}
             </div>
             {{#each recipe.ingredients}}
@@ -363,7 +374,7 @@
                 <div class="name">{{localize "beaversCrafting.recipe.results"}}</div>
                 <div class="attribute">{{localize "beaversCrafting.recipe.quantity"}}</div>
                 {{#if editable}}
-                    <div class="action">-</div>
+                    <div class="action"></div>
                 {{/if}}
             </div>
             {{#each recipe.results}}

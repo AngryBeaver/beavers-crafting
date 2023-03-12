@@ -167,4 +167,5 @@ interface RecipeData {
         [key: string]: ComponentData
     },
     macro?: string
+    folder?: string
 }

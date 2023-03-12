@@ -23,6 +23,7 @@ export class Recipe implements RecipeData {
         [key: string]: Component
     }
     macro: string
+    folder?: string;
     _trash: {
         ingredients: {};
         results: {};
@@ -75,6 +76,7 @@ export class Recipe implements RecipeData {
         this.tool = data.tool;
         this.attendants = deserializeComponents(data.attendants || {});
         this.macro = data.macro || "";
+        this.folder = data.folder;
         this._trash = {
             ingredients: {},
             results: {},
@@ -96,7 +98,8 @@ export class Recipe implements RecipeData {
             currency: this.currency,
             tool: this.tool,
             attendants: this.serializeAttendants(),
-            macro: this.macro
+            macro: this.macro,
+            folder: this.folder
         }
         if (!this.tool) {
             serialized["-=tool"] = null;
@@ -112,6 +115,9 @@ export class Recipe implements RecipeData {
         }
         if (!this.macro) {
             serialized["-=macro"] = null;
+        }
+        if(!this.folder) {
+            serialized["-=folder"] = null;
         }
         return serialized;
     }
