@@ -228,7 +228,7 @@ export class Result implements ResultApi, ResultData {
         }
         if (type === "consumed") {
             userInteraction = "onSuccess";
-            if (this._recipe.skill?.consume) {
+            if (this._recipe.skill?.consume || this._recipe.tests?.consume) {
                 userInteraction = "always";
             }
         }

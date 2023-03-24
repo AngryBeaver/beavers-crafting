@@ -110,10 +110,12 @@ export class Crafting implements CraftingData {
             await this.endCrafting();
         }
         if(Settings.get(Settings.TIME_TO_CRAFT) === "interaction"){
+            if(this.result.hasError()){
+                this.endCrafting();
+            }
             this.actor.sheet.activeTab = Settings.ACTOR_TAB_ID;
             await this.actor.sheet.render(true);
             this.actor.sheet.bringToTop();
-
         }
         return this.result;
 
