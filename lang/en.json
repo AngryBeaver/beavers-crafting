@@ -42,8 +42,8 @@
         "button": "save"
       },
       "folder": "Folder",
-      "folderHint": "You can create subfolder by separating words with ':>' e.g. Folder:>Subfolder",
-      "folderPlaceHolder":"Folder:>Subfolder"
+      "folderHint": "You can create subfolder by separating words with '.' e.g. Folder.Subfolder",
+      "folderPlaceHolder":"Folder.Subfolder"
     },
     "anyOf": {
       "dropItem": "drop item",

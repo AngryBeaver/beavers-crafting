@@ -12,6 +12,12 @@ export class CraftingApp extends Application {
         actor,
         filter,
         recipes:Recipe[],
+        folders:{
+            [key: string]: {
+                folders: string[],
+                recipes: Recipe[]
+            }
+        }
         index,
         filterItems:{},
         recipe?:Recipe,
@@ -26,7 +32,8 @@ export class CraftingApp extends Application {
             filter: FilterType.available,
             recipes: [],
             index: 0,
-            filterItems: {}
+            filterItems: {},
+            folders: {},
         };
         if(this.element.length > 0){
             this.bringToTop();
@@ -56,6 +63,44 @@ export class CraftingApp extends Application {
         if(Object.values(data.filterItems).length != 0){
             recipes = await RecipeCompendium.filterForItems(recipes,Object.values(data.filterItems));
         }
+        recipes.sort(
+            (a,b)=>{
+            if(a.folder == undefined){
+                if(b.folder != undefined){
+                    return -1
+                }
+                return 0
+            }else{
+                if(b.folder == undefined){
+                    return 1
+                }else{
+                    if(a.folder < b.folder){
+                        return -1
+                    }else if(a.folder > b.folder){
+                        return 1;
+                    }else {
+                        if(a.name < b.name){
+                            return -1
+                        }
+                        if(a.name > b.name){
+                            return 1;
+                        }
+                        return 0
+                    }
+                }
+            }
+        });
+
+        recipes.forEach(recipe=>{
+            const folder = recipe.folder || "";
+            if(!data.folders[folder]){
+                data.folders[folder] = {
+                    folders: folder.split("."),
+                    recipes:[]
+                };
+            }
+            data.folders[folder].recipes.push(recipe);
+        });
         data.recipes = recipes;
         data.recipe = data.recipes[data.index];
         data.content = null;

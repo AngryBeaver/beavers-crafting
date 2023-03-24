@@ -1,34 +1,44 @@
 <div class="flexcol" style="height:100%">
-    <div class="compendium header flexrow">
-        <div class="entry-filter">
-            <select class="search">
-                {{#select filter}}
-                    <option value="2">all</option>
-                    <option value="1">available</option>
-                    <option value="0">usable</option>
-                    <option value="3">own</option>
-                {{/select}}
-            </select>
-        </div>
-        <div class="filter">filter by item:</div>
-        <div class="drop-area">
-            {{#each filterItems}}
-                <a class="item flexrow" data-id="{{@key}}" title="{{this.name}}">
-                    <img src="{{this.img}}" alt="{{this.name}}">
-                </a>
-            {{/each}}
-        </div>
-    </div>
     <div class="flexrow" style="height:calc( 100% - 40px)">
         <aside class="sidebar flexcol">
-            <nav>
-                {{#each recipes}}
-                    <a class="item flexrow {{#if (eq ../index @key)}}selected{{/if}}" data-id="{{@key}}">
-                        <img src="{{this.img}}" alt="">
-                        <span>{{this.name}}</span>
-                    </a>
-                {{/each}}
-            </nav>
+            <div style="flex:0;height:30px;" class="flexrow">
+                <i style="width:25px;flex: 0;margin: auto;display: block;padding: 0px 5px;" class="fas fa-search"></i>
+                <select class="search">
+                    {{#select filter}}
+                        <option value="2">all</option>
+                        <option value="1">available</option>
+                        <option value="0">usable</option>
+                        <option value="3">own</option>
+                    {{/select}}
+                </select>
+                <i style="width:25px;flex: 0;margin: auto;display: block;padding: 0px 5px;"
+                   class="fas fa-sort-amount-up fa-fw"></i>
+            </div>
+            <div class="content">
+                <nav>
+                    {{#each folders}}
+                        {{#each this.folders}}
+                            
+                        <div class="folder">
+                            <div class="flexrow name">
+                                <i style="flex:0;margin:5px" class="fas fa-folder-open fa-fw"></i>
+                                {{this}}
+                            </div>
+                            <div class="folderContent">
+                        {{/each}}
+                        {{#each this.recipes}}
+                            <a class="recipeItem flexrow {{#if (eq ../index @key)}}selected{{/if}}" data-id="{{@key}}">
+                                <img src="{{this.img}}" alt="">
+                                <span>{{this.name}}</span>
+                            </a>
+                        {{/each}}
+                        {{#each this.folders}}
+                            </div>
+                        </div>
+                        {{/each}}
+                    {{/each}}
+                </nav>
+            </div>
         </aside>
         <section class="flexcol">
             <div class="sheet-body recipe">
