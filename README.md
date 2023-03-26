@@ -203,6 +203,7 @@ breaking change 0.1.x -> 0.2.x
 ## Notes
 ### Currency reorder
 When adding costs to your recipe your currency will get exchanged to highest values.
+You can however turn off currencyExchange then you need to have the exact currency values.
 ### Items reorder
 Actor Items will get merged to stacks in the crafting process. 
 (only those that match ingredients or results)

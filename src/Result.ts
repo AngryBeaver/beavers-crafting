@@ -1,4 +1,5 @@
 import { Recipe} from "./Recipe.js";
+import {Settings} from "./Settings.js";
 
 export class Result implements ResultApi, ResultData {
     _actorUpdate: {
@@ -358,7 +359,7 @@ export class CurrencyResult implements CurrencyResultData {
                 currencies[this.name] = currencies[this.name]*-1;
             }
             try {
-                await beaversSystemInterface.actorCurrenciesAdd(actor, currencies);
+                await beaversSystemInterface.actorCurrenciesAdd(actor, currencies,Settings.get(Settings.CURRENCY_EXCHANGE));
                 this.isConsumed = !revert;
             }catch (e){
                 console.error("Beavers Crafting | currency Error:", e);
