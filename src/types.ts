@@ -44,7 +44,8 @@ interface CraftingData {
     endAt: number,
     result: ResultData
     recipe: RecipeData
-    isFinished?:boolean
+    isFinished?:boolean,
+    restore: any[]
 }
 
 interface ComponentResultsData {

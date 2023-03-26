@@ -2,6 +2,7 @@
 ## 3.0.x progress tracking and multiple tests
 ## 3.0.2 
 - fix consume on failed check
+- fix restore consumed items
 
 ## 3.0.1 v11 support
 - enables support for v11

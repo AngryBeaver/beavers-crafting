@@ -44,7 +44,8 @@
           "type": "module",
           "manifest": "https://github.com/AngryBeaver/beavers-system-interface/releases/latest/download/module.json",
           "compatibility": {
-            "verified": "1.1.0"
+            "minimum" : "2.0.0",
+            "verified": "2.0.0"
           }
         },
         {

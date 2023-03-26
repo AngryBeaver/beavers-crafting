@@ -131,6 +131,9 @@ export class Result implements ResultApi, ResultData {
                 hasError = true;
             }
         }
+        if (this._hasException ){
+            hasError = true;
+        }
         return hasError
     }
 
