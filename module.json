@@ -53,7 +53,7 @@
           "type": "module",
           "manifest": "https://github.com/AngryBeaver/bsa-dnd5e/releases/latest/download/module.json",
           "compatibility": {
-            "verified": "1.0.1"
+            "verified": "2.0.0"
           }
         },
         {
