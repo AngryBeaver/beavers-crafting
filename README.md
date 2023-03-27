@@ -1,7 +1,13 @@
 # Beaver's Crafting Module
 With this module you can create recipes to craft items. E.g. a bunch of mushrooms to brew a potion.
-Since 3.x you can now also progress and track any downtime activities.
-You can use it for crafting, brewing, harvesting, mining, fabricating, gathering, running skillchallenges, track downtime activities, progress quests ...
+
+You can use it for:
+ - crafting, brewing, harvesting, mining, farbicating, gathering
+ - skillChallenges
+ - tracking downtime activities
+ - progressing quests
+ 
+by:
 - optionally granting specific or random items on success
 - optionally consuming ingredients and money 
 - optionally requireing features, tools, classes, backgrounds
@@ -136,7 +142,7 @@ Every Character will now have access to 50+ recipes to brew potions.
 
 ## Latest features:
 have a look at the changelog.md
-### 3.0.0 progress tracking and multiple tests
+### 3.0.x progress tracking and multiple tests
 This module now enables tracking of your progress through a series of tests.
 While you can track your crafting this features enables a new purpose of this module.
 
@@ -197,6 +203,7 @@ breaking change 0.1.x -> 0.2.x
 ## Notes
 ### Currency reorder
 When adding costs to your recipe your currency will get exchanged to highest values.
+You can however turn off currencyExchange then you need to have the exact currency values.
 ### Items reorder
 Actor Items will get merged to stacks in the crafting process. 
 (only those that match ingredients or results)

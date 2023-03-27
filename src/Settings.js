@@ -16,6 +16,7 @@ export class Settings {
     static ANYOF_SUBTYPE = "AnyOf";
     static MAJOR_VERSION = "majorVersion";
     static ACTOR_TAB_ID = "beavers-crafting";
+    static CURRENCY_EXCHANGE = "currencyExchange"
 
     static init() {
         game.settings.register(this.NAMESPACE, this.CREATE_ITEM_TITLE, {
@@ -77,6 +78,14 @@ export class Settings {
         game.settings.register(this.NAMESPACE, this.DISPLAY_INGREDIENTS, {
             name: game.i18n.localize('beaversCrafting.settings.displayIngredients.name'),
             hint: game.i18n.localize('beaversCrafting.settings.displayIngredients.hint'),
+            scope: "world",
+            config: true,
+            default: true,
+            type: Boolean,
+        });
+        game.settings.register(this.NAMESPACE, this.CURRENCY_EXCHANGE, {
+            name: game.i18n.localize('beaversCrafting.settings.currencyExchange.name'),
+            hint: game.i18n.localize('beaversCrafting.settings.currencyExchange.hint'),
             scope: "world",
             config: true,
             default: true,

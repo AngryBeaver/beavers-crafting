@@ -16,6 +16,7 @@ export class Crafting implements CraftingData {
     result: Result;
     recipe: Recipe;
     actor;
+    restore:any[];
 
     constructor(craftingData: CraftingData, actor) {
         this.uuid = craftingData.uuid || actor.uuid + ".Crafting." + randomID();
@@ -27,6 +28,7 @@ export class Crafting implements CraftingData {
         this.img = craftingData.img;
         this.recipe = new Recipe("invalid", "invalid", craftingData.name, craftingData.img, craftingData.recipe);
         this.result = new Result(craftingData.result, actor);
+        this.restore = craftingData.restore || [];
         this.actor = actor;
     }
 
@@ -40,7 +42,8 @@ export class Crafting implements CraftingData {
             endAt: this.endAt,
             result: this.result.serialize(),
             recipe: this.recipe.serialize(),
-            isFinished: this.isFinished
+            isFinished: this.isFinished,
+            restore: this.restore,
         }
     }
 
@@ -52,7 +55,8 @@ export class Crafting implements CraftingData {
             lastAt:  game["time"].worldTime,
             endAt: 0,
             result: Result.from(recipe, actor),
-            recipe: recipe
+            recipe: recipe,
+            restore: []
         }
         return new Crafting(craftingData, actor);
     }
@@ -110,10 +114,12 @@ export class Crafting implements CraftingData {
             await this.endCrafting();
         }
         if(Settings.get(Settings.TIME_TO_CRAFT) === "interaction"){
+            if(this.result.hasError()){
+                this.endCrafting();
+            }
             this.actor.sheet.activeTab = Settings.ACTOR_TAB_ID;
             await this.actor.sheet.render(true);
             this.actor.sheet.bringToTop();
-
         }
         return this.result;
 
@@ -241,7 +247,8 @@ export class Crafting implements CraftingData {
             }
         }
         try{
-            await beaversSystemInterface.actorComponentListAdd(this.actor,componentList);
+            const itemChange = await beaversSystemInterface.actorComponentListAdd(this.actor,componentList);
+            this.restore = itemChange.delete;
         }catch(e){
             // @ts-ignore
             ui.notifications.error(e.message)
@@ -249,12 +256,12 @@ export class Crafting implements CraftingData {
             return;
         }
         this.actor = await fromUuid(this.actor.uuid);
-        for (const componentResult of this.result._components.consumed._data) {
+        for (const componentResult of this.result._components.required._data) {
             if (componentResult.userInteraction !== "never") {
                 componentResult.setProcessed(true);
             }
         }
-        for (const componentResult of this.result._components.required._data) {
+        for (const componentResult of this.result._components.consumed._data) {
             if (componentResult.userInteraction !== "never") {
                 componentResult.setProcessed(true);
             }
@@ -266,7 +273,7 @@ export class Crafting implements CraftingData {
         this.actor = await fromUuid(this.actor.uuid); //refresh Actor
         const componentList: Component[] = [];
         for (const componentResult of this.result._components.required._data) {
-            const component = beaversSystemInterface.componentCreate(componentResult.component);
+            let component = beaversSystemInterface.componentCreate(componentResult.component);
             if (componentResult.userInteraction === "always" || (componentResult.userInteraction === "onSuccess" && !this.result.hasError())) {
                 if (!componentResult.isProcessed){
                     componentList.push(component);
@@ -274,12 +281,18 @@ export class Crafting implements CraftingData {
             } else {
                 if (componentResult.isProcessed) {
                     component.quantity = component.quantity * -1;
+                    this.restore.forEach(r=>{
+                        if(component.isSame(r)){
+                            r.quantity = component.quantity;
+                            component = beaversSystemInterface.componentCreate(r);
+                        }
+                    })
                     componentList.push(component);
                 }
             }
         }
         for (const componentResult of this.result._components.consumed._data) {
-            const component = beaversSystemInterface.componentCreate(componentResult.component);
+            let component = beaversSystemInterface.componentCreate(componentResult.component);
             if (componentResult.userInteraction === "always" || (componentResult.userInteraction === "onSuccess" && !this.result.hasError())) {
                 if (!componentResult.isProcessed){
                     componentList.push(component);
@@ -287,12 +300,18 @@ export class Crafting implements CraftingData {
             } else {
                 if (componentResult.isProcessed) {
                     component.quantity = component.quantity * -1;
+                    this.restore.forEach(r=>{
+                        if(component.isSame(r)){
+                            r.quantity = component.quantity;
+                            component = beaversSystemInterface.componentCreate(r);
+                        }
+                    })
                     componentList.push(component);
                 }
             }
         }
         for (const componentResult of this.result._components.produced._data) {
-            const component = beaversSystemInterface.componentCreate(componentResult.component);
+            let component = beaversSystemInterface.componentCreate(componentResult.component);
             if (componentResult.userInteraction === "always" || (componentResult.userInteraction === "onSuccess" && !this.result.hasError())) {
                 if (!componentResult.isProcessed){
                     componentList.push(component);
@@ -300,6 +319,12 @@ export class Crafting implements CraftingData {
             } else {
                 if (componentResult.isProcessed) {
                     component.quantity = component.quantity * -1;
+                    this.restore.forEach(r=>{
+                        if(component.isSame(r)){
+                            r.quantity = component.quantity;
+                            component = beaversSystemInterface.componentCreate(r);
+                        }
+                    })
                     componentList.push(component);
                 }
             }
@@ -499,6 +524,7 @@ export class Crafting implements CraftingData {
 
     end() {
         this.isFinished = true;
+        this.restore = [];
         this.endAt = game["time"].worldTime;
     }
 
