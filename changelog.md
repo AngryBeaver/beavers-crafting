@@ -1,4 +1,14 @@
 # Changelog
+## 3.1.0
+- add folder structure
+- ui redesign beavers recipe compendium add responsiveness
+- add precast currency
+- add hit progression text
+- fix wsiwyg type selection does not change type-sub selection.
+- todo add instruction text
+- todo add searchlist
+- todo fix more then two tests
+
 ## 3.0.x progress tracking and multiple tests
 ## 3.0.2 
 - fix consume on failed check

@@ -1,7 +1,7 @@
 <div class="flexcol" style="height:100%">
     <div class="flexrow" style="height:calc( 100% - 40px)">
         <aside class="sidebar flexcol">
-            <div style="flex:0;height:30px;" class="flexrow">
+            <div style="flex:0;min-height:34px;line-height:34px" class="flexrow">
                 <i style="width:25px;flex: 0;margin: auto;display: block;padding: 0px 5px;" class="fas fa-search"></i>
                 <select class="search">
                     {{#select filter}}
@@ -11,45 +11,17 @@
                         <option value="3">own</option>
                     {{/select}}
                 </select>
-                <i style="width:25px;flex: 0;margin: auto;display: block;padding: 0px 5px;"
-                   class="fas fa-sort-amount-up fa-fw"></i>
+                <a style="width:25px;flex: 0;margin: auto;display: block;padding: 0px 5px;"
+                   class="fas fa-sort-amount-up fa-fw"></a>
             </div>
             <div class="content">
-                <nav>
-                    {{#each folders}}
-                        {{#each this.folders}}
-                            
-                        <div class="folder">
-                            <div class="flexrow name">
-                                <i style="flex:0;margin:5px" class="fas fa-folder-open fa-fw"></i>
-                                {{this}}
-                            </div>
-                            <div class="folderContent">
-                        {{/each}}
-                        {{#each this.recipes}}
-                            <a class="recipeItem flexrow {{#if (eq ../index @key)}}selected{{/if}}" data-id="{{@key}}">
-                                <img src="{{this.img}}" alt="">
-                                <span>{{this.name}}</span>
-                            </a>
-                        {{/each}}
-                        {{#each this.folders}}
-                            </div>
-                        </div>
-                        {{/each}}
-                    {{/each}}
+                <nav class="navigation">
+                    {{>beavers-recipe-folders}}
                 </nav>
             </div>
         </aside>
-        <section class="flexcol">
-            <div class="sheet-body recipe">
-                {{#if content}}
-                    {{{content}}}
-                {{/if}}
-            </div>
-            <button class="dialog-button ok default" data-button="ok">
-                <i class="fas fa-check"></i>
-                {{localize "beaversCrafting.crafting-app.button"}}
-            </button>
+        <section style="height:100%" class="sheet-body">
+
         </section>
     </div>
 </div>

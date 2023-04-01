@@ -1,0 +1,16 @@
+<div class="flexrow component" data-key="{{key}}" data-id="{{component.uuid}}">
+    <div class="flexrow {{#if clickable}}clickable{{/if}}" data-key="{{key}}" data-id="{{component.uuid}}">
+        <img src="{{component.img}}"/>
+        <span class="name">{{component.name}}</span>
+    </div>
+    <div class="attribute flexrow">
+        {{component.quantity}}
+    </div>
+    <div class="attribute flexrow">
+        {{#if (eq check.isAvailable true) }}
+            <i class="fas fa-check"></i>
+        {{else if (eq check.isAvailable false) }}
+            <i class="fas fa-times"></i>
+        {{/if}}
+    </div>
+</div>

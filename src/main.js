@@ -105,7 +105,15 @@ Hooks.once("beavers-system-interface.ready", async function(){
             })
         }
     });
-
+    getTemplate('modules/beavers-crafting/templates/beavers-recipe-folders.hbs').then(t=>{
+        Handlebars.registerPartial('beavers-recipe-folders', t);
+    });
+    getTemplate('modules/beavers-crafting/templates/beavers-recipe-test.hbs').then(t=>{
+        Handlebars.registerPartial('beavers-recipe-test', t);
+    });
+    getTemplate('modules/beavers-crafting/templates/beavers-recipe-component.hbs').then(t=>{
+        Handlebars.registerPartial('beavers-recipe-component', t);
+    })
 });
 
 //fucking stupid handlebars !!!
@@ -114,4 +122,7 @@ Handlebars.registerHelper('hasKey', function (param1, key, options) {
         return options.fn(this);
     }
     return options.inverse(this);
+});
+Handlebars.registerHelper('isEmpty', function (object, options) {
+    return Object.keys(object).length === 0;
 });

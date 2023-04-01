@@ -29,7 +29,9 @@
         "consume": "consume",
         "consumeHint": "consumes cost on failed tests",
         "andTestHint": "add additional Test",
-        "orTestHint": "add alternative Test"
+        "orTestHint": "add alternative Test",
+        "skill":"Skill:",
+        "ability": "Ability:"
       },
       "tools": "Tool",
       "dc": "DC",
@@ -59,12 +61,18 @@
     },
     "crafting-app": {
       "title": "Beaver's Recipe Compendium",
-      "button": "Craft",
+      "button": "Start",
       "errors": {
         "tableNotFound": "RollTable not found for : ",
         "tableNotValid": "RollTable return invalid Object : ",
         "itemNotFound": "Item not found in RollTable for :"
-      }
+      },
+      "cost": "Cost",
+      "instruction": "Instruction",
+      "required": "Required",
+      "result": "Result",
+      "pass": "pass",
+      "before": "before"
     },
     "settings": {
       "createItemTitle": {

@@ -80,7 +80,7 @@ export class Crafting implements CraftingData {
         await this.checkAttendants();
         await this.evaluateAnyOf();
         RecipeCompendium.validateRecipeToItemList(Object.values(this.recipe.ingredients), this.actor.items, this.result);
-        await this.checkCurrency();
+        await this.payCurrency();
         await this.addOutput();
         await this.executeMacro();
         await this.processInput();
@@ -208,6 +208,12 @@ export class Crafting implements CraftingData {
     }
 
     async checkCurrency() {
+        if (this.recipe.currency) {
+            await this.result.checkCurrency(this.recipe.currency);
+        }
+    }
+
+    async payCurrency() {
         if (this.recipe.currency) {
             await this.result.payCurrency(this.recipe.currency);
         }
@@ -400,14 +406,7 @@ export class Crafting implements CraftingData {
         components.push(...Object.values(this.result._chatAddition).filter(s=>s.component.type !== "Currency"));
 
         if(this.result._currencyResult) {
-            const configCurrency = beaversSystemInterface.configCurrencies.find(c=>c.id===this.result._currencyResult?.name);
-            const component = configCurrency?.component?configCurrency.component:beaversSystemInterface.componentCreate(
-                {
-                    type:"Currency",
-                    name:configCurrency?.label,
-                    img:'icons/commodities/currency/coins-assorted-mix-copper-silver-gold.webp'
-                });
-            component.quantity = this.result._currencyResult.value * -1;
+            const component = getCurrencyComponent(this.result._currencyResult?.name,this.result._currencyResult.value * -1)
             components.push({
                 component: component,
                 hasError: this.result._currencyResult.hasError,
@@ -527,6 +526,16 @@ export class Crafting implements CraftingData {
         this.restore = [];
         this.endAt = game["time"].worldTime;
     }
+}
 
-
+export function getCurrencyComponent(id:string, quantity:number): Component{
+    const configCurrency = beaversSystemInterface.configCurrencies.find(c=>c.id===id);
+    const component = configCurrency?.component?configCurrency.component:beaversSystemInterface.componentCreate(
+        {
+            type:"Currency",
+            name:configCurrency?.label,
+            img:'icons/commodities/currency/coins-assorted-mix-copper-silver-gold.webp'
+        });
+    component.quantity = quantity;
+    return component;
 }

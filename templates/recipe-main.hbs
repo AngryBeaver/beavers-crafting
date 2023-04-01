@@ -244,6 +244,7 @@
                                             <select {{#unless ../../editable}}disabled{{/unless}}
                                                     name="flags.beavers-crafting.recipe.tests.ands.{{@../key}}.ors.{{@key}}.uuid">
                                                 {{#select this.uuid}}
+                                                        <option selected disabled value=""></option>
                                                     {{#each ../../skills}}
                                                         <option value="{{this.id}}">{{this.label}}</option>
                                                     {{/each}}
@@ -254,6 +255,7 @@
                                             <select {{#unless ../../editable}}disabled{{/unless}}
                                                     name="flags.beavers-crafting.recipe.tests.ands.{{@../key}}.ors.{{@key}}.uuid">
                                                 {{#select this.uuid}}
+                                                        <option selected disabled value=""></option>
                                                     {{#each ../../abilities}}
                                                         <option value="{{this.id}}">{{this.label}}</option>
                                                     {{/each}}
@@ -265,6 +267,7 @@
                                                 <select {{#unless ../../editable}}disabled{{/unless}}
                                                         name="flags.beavers-crafting.recipe.tests.ands.{{@../key}}.ors.{{@key}}.uuid">
                                                     {{#select this.uuid}}
+                                                            <option selected disabled value=""></option>
                                                         {{#each ../../tools}}
                                                             <option value="{{this.uuid}}" img="{{this.img}}">
                                                                 {{this.name}}
@@ -276,7 +279,11 @@
                                         {{/if}}
 
                                         {{#if (eq this.type "hit")}}
-
+                                            <input {{#unless ../../editable}}disabled{{/unless}}
+                                                   name="flags.beavers-crafting.recipe.tests.ands.{{@../key}}.ors.{{@key}}.uuid"
+                                                   type="text"
+                                                   placeholder="..."
+                                                   value="{{this.uuid}}"/>
                                         {{else}}
                                             <div class="attribute flexrow" style="line-height:20px">
                                                 {{localize "beaversCrafting.recipe.tests.dc"}}:
@@ -290,7 +297,7 @@
                                     </div>
                                     <div class="flexrow" style="flex-wrap:nowrap">
                                         <div class="flexrow">
-                                            <select {{#unless ../../editable}}disabled{{/unless}}
+                                            <select class="test-type" data-and="{{@../key}}" data-or="{{@key}}" {{#unless ../../editable}}disabled{{/unless}}
                                                     name="flags.beavers-crafting.recipe.tests.ands.{{@../key}}.ors.{{@key}}.type">
                                                 {{#select this.type}}
                                                     <option value="skill">Skill</option>

@@ -104,7 +104,7 @@ interface PreCastData {
         }
     }
     tool?: boolean;
-    currencies?: boolean;
+    currencies?: { isAvailable: boolean }
 }
 
 interface Tests {

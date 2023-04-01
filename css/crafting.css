@@ -123,7 +123,7 @@
 }
 
 .beavers-crafting.crafting-app .window-content {
-    overflow-y:auto;
+    overflow-y:hidden;
     height:100%;
 }
 
@@ -136,46 +136,6 @@
     line-height:40px;
     border-bottom: 1px solid var(--color-border-light-primary);
     flex: 0 0 40px;
-}
-
-.beavers-crafting.crafting-app aside.sidebar{
-    flex: 0 0 200px;
-    height: 100%;
-    width: 200px;
-    border-right: 1px solid var(--color-border-light-primary);
-    font-size: var(--font-size-12);
-}
-.beavers-crafting.crafting-app .sidebar .content{
-    overflow-y: scroll;
-}
-
-.beavers-crafting.crafting-app nav .item{
-    height:30px;
-    line-height:30px;
-    margin:5px;
-    border-radius: 5px;
-}
-
-.beavers-crafting.crafting-app nav .item img{
-    flex:0 0 30px;
-    height: 30px;
-    margin-right:5px;
-    border-radius: 5px;
-}
-
-.beavers-crafting.crafting-app nav .item span{
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.beavers-crafting.crafting-app .sheet-body{
-    padding:5px;
-}
-
-.beavers-crafting.crafting-app nav .item.selected{
-    box-shadow: 6px 6px 10px hsl(300deg 15% 25% / 30%) inset;
-    background-color: rgba(0, 0, 0, 0.05);
 }
 
 .beavers-crafting .dialog-button {
@@ -339,24 +299,192 @@
 }
 
 .beavers-crafting .fa-times{
-    color:#b94a48
+    color:#b94a48;
+    margin: auto;
+    width: 14px;
+    padding: 0px 0px 0px 3px;
 }
 .beavers-crafting .fa-check{
-    color:#468847
-}
-.beavers-crafting .folderContent {
-    margin-left:10px
+    color:#468847;
+    margin: auto;
 }
 
-.beavers-crafting .folder .name{
+.beavers-crafting.crafting-app aside.sidebar{
+    flex: 0 0 200px;
+    height: 100%;
+    width: 200px;
+    border-right: 2px groove #fff;
+    font-size: var(--font-size-12);
+}
+.beavers-crafting.crafting-app .sidebar .content{
+    overflow-y: scroll;
+    border-top: 2px groove #fff;
+    margin-top: 2px;
+}
+
+.beavers-crafting.crafting-app .sheet-body {
+    height:100%;
+}
+
+.beavers-crafting.crafting-app .sheet-body .main{
+    overflow-y: scroll;
+    border-top: 2px groove #fff;
+    margin-top: 2px;
+    height:calc( 100% - 64px );
+}
+
+.beavers-crafting.crafting-app .folderContent {
+    padding-left:10px;
+}
+
+.beavers-crafting.crafting-app .folderContent .folderContent {
+    padding-left:12px;
+    border-left: 1px solid dimgrey;
+}
+.beavers-crafting.crafting-app img {
+    border: 1px solid transparent;
+}
+
+.beavers-crafting.crafting-app .folderName{
     line-height:22px;
     height:22px;
-    border-bottom: 1px solid dimgrey;
-}
-.beavers-crafting .folderContent .folder .name{
-    border-left: 1px solid dimgrey;
 }
 
-.beavers-crafting .folderContent .recipeItem{
+.beavers-crafting.crafting-app .recipeItem {
+    line-height: 34px;
+    flex-wrap:nowrap;
+}
+
+.beavers-crafting.crafting-app .recipeItem span.name {
+    color: #4b4a44;
+    font-weight: 700;
+    font-size: 16px;
+    font-family: "Modesto Condensed", "Palatino Linotype", serif;
+    overflow:hidden;
+    text-overflow: ellipsis;
+}
+
+.beavers-crafting.crafting-app .recipeItem img {
+    height: 30px;
+    width: 30px;
+    flex: 0;
+    border-radius: 5px;
+    margin: 2px;
+}
+
+
+.beavers-crafting.crafting-app .recipeItem.selected a {
+    box-shadow: inset 0px 0px 10px;
+    border-radius: 5px;
+}
+
+.beavers-crafting.crafting-app .folderContent span.border {
     border-left: 1px solid dimgrey;
+    width:5px;
+}
+.beavers-crafting.crafting-app .folderContent span.border.top {
+    border-bottom: 1px solid dimgrey;
+}
+
+.beavers-crafting.crafting-app .folder.close>.folderContent {
+    display:none;
+}
+
+.beavers-crafting.crafting-app .folder.close>.folderName .fa-folder-open {
+    display:none;
+}
+
+.beavers-crafting.crafting-app .folder.open>.folderName .fa-folder {
+    display:none;
+}
+
+.beavers-crafting.crafting-app .folder.open>.folderName .fa-clipboard {
+    display:none;
+}
+.beavers-crafting.crafting-app .folder.close>.folderName .fa-clipboard-list-check {
+    display:none;
+}
+
+.beavers-crafting.crafting-app .main .header {
+    height: 22px;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.05);
+    border: 2px groove #eeede0;
+    font-weight: bold;
+    padding-left: 5px;
+    font-family: "Modesto Condensed", "Palatino Linotype", serif;
+    text-align: left;
+    line-height:20px;
+    color: dimgrey;
+    flex:0;
+    min-width:200px;
+}
+
+.beavers-crafting.crafting-app .main .section {
+    border: 2px groove #eeede0;
+    padding: 2px;
+}
+
+.beavers-crafting.crafting-app .test-description {
+    line-height: 22px;
+    flex-wrap:nowrap;
+}
+
+.beavers-crafting.crafting-app .test-description .name, .beavers-crafting.crafting-app .component .name {
+    overflow:hidden;
+    text-overflow: ellipsis;
+    white-space:nowrap;
+    width:0px;
+}
+
+.beavers-crafting.crafting-app .test-description img {
+    height: 18px;
+    width: 18px;
+    flex: 0;
+    border-radius: 4px;
+    margin: 2px;
+}
+.beavers-crafting.crafting-app .test-description .attribute {
+    flex:0;
+    padding-left:5px;
+}
+
+.beavers-crafting.crafting-app .test-section {
+    background-color: rgba(0, 0, 0, 0.1);
+    border: 1px solid grey;
+    border-radius: 5px;
+    margin: 2px;
+    padding: 1px;
+}
+
+.beavers-crafting.crafting-app .test-header {
+    text-align: right;
+    flex-direction: row-reverse;
+    font-size: x-small;
+    color: white;
+}
+
+.beavers-crafting .seperator{
+    border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+    border-left: 60px solid transparent;
+    border-right: 60px solid transparent;
+    flex:0;
+}
+
+.beavers-crafting.crafting-app .component {
+    line-height: 32px;
+    flex-wrap:nowrap;
+    flex:0;
+}
+
+.beavers-crafting.crafting-app .component img {
+    height: 28px;
+    width: 28px;
+    flex: 0;
+    border-radius: 4px;
+    margin: 2px;
+}
+.beavers-crafting.crafting-app .component .attribute {
+    flex:0;
+    padding-left:5px;
 }

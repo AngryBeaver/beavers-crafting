@@ -1,0 +1,41 @@
+<div class="flexrow test-description">
+{{#if (eq this.type "skill")}}
+        {{#each skills}}
+            {{#if (eq ../this.uuid this.id)}}
+                <div class="flexrow">
+                    {{localize "beaversCrafting.recipe.tests.skill"}}
+                     <span class="name">{{this.label}}</span>
+                </div>
+            {{/if}}
+        {{/each}}
+{{/if}}
+{{#if (eq this.type "ability")}}
+        {{#each abilities}}
+            {{#if (eq ../this.uuid this.id)}}
+                <div class="flexrow">
+                    {{localize "beaversCrafting.recipe.tests.ability"}}
+                    <span class="name">{{this.label}}</span>
+                </div>
+            {{/if}}
+        {{/each}}
+{{/if}}
+{{#if (eq this.type "tool")}}
+        {{#each tools}}
+            {{#if (eq ../this.uuid this.uuid)}}
+                <div class="flexrow">
+                    <img src="{{this.img}}">
+                    <span class="name">{{this.name}}</span>
+                </div>
+            {{/if}}
+        {{/each}}
+{{/if}}
+{{#if (eq this.type "hit")}}
+    <div class="flexrow">
+        <span class="name">{{this.uuid}}</span>
+    </div>
+{{else if this.check}}
+        <div class="attribute flexrow">
+            {{localize "beaversCrafting.recipe.tests.dc"}}:{{this.check}}
+        </div>
+{{/if}}
+</div>

@@ -185,6 +185,16 @@ export class RecipeSheet {
             this.update();
         });
 
+        this.recipeElement.find("select.test-type").on("change",e=>{
+                const and = $(e.currentTarget).data("and");
+                const or = $(e.currentTarget).data("or");
+                if( this.recipe.tests?.ands[and]?.ors[or]?.uuid !== undefined){
+                    this.recipe.tests.ands[and].ors[or].uuid = "";
+                    this.recipe.tests.ands[and].ors[or].type = "hit";
+                    this.recipeElement.find("[name='flags.beavers-crafting.recipe.tests.ands."+and+".ors."+or+".uuid']").val("");
+                }
+        })
+
         this.recipeElement.find('.results .crafting-item-img').on("click",e=>{
             const uuid = $(e.currentTarget).data("id");
             if(Settings.get(Settings.DISPLAY_RESULTS)) {
