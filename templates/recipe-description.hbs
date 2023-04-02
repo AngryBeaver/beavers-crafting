@@ -1,0 +1,20 @@
+<div class="flexrow recipe">
+    <div class="sheet-left">
+        <div class="folders flexcol">
+            <div class="header" title="{{localize "beaversCrafting.recipe.folderHint"}}">
+                {{localize "beaversCrafting.recipe.folder"}}
+            </div>
+            <div class="section">
+                <input {{#unless editable}}disabled{{/unless}} placeholder="folder.subfolder"  type="text" name="flags.beavers-crafting.recipe.folder" value="{{recipe.folder}}" placeholder="" />
+            </div>
+        </div>
+        <div class="instruction flexcol">
+            <div class="header">
+                {{localize "beaversCrafting.crafting-app.instruction"}}
+            </div>
+            <div class="section" style="flex:300px">
+                {{editor recipe.instruction engine="prosemirror" target="flags.beavers-crafting.recipe.instruction" editable=editable}}
+            </div>
+        </div>
+    </div>
+</div>

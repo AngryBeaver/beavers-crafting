@@ -69,7 +69,7 @@ export class CraftingApp extends Application {
         });
 
         function recursiveFolder(data,folder,recipe){
-            if(folder === undefined){
+            if(folder === undefined || folder === ""){
                 data[''] = data[''] || [];
                 data[''].push(recipe);
             }else{
@@ -140,17 +140,6 @@ export class CraftingApp extends Application {
             this.data.folders = {};
             this.render();
         });
-        html.find(".dialog-button").on("click", (e) => {
-            if (this.data.recipe === undefined){
-                return;
-            }
-            Crafting.fromRecipe(this.data.actor.id, this.data.recipe)
-                .then(crafting => {
-                    return crafting.craft();
-                }).then(result => {
-                    this.close();
-                });
-        });
         html.find(".sidebar .navigation .recipeItem").on("click", (e) => {
             const id = $(e.currentTarget).data().id;
             this.selectRecipe(id);
@@ -183,6 +172,17 @@ export class CraftingApp extends Application {
         });
         html.find(".main .folderName").on("click", (e)=>{
             $(e.currentTarget).parent(".folder").toggleClass(["open","close"]);
+        });
+        html.find(".dialog-button").on("click", (e) => {
+            if (this.data.recipe === undefined){
+                return;
+            }
+            Crafting.fromRecipe(this.data.actor.id, this.data.recipe)
+                .then(crafting => {
+                    return crafting.craft();
+                }).then(result => {
+                this.close();
+            });
         });
         this.addDragDrop(html);
     }
@@ -306,8 +306,8 @@ export class CraftingApp extends Application {
 
 
 function recursiveSort(a, afolder:string|undefined,b, bfolder:string|undefined){
-    if(afolder === undefined){
-        if(bfolder !== undefined){
+    if(afolder === undefined || afolder === ""){
+        if(bfolder !== undefined && bfolder !== ""){
             return 1
         }else{
             if(a.name < b.name){
@@ -319,7 +319,7 @@ function recursiveSort(a, afolder:string|undefined,b, bfolder:string|undefined){
             return 0
         }
     }else{
-        if(bfolder === undefined){
+        if(bfolder === undefined || bfolder === ""){
             return -1
         }else{
             const aparts = afolder.split(/\.(.*)/s);

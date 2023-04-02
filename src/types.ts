@@ -169,4 +169,5 @@ interface RecipeData {
     },
     macro?: string
     folder?: string
+    instruction?: string
 }

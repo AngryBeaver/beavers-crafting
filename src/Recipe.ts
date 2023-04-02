@@ -24,6 +24,7 @@ export class Recipe implements RecipeData {
     }
     macro: string
     folder?: string;
+    instruction?: string;
     _trash: {
         ingredients: {};
         results: {};
@@ -77,6 +78,7 @@ export class Recipe implements RecipeData {
         this.attendants = deserializeComponents(data.attendants || {});
         this.macro = data.macro || "";
         this.folder = data.folder;
+        this.instruction = data.instruction;
         this._trash = {
             ingredients: {},
             results: {},
@@ -99,7 +101,8 @@ export class Recipe implements RecipeData {
             tool: this.tool,
             attendants: this.serializeAttendants(),
             macro: this.macro,
-            folder: this.folder
+            folder: this.folder,
+            instruction: this.instruction
         }
         if (!this.tool) {
             serialized["-=tool"] = null;

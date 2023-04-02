@@ -25,7 +25,7 @@
                     {{@key}}
                 </a>
             </div>
-            <div class="folderContent">
+            <div class="folderContent" {{#if @last}}style="border-color:transparent"{{/if}}>
                 {{>beavers-recipe-folders selected=../selected}}
             </div>
         </div>

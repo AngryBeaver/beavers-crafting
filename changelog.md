@@ -5,6 +5,7 @@
 - add precast currency
 - add hit progression text
 - fix wsiwyg type selection does not change type-sub selection.
+- todo ui redesing recipe configuration
 - todo add instruction text
 - todo add searchlist
 - todo fix more then two tests

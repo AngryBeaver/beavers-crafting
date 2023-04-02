@@ -1,4 +1,4 @@
-<div class="flexrow component" data-key="{{key}}" data-id="{{component.uuid}}">
+<div class="flexrow beavers-component" data-key="{{key}}" data-id="{{component.uuid}}">
     <div class="flexrow {{#if clickable}}clickable{{/if}}" data-key="{{key}}" data-id="{{component.uuid}}">
         <img src="{{component.img}}"/>
         <span class="name">{{component.name}}</span>
@@ -13,4 +13,11 @@
             <i class="fas fa-times"></i>
         {{/if}}
     </div>
+    {{#if editable}}
+    <div class="attribute flexrow">
+        <a class="item-delete">
+            <i class="fas fa-trash" data-id="{{key}}"></i>
+        </a>
+    </div>
+    {{/if}}
 </div>

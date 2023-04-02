@@ -114,8 +114,6 @@ export class TestHandler{
         const choices = {};
         const testAnd = this.getCurrentTestAnd();
         //fix name for tool uuid !
-
-
         for(const [id,or] of  Object.entries(testAnd.ors)){
             if(or.type === "skill"){
                 beaversSystemInterface.configSkills.forEach(skill=>{
@@ -143,9 +141,8 @@ export class TestHandler{
                 });
             }
             if(or.type === "hit"){
-                choices[id] = {text:"hit step"};
+                choices[id] = {text:or.uuid};
             }
-
         }
         const choice = parseInt(await beaversSystemInterface.uiDialogSelect({choices:choices}));
         return testAnd.ors[choice];

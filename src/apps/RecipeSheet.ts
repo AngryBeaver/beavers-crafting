@@ -22,9 +22,13 @@ export class RecipeSheet {
                 recipeSheets[app.id] = new RecipeSheet(app,data);
             }
             recipeSheets[app.id].init(html);
-            app.options.height = 500;
-            app.options.width = 700;
-            app.setPosition({height:app.options.height,width:app.options.width});
+            if(!app.initialized){
+                app.options.height = 500;
+                app.options.width = 700;
+                app.setPosition({height:app.options.height,width:app.options.width});
+            }
+            app.initialized = true;
+
             app._onResize = (e)=>{
                 app.options.height = app.position.height;
                 app.options.width = app.position.width;
@@ -97,8 +101,14 @@ export class RecipeSheet {
                 canRollTool:getSystemSetting().hasTool,
                 canRollAbility:beaversSystemInterface.configCanRollAbility,
             });
+        let description = await renderTemplate('modules/beavers-crafting/templates/recipe-description.hbs',
+            {
+                recipe: this.recipe,
+                editable:this.editable,
+            });
         let template = await renderTemplate('modules/beavers-crafting/templates/recipe-sheet.hbs',{
             main: main,
+            description: description,
             active: this.sheet.active,
             advanced: "test",
             recipe: this.recipe
@@ -109,6 +119,8 @@ export class RecipeSheet {
     }
 
     handleEvents(){
+
+        this.app._activateEditor(this.recipeElement.find(".editor-content")[0]);
         this.recipeElement.find('.tabs a').click(e=>{
             this.sheet.active = $(e.currentTarget).data("tab");
             this.render();
@@ -165,7 +177,7 @@ export class RecipeSheet {
             this.recipe.removeCurrency();
             this.update();
         });
-        this.recipeElement.find('.currencies .item-add').click(e=>{
+        this.recipeElement.find('.cost .item-add').click(e=>{
             this.recipe.addCurrency();
             this.update();
         });
