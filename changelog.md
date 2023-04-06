@@ -10,8 +10,7 @@
 - fix rescale create Item
 - fix more then two tests
 - ui redesign crafting tab on actor
-- todo ui redesign chatMessage
-- todo add searchlist
+- ui redesign chatMessage
 - todo create tutorial video
 
 ## 3.0.x progress tracking and multiple tests

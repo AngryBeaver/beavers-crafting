@@ -66,7 +66,7 @@
                 </div>
                 <div class="flexcol results section">
                     {{#each recipe.attendants}}
-                        {{>beavers-recipe-component component=this key=@key clickable=../displayIngredients check=(lookup ../precast.attendants @key)}}
+                        {{>beavers-recipe-component component=this key=@key clickable=../displayIngredients status=(lookup ../precast.attendants @key)}}
                         {{#unless @last}}
                             <div class="beavers-seperator"></div>
                         {{/unless}}
@@ -81,14 +81,14 @@
                 </div>
                 <div class="flexcol ingredients section">
                     {{#if currencyComponent}}
-                        {{>beavers-recipe-component component=currencyComponent check=precast.currencies}}
+                        {{>beavers-recipe-component component=currencyComponent status=precast.currencies.status}}
                         {{#if (not (isEmpty recipe.ingredients))}}
                             <div class="beavers-seperator"></div>
                         {{/if}}
                     {{/if}}
                     {{#if (not (isEmpty recipe.ingredients))}}
                         {{#each recipe.ingredients}}
-                            {{>beavers-recipe-component component=this key=@key clickable=../displayIngredients check=(lookup ../precast.ingredients @key)}}
+                            {{>beavers-recipe-component component=this key=@key clickable=../displayIngredients status=(lookup ../precast.ingredients @key)}}
                             {{#unless @last}}
                                 <div class="beavers-seperator"></div>
                             {{/unless}}

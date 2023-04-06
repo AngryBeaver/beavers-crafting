@@ -65,15 +65,18 @@ type ComponentType = "consumed" | "required" | "produced";
 
 type TestType = "skill" | "tool" | "ability" | "hit";
 
+type ComponentStatus = "success"|"error"|"locked"|"undefined";
+
+
 interface ComponentChatData {
     component: ComponentData,
     type: ComponentType,
-    hasError: boolean,
+    status: ComponentStatus,
     isProcessed: boolean,
 }
 
 interface ChatData {
-    title: string;
+    name: string;
     img: string;
     components:ComponentChatData[]
     status: string;
@@ -91,20 +94,14 @@ interface ChatData {
         failPer:number
     }
 }
-
 interface PreCastData {
     ingredients: {
-        [key: string]: {
-            isAvailable: boolean
-        }
+        [key: string]: ComponentStatus
     }
     attendants: {
-        [key: string]: {
-            isAvailable: boolean
-        }
+        [key: string]: ComponentStatus
     }
-    tool?: boolean;
-    currencies?: { isAvailable: boolean }
+    currencies?: { status: ComponentStatus }
 }
 
 interface Tests {

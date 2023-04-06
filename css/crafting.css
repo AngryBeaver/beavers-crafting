@@ -24,7 +24,6 @@
     padding: 3px 0;
     border-top: 2px groove #FFF;
     border-bottom: 2px groove #FFF;
-    height:40px;
     line-height:40px;
     color:#555;
     font-weight:bold;
@@ -79,6 +78,20 @@
 }
 .beavers-crafting.chat .right{
     border-left: 2px groove #FFF;
+}
+
+.beavers-crafting.chat .beavers-chat-info .beavers-component {
+    line-height: 28px;
+    font-size: 12px;
+    height: 28px;
+    max-height: 28px;
+    padding:0px 2px;
+}
+
+.beavers-crafting.chat .header .beavers-component {
+    line-height: 40px;
+    height: 40px;
+    max-height: 40px;
 }
 
 .beavers-crafting.crafting-app .window-content {
@@ -228,9 +241,15 @@
     cursor: pointer;
 }
 
+.beavers-crafting .beavers-line {
+    white-space:nowrap;
+    flex-wrap:nowrap;
+}
+
 .beavers-crafting .beavers-line .attribute {
     flex:0;
     padding-left:5px;
+    flex-basis: fit-content;
 }
 
 .beavers-crafting .fa-times{
@@ -247,12 +266,45 @@
 beaver-component
  ****************/
 
+.beavers-crafting .statusbar {
+    margin: 2px;
+    max-height:20px;
+    width:50px;
+    color:white;
+    line-height:16px;
+    text-align:center;
+    padding:2px;
+    border-radius:5px;
+    border:1px solid darkgreen;
+}
+.beavers-crafting .statusbar.success {
+    border-color:darkgreen;
+}
+.beavers-crafting .statusbar.error {
+    border-color:darkred;
+}
+.beavers-crafting .statusbar .fill {
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+    width: 100%;
+    height: 100%;
+}
+
 .beavers-crafting .beavers-component {
-    flex-wrap:nowrap;
-    flex:0;
     line-height: 32px;
     height: 32px;
     max-height:32px;
+    overflow:hidden;
+    text-overflow: ellipsis;
+    white-space:nowrap;
+    flex-wrap:nowrap;
+}
+
+.beavers-crafting .beavers-component .flexrow {
+    overflow:hidden;
+    text-overflow: ellipsis;
+    white-space:nowrap;
+    flex-wrap:nowrap;
+    width:0px;
 }
 
 .beavers-crafting .beavers-component img {
@@ -263,9 +315,17 @@ beaver-component
     margin: 2px;
 }
 
+.beavers-crafting .beavers-component .name {
+    overflow:hidden;
+    text-overflow: ellipsis;
+    white-space:nowrap;
+    width:0px;
+}
+
 .beavers-crafting .beavers-component .attribute {
     flex:0;
     padding-left:5px;
+    flex-basis: fit-content;
 }
 /****************
 beaver-recipe-test
@@ -294,6 +354,7 @@ beaver-recipe-test
 .beavers-crafting .beavers-recipe-test .attribute {
     flex:0;
     padding-left:5px;
+    flex-basis: fit-content;
 }
 
 /* crafting-app */
@@ -493,28 +554,7 @@ todo check this
 /****
 actor-sheet
  */
-.beavers-crafting.actor-tab .statusbar {
-    margin: 2px;
-    max-height:20px;
-    width:50px;
-    color:white;
-    line-height:16px;
-    text-align:center;
-    padding:2px;
-    border-radius:5px;
-    border:1px solid darkgreen;
-}
-.beavers-crafting.actor-tab .statusbar.success {
-    border-color:darkgreen;
-}
-.beavers-crafting.actor-tab .statusbar.error {
-    border-color:darkred;
-}
-.beavers-crafting.actor-tab .statusbar .fill {
-    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
-    width: 100%;
-    height: 100%;
-}
+
 .beavers-crafting.actor-tab .test-description {
     line-height: 22px;
     flex-wrap:nowrap;

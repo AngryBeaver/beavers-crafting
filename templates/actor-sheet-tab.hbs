@@ -4,7 +4,7 @@
         <div class="flexrow beavers-line"
              style="flex-wrap:nowrap;margin:5px;">
             <div> </div>
-            <div class="attribute" style="min-width:60px">
+            <div class="attribute" style="min-width:60px;margin:5px">
                 <button class="addCrafting">
                         <i class="fas fa-plus"></i>
                         {{localize "beaversCrafting.actorSheet.table.add" }}
@@ -28,7 +28,7 @@
                         <div onclick="$(this).parents('.beavers-crafting-item').toggleClass('describe')">
                             <div class="crafting-rollIcon"
                                  style="text-indent:28px;background-repeat:no-repeat; background-size:24px 24px; background-image: url('{{this.chatData.img}}')">
-                                <span style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{this.chatData.title}}</span>
+                                <span style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{this.chatData.name}}</span>
                             </div>
                         </div>
                         {{#if (eq this.chatData.status "active") }}

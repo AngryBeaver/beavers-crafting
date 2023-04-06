@@ -134,7 +134,7 @@ export class Crafting implements CraftingData {
         }
         if(Settings.get(Settings.TIME_TO_CRAFT) === "interaction"){
             if(this.result.hasError()){
-                this.endCrafting();
+                await this.endCrafting();
             }
             this.actor.sheet.activeTab = Settings.ACTOR_TAB_ID;
             await this.actor.sheet.render(true);
@@ -397,26 +397,29 @@ export class Crafting implements CraftingData {
         const components: ComponentChatData[] = [];
         const hasError = this.result.hasError();
         for (const componentResult of this.result._components.required._data) {
+            const status = componentResult.hasError()?'error':!componentResult.isProcessed?'undefined':this.isFinished?'success':'locked';
             components.push({
                 component: componentResult.component,
-                hasError: componentResult.hasError(),
+                status: status,
                 type: "required",
                 isProcessed: componentResult.isProcessed
             })
         }
         for (const componentResult of this.result._components.consumed._data) {
+            const status = componentResult.hasError()?'error':!componentResult.isProcessed?'undefined':this.isFinished?'success':'locked';
             components.push({
                 component: componentResult.component,
-                hasError: componentResult.hasError(),
+                status: status,
                 type: "consumed",
                 isProcessed: componentResult.isProcessed
             })
         }
         for (const componentResult of this.result._components.produced._data) {
             if (componentResult.userInteraction === "always" || (componentResult.userInteraction === "onSuccess" && !hasError)) {
+                const status = componentResult.hasError()?'error':!componentResult.isProcessed?'undefined':this.isFinished?'success':'locked';
                 components.push({
                     component: componentResult.component,
-                    hasError: componentResult.hasError(),
+                    status: status,
                     type: "produced",
                     isProcessed: componentResult.isProcessed
                 })
@@ -426,9 +429,10 @@ export class Crafting implements CraftingData {
 
         if(this.result._currencyResult) {
             const component = getCurrencyComponent(this.result._currencyResult?.name,this.result._currencyResult.value * -1)
+            const status = this.result._currencyResult.hasError?'error':!this.result._currencyResult.isConsumed?'undefined':this.isFinished?'success':'locked';
             components.push({
                 component: component,
-                hasError: this.result._currencyResult.hasError,
+                status: status,
                 type: "consumed",
                 isProcessed: this.result._currencyResult.isConsumed,
             });
@@ -460,7 +464,7 @@ export class Crafting implements CraftingData {
         }
 
         return {
-            title: this.recipe.name,
+            name: this.recipe.name,
             img: this.recipe.img,
             status: status,
             skill: this.result._skill,
@@ -470,7 +474,6 @@ export class Crafting implements CraftingData {
     }
 
     async _sendToChat() {
-        if (this.result._hasException) return;
         let content = await renderTemplate(`modules/${Settings.NAMESPACE}/templates/crafting-chat.hbs`,
             {
                 data: this.getChatData(),

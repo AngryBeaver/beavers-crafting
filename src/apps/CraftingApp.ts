@@ -277,28 +277,19 @@ export class CraftingApp extends Application {
         const preCastData:PreCastData = {
             attendants: {},
             ingredients: {},
-            tool: false,
         }
         if(result._currencyResult){
-            preCastData.currencies = {isAvailable: !result._currencyResult.hasError};
+            preCastData.currencies = {status: result._currencyResult.hasError?'error':'success'};
         }
 
         for(const key in recipe.ingredients){
             const component = recipe.ingredients[key];
-            preCastData.ingredients[key]={
-                isAvailable: !result._components.consumed.hasError(component)
-            }
+            preCastData.ingredients[key]= result._components.consumed.hasError(component)?'error':'success'
+
         }
         for(const key in recipe.attendants){
             const component = recipe.attendants[key];
-            preCastData.attendants[key]={
-                isAvailable: !result._components.required.hasError(component)
-            }
-        }
-        if(Settings.get(Settings.USE_TOOL) && recipe.tool){
-            const item = await beaversSystemInterface.uuidToDocument(recipe.tool);
-            const component = beaversSystemInterface.componentFromEntity(item);
-            preCastData.tool = !result._components.required.hasError(component)
+            preCastData.attendants[key]=result._components.required.hasError(component)?'error':'success'
         }
         return preCastData;
     }
