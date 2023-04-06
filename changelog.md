@@ -5,13 +5,14 @@
 - add precast currency
 - add hit progression text
 - fix type selection does not change type-sub selection.
-- ui redesing recipe configuration
+- ui redesign recipe configuration
 - add instruction text
 - fix rescale create Item
 - fix more then two tests
-- todo ui redesing crafting tab on actor
+- ui redesign crafting tab on actor
+- todo ui redesign chatMessage
 - todo add searchlist
-- todo create video
+- todo create tutorial video
 
 ## 3.0.x progress tracking and multiple tests
 ## 3.0.2 
