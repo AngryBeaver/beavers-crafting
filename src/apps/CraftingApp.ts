@@ -140,11 +140,11 @@ export class CraftingApp extends Application {
             this.data.folders = {};
             this.render();
         });
-        html.find(".sidebar .navigation .recipeItem").on("click", (e) => {
+        html.find(".sidebar .navigation .beavers-folder-item").on("click", (e) => {
             const id = $(e.currentTarget).data().id;
             this.selectRecipe(id);
             html.find(".sidebar .navigation .selected").removeClass("selected");
-            html.find(".sidebar .navigation .recipeItem[data-id='" + id + "']").addClass("selected");
+            html.find(".sidebar .navigation .beavers-folder-item[data-id='" + id + "']").addClass("selected");
             void this.renderRecipeSheet();
         });
 

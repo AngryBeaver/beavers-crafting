@@ -4,11 +4,14 @@
 - ui redesign beavers recipe compendium add responsiveness
 - add precast currency
 - add hit progression text
-- fix wsiwyg type selection does not change type-sub selection.
-- todo ui redesing recipe configuration
-- todo add instruction text
+- fix type selection does not change type-sub selection.
+- ui redesing recipe configuration
+- add instruction text
+- fix rescale create Item
+- fix more then two tests
+- todo ui redesing crafting tab on actor
 - todo add searchlist
-- todo fix more then two tests
+- todo create video
 
 ## 3.0.x progress tracking and multiple tests
 ## 3.0.2 

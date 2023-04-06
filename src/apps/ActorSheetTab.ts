@@ -1,12 +1,16 @@
 import {CraftingApp} from "./CraftingApp.js";
 import {Crafting} from "../Crafting.js";
 import {Settings} from "../Settings.js";
+import {getToolConfig} from "./ToolConfig.js";
 
 export class ActorSheetTab {
     app;
     html;
     data;
     system:System;
+    craftingFolder: {
+        [key:string]:{id:string, crafting:Crafting,chatData:{}}[]
+    } = {}
     craftingList:{
         [key:string]:Crafting
     } = {};
@@ -23,14 +27,35 @@ export class ActorSheetTab {
     async init() {
         const label = game["i18n"].localize("beaversCrafting.actorSheet.tab");
         const flag = this.app.actor.flags["beavers-crafting"]?.crafting || {};
-        const chatList = {};
+        const unsortedFolders = {};
         for(const [x,y] of Object.entries(flag)){
             const craftingData = (y as CraftingData);
             const crafting = new Crafting(craftingData,this.app.actor);
+            let folder = "";
+            if(crafting.recipe.folder){
+                folder = crafting.recipe.folder.split(".")[0];
+            }
             this.craftingList[x] = crafting;
-            chatList[x] = crafting.getChatData();
+            if(!unsortedFolders[folder] ){
+                unsortedFolders[folder] = [];
+            }
+            unsortedFolders[folder].push({id:x,crafting:crafting, chatData: crafting.getChatData()});
         }
-        const tabBody = $(await renderTemplate('modules/beavers-crafting/templates/actor-sheet-tab.hbs', {craftingList:this.craftingList,chatList:chatList}));
+        Object.keys(unsortedFolders).sort().forEach((k)=> {
+            if (k !== "") {
+                this.craftingFolder[k] = unsortedFolders[k];
+            }
+        })
+        if(unsortedFolders[""]){
+            this.craftingFolder[""] = unsortedFolders[""];
+        }
+        const tabBody = $(await renderTemplate('modules/beavers-crafting/templates/actor-sheet-tab.hbs',
+            {
+                craftingFolder:this.craftingFolder,
+                skills: beaversSystemInterface.configSkills,
+                abilities: beaversSystemInterface.configCanRollAbility?beaversSystemInterface.configAbilities:[],
+                tools: await getToolConfig()
+            }));
         beaversSystemInterface.actorSheetAddTab(this.app, this.html, this.data.actor, { id: Settings.ACTOR_TAB_ID, label: label, html: "<i class=\"fas fa-scroll\"/>" }, tabBody);
         this.activateListeners(tabBody);
     }

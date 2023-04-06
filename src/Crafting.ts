@@ -75,6 +75,25 @@ export class Crafting implements CraftingData {
         return Crafting.fromRecipe(actorId, Recipe.fromItem(item));
     }
 
+    get nextTest():TestOr{
+        let result:TestOr = {
+            check: 0,
+            type: "hit",
+            uuid: "progress"
+        }
+        if(this.recipe.tests){
+            const testHandler = new TestHandler(this.recipe.tests,this.result,this.actor);
+            try {
+                const currentTest = testHandler.getCurrentTestAnd();
+                if(Object.keys(currentTest.ors).length == 1){
+                    return Object.values(currentTest.ors)[0];
+                }
+            }catch(e){
+            }
+        }
+        return result
+    }
+
     async startCrafting() {
         await this.checkTool();
         await this.checkAttendants();

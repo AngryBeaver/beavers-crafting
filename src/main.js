@@ -113,6 +113,9 @@ Hooks.once("beavers-system-interface.ready", async function(){
     });
     getTemplate('modules/beavers-crafting/templates/beavers-recipe-component.hbs').then(t=>{
         Handlebars.registerPartial('beavers-recipe-component', t);
+    });
+    getTemplate('modules/beavers-crafting/templates/beavers-recipe.hbs').then(t=>{
+        Handlebars.registerPartial('beavers-recipe', t);
     })
 });
 

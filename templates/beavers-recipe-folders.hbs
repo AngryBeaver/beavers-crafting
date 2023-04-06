@@ -1,7 +1,8 @@
+<div class="beavers-folder">
 {{#each folders}}
     {{#if (eq @key '')}}
         {{#each this}}
-            <div class="recipeItem flexrow {{#if (eq ../../selected this.uuid)}}selected{{/if}}" data-id="{{this.uuid}}">
+            <div class="beavers-folder-item flexrow {{#if (eq ../../selected this.uuid)}}selected{{/if}}" data-id="{{this.uuid}}">
                                 <span style="flex:0" class="flexcol">
                                     <span class="border top"></span>
                                     {{#if @last}}<span></span>{{else}}<span class="border"></span>{{/if}}
@@ -31,3 +32,4 @@
         </div>
     {{/if}}
 {{/each}}
+</div>

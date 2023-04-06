@@ -1,0 +1,116 @@
+<div class="flexrow beavers-recipe">
+    <div class="flexrow" style="flex-basis:auto">
+        {{#if (or recipe.tests recipe.instruction)}}
+            {{#if recipe.instruction}}
+                <div class="flexcol" style="min-width:200px">
+                    <div class="header">
+                        {{localize "beaversCrafting.crafting-app.instruction"}}
+                    </div>
+                    <div class="section">
+                        {{{recipe.instruction}}}
+                    </div>
+                </div>
+            {{/if}}
+            {{#if recipe.tests}}
+                <div class="flexcol" style="min-width:200px">
+                    <div class="header">
+                        {{localize "beaversCrafting.crafting-app.checks"}}
+                    </div>
+                    <div class="flexrow section beavers-folder">
+                        <div class="folder open">
+                            <div class="flexrow folderName">
+                                <div class="flexrow">
+                                    <i style="flex:0;margin:5px" class="fas faw fa-clipboard"></i>
+                                    <i style="flex:0;margin:5px" class="fas faw fa-clipboard-list-check"></i>
+                                    {{localize "beaversCrafting.crafting-app.pass"}} {{maxHits}}
+                                    {{#if (gt recipe.tests.fails 1)}}
+                                        {{localize "beaversCrafting.crafting-app.before"}} {{recipe.tests.fails}}
+                                        {{localize "beaversCrafting.crafting-app.fails"}}
+                                    {{/if}}
+                                </div>
+                            </div>
+                            <div class="folderContent">
+                                {{#each recipe.tests.ands}}
+                                    <div class="flexrow">
+                                <span style="flex:0" class="flexcol">
+                                    <span class="border top"></span>
+                                    {{#if @last}}<span></span>{{else}}<span class="border"></span>{{/if}}
+                                </span>
+                                        <div class="test-section flexcol">
+                                            <div class="flexrow test-header">
+                                                {{hits}} times
+                                            </div>
+                                            {{#each this.ors}}
+                                                <div class="flexrow">
+                                                    {{>beavers-recipe-test test=this abilities=../../abilities skills=../../skills tools=../../tools}}
+                                                </div>
+                                                {{#unless @last}}
+                                                    <div class="beavers-seperator"></div>
+                                                {{/unless}}
+                                            {{/each}}
+                                        </div>
+                                    </div>
+                                {{/each}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {{/if}}
+        {{/if}}
+    </div>
+    <div class="flexrow" style="flex-basis:auto">
+        {{#if (not (isEmpty recipe.attendants))}}
+            <div class="flexcol" style="min-width:200px">
+                <div class="header">
+                    {{localize "beaversCrafting.crafting-app.required"}}
+                </div>
+                <div class="flexcol results section">
+                    {{#each recipe.attendants}}
+                        {{>beavers-recipe-component component=this key=@key clickable=../displayIngredients check=(lookup ../precast.attendants @key)}}
+                        {{#unless @last}}
+                            <div class="beavers-seperator"></div>
+                        {{/unless}}
+                    {{/each}}
+                </div>
+            </div>
+        {{/if}}
+        {{#if (or currencyComponent (not (isEmpty recipe.ingredients)))}}
+            <div class="flexcol" style="min-width:200px">
+                <div class="header">
+                    {{localize "beaversCrafting.crafting-app.cost"}}
+                </div>
+                <div class="flexcol ingredients section">
+                    {{#if currencyComponent}}
+                        {{>beavers-recipe-component component=currencyComponent check=precast.currencies}}
+                        {{#if (not (isEmpty recipe.ingredients))}}
+                            <div class="beavers-seperator"></div>
+                        {{/if}}
+                    {{/if}}
+                    {{#if (not (isEmpty recipe.ingredients))}}
+                        {{#each recipe.ingredients}}
+                            {{>beavers-recipe-component component=this key=@key clickable=../displayIngredients check=(lookup ../precast.ingredients @key)}}
+                            {{#unless @last}}
+                                <div class="beavers-seperator"></div>
+                            {{/unless}}
+                        {{/each}}
+                    {{/if}}
+                </div>
+            </div>
+        {{/if}}
+        {{#if (not (isEmpty recipe.results))}}
+            <div class="flexcol" style="min-width:200px">
+                <div class="header">
+                    {{localize "beaversCrafting.crafting-app.result"}}
+                </div>
+                <div class="flexcol results section">
+                    {{#each recipe.results}}
+                        {{>beavers-recipe-component component=this key=@key clickable=../displayResults }}
+                        {{#unless @last}}
+                            <div class="beavers-seperator"></div>
+                        {{/unless}}
+                    {{/each}}
+                </div>
+            </div>
+        {{/if}}
+    </div>
+</div>

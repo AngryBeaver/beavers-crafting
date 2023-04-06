@@ -213,7 +213,7 @@ export class Recipe implements RecipeData {
         if(this.tests == undefined){
             this.tests = new DefaultTest();
         }else{
-            const sorted = Object.keys(this.tests).sort();
+            const sorted = Object.keys(this.tests.ands).sort();
             // @ts-ignore
             const nextId = sorted[sorted.length-1]-1+2;
             this.tests.ands[nextId] = new DefaultAndTest;
@@ -310,7 +310,6 @@ export class Recipe implements RecipeData {
             });
         }
     }
-
 }
 
 export class DefaultTest implements Tests {

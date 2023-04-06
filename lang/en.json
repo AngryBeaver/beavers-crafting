@@ -6,8 +6,8 @@
       "table": {
         "name": "Name",
         "status": "Status",
-        "input": "Resources",
-        "output": "Results"
+        "progress": "Progress",
+        "add": "Add"
       }
     },
     "inventory": {
@@ -72,7 +72,9 @@
       "required": "Required",
       "result": "Result",
       "pass": "pass",
-      "before": "before"
+      "before": "before",
+      "fails": "fails",
+      "checks": "Checklist"
     },
     "settings": {
       "createItemTitle": {

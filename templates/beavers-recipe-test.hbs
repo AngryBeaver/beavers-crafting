@@ -1,27 +1,25 @@
-<div class="flexrow test-description">
-{{#if (eq this.type "skill")}}
+<div class="flexrow beavers-recipe-test">
+{{#if (eq test.type "skill")}}
         {{#each skills}}
-            {{#if (eq ../this.uuid this.id)}}
+            {{#if (eq ../test.uuid this.id)}}
                 <div class="flexrow">
-                    {{localize "beaversCrafting.recipe.tests.skill"}}
-                     <span class="name">{{this.label}}</span>
+                     <span class="name">{{localize "beaversCrafting.recipe.tests.skill"}} {{this.label}}</span>
                 </div>
             {{/if}}
         {{/each}}
 {{/if}}
-{{#if (eq this.type "ability")}}
+{{#if (eq test.type "ability")}}
         {{#each abilities}}
-            {{#if (eq ../this.uuid this.id)}}
+            {{#if (eq ../test.uuid this.id)}}
                 <div class="flexrow">
-                    {{localize "beaversCrafting.recipe.tests.ability"}}
-                    <span class="name">{{this.label}}</span>
+                    <span class="name">{{localize "beaversCrafting.recipe.tests.ability"}} {{this.label}}</span>
                 </div>
             {{/if}}
         {{/each}}
 {{/if}}
-{{#if (eq this.type "tool")}}
+{{#if (eq test.type "tool")}}
         {{#each tools}}
-            {{#if (eq ../this.uuid this.uuid)}}
+            {{#if (eq ../test.uuid this.uuid)}}
                 <div class="flexrow">
                     <img src="{{this.img}}">
                     <span class="name">{{this.name}}</span>
@@ -29,13 +27,13 @@
             {{/if}}
         {{/each}}
 {{/if}}
-{{#if (eq this.type "hit")}}
+{{#if (eq test.type "hit")}}
     <div class="flexrow">
-        <span class="name">{{this.uuid}}</span>
+        <span class="name">{{test.uuid}}</span>
     </div>
-{{else if this.check}}
+{{else if test.check}}
         <div class="attribute flexrow">
-            {{localize "beaversCrafting.recipe.tests.dc"}}:{{this.check}}
+            {{localize "beaversCrafting.recipe.tests.dc"}}:{{test.check}}
         </div>
 {{/if}}
 </div>
