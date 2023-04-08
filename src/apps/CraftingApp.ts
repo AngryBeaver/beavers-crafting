@@ -1,19 +1,26 @@
 import {FilterType, RecipeCompendium} from "./RecipeCompendium.js";
-import {Crafting} from "../Crafting.js";
+import {Crafting, getCurrencyComponent} from "../Crafting.js";
 import {getDataFrom, sanitizeUuid} from "../helpers/Utility.js";
 import {Settings} from "../Settings.js";
 import {getToolConfig} from "./ToolConfig.js";
 import {AnyOf} from "../AnyOf.js";
 import {Recipe} from "../Recipe.js";
 import {Result} from "../Result.js";
+import {TestHandler} from "../TestHandler.js";
 
 export class CraftingApp extends Application {
     data: {
         actor,
         filter,
         recipes:Recipe[],
-        index,
+        folders:{
+            [key: string]: {
+                folders: string[],
+                recipes: Recipe[]
+            }
+        }
         filterItems:{},
+        selected?,
         recipe?:Recipe,
         content?,
         result?:Result,
@@ -25,8 +32,8 @@ export class CraftingApp extends Application {
             actor: actor,
             filter: FilterType.available,
             recipes: [],
-            index: 0,
-            filterItems: {}
+            filterItems: {},
+            folders: {},
         };
         if(this.element.length > 0){
             this.bringToTop();
@@ -53,13 +60,45 @@ export class CraftingApp extends Application {
     async getData(options = {}) {
         const data: any = mergeObject(this.data, await super.getData(options));
         let recipes = await RecipeCompendium.filterForActor(data.actor, data.filter);
-        if(Object.values(data.filterItems).length != 0){
-            recipes = await RecipeCompendium.filterForItems(recipes,Object.values(data.filterItems));
+        if(Object.values(data.filterItems).length != 0) {
+            recipes = await RecipeCompendium.filterForItems(recipes, Object.values(data.filterItems));
         }
+        recipes.sort(
+            (a,b)=> {
+                return recursiveSort(a, a.folder, b, b.folder)
+        });
+
+        function recursiveFolder(data,folder,recipe){
+            if(folder === undefined || folder === ""){
+                data[''] = data[''] || [];
+                data[''].push(recipe);
+            }else{
+                const parts = folder.split(/\.(.*)/s);
+                data[parts[0]] = data[parts[0]] || {folders:{}}
+                recursiveFolder(data[parts[0]].folders,parts[1],recipe);
+            }
+        }
+
+        recipes.forEach(recipe=>{
+            recursiveFolder(data.folders,recipe.folder,recipe);
+        });
         data.recipes = recipes;
-        data.recipe = data.recipes[data.index];
+        if(!data.selected){
+            data.selected = data.recipes[0]?.uuid;
+        }
+        this.selectRecipe(data.selected);
         data.content = null;
         return data;
+    }
+
+    selectRecipe(uuid: string){
+        this.data.selected = uuid;
+        this.data.recipes.forEach(r=>{
+            if(r.uuid === uuid){
+                this.data.recipe = Recipe.clone(r);
+                return;
+            }
+        });
     }
 
     async renderRecipeSheet() {
@@ -70,18 +109,19 @@ export class CraftingApp extends Application {
         RecipeCompendium.validateRecipeToItemList(Object.values(this.data.recipe.ingredients), this.data.actor.items,crafting.result);
         await crafting.checkTool();
         await crafting.checkAttendants();
+        await crafting.checkCurrency();
         this.data.result = crafting.result;
-        this.data.content = await renderTemplate('modules/beavers-crafting/templates/recipe-main.hbs',
+        this.data.content = await renderTemplate('modules/beavers-crafting/templates/crafting-app-main.hbs',
             {
                 recipe: this.data.recipe,
-                currencies: beaversSystemInterface.configCurrencies,
+                currencyComponent: this.data.recipe.currency?getCurrencyComponent(this.data.recipe.currency.name,this.data.recipe.currency.value):undefined,
                 skills: beaversSystemInterface.configSkills,
                 abilities: beaversSystemInterface.configCanRollAbility?beaversSystemInterface.configAbilities:[],
-                editable: false,
+                tools: await getToolConfig(),
                 precast: await this.getPrecastFromResult(this.data.result,this.data.recipe),
+                maxHits: this.data.recipe.tests?TestHandler.getMaxHits(this.data.recipe.tests):0,
                 displayResults:Settings.get(Settings.DISPLAY_RESULTS),
                 displayIngredients:Settings.get(Settings.DISPLAY_RESULTS),
-                tools: await getToolConfig(),
                 useTool: Settings.get(Settings.USE_TOOL),
                 useAttendants: Settings.get(Settings.USE_ATTENDANTS)
             });
@@ -93,11 +133,45 @@ export class CraftingApp extends Application {
     activateListeners(html) {
 
         super.activateListeners(html);
-        html.find(".header .entry-filter select.search").on("change", (e) => {
+        html.find(".sidebar select.search").on("change", (e) => {
             this.data.filter = $(e.target).val();
-            this.data.index = 0;
+            this.data.selected = null;
             this.data.content = null;
+            this.data.folders = {};
             this.render();
+        });
+        html.find(".sidebar .navigation .beavers-folder-item").on("click", (e) => {
+            const id = $(e.currentTarget).data().id;
+            this.selectRecipe(id);
+            html.find(".sidebar .navigation .selected").removeClass("selected");
+            html.find(".sidebar .navigation .beavers-folder-item[data-id='" + id + "']").addClass("selected");
+            void this.renderRecipeSheet();
+        });
+
+        html.find(".folderName").on("click", (e)=>{
+            $(e.currentTarget).parent(".folder").toggleClass(["open","close"]);
+        });
+        html.find(".sidebar .fa-sort-amount-up").on("click", (e)=>{
+            html.find(".navigation .folder").removeClass("open").addClass("close");
+        });
+        void this.renderRecipeSheet();
+    }
+
+    activateRecipeSheetListener(html) {
+        html.find('.results .clickable').on("click",e=>{
+            const uuid = $(e.currentTarget).data("id");
+            if(Settings.get(Settings.DISPLAY_RESULTS)) {
+                beaversSystemInterface.uuidToDocument(uuid).then(i=>i.sheet._render(true));
+            }
+        });
+        html.find('.ingredients .clickable').on("click",e=>{
+            const uuid = $(e.currentTarget).data("id");
+            if(Settings.get(Settings.DISPLAY_INGREDIENTS)) {
+                beaversSystemInterface.uuidToDocument(uuid).then(i=>i.sheet._render(true));
+            }
+        });
+        html.find(".main .folderName").on("click", (e)=>{
+            $(e.currentTarget).parent(".folder").toggleClass(["open","close"]);
         });
         html.find(".dialog-button").on("click", (e) => {
             if (this.data.recipe === undefined){
@@ -107,37 +181,8 @@ export class CraftingApp extends Application {
                 .then(crafting => {
                     return crafting.craft();
                 }).then(result => {
-                    this.close();
-                });
-        });
-        html.find(".header .drop-area .item").on("click", (e) => {
-            const uuid = $(e.currentTarget).data("id");
-            delete this.data.filterItems[uuid];
-            this.render();
-        });
-        html.find(".sidebar a.item").on("click", (e) => {
-            const index = $(e.currentTarget).data().id;
-            this.data.index = index;
-            this.data.recipe = Recipe.clone(this.data.recipes[index]);
-            html.find(".sidebar a.item.selected").removeClass("selected");
-            html.find(".sidebar a.item[data-id =" + index + "]").addClass("selected");
-            void this.renderRecipeSheet();
-        });
-        void this.renderRecipeSheet();
-    }
-
-    activateRecipeSheetListener(html) {
-        html.find('.results .flexrow').on("click",e=>{
-            const uuid = $(e.currentTarget).data("id");
-            if(Settings.get(Settings.DISPLAY_RESULTS)) {
-                beaversSystemInterface.uuidToDocument(uuid).then(i=>i.sheet._render(true));
-            }
-        });
-        html.find('.ingredients .flexrow').on("click",e=>{
-            const uuid = $(e.currentTarget).data("id");
-            if(Settings.get(Settings.DISPLAY_INGREDIENTS)) {
-                beaversSystemInterface.uuidToDocument(uuid).then(i=>i.sheet._render(true));
-            }
+                this.close();
+            });
         });
         this.addDragDrop(html);
     }
@@ -231,28 +276,52 @@ export class CraftingApp extends Application {
     async getPrecastFromResult(result: Result, recipe: Recipe): Promise<PreCastData>{
         const preCastData:PreCastData = {
             attendants: {},
-            currencies: !result._currencyResult?.hasError,
             ingredients: {},
-            tool: false,
         }
+        if(result._currencyResult){
+            preCastData.currencies = {status: result._currencyResult.hasError?'error':'success'};
+        }
+
         for(const key in recipe.ingredients){
             const component = recipe.ingredients[key];
-            preCastData.ingredients[key]={
-                isAvailable: !result._components.consumed.hasError(component)
-            }
+            preCastData.ingredients[key]= result._components.consumed.hasError(component)?'error':'success'
+
         }
         for(const key in recipe.attendants){
             const component = recipe.attendants[key];
-            preCastData.attendants[key]={
-                isAvailable: !result._components.required.hasError(component)
-            }
-        }
-        if(Settings.get(Settings.USE_TOOL) && recipe.tool){
-            const item = await beaversSystemInterface.uuidToDocument(recipe.tool);
-            const component = beaversSystemInterface.componentFromEntity(item);
-            preCastData.tool = !result._components.required.hasError(component)
+            preCastData.attendants[key]=result._components.required.hasError(component)?'error':'success'
         }
         return preCastData;
     }
 }
 
+
+function recursiveSort(a, afolder:string|undefined,b, bfolder:string|undefined){
+    if(afolder === undefined || afolder === ""){
+        if(bfolder !== undefined && bfolder !== ""){
+            return 1
+        }else{
+            if(a.name < b.name){
+                return -1
+            }
+            if(a.name > b.name){
+                return 1;
+            }
+            return 0
+        }
+    }else{
+        if(bfolder === undefined || bfolder === ""){
+            return -1
+        }else{
+            const aparts = afolder.split(/\.(.*)/s);
+            const bparts = bfolder.split(/\.(.*)/s);
+            if(aparts[0] < bparts[0]){
+                return -1
+            }else if(aparts[0] > bparts[0]){
+                return 1;
+            }else {
+                return recursiveSort(a, aparts[1],b, bparts[1])
+            }
+        }
+    }
+}

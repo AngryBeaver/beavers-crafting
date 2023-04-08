@@ -75,12 +75,31 @@ export class Crafting implements CraftingData {
         return Crafting.fromRecipe(actorId, Recipe.fromItem(item));
     }
 
+    get nextTest():TestOr{
+        let result:TestOr = {
+            check: 0,
+            type: "hit",
+            uuid: "progress"
+        }
+        if(this.recipe.tests){
+            const testHandler = new TestHandler(this.recipe.tests,this.result,this.actor);
+            try {
+                const currentTest = testHandler.getCurrentTestAnd();
+                if(Object.keys(currentTest.ors).length == 1){
+                    return Object.values(currentTest.ors)[0];
+                }
+            }catch(e){
+            }
+        }
+        return result
+    }
+
     async startCrafting() {
         await this.checkTool();
         await this.checkAttendants();
         await this.evaluateAnyOf();
         RecipeCompendium.validateRecipeToItemList(Object.values(this.recipe.ingredients), this.actor.items, this.result);
-        await this.checkCurrency();
+        await this.payCurrency();
         await this.addOutput();
         await this.executeMacro();
         await this.processInput();
@@ -115,7 +134,7 @@ export class Crafting implements CraftingData {
         }
         if(Settings.get(Settings.TIME_TO_CRAFT) === "interaction"){
             if(this.result.hasError()){
-                this.endCrafting();
+                await this.endCrafting();
             }
             this.actor.sheet.activeTab = Settings.ACTOR_TAB_ID;
             await this.actor.sheet.render(true);
@@ -208,6 +227,12 @@ export class Crafting implements CraftingData {
     }
 
     async checkCurrency() {
+        if (this.recipe.currency) {
+            await this.result.checkCurrency(this.recipe.currency);
+        }
+    }
+
+    async payCurrency() {
         if (this.recipe.currency) {
             await this.result.payCurrency(this.recipe.currency);
         }
@@ -367,54 +392,65 @@ export class Crafting implements CraftingData {
             }
         }
     }
+    get chatData(): ChatData {
+        return this.getChatData();
+    }
 
     getChatData(): ChatData {
-        const components: ComponentChatData[] = [];
+        const components: {
+            required:ComponentChatData[],
+            consumed:ComponentChatData[],
+            produced:ComponentChatData[]
+        } = {
+            required:[],
+            consumed:[],
+            produced:[]
+        };
         const hasError = this.result.hasError();
         for (const componentResult of this.result._components.required._data) {
-            components.push({
+            const status = componentResult.hasError()?'error':!componentResult.isProcessed?'undefined':this.isFinished?'success':'locked';
+            components.required.push({
                 component: componentResult.component,
-                hasError: componentResult.hasError(),
+                status: status,
                 type: "required",
                 isProcessed: componentResult.isProcessed
             })
         }
+        if(this.result._currencyResult) {
+            const component = getCurrencyComponent(this.result._currencyResult?.name,this.result._currencyResult.value * -1)
+            const status = this.result._currencyResult.hasError?'error':!this.result._currencyResult.isConsumed?'undefined':this.isFinished?'success':'locked';
+            components.consumed.push({
+                component: component,
+                status: status,
+                type: "consumed",
+                isProcessed: this.result._currencyResult.isConsumed,
+            });
+        }
         for (const componentResult of this.result._components.consumed._data) {
-            components.push({
+            const status = componentResult.hasError()?'error':!componentResult.isProcessed?'undefined':this.isFinished?'success':'locked';
+            components.consumed.push({
                 component: componentResult.component,
-                hasError: componentResult.hasError(),
+                status: status,
                 type: "consumed",
                 isProcessed: componentResult.isProcessed
             })
         }
         for (const componentResult of this.result._components.produced._data) {
             if (componentResult.userInteraction === "always" || (componentResult.userInteraction === "onSuccess" && !hasError)) {
-                components.push({
+                const status = componentResult.hasError()?'error':!componentResult.isProcessed?'undefined':this.isFinished?'success':'locked';
+                components.produced.push({
                     component: componentResult.component,
-                    hasError: componentResult.hasError(),
+                    status: status,
                     type: "produced",
                     isProcessed: componentResult.isProcessed
                 })
             }
         }
-        components.push(...Object.values(this.result._chatAddition).filter(s=>s.component.type !== "Currency"));
-
-        if(this.result._currencyResult) {
-            const configCurrency = beaversSystemInterface.configCurrencies.find(c=>c.id===this.result._currencyResult?.name);
-            const component = configCurrency?.component?configCurrency.component:beaversSystemInterface.componentCreate(
-                {
-                    type:"Currency",
-                    name:configCurrency?.label,
-                    img:'icons/commodities/currency/coins-assorted-mix-copper-silver-gold.webp'
-                });
-            component.quantity = this.result._currencyResult.value * -1;
-            components.push({
-                component: component,
-                hasError: this.result._currencyResult.hasError,
-                type: "consumed",
-                isProcessed: this.result._currencyResult.isConsumed,
+        Object.values(this.result._chatAddition)
+            .filter(s=>s.component.type !== "Currency")//legacy
+            .forEach(c=>{
+                components[c.type].push(c);
             });
-        }
 
 
         const tests = {maxHits:1,maxFails:1,hits:0,fails:0,hitPer:0,failPer:0}
@@ -440,19 +476,18 @@ export class Crafting implements CraftingData {
             status = "success";
             tests.hitPer = 100;
         }
-
         return {
-            title: this.recipe.name,
+            name: this.recipe.name,
             img: this.recipe.img,
             status: status,
             skill: this.result._skill,
             tests:tests,
             components: components,
         }
+
     }
 
     async _sendToChat() {
-        if (this.result._hasException) return;
         let content = await renderTemplate(`modules/${Settings.NAMESPACE}/templates/crafting-chat.hbs`,
             {
                 data: this.getChatData(),
@@ -527,6 +562,16 @@ export class Crafting implements CraftingData {
         this.restore = [];
         this.endAt = game["time"].worldTime;
     }
+}
 
-
+export function getCurrencyComponent(id:string, quantity:number): Component{
+    const configCurrency = beaversSystemInterface.configCurrencies.find(c=>c.id===id);
+    const component = configCurrency?.component?configCurrency.component:beaversSystemInterface.componentCreate(
+        {
+            type:"Currency",
+            name:configCurrency?.label,
+            img:'icons/commodities/currency/coins-assorted-mix-copper-silver-gold.webp'
+        });
+    component.quantity = quantity;
+    return component;
 }

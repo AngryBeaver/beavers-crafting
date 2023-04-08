@@ -1,45 +1,27 @@
 <div class="flexcol" style="height:100%">
-    <div class="compendium header flexrow">
-        <div class="entry-filter">
-            <select class="search">
-                {{#select filter}}
-                    <option value="2">all</option>
-                    <option value="1">available</option>
-                    <option value="0">usable</option>
-                    <option value="3">own</option>
-                {{/select}}
-            </select>
-        </div>
-        <div class="filter">filter by item:</div>
-        <div class="drop-area">
-            {{#each filterItems}}
-                <a class="item flexrow" data-id="{{@key}}" title="{{this.name}}">
-                    <img src="{{this.img}}" alt="{{this.name}}">
-                </a>
-            {{/each}}
-        </div>
-    </div>
     <div class="flexrow" style="height:calc( 100% - 40px)">
         <aside class="sidebar flexcol">
-            <nav>
-                {{#each recipes}}
-                    <a class="item flexrow {{#if (eq ../index @key)}}selected{{/if}}" data-id="{{@key}}">
-                        <img src="{{this.img}}" alt="">
-                        <span>{{this.name}}</span>
-                    </a>
-                {{/each}}
-            </nav>
-        </aside>
-        <section class="flexcol">
-            <div class="sheet-body recipe">
-                {{#if content}}
-                    {{{content}}}
-                {{/if}}
+            <div style="flex:0;min-height:34px;line-height:34px" class="flexrow">
+                <i style="width:25px;flex: 0;margin: auto;display: block;padding: 0px 5px;" class="fas fa-search"></i>
+                <select class="search">
+                    {{#select filter}}
+                        <option value="2">all</option>
+                        <option value="1">available</option>
+                        <option value="0">usable</option>
+                        <option value="3">own</option>
+                    {{/select}}
+                </select>
+                <a style="width:25px;flex: 0;margin: auto;display: block;padding: 0px 5px;"
+                   class="fas fa-sort-amount-up fa-fw"></a>
             </div>
-            <button class="dialog-button ok default" data-button="ok">
-                <i class="fas fa-check"></i>
-                {{localize "beaversCrafting.crafting-app.button"}}
-            </button>
+            <div class="content">
+                <nav class="navigation">
+                    {{>beavers-recipe-folders}}
+                </nav>
+            </div>
+        </aside>
+        <section style="height:100%" class="sheet-body">
+
         </section>
     </div>
 </div>

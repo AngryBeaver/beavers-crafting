@@ -23,6 +23,8 @@ export class Recipe implements RecipeData {
         [key: string]: Component
     }
     macro: string
+    folder?: string;
+    instruction?: string;
     _trash: {
         ingredients: {};
         results: {};
@@ -75,6 +77,8 @@ export class Recipe implements RecipeData {
         this.tool = data.tool;
         this.attendants = deserializeComponents(data.attendants || {});
         this.macro = data.macro || "";
+        this.folder = data.folder;
+        this.instruction = data.instruction;
         this._trash = {
             ingredients: {},
             results: {},
@@ -96,7 +100,9 @@ export class Recipe implements RecipeData {
             currency: this.currency,
             tool: this.tool,
             attendants: this.serializeAttendants(),
-            macro: this.macro
+            macro: this.macro,
+            folder: this.folder,
+            instruction: this.instruction
         }
         if (!this.tool) {
             serialized["-=tool"] = null;
@@ -112,6 +118,9 @@ export class Recipe implements RecipeData {
         }
         if (!this.macro) {
             serialized["-=macro"] = null;
+        }
+        if(!this.folder) {
+            serialized["-=folder"] = null;
         }
         return serialized;
     }
@@ -204,7 +213,7 @@ export class Recipe implements RecipeData {
         if(this.tests == undefined){
             this.tests = new DefaultTest();
         }else{
-            const sorted = Object.keys(this.tests).sort();
+            const sorted = Object.keys(this.tests.ands).sort();
             // @ts-ignore
             const nextId = sorted[sorted.length-1]-1+2;
             this.tests.ands[nextId] = new DefaultAndTest;
@@ -301,7 +310,6 @@ export class Recipe implements RecipeData {
             });
         }
     }
-
 }
 
 export class DefaultTest implements Tests {

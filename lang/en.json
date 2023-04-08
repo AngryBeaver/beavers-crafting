@@ -6,8 +6,8 @@
       "table": {
         "name": "Name",
         "status": "Status",
-        "input": "Resources",
-        "output": "Results"
+        "progress": "Progress",
+        "add": "Add"
       }
     },
     "inventory": {
@@ -29,7 +29,9 @@
         "consume": "consume",
         "consumeHint": "consumes cost on failed tests",
         "andTestHint": "add additional Test",
-        "orTestHint": "add alternative Test"
+        "orTestHint": "add alternative Test",
+        "skill":"Skill:",
+        "ability": "Ability:"
       },
       "tools": "Tool",
       "dc": "DC",
@@ -40,7 +42,10 @@
       "attendants": "Attendants",
       "macro": {
         "button": "save"
-      }
+      },
+      "folder": "Folder",
+      "folderHint": "You can create subfolder by separating words with '.' e.g. Folder.Subfolder",
+      "folderPlaceHolder":"Folder.Subfolder"
     },
     "anyOf": {
       "dropItem": "drop item",
@@ -56,12 +61,20 @@
     },
     "crafting-app": {
       "title": "Beaver's Recipe Compendium",
-      "button": "Craft",
+      "button": "Start",
       "errors": {
         "tableNotFound": "RollTable not found for : ",
         "tableNotValid": "RollTable return invalid Object : ",
         "itemNotFound": "Item not found in RollTable for :"
-      }
+      },
+      "cost": "Cost",
+      "instruction": "Instruction",
+      "required": "Required",
+      "result": "Result",
+      "pass": "pass",
+      "before": "before",
+      "fails": "fails",
+      "checks": "Checklist"
     },
     "settings": {
       "createItemTitle": {
@@ -86,7 +99,7 @@
       },
       "currencyExchange": {
         "name": "Exchange currencies",
-        "hint": "if disabled you need to poses the exact currency in order to pay the recipe cost"
+        "hint": "if disabled you need to possess the exact currency in order to pay the recipe cost"
       },
       "toolButton": {
         "name": "Configure tools available",

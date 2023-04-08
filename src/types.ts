@@ -54,9 +54,9 @@ interface ComponentResultsData {
 
 interface ComponentResultData {
     component: ComponentData,
+    isProcessed: boolean,
     originalQuantity: number,
     userInteraction: UserInteraction
-    isProcessed: boolean,
 }
 
 type UserInteraction =  "always" | "never" | "onSuccess";
@@ -65,17 +65,24 @@ type ComponentType = "consumed" | "required" | "produced";
 
 type TestType = "skill" | "tool" | "ability" | "hit";
 
+type ComponentStatus = "success"|"error"|"locked"|"undefined";
+
+
 interface ComponentChatData {
     component: ComponentData,
     type: ComponentType,
-    hasError: boolean,
+    status: ComponentStatus,
     isProcessed: boolean,
 }
 
 interface ChatData {
-    title: string;
+    name: string;
     img: string;
-    components:ComponentChatData[]
+    components:{
+        required:ComponentChatData[],
+        consumed:ComponentChatData[],
+        produced:ComponentChatData[]
+    }
     status: string;
     skill?: {
         name: string,
@@ -91,20 +98,14 @@ interface ChatData {
         failPer:number
     }
 }
-
 interface PreCastData {
     ingredients: {
-        [key: string]: {
-            isAvailable: boolean
-        }
+        [key: string]: ComponentStatus
     }
     attendants: {
-        [key: string]: {
-            isAvailable: boolean
-        }
+        [key: string]: ComponentStatus
     }
-    tool?: boolean;
-    currencies?: boolean;
+    currencies?: { status: ComponentStatus }
 }
 
 interface Tests {
@@ -168,4 +169,6 @@ interface RecipeData {
         [key: string]: ComponentData
     },
     macro?: string
+    folder?: string
+    instruction?: string
 }

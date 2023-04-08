@@ -1,0 +1,25 @@
+<div class="flexrow beavers-component" data-key="{{key}}" data-id="{{component.uuid}}">
+    <div class="flexrow {{#if clickable}}clickable{{/if}}" data-key="{{key}}" data-id="{{component.uuid}}">
+        <img src="{{component.img}}"/>
+        <span class="name">{{component.name}}</span>
+    </div>
+    <div class="attribute flexrow">
+        {{component.quantity}}
+    </div>
+    <div class="attribute flexrow">
+        {{#if (eq status 'success') }}
+            <i class="fas fa-check"></i>
+        {{else if (eq status 'error') }}
+            <i class="fas fa-times"></i>
+        {{else if (eq status 'locked') }}
+            <i class="fa-regular fa-lock"></i>
+        {{/if}}
+    </div>
+    {{#if editable}}
+    <div class="attribute flexrow">
+        <a class="item-delete">
+            <i class="fas fa-trash" data-id="{{key}}"></i>
+        </a>
+    </div>
+    {{/if}}
+</div>

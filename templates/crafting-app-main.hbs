@@ -1,0 +1,10 @@
+{{#if recipe}}
+    <div class="beavers-crafting-header">
+        {{>beavers-recipe-component component=recipe}}
+    </div>
+    {{>beavers-recipe}}
+    <button class="dialog-button ok default" data-button="ok">
+        <i class="fas fa-check"></i>
+        {{localize "beaversCrafting.crafting-app.button"}}
+    </button>
+{{/if}}

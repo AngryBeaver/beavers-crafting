@@ -81,8 +81,6 @@ export class ToolConfig extends FormApplication {
     }
 }
 
-
-
 export async function getToolConfig(): Promise<ComponentData[]>{
     if(components.length === 0) {
         await _setToolConfig();

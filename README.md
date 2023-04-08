@@ -21,6 +21,8 @@ by:
 
 ## Features
 ![img.gif](pictures/video.gif)
+### demoVideo
+https://www.youtube.com/watch?v=t3YGk8uFK0w
 ### Loot subtype Recipe
 ![img.png](pictures/newItem.png)
 For this to work you must go to your settings and enter the name of the create Item Dialog.

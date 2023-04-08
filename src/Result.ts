@@ -183,6 +183,11 @@ export class Result implements ResultApi, ResultData {
         void await this._currencyResult.pay(this._actor);
     }
 
+    async checkCurrency(currency: Currency) {
+        this._currencyResult = new CurrencyResult(currency);
+        void await this._currencyResult.canPay(this._actor);
+    }
+
     async revertPayedCurrency() {
         if(this._currencyResult== undefined){
             return;
@@ -200,7 +205,7 @@ export class Result implements ResultApi, ResultData {
             component.quantity = this._currencyResult.value * -1
             this.addChatComponent({
                 component: component,
-                hasError: this._currencyResult.hasError,
+                status: this._currencyResult.hasError?'error':'undefined',
                 type: "consumed",
                 isProcessed: false,
             });
@@ -349,6 +354,14 @@ export class CurrencyResult implements CurrencyResultData {
         this.value = config.value;
         this.isConsumed = config.isConsumed;
         this.hasError = config.hasError;
+    }
+
+    async canPay(actor) {
+        const currencies = {};
+        currencies[this.name] = this.value*-1;
+        const canPay = await beaversSystemInterface.actorCurrenciesCanAdd(actor, currencies);
+        this.hasError = canPay;
+        return canPay;
     }
 
     async pay(actor,revert:boolean= false) {
