@@ -312,8 +312,6 @@ beaver-component
 }
 
 .beavers-crafting .beavers-component img {
-    height: calc( 100% - 4px);
-    width: calc( 100% - 4px);
     flex: 0;
     border-radius: 4px;
     margin: 2px;
