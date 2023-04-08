@@ -54,9 +54,9 @@ interface ComponentResultsData {
 
 interface ComponentResultData {
     component: ComponentData,
+    isProcessed: boolean,
     originalQuantity: number,
     userInteraction: UserInteraction
-    isProcessed: boolean,
 }
 
 type UserInteraction =  "always" | "never" | "onSuccess";
@@ -78,7 +78,11 @@ interface ComponentChatData {
 interface ChatData {
     name: string;
     img: string;
-    components:ComponentChatData[]
+    components:{
+        required:ComponentChatData[],
+        consumed:ComponentChatData[],
+        produced:ComponentChatData[]
+    }
     status: string;
     skill?: {
         name: string,

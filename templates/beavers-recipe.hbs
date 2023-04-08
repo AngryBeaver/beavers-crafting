@@ -59,58 +59,106 @@
         {{/if}}
     </div>
     <div class="flexrow" style="flex-basis:auto">
-        {{#if (not (isEmpty recipe.attendants))}}
-            <div class="flexcol" style="min-width:200px">
-                <div class="header">
-                    {{localize "beaversCrafting.crafting-app.required"}}
-                </div>
-                <div class="flexcol results section">
-                    {{#each recipe.attendants}}
-                        {{>beavers-recipe-component component=this key=@key clickable=../displayIngredients status=(lookup ../precast.attendants @key)}}
-                        {{#unless @last}}
-                            <div class="beavers-seperator"></div>
-                        {{/unless}}
-                    {{/each}}
-                </div>
-            </div>
-        {{/if}}
-        {{#if (or currencyComponent (not (isEmpty recipe.ingredients)))}}
-            <div class="flexcol" style="min-width:200px">
-                <div class="header">
-                    {{localize "beaversCrafting.crafting-app.cost"}}
-                </div>
-                <div class="flexcol ingredients section">
-                    {{#if currencyComponent}}
-                        {{>beavers-recipe-component component=currencyComponent status=precast.currencies.status}}
-                        {{#if (not (isEmpty recipe.ingredients))}}
-                            <div class="beavers-seperator"></div>
-                        {{/if}}
-                    {{/if}}
-                    {{#if (not (isEmpty recipe.ingredients))}}
-                        {{#each recipe.ingredients}}
-                            {{>beavers-recipe-component component=this key=@key clickable=../displayIngredients status=(lookup ../precast.ingredients @key)}}
+        {{#if chatData}}
+            {{#if (not isEmpty chatData.components.required)}}
+                <div class="flexcol" style="min-width:200px">
+                    <div class="header">
+                        {{localize "beaversCrafting.crafting-app.required"}}
+                    </div>
+                    <div class="flexcol required section">
+                        {{#each chatData.components.required}}
+                            {{>beavers-recipe-component component=this.component key=@key clickable=../displayIngredients status=this.status}}
                             {{#unless @last}}
                                 <div class="beavers-seperator"></div>
                             {{/unless}}
                         {{/each}}
-                    {{/if}}
+                    </div>
                 </div>
-            </div>
-        {{/if}}
-        {{#if (not (isEmpty recipe.results))}}
-            <div class="flexcol" style="min-width:200px">
-                <div class="header">
-                    {{localize "beaversCrafting.crafting-app.result"}}
+            {{/if}}
+            {{#if (not isEmpty chatData.components.consumed)}}
+                <div class="flexcol" style="min-width:200px">
+                    <div class="header">
+                        {{localize "beaversCrafting.crafting-app.cost"}}
+                    </div>
+                    <div class="flexcol consumed section">
+                        {{#each chatData.components.consumed}}
+                            {{>beavers-recipe-component component=this.component key=@key clickable=../displayIngredients status=this.status}}
+                            {{#unless @last}}
+                                <div class="beavers-seperator"></div>
+                            {{/unless}}
+                        {{/each}}
+                    </div>
                 </div>
-                <div class="flexcol results section">
-                    {{#each recipe.results}}
-                        {{>beavers-recipe-component component=this key=@key clickable=../displayResults }}
-                        {{#unless @last}}
-                            <div class="beavers-seperator"></div>
-                        {{/unless}}
-                    {{/each}}
+            {{/if}}
+            {{#if (not isEmpty chatData.components.produced)}}
+                <div class="flexcol" style="min-width:200px">
+                    <div class="header">
+                        {{localize "beaversCrafting.crafting-app.result"}}
+                    </div>
+                    <div class="flexcol produced section">
+                        {{#each chatData.components.produced}}
+                            {{>beavers-recipe-component component=this.component key=@key clickable=../displayIngredients status=this.status}}
+                            {{#unless @last}}
+                                <div class="beavers-seperator"></div>
+                            {{/unless}}
+                        {{/each}}
+                    </div>
                 </div>
-            </div>
+            {{/if}}
+        {{else}}
+            {{#if (not (isEmpty recipe.attendants))}}
+                <div class="flexcol" style="min-width:200px">
+                    <div class="header">
+                        {{localize "beaversCrafting.crafting-app.required"}}
+                    </div>
+                    <div class="flexcol attendants section">
+                        {{#each recipe.attendants}}
+                            {{>beavers-recipe-component component=this key=@key clickable=../displayIngredients status=(lookup ../precast.attendants @key)}}
+                            {{#unless @last}}
+                                <div class="beavers-seperator"></div>
+                            {{/unless}}
+                        {{/each}}
+                    </div>
+                </div>
+            {{/if}}
+            {{#if (or currencyComponent (not (isEmpty recipe.ingredients)))}}
+                <div class="flexcol" style="min-width:200px">
+                    <div class="header">
+                        {{localize "beaversCrafting.crafting-app.cost"}}
+                    </div>
+                    <div class="flexcol ingredients section">
+                        {{#if currencyComponent}}
+                            {{>beavers-recipe-component component=currencyComponent status=precast.currencies.status}}
+                            {{#if (not (isEmpty recipe.ingredients))}}
+                                <div class="beavers-seperator"></div>
+                            {{/if}}
+                        {{/if}}
+                        {{#if (not (isEmpty recipe.ingredients))}}
+                            {{#each recipe.ingredients}}
+                                {{>beavers-recipe-component component=this key=@key clickable=../displayIngredients status=(lookup ../precast.ingredients @key)}}
+                                {{#unless @last}}
+                                    <div class="beavers-seperator"></div>
+                                {{/unless}}
+                            {{/each}}
+                        {{/if}}
+                    </div>
+                </div>
+            {{/if}}
+            {{#if (not (isEmpty recipe.results))}}
+                <div class="flexcol" style="min-width:200px">
+                    <div class="header">
+                        {{localize "beaversCrafting.crafting-app.result"}}
+                    </div>
+                    <div class="flexcol results section">
+                        {{#each recipe.results}}
+                            {{>beavers-recipe-component component=this key=@key clickable=../displayResults }}
+                            {{#unless @last}}
+                                <div class="beavers-seperator"></div>
+                            {{/unless}}
+                        {{/each}}
+                    </div>
+                </div>
+            {{/if}}
         {{/if}}
     </div>
 </div>

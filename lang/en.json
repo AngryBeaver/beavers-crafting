@@ -99,7 +99,7 @@
       },
       "currencyExchange": {
         "name": "Exchange currencies",
-        "hint": "if disabled you need to poses the exact currency in order to pay the recipe cost"
+        "hint": "if disabled you need to possess the exact currency in order to pay the recipe cost"
       },
       "toolButton": {
         "name": "Configure tools available",

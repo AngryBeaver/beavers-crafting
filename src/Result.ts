@@ -205,7 +205,7 @@ export class Result implements ResultApi, ResultData {
             component.quantity = this._currencyResult.value * -1
             this.addChatComponent({
                 component: component,
-                hasError: this._currencyResult.hasError,
+                status: this._currencyResult.hasError?'error':'undefined',
                 type: "consumed",
                 isProcessed: false,
             });

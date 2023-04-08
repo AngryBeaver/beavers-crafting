@@ -262,6 +262,10 @@
     color:#468847;
     margin: auto;
 }
+.beavers-crafting .fa-lock{
+    color:darkorange;
+    margin: auto;
+}
 /****************
 beaver-component
  ****************/
@@ -313,6 +317,7 @@ beaver-component
     flex: 0;
     border-radius: 4px;
     margin: 2px;
+    border: 0px solid transparent;
 }
 
 .beavers-crafting .beavers-component .name {
@@ -424,6 +429,8 @@ beaver-folder
     font-family: "Modesto Condensed", "Palatino Linotype", serif;
     overflow:hidden;
     text-overflow: ellipsis;
+    flex-wrap:nowrap;
+    white-space:nowrap;
 }
 
 .beavers-crafting .beavers-folder .beavers-folder-item img {

@@ -33,10 +33,8 @@
     </div>
     <div class="flexrow beavers-chat-info">
         <div class="left flexcol">
-            {{#each data.components}}
-                {{#if (eq type "consumed")}}
-                    {{>beavers-recipe-component component=this.component status=this.status }}
-                {{/if}}
+            {{#each data.components.consumed}}
+                {{>beavers-recipe-component component=this.component status=this.status }}
             {{/each}}
         </div>
         <div class="right flexcol">
@@ -45,10 +43,8 @@
                     <div class="name">{{localize "beaversCrafting.recipe.results"}}</div>
                 </div>
             </div>
-            {{#each data.components}}
-                {{#if (eq type "produced")}}
+            {{#each data.components.produced}}
                     {{>beavers-recipe-component component=this.component status=this.status }}
-                {{/if}}
             {{/each}}
         </div>
     </div>

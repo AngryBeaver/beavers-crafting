@@ -392,22 +392,43 @@ export class Crafting implements CraftingData {
             }
         }
     }
+    get chatData(): ChatData {
+        return this.getChatData();
+    }
 
     getChatData(): ChatData {
-        const components: ComponentChatData[] = [];
+        const components: {
+            required:ComponentChatData[],
+            consumed:ComponentChatData[],
+            produced:ComponentChatData[]
+        } = {
+            required:[],
+            consumed:[],
+            produced:[]
+        };
         const hasError = this.result.hasError();
         for (const componentResult of this.result._components.required._data) {
             const status = componentResult.hasError()?'error':!componentResult.isProcessed?'undefined':this.isFinished?'success':'locked';
-            components.push({
+            components.required.push({
                 component: componentResult.component,
                 status: status,
                 type: "required",
                 isProcessed: componentResult.isProcessed
             })
         }
+        if(this.result._currencyResult) {
+            const component = getCurrencyComponent(this.result._currencyResult?.name,this.result._currencyResult.value * -1)
+            const status = this.result._currencyResult.hasError?'error':!this.result._currencyResult.isConsumed?'undefined':this.isFinished?'success':'locked';
+            components.consumed.push({
+                component: component,
+                status: status,
+                type: "consumed",
+                isProcessed: this.result._currencyResult.isConsumed,
+            });
+        }
         for (const componentResult of this.result._components.consumed._data) {
             const status = componentResult.hasError()?'error':!componentResult.isProcessed?'undefined':this.isFinished?'success':'locked';
-            components.push({
+            components.consumed.push({
                 component: componentResult.component,
                 status: status,
                 type: "consumed",
@@ -417,7 +438,7 @@ export class Crafting implements CraftingData {
         for (const componentResult of this.result._components.produced._data) {
             if (componentResult.userInteraction === "always" || (componentResult.userInteraction === "onSuccess" && !hasError)) {
                 const status = componentResult.hasError()?'error':!componentResult.isProcessed?'undefined':this.isFinished?'success':'locked';
-                components.push({
+                components.produced.push({
                     component: componentResult.component,
                     status: status,
                     type: "produced",
@@ -425,18 +446,11 @@ export class Crafting implements CraftingData {
                 })
             }
         }
-        components.push(...Object.values(this.result._chatAddition).filter(s=>s.component.type !== "Currency"));
-
-        if(this.result._currencyResult) {
-            const component = getCurrencyComponent(this.result._currencyResult?.name,this.result._currencyResult.value * -1)
-            const status = this.result._currencyResult.hasError?'error':!this.result._currencyResult.isConsumed?'undefined':this.isFinished?'success':'locked';
-            components.push({
-                component: component,
-                status: status,
-                type: "consumed",
-                isProcessed: this.result._currencyResult.isConsumed,
+        Object.values(this.result._chatAddition)
+            .filter(s=>s.component.type !== "Currency")//legacy
+            .forEach(c=>{
+                components[c.type].push(c);
             });
-        }
 
 
         const tests = {maxHits:1,maxFails:1,hits:0,fails:0,hitPer:0,failPer:0}
@@ -462,7 +476,6 @@ export class Crafting implements CraftingData {
             status = "success";
             tests.hitPer = 100;
         }
-
         return {
             name: this.recipe.name,
             img: this.recipe.img,
@@ -471,6 +484,7 @@ export class Crafting implements CraftingData {
             tests:tests,
             components: components,
         }
+
     }
 
     async _sendToChat() {
