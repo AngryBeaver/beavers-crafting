@@ -60,7 +60,7 @@
     </div>
     <div class="flexrow" style="flex-basis:auto">
         {{#if chatData}}
-            {{#if (not beavers-isEmpty chatData.components.required)}}
+            {{#if (not (beavers-isEmpty chatData.components.required))}}
                 <div class="flexcol" style="min-width:200px">
                     <div class="header">
                         {{localize "beaversCrafting.crafting-app.required"}}
@@ -75,7 +75,7 @@
                     </div>
                 </div>
             {{/if}}
-            {{#if (not beavers-isEmpty chatData.components.consumed)}}
+            {{#if (not (beavers-isEmpty chatData.components.consumed))}}
                 <div class="flexcol" style="min-width:200px">
                     <div class="header">
                         {{localize "beaversCrafting.crafting-app.cost"}}
@@ -90,7 +90,7 @@
                     </div>
                 </div>
             {{/if}}
-            {{#if (not beavers-isEmpty chatData.components.produced)}}
+            {{#if (not (beavers-isEmpty chatData.components.produced))}}
                 <div class="flexcol" style="min-width:200px">
                     <div class="header">
                         {{localize "beaversCrafting.crafting-app.result"}}
