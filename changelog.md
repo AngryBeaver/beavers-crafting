@@ -1,4 +1,9 @@
 # Changelog
+## 3.1.x folders
+## 3.1.2
+- fix collision to better roll tables
+## 3.1.1
+- css bug in some browsers
 ## 3.1.0
 - add folder structure
 - ui redesign beavers recipe compendium add responsiveness
@@ -11,7 +16,6 @@
 - fix more then two tests
 - ui redesign crafting tab on actor
 - ui redesign chatMessage
-- todo create tutorial video
 
 ## 3.0.x progress tracking and multiple tests
 ## 3.0.2 

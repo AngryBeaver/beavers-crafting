@@ -120,12 +120,8 @@ Hooks.once("beavers-system-interface.ready", async function(){
 });
 
 //fucking stupid handlebars !!!
-Handlebars.registerHelper('hasKey', function (param1, key, options) {
-    if (param1[key]) {
-        return options.fn(this);
-    }
-    return options.inverse(this);
-});
-Handlebars.registerHelper('isEmpty', function (object, options) {
-    return Object.keys(object).length === 0;
+Handlebars.registerHelper('beavers-isEmpty', function (value, options) {
+    return value === undefined ||
+    (value instanceof Object && Object.keys(value).length === 0) ||
+    (value instanceof Array && value.length === 0)
 });
