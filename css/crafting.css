@@ -630,4 +630,14 @@ actor-sheet
 .beavers-crafting.actor-tab .addCrafting {
     font-size:12px;
     line-height:12px;
+    background: rgba(0, 0, 0, 0.1);
+    border: 2px groove #eeede0;
+    padding:1px 5px;
+    text-align:center;
+    cursor:pointer;
+}
+
+.beavers-crafting.actor-tab .addCrafting:hover {
+    outline: none;
+    box-shadow: 0 0 5px var(--color-shadow-primary);
 }
