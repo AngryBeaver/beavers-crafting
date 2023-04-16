@@ -50,13 +50,12 @@ export class RecipeSheet {
         if(html[0].localName !== "div") {
             html = $(html[0].parentElement.parentElement);
         }
-        let exists = html.find(".sheet-body .beavers-crafting");
+        let exists = html.find(".beavers-crafting.recipe");
         if(exists.length != 0){
             return;
         }
         this.recipeElement = $('<div class="beavers-crafting recipe"></div>');
-        html.find(".sheet-body").empty();
-        html.find(".sheet-body").append(this.recipeElement);
+        beaversSystemInterface.itemSheetReplaceContent(this.app,html,this.recipeElement);
         this.recipe = Recipe.fromItem(this.item);
         this.render();
     }
