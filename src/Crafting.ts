@@ -355,7 +355,7 @@ export class Crafting implements CraftingData {
             }
         }
         if (this.result._currencyResult !== undefined) {
-            if (!this.recipe.skill?.consume && this.result.hasError()) {
+            if (!this.recipe.tests?.consume && this.result.hasError()) {
                 this.result.revertPayedCurrency();
             }
         }

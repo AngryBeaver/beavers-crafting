@@ -1,4 +1,13 @@
 # Beaver's Crafting Module
+![Foundry Core Compatible Version](https://img.shields.io/endpoint?url=https%3A%2F%2Ffoundryshields.com%2Fversion%3Fstyle%3Dflat%26url%3Dhttps%3A%2F%2Fgithub.com%2FAngryBeaver%2Fbeavers-crafting%2Freleases%2Flatest%2Fdownload%2Fmodule.json)
+![Foundry System](https://img.shields.io/endpoint?url=https%3A%2F%2Ffoundryshields.com%2Fsystem%3FnameType%3Draw%26showVersion%3D1%26style%3Dflat%26url%3Dhttps%3A%2F%2Fraw.githubusercontent.com%2FAngryBeaver%2Fbeavers-crafting%2Fmain%2Fmodule.json)
+![Download Count](https://img.shields.io/github/downloads/AngryBeaver/beavers-crafting/total?color=bright-green)
+
+## Features
+![img.gif](pictures/video.gif)
+### demoVideo
+https://www.youtube.com/watch?v=t3YGk8uFK0w
+
 With this module you can create recipes to craft items. E.g. a bunch of mushrooms to brew a potion.
 
 You can use it for:
@@ -13,16 +22,6 @@ by:
 - optionally requireing features, tools, classes, backgrounds
 - optionally tracking your progress by optionally testing (skills, tools, abilities) or just advanceing it.
 
-
-![Foundry Core Compatible Version](https://img.shields.io/endpoint?url=https%3A%2F%2Ffoundryshields.com%2Fversion%3Fstyle%3Dflat%26url%3Dhttps%3A%2F%2Fgithub.com%2FAngryBeaver%2Fbeavers-crafting%2Freleases%2Flatest%2Fdownload%2Fmodule.json)
-![Foundry System](https://img.shields.io/endpoint?url=https%3A%2F%2Ffoundryshields.com%2Fsystem%3FnameType%3Draw%26showVersion%3D1%26style%3Dflat%26url%3Dhttps%3A%2F%2Fraw.githubusercontent.com%2FAngryBeaver%2Fbeavers-crafting%2Fmain%2Fmodule.json)
-![Download Count](https://img.shields.io/github/downloads/AngryBeaver/beavers-crafting/total?color=bright-green)
-
-
-## Features
-![img.gif](pictures/video.gif)
-### demoVideo
-https://www.youtube.com/watch?v=t3YGk8uFK0w
 ### Loot subtype Recipe
 ![img.png](pictures/newItem.png)
 For this to work you must go to your settings and enter the name of the create Item Dialog.

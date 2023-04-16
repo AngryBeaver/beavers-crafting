@@ -1,5 +1,9 @@
 # Changelog
 ## 3.1.x folders
+## 3.1.3
+- fix always revert currency on failed crafts.
+- fix on enter open crafting tab.
+- css adaption to overwrite swade incompatibility stlyes.
 ## 3.1.2
 - fix collision to better roll tables
 ## 3.1.1
