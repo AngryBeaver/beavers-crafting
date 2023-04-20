@@ -56,7 +56,7 @@ export class TestHandler{
 
     async test(){
         const testOr = await this.selectTestChoice();
-        let test = false;
+        let test:boolean|null = null;
         if(testOr.type === "ability") {
             test = await this._testAbility(testOr);
         }else if(testOr.type === "skill") {
@@ -67,30 +67,36 @@ export class TestHandler{
             test = true;
         }
         //todo time,hook,macro,item
-        if(test){
+        if(test === true){
             this.result.updateTests(1,0);
-        }else{
+        }else if(test === false){
             this.result.updateTests(0,1);
         }
     }
 
-    async _testAbility(testOr:TestOr):Promise<boolean>{
+    async _testAbility(testOr:TestOr):Promise<boolean|null>{
         let roll = await beaversSystemInterface.actorRollAbility(this.actor, testOr.uuid);
+        if( roll == null){
+            return null
+        }
         if(roll != undefined && roll.total >= testOr.check){
             return true;
         }
         return false;
     }
 
-    async _testSkill(testOr:TestOr):Promise<boolean>{
+    async _testSkill(testOr:TestOr):Promise<boolean|null>{
         let roll = await beaversSystemInterface.actorRollSkill(this.actor, testOr.uuid);
+        if( roll == null){
+            return null;
+        }
         if(roll != undefined && roll.total >= testOr.check){
             return true;
         }
         return false;
     }
 
-    async _testTool(testOr:TestOr):Promise<boolean>{
+    async _testTool(testOr:TestOr):Promise<boolean|null>{
         const item = await beaversSystemInterface.uuidToDocument(testOr.uuid);
         const toolComponent = beaversSystemInterface.componentFromEntity(item);
         const results = beaversSystemInterface.itemListComponentFind(this.actor.items,toolComponent);
@@ -102,6 +108,9 @@ export class TestHandler{
         }
         const actorItem = await beaversSystemInterface.uuidToDocument(actorComponent.uuid);
         let roll = await beaversSystemInterface.actorRollTool(this.actor, actorItem);
+        if( roll == null ){
+            return null;
+        }
         if(roll != undefined && roll.total >= testOr.check){
             return true;
         }

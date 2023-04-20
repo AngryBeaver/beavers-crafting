@@ -63,7 +63,7 @@ export class RecipeSheet {
     addDragDrop(){
         if(this.editable) {
             const dragDrop = new DragDrop({
-                dropSelector: '.sheet-body',
+                dropSelector: '',
                 permissions: {
                     dragstart: this.app._canDragStart.bind(this.app),
                     drop: this.app._canDragDrop.bind(this.app)
@@ -228,9 +228,9 @@ export class RecipeSheet {
 
 
     async _onDropMain(e){
-        const isIngredient = $(e.target).parents(".beavers-crafting .recipe .ingredients").length !==0;
-        const isResult = $(e.target).parents(".beavers-crafting .recipe .results").length !==0;
-        const isAttendant = $(e.target).parents(".beavers-crafting .recipe .attendants").length !==0;
+        const isIngredient = $(e.target).parents(".beavers-crafting.recipe .ingredients").length !==0;
+        const isResult = $(e.target).parents(".beavers-crafting.recipe .results").length !==0;
+        const isAttendant = $(e.target).parents(".beavers-crafting.recipe .attendants").length !==0;
         if(!isIngredient && !isResult && !isAttendant){
             return;
         }

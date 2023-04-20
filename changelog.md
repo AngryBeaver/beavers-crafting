@@ -1,5 +1,9 @@
 # Changelog
 ## 3.1.x folders
+## 3.1.5
+- handle null rolls
+- systeminterface return type of rolls maybe null (if aborted)
+- fix drag and drop in recipesheet for some systems.
 ## 3.1.3
 - fix always revert currency on failed crafts.
 - fix on enter open crafting tab.

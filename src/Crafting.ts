@@ -309,6 +309,7 @@ export class Crafting implements CraftingData {
                     this.restore.forEach(r=>{
                         if(component.isSame(r)){
                             r.quantity = component.quantity;
+                            r.quantity = component.quantity;
                             component = beaversSystemInterface.componentCreate(r);
                         }
                     })
