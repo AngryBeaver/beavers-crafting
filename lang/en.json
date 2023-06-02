@@ -94,8 +94,8 @@
         "hint": "A Recipe can require to have a tool present on actor. Deprecated since 0.7.x in favour of attendants. It will get removed at somePoint in future, you should migrate to attendants."
       },
       "useAttendants": {
-        "name": "Recipes use attendants",
-        "hint": "A Recipe can require to have attendance present on actor. You can setUp anything you want feats, class, background, tools etc!"
+        "name": "Recipes use required Items",
+        "hint": "A Recipe can require to have items present on actor that does not get consumed in the process. You can setUp anything your system models as item e.g. for dnd5e feats, class, background, tools etc!"
       },
       "currencyExchange": {
         "name": "Exchange currencies",

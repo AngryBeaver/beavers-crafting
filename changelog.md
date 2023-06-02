@@ -1,4 +1,7 @@
 # Changelog
+## 3.2.0 simple or
+- fix consistent name of attendants as required in ui.
+
 ## 3.1.x folders
 ## 3.1.5
 - handle null rolls
