@@ -17,6 +17,7 @@ export class Settings {
     static MAJOR_VERSION = "majorVersion";
     static ACTOR_TAB_ID = "beavers-crafting";
     static CURRENCY_EXCHANGE = "currencyExchange"
+    static DISABLED_ACTOR = "disabledActor";
 
     static init() {
         game.settings.register(this.NAMESPACE, this.CREATE_ITEM_TITLE, {
@@ -91,6 +92,14 @@ export class Settings {
             default: true,
             type: Boolean,
         });
+        game.settings.register(this.NAMESPACE, this.DISABLED_ACTOR, {
+            name: game.i18n.localize('beaversCrafting.settings.disabledActor.name'),
+            hint: game.i18n.localize('beaversCrafting.settings.disabledActor.hint'),
+            scope: "world",
+            config: true,
+            default: "npc",
+            type: String,
+        });
         game.settings.register(this.NAMESPACE, this.MAJOR_VERSION, {
             scope: "world",
             config: false,
@@ -122,6 +131,10 @@ export class Settings {
 
     static set(key, value) {
         game.settings.set(this.NAMESPACE, key, value);
+    }
+
+    static isDisabledActor(actor) {
+        return Settings.get(Settings.DISABLED_ACTOR).split(",").includes(actor.type);
     }
 
 }

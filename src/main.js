@@ -37,8 +37,9 @@ Hooks.once("beavers-system-interface.ready", async function(){
     }
     Settings.set(Settings.MAJOR_VERSION,3);
 
+
     Hooks.on("getActorSheetHeaderButtons", (app, buttons) => {
-        if(Settings.get(Settings.ADD_HEADER_LINK)) {
+        if(Settings.get(Settings.ADD_HEADER_LINK) && !Settings.isDisabledActor(app.actor)) {
             buttons.unshift({
                 label: "beaversCrafting.actorLink",
                 class: "beaversCrafting",
@@ -49,7 +50,9 @@ Hooks.once("beavers-system-interface.ready", async function(){
     });
 
     Hooks.on("renderActorSheet", (app, html, data)=>{
-        new ActorSheetTab(app, html, data);
+        if(!Settings.isDisabledActor(app.actor)){
+            new ActorSheetTab(app, html, data);
+        }
     });
 
 //Recipe remap use action

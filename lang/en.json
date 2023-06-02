@@ -101,6 +101,10 @@
         "name": "Exchange currencies",
         "hint": "if disabled you need to possess the exact currency in order to pay the recipe cost"
       },
+      "disabledActor": {
+        "name": "Disabled Actors",
+        "hint": "Comma separated list of actor types that will not have a crafting tab"
+      },
       "toolButton": {
         "name": "Configure tools available",
         "hint": "Configure list of tools that are available in tool dropdown when creating recipes",

@@ -1,6 +1,7 @@
 # Changelog
 ## 3.2.0 simple or
 - fix consistent name of attendants as required in ui.
+- add Settings to disable actor types that should not have a crafting tab.
 
 ## 3.1.x folders
 ## 3.1.5
