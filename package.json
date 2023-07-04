@@ -3,8 +3,8 @@
 	"title": "Beaver's Crafting",
 	"version": "3.2.0",
 	"description": "Crafting",
-	"devDir": "C:\\Users\\Riess\\AppData\\Local\\FoundryVTT\\Data\\modules",
-	"#devDir": "C:\\data\\Data\\modules",
+	"#devDir": "C:\\Users\\Riess\\AppData\\Local\\FoundryVTT\\Data\\modules",
+	"devDir": "C:\\data\\Data\\modules",
 	"main": "src/main.js",
 	"scripts": {
 		"build": "npx gulp",

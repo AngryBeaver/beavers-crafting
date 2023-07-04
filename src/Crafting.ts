@@ -98,7 +98,7 @@ export class Crafting implements CraftingData {
         await this.checkTool();
         await this.checkAttendants();
         await this.evaluateAnyOf();
-        RecipeCompendium.validateRecipeToItemList(Object.values(this.recipe.ingredients), this.actor.items, this.result);
+        RecipeCompendium.validateRecipeToItemList(RecipeCompendium._filterData(this.recipe.input,component=>true), this.actor.items, this.result);
         await this.payCurrency();
         await this.addOutput();
         await this.executeMacro();
@@ -195,28 +195,35 @@ export class Crafting implements CraftingData {
         await RecipeCompendium.validateAttendants(this.recipe, this.actor.items, this.result);
     }
 
+    async evaluatePossibilities(){
+        //todo
+    }
+
     async evaluateAnyOf() {
-        const toDelete: string[] = [];
-        const toAdd: Component[] = [];
-        for (const [key, component] of Object.entries(this.recipe.ingredients)) {
-            if (component.type === Settings.ANYOF_SUBTYPE) {
-                const item = await component.getEntity();
-                const anyOf = new AnyOf(item);
-                let results = await anyOf.filter(this.actor.items);
-                results = results.filter(c => {
-                    let quantity = c.quantity;
-                    toAdd.forEach(a => {
-                        if (a.id === c.id) {
-                            quantity = quantity - a.quantity;
-                        }
+        /* move to posibilities create popups for each decission.
+        const toDelete = {};
+        const toAdd = {};
+        for (const [group, ors] of Object.entries(this.recipe.input)) {
+            for(const [id, component] of Object.entries(ors)) {
+                if (component.type === Settings.ANYOF_SUBTYPE) {
+                    const item = await component.getEntity();
+                    const anyOf = new AnyOf(item);
+                    let results = await anyOf.filter(this.actor.items);
+                    results = results.filter(c => {
+                        let quantity = c.quantity;
+                        toAdd.forEach(a => {
+                            if (a.id === c.id) {
+                                quantity = quantity - a.quantity;
+                            }
+                        });
+                        return quantity >= component.quantity
                     });
-                    return quantity >= component.quantity
-                });
-                if (results.length >= 0) {
-                    const result = results[Math.floor(Math.random() * results.length)];
-                    result.quantity = component.quantity;
-                    toAdd.push(result);
-                    toDelete.push(key);
+                    if (results.length >= 0) {
+                        const result = results[Math.floor(Math.random() * results.length)];
+                        result.quantity = component.quantity;
+                        toAdd[group]=toAdd[group];
+                        toDelete[group]=[id];
+                    }
                 }
             }
         }
@@ -224,6 +231,7 @@ export class Crafting implements CraftingData {
         toAdd.forEach(component => {
             this.recipe.addIngredientComponent(component)
         });
+         */
     }
 
     async checkCurrency() {

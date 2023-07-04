@@ -37,6 +37,8 @@
       "dc": "DC",
       "results": "Results",
       "dropItem": "drop item",
+      "addItem" : "add item",
+      "orItem": "or item",
       "currency": "Cost",
       "consumeOnFailedSaveHint": "Consumes Cost on failed Skill check",
       "attendants": "Attendants",

@@ -155,19 +155,34 @@ interface AnyOfStoreData {
 }
 
 interface RecipeData {
-    ingredients: {
+    input: {
+        [key: string]: {
+            [key: string]: ComponentData
+        }
+    }
+    output: {
+        [key: string]: {
+            [key: string]: ComponentData
+        }
+    }
+    required: {
+        [key: string]: {
+            [key: string]: ComponentData
+        }
+    }
+    ingredients?: {
         [key: string]: ComponentData
     }
-    results: {
+    results?: {
         [key: string]: ComponentData
     }
+    attendants?: {
+        [key: string]: ComponentData
+    },
     tests?: Tests;
     skill?: Skill;
     currency?: Currency;
     tool?: string;
-    attendants: {
-        [key: string]: ComponentData
-    },
     macro?: string
     folder?: string
     instruction?: string

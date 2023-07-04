@@ -1,5 +1,5 @@
-<div class="flexrow beavers-component" data-key="{{key}}" data-id="{{component.uuid}}">
-    <div class="flexrow {{#if clickable}}clickable{{/if}}" data-key="{{key}}" data-id="{{component.uuid}}">
+<div class="flexrow beavers-component" data-group="{{group}}" data-key="{{key}}" data-id="{{component.uuid}}">
+    <div class="flexrow {{#if clickable}}clickable{{/if}}" data-group="{{group}}" data-key="{{key}}" data-id="{{component.uuid}}">
         <img src="{{component.img}}"/>
         <span class="name">{{component.name}}</span>
     </div>
@@ -18,7 +18,7 @@
     {{#if editable}}
     <div class="attribute flexrow">
         <a class="item-delete">
-            <i class="fas fa-trash" data-id="{{key}}"></i>
+            <i class="fas fa-trash" data-group="{{group}}" data-id="{{key}}"></i>
         </a>
     </div>
     {{/if}}

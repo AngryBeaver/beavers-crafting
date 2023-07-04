@@ -11,14 +11,20 @@ export async function itemTypeMigration() {
     }
 
     async function migrateRecipe(recipe) {
-        for (const key in recipe.attendants) {
-            await addItemType(recipe.attendants[key]);
+        if (recipe.attendants) {
+            for (const key in recipe.attendants) {
+                await addItemType(recipe.attendants[key]);
+            }
         }
-        for (const key in recipe.ingredients) {
-            await addItemType(recipe.ingredients[key]);
+        if (recipe.ingredients) {
+            for (const key in recipe.ingredients) {
+                await addItemType(recipe.ingredients[key]);
+            }
         }
-        for (const key in recipe.results) {
-            await addItemType(recipe.results[key]);
+        if( recipe.results) {
+            for (const key in recipe.results) {
+                await addItemType(recipe.results[key]);
+            }
         }
         await recipe.update();
     }
@@ -137,7 +143,7 @@ export function recipeSkillToTests(recipe: RecipeData) {
 export async function toolToAttendant(recipe: Recipe) {
     if (recipe.tool != undefined) {
         const item = await beaversSystemInterface.uuidToDocument(recipe.tool);
-        recipe.addAttendant(item, item.uuid, item.type);
+        recipe.addRequired(item, item.uuid, "");
         recipe.removeTool();
     }
 }

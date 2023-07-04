@@ -23,11 +23,25 @@ export class RecipeCompendium {
         return [...RecipeCompendium.getAllItems(),...RecipeCompendium.getForActor(actor)];
     }
 
+    static _filterData(data:{[key:string]:{[key:string]:Component}}, filter:(component:Component)=>boolean):Component[]{
+        const list: Component[] = [];
+        for(const group of Object.values(data)){
+            for (const component of Object.values(group)) {
+                if(filter(component)){
+                    list.push(component);
+                }
+            }
+        }
+        return list;
+    }
+
+
+
     static async filterForItems(recipes: Recipe[], items) {
         const returnList: Recipe[] = [];
         for (const recipe of recipes) {
-            const listOfAnyOfIngredients = Object.values(recipe.ingredients).filter(component => component.type === Settings.ANYOF_SUBTYPE);
-            const listOfIngredientsWithoutAnyOf = Object.values(recipe.ingredients).filter(component => component.type !== Settings.ANYOF_SUBTYPE);
+            const listOfAnyOfIngredients = this._filterData(recipe.input,component => component.type === Settings.ANYOF_SUBTYPE);
+            const listOfIngredientsWithoutAnyOf = this._filterData(recipe.input,component => component.type !== Settings.ANYOF_SUBTYPE);
             let countItems = 0;
             itemLoop: for(const item of items) {
                 const itemComponent = beaversSystemInterface.componentFromEntity(item);
@@ -64,7 +78,7 @@ export class RecipeCompendium {
             if (filter == FilterType.all || filter == FilterType.own) {
                 returnList.push(recipe);
             } else {
-                const listOfAnyOfIngredients = Object.values(recipe.ingredients).filter(component => component.type === Settings.ANYOF_SUBTYPE);
+                const listOfAnyOfIngredients = this._filterData(recipe.input,component => component.type === Settings.ANYOF_SUBTYPE);
                 if (await this.isAnyAnyOfInList(listOfAnyOfIngredients, actor.items)) {                                       //isAvailable or usable ! when any item matches anyOf has the given quantity
                     const listOfIngredientsWithoutAnyOf = Object.values(recipe.ingredients).filter(component => component.type !== Settings.ANYOF_SUBTYPE);
                     const result = RecipeCompendium.validateRecipeToItemList(listOfIngredientsWithoutAnyOf, actor.items, Result.from(recipe,actor));

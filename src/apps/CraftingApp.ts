@@ -106,7 +106,7 @@ export class CraftingApp extends Application {
             return;
         }
         const crafting = await Crafting.from(this.data.actor.id, this.data.recipe.uuid);
-        RecipeCompendium.validateRecipeToItemList(Object.values(this.data.recipe.ingredients), this.data.actor.items,crafting.result);
+        RecipeCompendium.validateRecipeToItemList(RecipeCompendium._filterData(this.data.recipe.input,(c)=>true), this.data.actor.items,crafting.result);
         await crafting.checkTool();
         await crafting.checkAttendants();
         await crafting.checkCurrency();
@@ -214,12 +214,12 @@ export class CraftingApp extends Application {
         }
         const uuid = $(e.currentTarget).data("id");
         if(uuid != undefined){
-            const uuid = $(e.currentTarget).data("id");
             const key = $(e.currentTarget).data("key");
+            const group = $(e.currentTarget).data("group");
             beaversSystemInterface.uuidToDocument(uuid).then(
                 item => {
                     if(AnyOf.isAnyOf(item)){
-                       return this._onDropAnyOf(new AnyOf(item),key,e);
+                       return this._onDropAnyOf(new AnyOf(item),group, key,e);
                     }
                     return;
                 }
@@ -228,7 +228,7 @@ export class CraftingApp extends Application {
 
     }
 
-    async _onDropAnyOf(anyOf:AnyOf, key:string, e:DragEvent) {
+    async _onDropAnyOf(anyOf:AnyOf, group:string, key:string, e:DragEvent) {
         if (this.data.recipe === undefined){
             return;
         }
@@ -238,24 +238,24 @@ export class CraftingApp extends Application {
             const entity = await fromUuid(data.uuid);
             let result = await anyOf.executeMacro(entity);
             if(result.value) {
-                const previousComponent = this.data.recipe.ingredients[key];
+                const previousComponent = this.data.recipe.input[group][key];
                 const component = beaversSystemInterface.componentFromEntity(entity);
-                const nextKey = sanitizeUuid(data.uuid);
+                const id = sanitizeUuid(data.uuid);
                 component.quantity = previousComponent.quantity;
                 this.data.recipe = Recipe.clone(this.data.recipe);
                 //remove existing ingredient with same id and add quantity;
-                if(this.data.recipe.ingredients[nextKey]){
-                    component.quantity = component.quantity + this.data.recipe.ingredients[nextKey].quantity;
-                    delete this.data.recipe.ingredients[nextKey];
+                if(this.data.recipe.input[group][id]){
+                    component.quantity = component.quantity + this.data.recipe.input[group][id].quantity;
+                    delete this.data.recipe.input[group][id];
                 }
                 //copyInPlace;
                 const ingredients = Object.fromEntries(
-                    Object.entries(this.data.recipe.ingredients).map(([o_key, o_val]) => {
-                        if (o_key === key) return [nextKey, component];
+                    Object.entries(this.data.recipe.input[group]).map(([o_key, o_val]) => {
+                        if (o_key === key) return [id, component];
                         return [o_key, o_val];
                     })
                 );
-                this.data.recipe.ingredients = ingredients;
+                this.data.recipe.input[group] = ingredients;
                 void this.renderRecipeSheet();
             }
 
