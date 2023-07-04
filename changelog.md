@@ -4,6 +4,9 @@
 - add Settings to disable actor types that should not have a crafting tab.
 
 ## 3.1.x folders
+## 3.1.6 v11 fixes
+- fix chat message
+- fix close RecipeCompendium
 ## 3.1.5
 - handle null rolls
 - systeminterface return type of rolls maybe null (if aborted)
