@@ -501,7 +501,7 @@ export class Crafting implements CraftingData {
             {
                 data: this.getChatData(),
             })
-        content = TextEditor.enrichHTML(content);
+        content = await TextEditor.enrichHTML(content);
         await ChatMessage.create({
             content: content,
             speaker: {actor: this.actor.id},

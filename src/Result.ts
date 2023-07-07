@@ -91,7 +91,7 @@ export class Result implements ResultApi, ResultData {
         const serialized = {
             _actorUpdate: this._actorUpdate,
             _hasException: this._hasException,
-            _components: this._components,
+            _components: this.serializeComponents(),
             _skill: this._skill,
             _tests:this._tests,
             _chatAddition: this._chatAddition,
@@ -109,6 +109,14 @@ export class Result implements ResultApi, ResultData {
             serialized["-=_tests"] = null;
         }
         return serialized;
+    }
+
+    serializeComponents(){
+        return {
+            required: this._components.required.serialize(),
+            consumed: this._components.consumed.serialize(),
+            produced: this._components.produced.serialize()
+        }
     }
 
     hasError(): boolean {
@@ -253,6 +261,18 @@ export class ComponentResults implements ComponentResultsData {
         this._data = [];
     }
 
+    serialize():ComponentResultsData{
+        const serialized = {
+            _data:[]
+        };
+        Object.values(this._data).forEach(c=>{
+            const x = c.serialize();
+            // @ts-ignore
+            serialized._data.push(x);
+        });
+        return serialized;
+    }
+
     hasAnyError() {
         for (const componentResult of this._data) {
             if (componentResult.hasError()) {
@@ -305,6 +325,15 @@ export class ComponentResult implements ComponentResultData {
         componentResult.userInteraction = componentResultData.userInteraction;
         componentResult.isProcessed = componentResultData.isProcessed;
         return componentResult;
+    }
+
+    serialize():ComponentResultData{
+        return {
+            component: this.component,
+            isProcessed: this.isProcessed,
+            originalQuantity: this.originalQuantity,
+            userInteraction: this.userInteraction
+        }
     }
 
     hasError(): boolean {
