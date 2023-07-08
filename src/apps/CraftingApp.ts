@@ -200,8 +200,11 @@ export class CraftingApp extends Application {
                 drop: this._onDrop.bind(this)
             }
         });
-        if(this._dragDrop.length > 1){
-            this._dragDrop.pop();
+        for(const x in this._dragDrop){
+            if(this._dragDrop[x].dropSelector === dropFilter.dropSelector){
+                this._dragDrop[x].bind(html[0]);
+                return;
+            }
         }
         this._dragDrop.push(dropFilter);
         dropFilter.bind(html[0]);
@@ -229,7 +232,7 @@ export class CraftingApp extends Application {
     }
 
     async _onDropAnyOf(anyOf:AnyOf, group:string, key:string, e:DragEvent) {
-        if (this.data.recipe === undefined){
+        if (this.data.recipe === undefined || e["isHandled"]){
             return;
         }
         const data = getDataFrom(e);
@@ -256,7 +259,8 @@ export class CraftingApp extends Application {
                     })
                 );
                 this.data.recipe.input[group] = ingredients;
-                void this.renderRecipeSheet();
+                e["isHandled"] = true;
+                window.setTimeout(this.renderRecipeSheet.bind(this),100);
             }
 
         }
@@ -292,6 +296,10 @@ export class CraftingApp extends Application {
             preCastData.attendants[key]=result._components.required.hasError(component)?'error':'success'
         }
         return preCastData;
+    }
+
+    protected _canDragDrop(selector: string): boolean {
+        return true;
     }
 }
 
