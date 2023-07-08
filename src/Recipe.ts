@@ -24,15 +24,6 @@ export class Recipe implements RecipeData {
             [key: string]: Component
         }
     }
-    attendants: {
-        [key: string]: Component
-    }
-    ingredients: {
-        [key: string]: Component
-    }
-    results: {
-        [key: string]: Component
-    }
     tests?: Tests;
     skill?: Skill;
     currency?: Currency;
