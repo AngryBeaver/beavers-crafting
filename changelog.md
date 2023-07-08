@@ -4,6 +4,8 @@
 - add Settings to disable actor types that should not have a crafting tab.
 
 ## 3.1.x folders
+## 3.1.7
+- fix anyOf allow dropping for players
 ## 3.1.6 v11 fixes
 - fix chat message
 - fix close RecipeCompendium
