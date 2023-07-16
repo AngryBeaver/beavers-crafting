@@ -95,9 +95,9 @@ export class Crafting implements CraftingData {
     }
 
     async startCrafting() {
+        await this.evaluatePossibilities();
         await this.checkTool();
         await this.checkAttendants();
-        await this.evaluateAnyOf();
         RecipeCompendium.validateRecipeToItemList(RecipeCompendium._filterData(this.recipe.input,component=>true), this.actor.items, this.result);
         await this.payCurrency();
         await this.addOutput();
@@ -192,11 +192,13 @@ export class Crafting implements CraftingData {
     }
 
     async checkAttendants() {
-        await RecipeCompendium.validateAttendants(this.recipe, this.actor.items, this.result);
+        await RecipeCompendium.validateAttendants(this.recipe, this.result);
     }
 
     async evaluatePossibilities(){
-        //todo
+        await RecipeCompendium.evaluateOptions("required",this.recipe,this.actor.items);
+        await RecipeCompendium.evaluateOptions("input",this.recipe,this.actor.items);
+        await RecipeCompendium.evaluateOptions("output",this.recipe,this.actor.items);
     }
 
     async evaluateAnyOf() {
@@ -522,8 +524,8 @@ export class Crafting implements CraftingData {
     }
 
     async _getResultComponents(result: Result): Promise<ComponentData[]> {
-        const items = Object.values(this.recipe.results).filter(component => component.type === "Item");
-        const tables = Object.values(this.recipe.results).filter(component => component.type === "RollTable");
+        const items = RecipeCompendium._filterData(this.recipe.output,c => c.type === "Item");
+        const tables = RecipeCompendium._filterData(this.recipe.output,c => c.type === "RollTable");
         for (const component of tables) {
             items.push(...await this._rollTableToComponents(component, result));
         }

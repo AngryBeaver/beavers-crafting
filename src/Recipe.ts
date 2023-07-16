@@ -234,7 +234,7 @@ export class Recipe implements RecipeData {
         this._removeData("output", group, id);
     }
 
-    _addData(dataType, component:Component, keyId, group) {
+    _addData(dataType:DataType, component:Component, keyId, group) {
         if (!group || !this[dataType][group]) {
             group = this._getNextId(this[dataType]);
             this[dataType][group] = {};
@@ -249,7 +249,7 @@ export class Recipe implements RecipeData {
 
     }
 
-    _removeData(type, group, id) {
+    _removeData(type:DataType, group:string, id) {
         delete this[type][group][id];
         if (!this._trash[type].ors[group]) {
             this._trash[type].ors[group] = {}

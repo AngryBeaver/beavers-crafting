@@ -279,21 +279,28 @@ export class CraftingApp extends Application {
 
     async getPrecastFromResult(result: Result, recipe: Recipe): Promise<PreCastData>{
         const preCastData:PreCastData = {
-            attendants: {},
-            ingredients: {},
+            required: {},
+            input: {},
         }
         if(result._currencyResult){
             preCastData.currencies = {status: result._currencyResult.hasError?'error':'success'};
         }
 
-        for(const key in recipe.ingredients){
-            const component = recipe.ingredients[key];
-            preCastData.ingredients[key]= result._components.consumed.hasError(component)?'error':'success'
+        for(const group in recipe.input){
+            preCastData.input[group] = {};
+            for(const key in recipe.input[group]){
+                const component = recipe.input[group][key];
+                preCastData.input[group][key]= result._components.consumed.hasError(component)?'error':'success'
+            }
+
 
         }
-        for(const key in recipe.attendants){
-            const component = recipe.attendants[key];
-            preCastData.attendants[key]=result._components.required.hasError(component)?'error':'success'
+        for(const group in recipe.required){
+            preCastData.required[group] = {};
+            for(const key in recipe.required[group]){
+                const component = recipe.required[group][key];
+                preCastData.required[group][key]=result._components.required.hasError(component)?'error':'success'
+            }
         }
         return preCastData;
     }

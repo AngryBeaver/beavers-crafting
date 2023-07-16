@@ -106,56 +106,135 @@
                 </div>
             {{/if}}
         {{else}}
-            {{#if (not (beavers-isEmpty recipe.attendants))}}
+            {{#if (not (beavers-isEmpty recipe.required))}}
                 <div class="flexcol" style="min-width:200px">
                     <div class="header">
                         {{localize "beaversCrafting.crafting-app.required"}}
                     </div>
-                    <div class="flexcol attendants section">
-                        {{#each recipe.attendants}}
-                            {{>beavers-recipe-component component=this key=@key clickable=../displayIngredients status=(lookup ../precast.attendants @key)}}
-                            {{#unless @last}}
-                                <div class="beavers-seperator"></div>
-                            {{/unless}}
-                        {{/each}}
+                    <div class="flexcol attendants section beavers-folder">
+                        <div class="folder open">
+                            {{#each recipe.required}}
+                                <div class="folderContent">
+                                    <div class="flexrow">
+                                        <div style="flex:0" class="flexcol">
+                                            <span class="border top"></span>
+                                            {{#if @last}}<span></span>{{else}}<span class="border"></span>{{/if}}
+                                        </div>
+                                        <div class="data-section flexcol">
+                                            {{#each this}}
+                                                {{#if (gt (beavers-objectLen ../this) 1)}}
+                                                <div class="flexrow">
+                                                    <input class="choose" data-key="{{@key}}" data-group="{{@../key}}"
+                                                           style="flex:0;height:14px;margin-top:6px;cusor:pointer"
+                                                           type="radio"/>
+                                                {{/if}}
+                                                {{>beavers-recipe-component component=this key=@key group=@../key clickable=../../displayResults status=(lookup (lookup ../../precast.required @../key) @key)}}
+                                                {{#if (gt (beavers-objectLen ../this) 1)}}
+                                                </div>
+                                                {{/if}}
+                                                {{#unless @last}}
+                                                    <div style="margin-left:20px" class="beavers-seperator"></div>
+                                                {{/unless}}
+                                            {{/each}}
+                                        </div>
+                                    </div>
+                                </div>
+                            {{/each}}
+                        </div>
                     </div>
                 </div>
             {{/if}}
-            {{#if (or currencyComponent (not (beavers-isEmpty recipe.ingredients)))}}
+            {{#if (or currencyComponent (not (beavers-isEmpty recipe.input)))}}
                 <div class="flexcol" style="min-width:200px">
                     <div class="header">
                         {{localize "beaversCrafting.crafting-app.cost"}}
                     </div>
-                    <div class="flexcol ingredients section">
-                        {{#if currencyComponent}}
-                            {{>beavers-recipe-component component=currencyComponent status=precast.currencies.status}}
-                            {{#if (not (beavers-isEmpty recipe.ingredients))}}
-                                <div class="beavers-seperator"></div>
+                    <div class="flexcol ingredients section beavers-folder">
+                        <div class="folder open">
+                            {{#if currencyComponent}}
+                                <div class="folderContent">
+                                    <div class="flexrow">
+                                        <div style="flex:0" class="flexcol">
+                                            <span class="border top"></span>
+                                            {{#if (beavers-isEmpty recipe.input)}}<span></span>{{else}}
+                                                <span class="border"></span>{{/if}}
+                                        </div>
+                                        <div class="data-section flexcol">
+                                            {{>beavers-recipe-component component=currencyComponent status=precast.currencies.status}}
+                                        </div>
+                                    </div>
+                                </div>
                             {{/if}}
-                        {{/if}}
-                        {{#if (not (beavers-isEmpty recipe.ingredients))}}
-                            {{#each recipe.ingredients}}
-                                {{>beavers-recipe-component component=this key=@key clickable=../displayIngredients status=(lookup ../precast.ingredients @key)}}
-                                {{#unless @last}}
-                                    <div class="beavers-seperator"></div>
-                                {{/unless}}
-                            {{/each}}
-                        {{/if}}
+                            {{#if (not (beavers-isEmpty recipe.input))}}
+                                {{#each recipe.input}}
+                                    <div class="folderContent">
+                                        <div class="flexrow">
+                                            <div style="flex:0" class="flexcol">
+                                                <span class="border top"></span>
+                                                {{#if @last}}<span></span>{{else}}<span class="border"></span>{{/if}}
+                                            </div>
+                                            <div class="data-section flexcol">
+                                                {{#each this}}
+                                                    {{#if (gt (beavers-objectLen ../this) 1)}}
+                                                    <div class="flexrow">
+                                                        <input class="choose" data-key="{{@key}}"
+                                                               data-group="{{@../key}}"
+                                                               style="flex:0;height:14px;margin-top:6px;cusor:pointer"
+                                                               type="radio"/>
+                                                    {{/if}}
+                                                    {{>beavers-recipe-component component=this key=@key group=@../key clickable=../../displayIngredients status=(lookup (lookup ../../precast.input @../key) @key)}}
+                                                    {{#if (gt (beavers-objectLen ../this) 1)}}
+                                                    </div>
+                                                    {{/if}}
+                                                    {{#unless @last}}
+                                                        <div style="margin-left:20px" class="beavers-seperator"></div>
+                                                    {{/unless}}
+                                                {{/each}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {{/each}}
+                            {{/if}}
+                        </div>
                     </div>
                 </div>
             {{/if}}
-            {{#if (not (beavers-isEmpty recipe.results))}}
+            {{#if (not (beavers-isEmpty recipe.output))}}
                 <div class="flexcol" style="min-width:200px">
                     <div class="header">
                         {{localize "beaversCrafting.crafting-app.result"}}
                     </div>
-                    <div class="flexcol results section">
-                        {{#each recipe.results}}
-                            {{>beavers-recipe-component component=this key=@key clickable=../displayResults }}
-                            {{#unless @last}}
-                                <div class="beavers-seperator"></div>
-                            {{/unless}}
-                        {{/each}}
+                    <div class="flexcol results section beavers-folder">
+                        <div class="folder open">
+                            {{#each recipe.output}}
+                                <div class="folderContent">
+                                    <div class="flexrow">
+                                        <div style="flex:0" class="flexcol">
+                                            <span class="border top"></span>
+                                            {{#if @last}}<span></span>{{else}}<span class="border"></span>{{/if}}
+                                        </div>
+                                        <div class="data-section flexcol">
+                                            {{#each this}}
+                                                {{#if (gt (beavers-objectLen ../this) 1)}}
+                                                <div class="flexrow">
+                                                    <input class="choose" data-key="{{@key}}"
+                                                           data-group="{{@../key}}"
+                                                           style="flex:0;height:14px;margin-top:6px;cusor:pointer"
+                                                           type="radio"/>
+                                                {{/if}}
+                                                {{>beavers-recipe-component component=this key=@key group=@../key clickable=../../displayResults}}
+                                                {{#if (gt (beavers-objectLen ../this) 1)}}
+                                                </div>
+                                                {{/if}}
+                                                {{#unless @last}}
+                                                    <div style="margin-left:20px" class="beavers-seperator"></div>
+                                                {{/unless}}
+                                            {{/each}}
+                                        </div>
+                                    </div>
+                                </div>
+                            {{/each}}
+                        </div>
                     </div>
                 </div>
             {{/if}}

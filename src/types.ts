@@ -62,6 +62,7 @@ interface ComponentResultData {
 type UserInteraction =  "always" | "never" | "onSuccess";
 
 type ComponentType = "consumed" | "required" | "produced";
+type DataType = "required" | "input" | "output";
 
 type TestType = "skill" | "tool" | "ability" | "hit";
 
@@ -99,11 +100,15 @@ interface ChatData {
     }
 }
 interface PreCastData {
-    ingredients: {
-        [key: string]: ComponentStatus
+    input: {
+        [key: string]: {
+            [key: string]: ComponentStatus
+        }
     }
-    attendants: {
-        [key: string]: ComponentStatus
+    required: {
+        [key: string]: {
+            [key: string]: ComponentStatus
+        }
     }
     currencies?: { status: ComponentStatus }
 }
