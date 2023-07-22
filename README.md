@@ -217,7 +217,7 @@ Actor Items will get merged to stacks in the crafting process.
 When creating new Items the drop down menu does not have Recipe or AnyOf.
 #### Solution: 
 You probably have a diffrent language as english you need to type in the exact title of the item creation window in the settings:
-default is english "Create new Item" 
+default is english "Create New Item" 
 
 ![img.png](pictures/newItem.png).
 #### Explanation:
