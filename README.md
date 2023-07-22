@@ -217,7 +217,9 @@ Actor Items will get merged to stacks in the crafting process.
 When creating new Items the drop down menu does not have Recipe or AnyOf.
 #### Solution: 
 You probably have a diffrent language as english you need to type in the exact title of the item creation window in the settings:
-default is engl: "Create new Item" ![img.png](pictures/newItem.png).
+default is english "Create new Item" 
+
+![img.png](pictures/newItem.png).
 #### Explanation:
 In V10 it is not possible that a module really add a new item types into a system. So beavers-crafting fake it by listening to an event that opens windows and when the window is 
 the Item Creation Window it adds item types to the drop down list. Yes that is evil and has high risks to break at somepoint but as said there is no other possiblity.
