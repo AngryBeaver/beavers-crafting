@@ -211,7 +211,7 @@ Actor Items will get merged to stacks in the crafting process.
 ### Work in progress
 ! Carefully structure might change until i finalize this module with version 1.0.0 !,
 
-##Troubleshooting
+## Troubleshooting
 ### Dont show "RECIPE" in item menu
 #### Problem: 
 When creating new Items the drop down menu does not have Recipe or AnyOf.
