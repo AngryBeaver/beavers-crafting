@@ -170,6 +170,12 @@ export class CraftingApp extends Application {
                 beaversSystemInterface.uuidToDocument(uuid).then(i=>i.sheet._render(true));
             }
         });
+        html.find('.attendants .clickable').on("click",e=>{
+            const uuid = $(e.currentTarget).data("id");
+            if(Settings.get(Settings.DISPLAY_INGREDIENTS)) {
+                beaversSystemInterface.uuidToDocument(uuid).then(i=>i.sheet._render(true));
+            }
+        });
         html.find(".main .folderName").on("click", (e)=>{
             $(e.currentTarget).parent(".folder").toggleClass(["open","close"]);
         });
@@ -184,7 +190,24 @@ export class CraftingApp extends Application {
                 this.close();
             });
         });
+
+        html.find(".choose").on("click",e=> {
+            const group = $(e.currentTarget).data("group");
+            const key = $(e.currentTarget).data("key");
+            const type = $(e.currentTarget).data("type");
+            this._choose(type,group,key);
+            window.setTimeout(this.renderRecipeSheet.bind(this),100);
+        });
+
         this.addDragDrop(html);
+    }
+
+    _choose(type: DataType, group: string, key: string){
+        if(this.data.recipe) {
+            const component = this.data.recipe[type][group][key];
+            this.data.recipe[type][group] = {};
+            this.data.recipe._addData(type,component,key,group);
+        }
     }
 
     addDragDrop(html) {

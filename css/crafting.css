@@ -513,6 +513,13 @@ beavers-recipe
     margin: 2px 2px 2px 0px;
     padding:2px;
 }
+.beavers-crafting .beavers-recipe .data-section .choose {
+    cursor: pointer;
+    width:16px;
+    height:16px;
+    flex:0 16px;
+    margin-top:8px;
+}
 
 .beavers-crafting .beavers-recipe .text-section .test-header {
     text-align: right;

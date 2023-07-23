@@ -124,9 +124,8 @@
                                             {{#each this}}
                                                 {{#if (gt (beavers-objectLen ../this) 1)}}
                                                 <div class="flexrow">
-                                                    <input class="choose" data-key="{{@key}}" data-group="{{@../key}}"
-                                                           style="flex:0;height:14px;margin-top:6px;cusor:pointer"
-                                                           type="radio"/>
+                                                    <input class="choose" data-type="required" data-key="{{@key}}" data-group="{{@../key}}"
+                                                           type="checkbox"/>
                                                 {{/if}}
                                                 {{>beavers-recipe-component component=this key=@key group=@../key clickable=../../displayResults status=(lookup (lookup ../../precast.required @../key) @key)}}
                                                 {{#if (gt (beavers-objectLen ../this) 1)}}
@@ -177,9 +176,8 @@
                                                 {{#each this}}
                                                     {{#if (gt (beavers-objectLen ../this) 1)}}
                                                     <div class="flexrow">
-                                                        <input class="choose" data-key="{{@key}}"
+                                                        <input class="choose" data-type="input" data-key="{{@key}}"
                                                                data-group="{{@../key}}"
-                                                               style="flex:0;height:14px;margin-top:6px;cusor:pointer"
                                                                type="radio"/>
                                                     {{/if}}
                                                     {{>beavers-recipe-component component=this key=@key group=@../key clickable=../../displayIngredients status=(lookup (lookup ../../precast.input @../key) @key)}}
@@ -217,9 +215,8 @@
                                             {{#each this}}
                                                 {{#if (gt (beavers-objectLen ../this) 1)}}
                                                 <div class="flexrow">
-                                                    <input class="choose" data-key="{{@key}}"
+                                                    <input class="choose" data-type="output" data-key="{{@key}}"
                                                            data-group="{{@../key}}"
-                                                           style="flex:0;height:14px;margin-top:6px;cusor:pointer"
                                                            type="radio"/>
                                                 {{/if}}
                                                 {{>beavers-recipe-component component=this key=@key group=@../key clickable=../../displayResults}}
