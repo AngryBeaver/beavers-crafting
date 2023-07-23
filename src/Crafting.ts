@@ -201,41 +201,6 @@ export class Crafting implements CraftingData {
         await RecipeCompendium.evaluateOptions("output",this.recipe,this.actor.items);
     }
 
-    async evaluateAnyOf() {
-        /* move to posibilities create popups for each decission.
-        const toDelete = {};
-        const toAdd = {};
-        for (const [group, ors] of Object.entries(this.recipe.input)) {
-            for(const [id, component] of Object.entries(ors)) {
-                if (component.type === Settings.ANYOF_SUBTYPE) {
-                    const item = await component.getEntity();
-                    const anyOf = new AnyOf(item);
-                    let results = await anyOf.filter(this.actor.items);
-                    results = results.filter(c => {
-                        let quantity = c.quantity;
-                        toAdd.forEach(a => {
-                            if (a.id === c.id) {
-                                quantity = quantity - a.quantity;
-                            }
-                        });
-                        return quantity >= component.quantity
-                    });
-                    if (results.length >= 0) {
-                        const result = results[Math.floor(Math.random() * results.length)];
-                        result.quantity = component.quantity;
-                        toAdd[group]=toAdd[group];
-                        toDelete[group]=[id];
-                    }
-                }
-            }
-        }
-        toDelete.forEach(k => this.recipe.removeIngredient(k));
-        toAdd.forEach(component => {
-            this.recipe.addIngredientComponent(component)
-        });
-         */
-    }
-
     async checkCurrency() {
         if (this.recipe.currency) {
             await this.result.checkCurrency(this.recipe.currency);

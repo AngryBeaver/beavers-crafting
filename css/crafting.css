@@ -521,6 +521,10 @@ beavers-recipe
     margin-top:8px;
 }
 
+.beavers-crafting .beavers-recipe .data-section .chooseAnyOf {
+    cursor: pointer;
+}
+
 .beavers-crafting .beavers-recipe .text-section .test-header {
     text-align: right;
     flex-direction: row-reverse;

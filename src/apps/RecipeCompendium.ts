@@ -130,7 +130,7 @@ export class RecipeCompendium {
     static async evaluateOption(type: DataType, recipe:Recipe, group:string ): Promise<string> {
         const data = recipe[type][group];
         const listOfPossibilities = Object.keys(data);
-        let chosen = Object.keys[0];
+        let chosen = listOfPossibilities[0];
         if (listOfPossibilities.length > 1) {
             chosen = await this.chooseComponent(data);
             for (const key of listOfPossibilities) {
@@ -151,7 +151,8 @@ export class RecipeCompendium {
     static async evaluateAnyOf(type: DataType, recipe:Recipe,group:string,key:string,actorItems){
         const component = recipe[type][group][key];
             if(component.type === Settings.ANYOF_SUBTYPE) {
-                const anyOf = new AnyOf(component);
+                const item = await component.getEntity();
+                const anyOf = new AnyOf(item);
                 const components = await anyOf.filter(actorItems)
                 const comps = components.reduce((result, item,index ) => {
                     result[index.toString()]=item;

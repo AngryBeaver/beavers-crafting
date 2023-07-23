@@ -105,7 +105,7 @@ export class CraftingApp extends Application {
         if (this.data.recipe === undefined || this.element === null) {
             return;
         }
-        const crafting = await Crafting.from(this.data.actor.id, this.data.recipe.uuid);
+        const crafting = await Crafting.fromRecipe(this.data.actor.id, this.data.recipe);
         RecipeCompendium.validateRecipeToItemList(RecipeCompendium._filterData(this.data.recipe.input,(c)=>true), this.data.actor.items,crafting.result);
         await crafting.checkTool();
         await crafting.checkAttendants();
@@ -197,6 +197,16 @@ export class CraftingApp extends Application {
             const type = $(e.currentTarget).data("type");
             this._choose(type,group,key);
             window.setTimeout(this.renderRecipeSheet.bind(this),100);
+        });
+
+        html.find(".chooseAnyOf").on("click",e=> {
+            const group = $(e.currentTarget).data("group");
+            const key = $(e.currentTarget).data("key");
+            const type = $(e.currentTarget).data("type");
+            if(this.data.recipe != undefined) {
+                RecipeCompendium.evaluateAnyOf(type, this.data.recipe, group, key, this.data.actor.items)
+                    .then(()=>window.setTimeout(this.renderRecipeSheet.bind(this),100))
+            }
         });
 
         this.addDragDrop(html);
