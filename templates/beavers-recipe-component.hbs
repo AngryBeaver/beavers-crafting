@@ -3,8 +3,12 @@
         <img src="{{component.img}}"/>
         <span class="name">{{component.name}}</span>
     </div>
-    <div class="attribute flexrow">
-        {{component.quantity}}
+    <div class="attribute">
+        <input style="width:30px;text-align:right;background: rgba(0, 0, 0, 0)" name="flags.beavers-crafting.recipe.{{type}}.{{group}}.{{key}}.quantity"
+               {{#unless editable}}disabled{{/unless}}
+               type="number"
+               step="any"
+               value="{{component.quantity}}"/>
     </div>
     <div class="attribute flexrow">
         {{#if (eq status 'success') }}

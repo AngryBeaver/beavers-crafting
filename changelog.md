@@ -1,5 +1,8 @@
 # Changelog
-## 3.2.0 simple or
+## 3.2.x simple or
+## 3.2.1
+- recipe edit quantity
+## 3.2.0
 - fix consistent name of attendants as required in ui.
 - add Settings to disable actor types that should not have a crafting tab.
 - add simple or
