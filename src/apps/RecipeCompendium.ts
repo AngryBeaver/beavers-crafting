@@ -159,6 +159,7 @@ export class RecipeCompendium {
                     return result;
                 },{})
                 const used = await this.chooseComponent(comps);
+                comps[used].quantity = component.quantity;
                 recipe._addData(type,comps[used],comps[used].uuid,group);
                 recipe._removeData(type,group,key);
             }
