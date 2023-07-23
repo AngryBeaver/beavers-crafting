@@ -145,15 +145,15 @@ export class RecipeSheet {
 
     handleMainEvents() {
         this.recipeElement.find('.ingredients .item-delete').click(e=>{
-            this.recipe.removeIngredient(e.target.dataset.id);
+            this.recipe.removeInput(e.target.dataset.group,e.target.dataset.id);
             this.update();
         });
         this.recipeElement.find('.results .item-delete').click(e=>{
-            this.recipe.removeResult(e.target.dataset.id);
+            this.recipe.removeOutput(e.target.dataset.group,e.target.dataset.id);
             this.update();
         });
         this.recipeElement.find('.attendants .item-delete').click(e=>{
-            this.recipe.removeAttendant(e.target.dataset.id);
+            this.recipe.removeRequired(e.target.dataset.group,e.target.dataset.id);
             this.update();
         });
         this.recipeElement.find('.skills .item-delete').click(e=>{
@@ -228,38 +228,40 @@ export class RecipeSheet {
 
 
     async _onDropMain(e){
-        const isIngredient = $(e.target).parents(".beavers-crafting.recipe .ingredients").length !==0;
-        const isResult = $(e.target).parents(".beavers-crafting.recipe .results").length !==0;
-        const isAttendant = $(e.target).parents(".beavers-crafting.recipe .attendants").length !==0;
-        if(!isIngredient && !isResult && !isAttendant){
+        const isDrop = $(e.target).hasClass("drop-area");
+        const isInput = $(e.target).parents(".beavers-crafting.recipe .ingredients").length !==0;
+        const isOutput = $(e.target).parents(".beavers-crafting.recipe .results").length !==0;
+        const isRequired = $(e.target).parents(".beavers-crafting.recipe .attendants").length !==0;
+        if(!isDrop&& !isInput && !isOutput && !isRequired){
             return;
         }
         const data = getDataFrom(e);
         if(data &&
             (data.type === "Item" ||
-                (data.type === "RollTable" && isResult)
+                (data.type === "RollTable" && isOutput)
             )
         ) {
             const entity = await fromUuid(data.uuid);
             if (entity) {
                 const isAnyOf = AnyOf.isAnyOf(entity)
-                if(isAnyOf && !isIngredient){
+                if(isAnyOf && !isInput){
                     return;
                 }
-                if (isIngredient) {
-                    let type = data.type;
+                const component = beaversSystemInterface.componentFromEntity(entity);
+                component.type = data.type;
+                if (isInput) {
                     let keyid = data.uuid;
                     if(AnyOf.isAnyOf(entity)){
-                        type = Settings.ANYOF_SUBTYPE;
+                        component.type = Settings.ANYOF_SUBTYPE;
                         keyid = foundry.utils.randomID();
                     }
-                    this.recipe.addIngredient(entity, keyid,type);
+                    this.recipe.addInput(component, keyid,$(e.target).data("id"));
                 }
-                if (isResult) {
-                    this.recipe.addResult(entity, data.uuid, data.type);
+                if (isOutput) {
+                    this.recipe.addOutput(component, data.uuid, $(e.target).data("id"));
                 }
-                if (isAttendant) {
-                    this.recipe.addAttendant(entity, data.uuid, data.type);
+                if (isRequired) {
+                    this.recipe.addRequired(component, data.uuid,$(e.target).data("id"));
                 }
                 this.update();
             }

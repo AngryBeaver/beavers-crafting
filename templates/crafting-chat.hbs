@@ -1,6 +1,6 @@
 <div class="beavers-crafting chat flexcol">
     <div class="flexrow header beavers-line">
-        {{>beavers-recipe-component component=data}}
+        {{>beavers-recipe-component type="recipe" component=data}}
         <div class="attribute flexrow">
             <div class="flexrow beavers-line" style="margin:auto">
                 {{#if (not (eq data.status "error"))}}
@@ -34,7 +34,7 @@
     <div class="flexrow beavers-chat-info">
         <div class="left flexcol">
             {{#each data.components.consumed}}
-                {{>beavers-recipe-component component=this.component status=this.status }}
+                {{>beavers-recipe-component type="input" component=this.component status=this.status }}
             {{/each}}
         </div>
         <div class="right flexcol">
@@ -44,7 +44,7 @@
                 </div>
             </div>
             {{#each data.components.produced}}
-                    {{>beavers-recipe-component component=this.component status=this.status }}
+                    {{>beavers-recipe-component type="output" component=this.component status=this.status }}
             {{/each}}
         </div>
     </div>

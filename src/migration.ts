@@ -2,6 +2,26 @@ import {Settings} from "./Settings.js";
 import {Crafting} from "./Crafting.js";
 import {DefaultTest, Recipe} from "./Recipe.js";
 
+
+export async function migrateRecipeToOrConditions(recipe: Recipe) {
+
+    async function migrateRecipe(recipe) {
+        await recipe.update();
+    }
+
+    ui.notifications?.info("Beavers Crafting | migration: items");
+    for (const recipe of game[Settings.NAMESPACE].RecipeCompendium.getAllItems()) {
+        await migrateRecipe(recipe);
+    }
+    ui.notifications?.info("Beavers Crafting | migration: actors");
+    for (const actor of game["actors"]) {
+        for (const recipe of game[Settings.NAMESPACE].RecipeCompendium.getForActor(actor)) {
+            await migrateRecipe(recipe);
+        }
+    }
+    ui.notifications?.info("Beavers Crafting | migration: done");
+}
+
 export async function itemTypeMigration() {
     async function addItemType(component) {
         if (component.type === "Item") {
@@ -11,14 +31,20 @@ export async function itemTypeMigration() {
     }
 
     async function migrateRecipe(recipe) {
-        for (const key in recipe.attendants) {
-            await addItemType(recipe.attendants[key]);
+        if (recipe.attendants) {
+            for (const key in recipe.attendants) {
+                await addItemType(recipe.attendants[key]);
+            }
         }
-        for (const key in recipe.ingredients) {
-            await addItemType(recipe.ingredients[key]);
+        if (recipe.ingredients) {
+            for (const key in recipe.ingredients) {
+                await addItemType(recipe.ingredients[key]);
+            }
         }
-        for (const key in recipe.results) {
-            await addItemType(recipe.results[key]);
+        if( recipe.results) {
+            for (const key in recipe.results) {
+                await addItemType(recipe.results[key]);
+            }
         }
         await recipe.update();
     }
@@ -137,8 +163,9 @@ export function recipeSkillToTests(recipe: RecipeData) {
 export async function toolToAttendant(recipe: Recipe) {
     if (recipe.tool != undefined) {
         const item = await beaversSystemInterface.uuidToDocument(recipe.tool);
-        recipe.addAttendant(item, item.uuid, item.type);
+        recipe.addRequired(item, item.uuid, "");
         recipe.removeTool();
     }
 }
+
 

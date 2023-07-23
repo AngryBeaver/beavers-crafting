@@ -105,8 +105,8 @@ export class CraftingApp extends Application {
         if (this.data.recipe === undefined || this.element === null) {
             return;
         }
-        const crafting = await Crafting.from(this.data.actor.id, this.data.recipe.uuid);
-        RecipeCompendium.validateRecipeToItemList(Object.values(this.data.recipe.ingredients), this.data.actor.items,crafting.result);
+        const crafting = await Crafting.fromRecipe(this.data.actor.id, this.data.recipe);
+        RecipeCompendium.validateRecipeToItemList(RecipeCompendium._filterData(this.data.recipe.input,(c)=>true), this.data.actor.items,crafting.result);
         await crafting.checkTool();
         await crafting.checkAttendants();
         await crafting.checkCurrency();
@@ -170,6 +170,12 @@ export class CraftingApp extends Application {
                 beaversSystemInterface.uuidToDocument(uuid).then(i=>i.sheet._render(true));
             }
         });
+        html.find('.attendants .clickable').on("click",e=>{
+            const uuid = $(e.currentTarget).data("id");
+            if(Settings.get(Settings.DISPLAY_INGREDIENTS)) {
+                beaversSystemInterface.uuidToDocument(uuid).then(i=>i.sheet._render(true));
+            }
+        });
         html.find(".main .folderName").on("click", (e)=>{
             $(e.currentTarget).parent(".folder").toggleClass(["open","close"]);
         });
@@ -184,7 +190,34 @@ export class CraftingApp extends Application {
                 this.close();
             });
         });
+
+        html.find(".choose").on("click",e=> {
+            const group = $(e.currentTarget).data("group");
+            const key = $(e.currentTarget).data("key");
+            const type = $(e.currentTarget).data("type");
+            this._choose(type,group,key);
+            window.setTimeout(this.renderRecipeSheet.bind(this),100);
+        });
+
+        html.find(".chooseAnyOf").on("click",e=> {
+            const group = $(e.currentTarget).data("group");
+            const key = $(e.currentTarget).data("key");
+            const type = $(e.currentTarget).data("type");
+            if(this.data.recipe != undefined) {
+                RecipeCompendium.evaluateAnyOf(type, this.data.recipe, group, key, this.data.actor.items)
+                    .then(()=>window.setTimeout(this.renderRecipeSheet.bind(this),100))
+            }
+        });
+
         this.addDragDrop(html);
+    }
+
+    _choose(type: DataType, group: string, key: string){
+        if(this.data.recipe) {
+            const component = this.data.recipe[type][group][key];
+            this.data.recipe[type][group] = {};
+            this.data.recipe._addData(type,component,key,group);
+        }
     }
 
     addDragDrop(html) {
@@ -200,8 +233,11 @@ export class CraftingApp extends Application {
                 drop: this._onDrop.bind(this)
             }
         });
-        if(this._dragDrop.length > 1){
-            this._dragDrop.pop();
+        for(const x in this._dragDrop){
+            if(this._dragDrop[x].dropSelector === dropFilter.dropSelector){
+                this._dragDrop[x].bind(html[0]);
+                return;
+            }
         }
         this._dragDrop.push(dropFilter);
         dropFilter.bind(html[0]);
@@ -214,12 +250,12 @@ export class CraftingApp extends Application {
         }
         const uuid = $(e.currentTarget).data("id");
         if(uuid != undefined){
-            const uuid = $(e.currentTarget).data("id");
             const key = $(e.currentTarget).data("key");
+            const group = $(e.currentTarget).data("group");
             beaversSystemInterface.uuidToDocument(uuid).then(
                 item => {
                     if(AnyOf.isAnyOf(item)){
-                       return this._onDropAnyOf(new AnyOf(item),key,e);
+                       return this._onDropAnyOf(new AnyOf(item),group, key,e);
                     }
                     return;
                 }
@@ -228,8 +264,8 @@ export class CraftingApp extends Application {
 
     }
 
-    async _onDropAnyOf(anyOf:AnyOf, key:string, e:DragEvent) {
-        if (this.data.recipe === undefined){
+    async _onDropAnyOf(anyOf:AnyOf, group:string, key:string, e:DragEvent) {
+        if (this.data.recipe === undefined || e["isHandled"]){
             return;
         }
         const data = getDataFrom(e);
@@ -238,25 +274,26 @@ export class CraftingApp extends Application {
             const entity = await fromUuid(data.uuid);
             let result = await anyOf.executeMacro(entity);
             if(result.value) {
-                const previousComponent = this.data.recipe.ingredients[key];
+                const previousComponent = this.data.recipe.input[group][key];
                 const component = beaversSystemInterface.componentFromEntity(entity);
-                const nextKey = sanitizeUuid(data.uuid);
+                const id = sanitizeUuid(data.uuid);
                 component.quantity = previousComponent.quantity;
                 this.data.recipe = Recipe.clone(this.data.recipe);
                 //remove existing ingredient with same id and add quantity;
-                if(this.data.recipe.ingredients[nextKey]){
-                    component.quantity = component.quantity + this.data.recipe.ingredients[nextKey].quantity;
-                    delete this.data.recipe.ingredients[nextKey];
+                if(this.data.recipe.input[group][id]){
+                    component.quantity = component.quantity + this.data.recipe.input[group][id].quantity;
+                    delete this.data.recipe.input[group][id];
                 }
                 //copyInPlace;
                 const ingredients = Object.fromEntries(
-                    Object.entries(this.data.recipe.ingredients).map(([o_key, o_val]) => {
-                        if (o_key === key) return [nextKey, component];
+                    Object.entries(this.data.recipe.input[group]).map(([o_key, o_val]) => {
+                        if (o_key === key) return [id, component];
                         return [o_key, o_val];
                     })
                 );
-                this.data.recipe.ingredients = ingredients;
-                void this.renderRecipeSheet();
+                this.data.recipe.input[group] = ingredients;
+                e["isHandled"] = true;
+                window.setTimeout(this.renderRecipeSheet.bind(this),100);
             }
 
         }
@@ -275,23 +312,34 @@ export class CraftingApp extends Application {
 
     async getPrecastFromResult(result: Result, recipe: Recipe): Promise<PreCastData>{
         const preCastData:PreCastData = {
-            attendants: {},
-            ingredients: {},
+            required: {},
+            input: {},
         }
         if(result._currencyResult){
             preCastData.currencies = {status: result._currencyResult.hasError?'error':'success'};
         }
 
-        for(const key in recipe.ingredients){
-            const component = recipe.ingredients[key];
-            preCastData.ingredients[key]= result._components.consumed.hasError(component)?'error':'success'
+        for(const group in recipe.input){
+            preCastData.input[group] = {};
+            for(const key in recipe.input[group]){
+                const component = recipe.input[group][key];
+                preCastData.input[group][key]= result._components.consumed.hasError(component)?'error':'success'
+            }
+
 
         }
-        for(const key in recipe.attendants){
-            const component = recipe.attendants[key];
-            preCastData.attendants[key]=result._components.required.hasError(component)?'error':'success'
+        for(const group in recipe.required){
+            preCastData.required[group] = {};
+            for(const key in recipe.required[group]){
+                const component = recipe.required[group][key];
+                preCastData.required[group][key]=result._components.required.hasError(component)?'error':'success'
+            }
         }
         return preCastData;
+    }
+
+    protected _canDragDrop(selector: string): boolean {
+        return true;
     }
 }
 

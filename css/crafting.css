@@ -9,7 +9,6 @@
     height:100%;
 }
 
-
 .beavers-crafting .drop-area {
     /* Center the content */
     align-items: center;
@@ -243,7 +242,7 @@
     flex:0;
 }
 .beavers-crafting .clickable{
-    cursor: pointer;
+    cursor: help;
 }
 
 .beavers-crafting .beavers-line {
@@ -506,6 +505,24 @@ beavers-recipe
     border-radius: 5px;
     margin: 2px;
     padding: 1px;
+}
+
+.beavers-crafting .beavers-recipe .data-section {
+    border: 1px solid grey;
+    border-radius: 5px;
+    margin: 2px 2px 2px 0px;
+    padding:2px;
+}
+.beavers-crafting .beavers-recipe .data-section .choose {
+    cursor: pointer;
+    width:16px;
+    height:16px;
+    flex:0 16px;
+    margin-top:8px;
+}
+
+.beavers-crafting .beavers-recipe .data-section .chooseAnyOf {
+    cursor: pointer;
 }
 
 .beavers-crafting .beavers-recipe .text-section .test-header {

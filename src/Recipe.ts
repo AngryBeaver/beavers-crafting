@@ -9,29 +9,45 @@ export class Recipe implements RecipeData {
     id: string;
     name: string;
     img: string;
-    ingredients: {
-        [key: string]: Component
+    input: {
+        [key: string]: {
+            [key: string]: Component
+        }
     }
-    results: {
-        [key: string]: Component
+    output: {
+        [key: string]: {
+            [key: string]: Component
+        }
+    }
+    required: {
+        [key: string]: {
+            [key: string]: Component
+        }
     }
     tests?: Tests;
     skill?: Skill;
     currency?: Currency;
     tool?: string;
-    attendants: {
-        [key: string]: Component
-    }
+
     macro: string
     folder?: string;
     instruction?: string;
     _trash: {
-        ingredients: {};
-        results: {};
-        attendants: {};
+        required: {
+            ands: {},
+            ors: {}
+        };
+        input: {
+            ands: {},
+            ors: {}
+        };
+        output: {
+            ands: {},
+            ors: {}
+        };
         tests: {
-            ands:{},
-            ors:{}
+            ands: {},
+            ors: {}
         };
     }
 
@@ -46,7 +62,7 @@ export class Recipe implements RecipeData {
 
     static fromItem(item): Recipe {
         const flags = item.flags[Settings.NAMESPACE]?.recipe;
-        const data = mergeObject({attendants: {}, ingredients: {}, results: {}}, flags || {}, {inplace: false});
+        const data = mergeObject({input: {}, output: {}, required: {}}, flags || {}, {inplace: false});
         return new Recipe(item.uuid, item.id, item.name, item.img, data);
     }
 
@@ -56,36 +72,67 @@ export class Recipe implements RecipeData {
     }
 
     constructor(uuid, id, name, img, data: RecipeData) {
-        function deserializeComponents(map: { [key: string]: ComponentData }): { [key: string]: Component } {
+        function deserializeComponents(map: { [key: string]: { [key: string]: ComponentData } }): { [key: string]: { [key: string]: Component } } {
             const result = {};
             for (const key in map) {
-                const component = map[key];
-                result[key] = beaversSystemInterface.componentCreate(component);
+                const map2 = map[key];
+                for (const key2 in map2) {
+                    if (!result[key]) {
+                        result[key] = {};
+                    }
+                    const component = map2[key2];
+                    result[key][key2] = beaversSystemInterface.componentCreate(component);
+                }
             }
             return result;
         }
+
+        function migrate(map: { [key: string]: ComponentData }): false | { [key: string]: { [key: string]: Component } } {
+            let hasResult = false;
+            const result = {};
+            let group = 0;
+            for (const key in map) {
+                group++;
+                hasResult = true;
+                result[group] = {key: beaversSystemInterface.componentCreate(map[key])};
+            }
+            if (hasResult) {
+                return result;
+            }
+            return false;
+        }
+
 
         this.uuid = uuid;
         this.id = id;
         this.name = name;
         this.img = img;
-        this.ingredients = deserializeComponents(data.ingredients || {});
-        this.results = deserializeComponents(data.results || {});
+        this.required = migrate(data.attendants || {}) || deserializeComponents(data.required || {});
+        this.input = migrate(data.ingredients || {}) || deserializeComponents(data.input || {});
+        this.output = migrate(data.results || {}) || deserializeComponents(data.output || {});
         this.skill = data.skill;
         this.tests = data.tests;
         this.currency = data.currency;
         this.tool = data.tool;
-        this.attendants = deserializeComponents(data.attendants || {});
         this.macro = data.macro || "";
         this.folder = data.folder;
         this.instruction = data.instruction;
         this._trash = {
-            ingredients: {},
-            results: {},
-            attendants: {},
+            required: {
+                ands: {},
+                ors: {}
+            },
+            input: {
+                ands: {},
+                ors: {}
+            },
+            output: {
+                ands: {},
+                ors: {}
+            },
             tests: {
-                ands:{},
-                ors:{},
+                ands: {},
+                ors: {},
             }
         };
 
@@ -93,16 +140,16 @@ export class Recipe implements RecipeData {
 
     serialize(): RecipeData {
         const serialized = {
-            ingredients: this.serializeIngredients(),
+            required: this.serializeData("required"),
+            input: this.serializeData("input"),
+            output: this.serializeData("output"),
             skill: this.skill,
-            tests: this.serializeTests(),
-            results: this.serializeResults(),
             currency: this.currency,
             tool: this.tool,
-            attendants: this.serializeAttendants(),
             macro: this.macro,
             folder: this.folder,
-            instruction: this.instruction
+            instruction: this.instruction,
+            tests: this.serializeTests()
         }
         if (!this.tool) {
             serialized["-=tool"] = null;
@@ -119,30 +166,32 @@ export class Recipe implements RecipeData {
         if (!this.macro) {
             serialized["-=macro"] = null;
         }
-        if(!this.folder) {
+        if (!this.folder) {
             serialized["-=folder"] = null;
         }
+        serialized["-=attendants"] = null;
+        serialized["-=ingredients"] = null;
+        serialized["-=results"] = null;
         return serialized;
     }
 
-    serializeAttendants() {
-        return {...this.attendants, ...this._trash.attendants}
+    serializeData(type) {
+        const serialized = {...this[type], ...this._trash[type].ands}
+        Object.keys(serialized).forEach(key => {
+            if (this._trash[type].ors[key] !== undefined) {
+                serialized[key] = {...this[type][key], ...this._trash[type].ors[key]}
+            }
+        });
+        return serialized
     }
 
-    serializeIngredients() {
-        return {...this.ingredients, ...this._trash.ingredients}
-    }
-
-    serializeResults() {
-        return {...this.results, ...this._trash.results}
-    }
     serializeTests() {
-        if(this.tests != undefined){
-            const serialized =  {fails:this.tests.fails,consume:this.tests.consume,ands:this.tests.ands};
+        if (this.tests != undefined) {
+            const serialized = {fails: this.tests.fails, consume: this.tests.consume, ands: this.tests.ands};
             const ands = {...this.tests.ands, ...this._trash.tests.ands}
-            Object.keys(ands).forEach(key=>{
-                if(this._trash.tests.ors[key] !== undefined){
-                    ands[key].ors = {...ands[key].ors,...this._trash.tests.ors[key]}
+            Object.keys(ands).forEach(key => {
+                if (this._trash.tests.ors[key] !== undefined) {
+                    ands[key].ors = {...ands[key].ors, ...this._trash.tests.ors[key]}
                 }
             })
             serialized.ands = ands;
@@ -151,99 +200,108 @@ export class Recipe implements RecipeData {
         return undefined;
     }
 
-    addAttendant(entity, keyId, type) {
-        const uuidS = sanitizeUuid(keyId);
-        if (!this.attendants[uuidS]) {
-            this.attendants[uuidS] = beaversSystemInterface.componentFromEntity(entity);
-            this.attendants[uuidS].type = type;
-        } else {
-            this.attendants[uuidS].quantity = this.attendants[uuidS].quantity+1;
+    _getNextId(obj) {
+        const keys = Object.keys(obj);
+        if(keys.length == 0){
+            return 1;
         }
+        const sorted = keys.sort();
+        // @ts-ignore
+        return sorted[sorted.length - 1] - 1 + 2;
     }
 
-    removeAttendant(uuidS) {
-        delete this.attendants[uuidS];
-        this._trash.attendants["-=" + uuidS] = null;
+    addRequired(component:Component, keyId, group) {
+        this._addData("required", component, keyId, group)
     }
 
-    addIngredient(entity, keyId, type) {
-        const uuidS = sanitizeUuid(keyId);
-        if (!this.ingredients[uuidS]) {
-            this.ingredients[uuidS] = beaversSystemInterface.componentFromEntity(entity);
-            this.ingredients[uuidS].type = type;
-        } else {
-            this.ingredients[uuidS].quantity = this.ingredients[uuidS].quantity+1;
+    addInput(component:Component, keyId, group) {
+        this._addData("input", component, keyId, group)
+    }
+
+    addOutput(component:Component, keyId, group) {
+        this._addData("output", component, keyId, group)
+    }
+
+    removeRequired(group, id) {
+        this._removeData("required", group, id);
+    }
+
+    removeInput(group, id) {
+        this._removeData("input", group, id);
+    }
+
+    removeOutput(group, id) {
+        this._removeData("output", group, id);
+    }
+
+    _addData(dataType:DataType, component:Component, keyId, group) {
+        if (!group || !this[dataType][group]) {
+            group = this._getNextId(this[dataType]);
+            this[dataType][group] = {};
+            delete this._trash[dataType].ands["-=" +group]
         }
-    }
-    addIngredientComponent(component) {
-        const uuidS = sanitizeUuid(component.uuid);
-        if (!this.ingredients[uuidS]) {
-            this.ingredients[uuidS] = component;
+        const id = sanitizeUuid(keyId);
+        if (!this[dataType][group][id]) {
+            this[dataType][group][id] = component;
         } else {
-            this.ingredients[uuidS].quantity = this.ingredients[uuidS].quantity+1;
+            this[dataType][group][id].quantity = this[dataType][group][id].quantity + component.quantity;
         }
+
     }
 
-    removeIngredient(uuidS) {
-        delete this.ingredients[uuidS];
-        this._trash.ingredients["-=" + uuidS] = null;
-    }
-
-    addResult(entity, keyId, type) {
-        const uuidS = sanitizeUuid(keyId);
-        if (!this.results[uuidS]) {
-            this.results[uuidS] = beaversSystemInterface.componentFromEntity(entity);
-            this.results[uuidS].type = type;
-        } else {
-            this.results[uuidS].quantity = this.results[uuidS].quantity+1;
+    _removeData(type:DataType, group:string, id) {
+        delete this[type][group][id];
+        if (!this._trash[type].ors[group]) {
+            this._trash[type].ors[group] = {}
         }
-    }
-
-    removeResult(uuidS) {
-        delete this.results[uuidS];
-        this._trash.results["-=" + uuidS] = null;
+        this._trash[type].ors[group]["-=" + id] = null;
+        if(Object.keys(this[type][group]).length==0){
+            delete this[type][group]
+            delete this._trash[type].ors[group]
+            this._trash[type].ands["-=" +group]=null;
+        }
     }
 
     addTestAnd() {
-        if(this.skill){
+        if (this.skill) {
             // @ts-ignore
             recipeSkillToTests(this);
             return;
         }
-        if(this.tests == undefined){
+        if (this.tests == undefined) {
             this.tests = new DefaultTest();
-        }else{
+        } else {
             const sorted = Object.keys(this.tests.ands).sort();
             // @ts-ignore
-            const nextId = sorted[sorted.length-1]-1+2;
+            const nextId = sorted[sorted.length - 1] - 1 + 2;
             this.tests.ands[nextId] = new DefaultAndTest;
         }
     }
 
     addTestOr(and) {
-        if(this.tests?.ands[and] != undefined){
+        if (this.tests?.ands[and] != undefined) {
             const sorted = Object.keys(this.tests?.ands[and].ors).sort();
             // @ts-ignore
-            const nextId = sorted[sorted.length-1]-1+2;
+            const nextId = sorted[sorted.length - 1] - 1 + 2;
             this.tests.ands[and].ors[nextId] = new DefaultOrTest();
         }
     }
 
-    removeTestOr(and,or){
-        if(this.tests?.ands[and]?.ors[or] != undefined){
-            if(Object.keys(this.tests?.ands[and]?.ors).length <= 1) {
-                if(Object.keys(this.tests?.ands).length <= 1) {
+    removeTestOr(and, or) {
+        if (this.tests?.ands[and]?.ors[or] != undefined) {
+            if (Object.keys(this.tests?.ands[and]?.ors).length <= 1) {
+                if (Object.keys(this.tests?.ands).length <= 1) {
                     this.tests = undefined;
-                }else{
+                } else {
                     delete this.tests.ands[and];
-                    this._trash.tests.ands["-="+and] = null;
+                    this._trash.tests.ands["-=" + and] = null;
                 }
-            }else{
+            } else {
                 delete this.tests.ands[and].ors[or];
-                if( this._trash.tests.ors[and] == undefined){
+                if (this._trash.tests.ors[and] == undefined) {
                     this._trash.tests.ors[and] = {};
                 }
-                this._trash.tests.ors[and]["-="+or] = null;
+                this._trash.tests.ors[and]["-=" + or] = null;
             }
         }
     }
@@ -298,7 +356,7 @@ export class Recipe implements RecipeData {
         await this.updateData(this.serialize());
     }
 
-    async updateData(data){
+    async updateData(data) {
         const flags = {};
         flags[Settings.NAMESPACE] = {
             recipe: data
@@ -313,22 +371,24 @@ export class Recipe implements RecipeData {
 }
 
 export class DefaultTest implements Tests {
-    fails:number =1;
+    fails: number = 1;
     consume: boolean = true;
-    ands={
+    ands = {
         1: new DefaultAndTest()
     }
 }
+
 class DefaultAndTest implements TestAnd {
-    hits:number=1;
-    ors={
+    hits: number = 1;
+    ors = {
         1: new DefaultOrTest
     };
 }
-class DefaultOrTest implements TestOr{
-    check:number=8;
-    type:TestType="skill"
-    uuid=""
+
+class DefaultOrTest implements TestOr {
+    check: number = 8;
+    type: TestType = "skill"
+    uuid = ""
 }
 
 class DefaultSkill implements Skill {

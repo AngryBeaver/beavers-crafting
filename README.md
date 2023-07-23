@@ -108,11 +108,20 @@ When you use a recipe with AnyOf you can customize it and by doing so define wha
 ![img.png](pictures/anyOfDrop1.png)
 ![img.png](pictures/anyOfDrop2.png)
 
+**Drag And Drop**
 - drag and drop an ingredient (e.g. from your inventar) to "anyOf" ingredient within your recipeCompendium.
+**ChoiceWindow (3.2.x)**
+- clicking the AnyOf will popup a multiple choice dialog of available matching items you can choose from.
+
 - it will automatically check if that new ingredient is available in that quantity.
-- it will stack same (identity) ingredients.
+- none customized AnyOf ingredients will popup a multiple choice dialog of available matching items before starting
 - when you reselect the recipe it will remove your customization and start over with anyOf Items again.
-- none customized AnyOf ingredients will consume a random fitting ingredient of your inventory.
+### Simple Or Condition (3.2.x)
+Your recipe can have "or conditions" for required, cost and result items. 
+You can choose one of those or conditions in the RecipeCompendium by selecting on checkbox.
+
+![img.png](pictures/simpleOr.png)
+
 
 ## Examples
 The easiest way to get started with this module is with some examples.

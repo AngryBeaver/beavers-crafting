@@ -2,7 +2,9 @@
 ## 3.2.0 simple or
 - fix consistent name of attendants as required in ui.
 - add Settings to disable actor types that should not have a crafting tab.
-
+- add simple or
+- simple or ui selection
+- anyOf ui selection
 ## 3.1.x folders
 ## 3.1.7
 - fix anyOf allow dropping for players
