@@ -211,5 +211,21 @@ Actor Items will get merged to stacks in the crafting process.
 ### Work in progress
 ! Carefully structure might change until i finalize this module with version 1.0.0 !,
 
+## Troubleshooting
+### Dont show "RECIPE" in item menu
+#### Problem: 
+When creating new Items the drop down menu does not have Recipe or AnyOf.
+#### Solution: 
+You probably have a diffrent language as english you need to type in the exact title of the item creation window in the settings:
+default is english "Create New Item" 
+
+![img.png](pictures/newItem.png).
+#### Explanation:
+In V10 it is not possible that a module really add a new item types into a system. So beavers-crafting fake it by listening to an event that opens windows and when the window is 
+the Item Creation Window it adds item types to the drop down list. Yes that is evil and has high risks to break at somepoint but as said there is no other possiblity.
+To filter the right window the module uses the title of the window as there is no real good identification for it and yes I know the title might change in diffrent languages thats why i also added the configuration field.
+![image](https://github.com/AngryBeaver/beavers-crafting/assets/10677192/2161e666-7e5f-4398-bb4c-aa7ecaf62de5)
+
+
 ## Credits
 Copy organizational structur from midi-qol (gulpfile,package.json,tsconcig.json)

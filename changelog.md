@@ -6,8 +6,8 @@
 - simple or ui selection
 - anyOf ui selection
 ## 3.1.x folders
-## 3.1.7 anyOf fix
-- fix drop items on anyOf as player.
+## 3.1.7
+- fix anyOf allow dropping for players
 ## 3.1.6 v11 fixes
 - fix chat message
 - fix close RecipeCompendium
