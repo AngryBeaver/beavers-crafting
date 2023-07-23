@@ -4,7 +4,7 @@
 - add Settings to disable actor types that should not have a crafting tab.
 - add simple or
 - simple or ui selection
-- todo: anyOf ui selection
+- anyOf ui selection
 ## 3.1.x folders
 ## 3.1.7 anyOf fix
 - fix drop items on anyOf as player.
