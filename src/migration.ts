@@ -2,6 +2,26 @@ import {Settings} from "./Settings.js";
 import {Crafting} from "./Crafting.js";
 import {DefaultTest, Recipe} from "./Recipe.js";
 
+
+export async function migrateRecipeToOrConditions(recipe: Recipe) {
+
+    async function migrateRecipe(recipe) {
+        await recipe.update();
+    }
+
+    ui.notifications?.info("Beavers Crafting | migration: items");
+    for (const recipe of game[Settings.NAMESPACE].RecipeCompendium.getAllItems()) {
+        await migrateRecipe(recipe);
+    }
+    ui.notifications?.info("Beavers Crafting | migration: actors");
+    for (const actor of game["actors"]) {
+        for (const recipe of game[Settings.NAMESPACE].RecipeCompendium.getForActor(actor)) {
+            await migrateRecipe(recipe);
+        }
+    }
+    ui.notifications?.info("Beavers Crafting | migration: done");
+}
+
 export async function itemTypeMigration() {
     async function addItemType(component) {
         if (component.type === "Item") {
@@ -147,4 +167,5 @@ export async function toolToAttendant(recipe: Recipe) {
         recipe.removeTool();
     }
 }
+
 

@@ -6,7 +6,12 @@ import {RecipeCompendium} from "./apps/RecipeCompendium.js";
 import {AnyOfSheet} from "./apps/AnyOfSheet.js";
 import {Recipe} from "./Recipe.js";
 import {ActorSheetTab} from "./apps/ActorSheetTab.js";
-import {itemTypeMigration, migrateDeprecateTools, migrateRecipeSkillToTests} from "./migration.js";
+import {
+    itemTypeMigration,
+    migrateDeprecateTools,
+    migrateRecipeSkillToTests,
+    migrateRecipeToOrConditions
+} from "./migration.js";
 import {getToolConfig} from "./apps/ToolConfig";
 
 
@@ -25,17 +30,23 @@ Hooks.once("beavers-system-interface.ready", async function(){
     game[Settings.NAMESPACE].Crafting = Crafting;
     game[Settings.NAMESPACE].RecipeCompendium = RecipeCompendium;
     game[Settings.NAMESPACE].Recipe = Recipe;
+    game[Settings.NAMESPACE].Settings = Settings;
     game[Settings.NAMESPACE].migrateRecipeAddItemType = itemTypeMigration;
     game[Settings.NAMESPACE].migrateRecipeSkillToTests= migrateRecipeSkillToTests;
     game[Settings.NAMESPACE].migrateDeprecateTools= migrateDeprecateTools;
+    game[Settings.NAMESPACE].migrateRecipeToOrConditions= migrateRecipeToOrConditions;
 
     const version = Settings.get(Settings.MAJOR_VERSION);
     if(version == 2){
         await migrateDeprecateTools();
         await migrateRecipeSkillToTests();
         Settings.set(Settings.USE_TOOL,false);
+        Settings.set(Settings.MAJOR_VERSION,3);
     }
-    Settings.set(Settings.MAJOR_VERSION,3);
+    if(version == 3){
+        await migrateRecipeToOrConditions();
+    }
+    Settings.set(Settings.MAJOR_VERSION,4);
 
 
     Hooks.on("getActorSheetHeaderButtons", (app, buttons) => {
