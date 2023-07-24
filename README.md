@@ -90,7 +90,9 @@ Or can start a crafting process by clicking on a recipe in your inventory (depre
 You will see a chat message with your result
 
 Items updated or created in a successfull crafting process are flagged:
+````
 flags.beavers-crafting.status = "created" or "updated"
+````
 
 
 ### AnyOf
