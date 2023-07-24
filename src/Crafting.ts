@@ -336,7 +336,9 @@ export class Crafting implements CraftingData {
             }
         }
         try{
-            await beaversSystemInterface.actorComponentListAdd(this.actor,componentList);
+            const itemChange = await beaversSystemInterface.actorComponentListAdd(this.actor,componentList);
+            const actor = await fromUuid(this.actor.uuid);
+            this._flagCreatedItems(actor, itemChange);
         }catch(e){
             // @ts-ignore
             ui.notifications.error(e.message)
@@ -368,6 +370,23 @@ export class Crafting implements CraftingData {
             }
         }
     }
+    async _flagCreatedItems(actor: any, itemChange:ItemChange){
+        const updates:any[] = [];
+        if(!this.result.hasError()) {
+            for (const u of itemChange.update) {
+                const update = {_id: u._id};
+                beaversSystemInterface.objectAttributeSet(update, "flags.beavers-crafting.status", "updated");
+                updates.push(update);
+            }
+            for (const c of itemChange.create) {
+                const update = {_id: c._id || c.id}
+                beaversSystemInterface.objectAttributeSet(update, "flags.beavers-crafting.status", "created");
+                updates.push(update);
+            }
+            await actor.updateEmbeddedDocuments("Item", updates);
+        }
+    }
+
     get chatData(): ChatData {
         return this.getChatData();
     }

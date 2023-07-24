@@ -262,6 +262,15 @@
     width: 14px;
     padding: 0px 0px 0px 3px;
 }
+
+.beavers-crafting .fa-question{
+    color: #3f678e;
+    width:14px;
+    padding-left:2px;
+    font-size:small;
+    margin: auto;
+}
+
 .beavers-crafting .fa-check{
     color:#468847;
     margin: auto;

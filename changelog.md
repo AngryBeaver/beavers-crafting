@@ -1,5 +1,10 @@
 # Changelog
 ## 3.2.x simple or
+## 3.2.2
+- automatically fix broken tools (dnd5e)
+- add flag to created or updated items
+- fix broken anyOf precast status
+- fix recipes returning results that are based on items that do not have quantity
 ## 3.2.1
 - recipe edit quantity
 ## 3.2.0

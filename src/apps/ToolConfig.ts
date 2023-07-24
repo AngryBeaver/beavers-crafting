@@ -91,9 +91,16 @@ export async function getToolConfig(): Promise<ComponentData[]>{
 async function _setToolConfig(){
     components.length = 0;
     const tools = Settings.get(Settings.TOOL_CONFIG) || [];
+    const resultTools : string[] = [];
     for (const uuid of tools) {
-        await _addToolConfig(uuid);
+        try {
+            await _addToolConfig(uuid);
+            resultTools.push(uuid);
+        } catch( e ){
+            console.warn("Could not find tool uuid, automatically fixed by removing it");
+        }
     }
+    Settings.set(Settings.TOOL_CONFIG,resultTools);
 }
 async function _addToolConfig(uuid){
     const item = await beaversSystemInterface.uuidToDocument(uuid);
