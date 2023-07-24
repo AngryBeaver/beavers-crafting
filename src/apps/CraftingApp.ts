@@ -106,7 +106,7 @@ export class CraftingApp extends Application {
             return;
         }
         const crafting = await Crafting.fromRecipe(this.data.actor.id, this.data.recipe);
-        RecipeCompendium.validateRecipeToItemList(RecipeCompendium._filterData(this.data.recipe.input,(c)=>true), this.data.actor.items,crafting.result);
+        RecipeCompendium.validateRecipeToItemList(RecipeCompendium._filterData(this.data.recipe.input,(c)=>c.type==="Item"), this.data.actor.items,crafting.result);
         await crafting.checkTool();
         await crafting.checkAttendants();
         await crafting.checkCurrency();
@@ -323,16 +323,22 @@ export class CraftingApp extends Application {
             preCastData.input[group] = {};
             for(const key in recipe.input[group]){
                 const component = recipe.input[group][key];
-                preCastData.input[group][key]= result._components.consumed.hasError(component)?'error':'success'
+                if( result._components.consumed.findComponentResult(component)){
+                    preCastData.input[group][key]= result._components.consumed.hasError(component)?'error':'success'
+                }else{
+                    preCastData.input[group][key]= 'unknown';
+                }
             }
-
-
         }
         for(const group in recipe.required){
             preCastData.required[group] = {};
             for(const key in recipe.required[group]){
                 const component = recipe.required[group][key];
-                preCastData.required[group][key]=result._components.required.hasError(component)?'error':'success'
+                if( result._components.required.findComponentResult(component)) {
+                    preCastData.required[group][key] = result._components.required.hasError(component) ? 'error' : 'success'
+                }else{
+                    preCastData.required[group][key]= 'unknown';
+                }
             }
         }
         return preCastData;

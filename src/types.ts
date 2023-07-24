@@ -66,7 +66,7 @@ type DataType = "required" | "input" | "output";
 
 type TestType = "skill" | "tool" | "ability" | "hit";
 
-type ComponentStatus = "success"|"error"|"locked"|"undefined";
+type ComponentStatus = "success"|"error"|"locked"|"undefined"|"unknown";
 
 
 interface ComponentChatData {

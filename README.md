@@ -89,6 +89,10 @@ Or can start a crafting process by clicking on a recipe in your inventory (depre
 
 You will see a chat message with your result
 
+Items updated or created in a successfull crafting process are flagged:
+flags.beavers-crafting.status = "created" or "updated"
+
+
 ### AnyOf
 AnyOf is an Item that is intended to be used as ingredient to create recipes that do not need a specific ingredient but any ingredient of... e.g. specific type.
 

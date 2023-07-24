@@ -17,6 +17,8 @@
             <i class="fas fa-times"></i>
         {{else if (eq status 'locked') }}
             <i class="fa-regular fa-lock"></i>
+        {{else if (eq status 'unknown') }}
+            <i class="fa-regular fa-question"></i>
         {{/if}}
     </div>
     {{#if editable}}

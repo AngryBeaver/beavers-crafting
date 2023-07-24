@@ -1,8 +1,8 @@
 {
     "title": "Beaver's Crafting Module",
-    "description": "A Crafting Module",
+    "description": "A Module for not only Crafting. But also Tracking any activities, Skill challenges, Quest and Progress, Faction reputation and more",
     "id": "beavers-crafting",
-    "version": "3.2.1",
+    "version": "3.2.2",
     "authors": [
       {
         "name": "angryBeaver",
@@ -44,16 +44,18 @@
           "type": "module",
           "manifest": "https://github.com/AngryBeaver/beavers-system-interface/releases/latest/download/module.json",
           "compatibility": {
-            "minimum" : "2.1.1",
-            "verified": "2.1.1"
+            "minimum" : "2.1.2",
+            "verified": "2.1.2"
           }
-        },
+        }
+        ],
+      "recommends": [
         {
           "id": "bsa-dnd5e",
           "type": "module",
           "manifest": "https://github.com/AngryBeaver/bsa-dnd5e/releases/latest/download/module.json",
           "compatibility": {
-            "verified": "2.0.0"
+            "verified": "2.0.1"
           }
         },
         {
@@ -61,7 +63,23 @@
           "type": "module",
           "manifest": "https://github.com/AngryBeaver/bsa-pf2e/releases/latest/download/module.json",
           "compatibility": {
-            "verified": "1.0.0"
+            "verified": "1.0.1"
+          }
+        },
+        {
+          "id": "bsa-pf1",
+          "type": "module",
+          "manifest": "https://github.com/AngryBeaver/bsa-pf1/releases/latest/download/module.json",
+          "compatibility": {
+            "verified": "1.0.1"
+          }
+        },
+        {
+          "id": "bsa-swade",
+          "type": "module",
+          "manifest": "https://github.com/AngryBeaver/bsa-swade/releases/latest/download/module.json",
+          "compatibility": {
+            "verified": "1.0.2"
           }
         }
       ]

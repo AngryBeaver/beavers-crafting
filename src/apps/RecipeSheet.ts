@@ -1,5 +1,5 @@
 import {Recipe} from "../Recipe.js";
-import {getSystemSetting, Settings} from "../Settings.js";
+import {Settings} from "../Settings.js";
 import {getDataFrom} from "../helpers/Utility.js";
 import {AnyOf} from "../AnyOf.js";
 import {getToolConfig} from "./ToolConfig.js";
@@ -97,7 +97,7 @@ export class RecipeSheet {
                 displayResults:Settings.get(Settings.DISPLAY_RESULTS),
                 displayIngredients:Settings.get(Settings.DISPLAY_RESULTS),
                 useAttendants: Settings.get(Settings.USE_ATTENDANTS),
-                canRollTool:getSystemSetting().hasTool,
+                canRollTool:Settings.getSystemSetting().hasTool,
                 canRollAbility:beaversSystemInterface.configCanRollAbility,
             });
         let description = await renderTemplate('modules/beavers-crafting/templates/recipe-description.hbs',
