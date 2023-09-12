@@ -139,7 +139,7 @@ Similar to update this will delete all appearance of that component in the craft
 ### Selectively keep ingredients on failed crafting
 with this code your crafting will not consume the first ingredient component when crafting fails. 
 ````javascript
-const ingredient1 = Object.values(recipeData.ingredients)[0];
+const ingredient1 = Object.values(recipeData.input)[0];
 result.updateComponent("consumed",ingredient1,
   (componentResult, quantity) => {
     componentResult.userInteraction = "onSuccess"
@@ -147,7 +147,7 @@ result.updateComponent("consumed",ingredient1,
 ````
 or the other way it will explicitly consume the first ingredient component also on failed crafting checks.
 ````javascript
-const ingredient1 = Object.values(recipeData.ingredients)[0];
+const ingredient1 = Object.values(recipeData.input)[0];
 result.updateComponent("consumed",ingredient1,
   (componentResult, quantity) => {
     componentResult.userInteraction = "always"
