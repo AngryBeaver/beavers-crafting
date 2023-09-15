@@ -83,10 +83,10 @@ Hooks.once("beavers-system-interface.ready", async function(){
 
 //add Subtype to create Item
     Hooks.on("preCreateItem", (doc, createData, options, user) => {
-        if (getProperty(createData, `flags.beavers-crafting.subtype`) === 'recipe' ) {
+        if (getProperty(createData, `flags.${Settings.NAMESPACE}.subtype`) === 'recipe' ) {
             doc.updateSource({"flags.beavers-crafting.subtype": Settings.RECIPE_SUBTYPE,"img":"icons/sundries/scrolls/scroll-worn-tan.webp"});
         }
-        if (getProperty(createData,`flags.beavers-crafting.subtype`) === 'anyOf' ) {
+        if (getProperty(createData,`flags.${Settings.NAMESPACE}.subtype`) === 'anyOf' ) {
             doc.updateSource({"flags.beavers-crafting.subtype": Settings.ANYOF_SUBTYPE,"img":"modules/beavers-crafting/icons/anyOf.png"});
         }
     });

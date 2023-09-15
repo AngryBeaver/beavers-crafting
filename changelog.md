@@ -1,5 +1,7 @@
 # Changelog
 ## 3.2.x simple or
+## 3.2.3
+- some reported module incompatibility fixes
 ## 3.2.2
 - automatically fix broken tools (dnd5e)
 - add flag to created or updated items
