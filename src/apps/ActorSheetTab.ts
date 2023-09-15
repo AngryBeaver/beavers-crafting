@@ -26,7 +26,7 @@ export class ActorSheetTab {
 
     async init() {
         const label = game["i18n"].localize("beaversCrafting.actorSheet.tab");
-        const flag = this.app.actor.flags["beavers-crafting"]?.crafting || {};
+        const flag = getProperty(this.app.actor,`flags.beavers-crafting.crafting`) || {};
         const unsortedFolders = {};
         for(const [x,y] of Object.entries(flag)){
             const craftingData = (y as CraftingData);

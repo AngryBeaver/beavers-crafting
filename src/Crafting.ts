@@ -503,7 +503,7 @@ export class Crafting implements CraftingData {
                 }
             }
         };
-        update.flags["beavers-crafting"].crafting[uuid] = this.serialize();
+        setProperty(update, `flags.beavers-crafting.crafting.${uuid}`, this.serialize());
         await this.actor.update(update);
     }
 
