@@ -55,13 +55,13 @@ export class Recipe implements RecipeData {
         // @ts-ignore
         return (item?.type === beaversSystemInterface.configLootItemType && (
                 item?.system?.source === Settings.RECIPE_SUBTYPE ||
-                item?.flags["beavers-crafting"]?.subtype === Settings.RECIPE_SUBTYPE
+                getProperty(item, `flags.beavers-crafting.subtype`) === Settings.RECIPE_SUBTYPE
             )
         )
     }
 
     static fromItem(item): Recipe {
-        const flags = item.flags[Settings.NAMESPACE]?.recipe;
+        const flags = getProperty(item,`flags.${Settings.NAMESPACE}.recipe`) || {};
         const data = mergeObject({input: {}, output: {}, required: {}}, flags || {}, {inplace: false});
         return new Recipe(item.uuid, item.id, item.name, item.img, data);
     }

@@ -68,7 +68,7 @@ Hooks.once("beavers-system-interface.ready", async function(){
 
 //Recipe remap use action
     Hooks.on(`dnd5e.preUseItem`, (item, config, options) => {
-        if(item.flags[Settings.NAMESPACE]?.recipe){
+        if(getProperty(item, `flags.${Settings.NAMESPACE}.recipe`)){
             Crafting.fromOwned(item).craft();
             return false;
         }
@@ -83,10 +83,10 @@ Hooks.once("beavers-system-interface.ready", async function(){
 
 //add Subtype to create Item
     Hooks.on("preCreateItem", (doc, createData, options, user) => {
-        if (createData.flags["beavers-crafting"]?.subtype === 'recipe' ) {
+        if (getProperty(createData, `flags.beavers-crafting.subtype`) === 'recipe' ) {
             doc.updateSource({"flags.beavers-crafting.subtype": Settings.RECIPE_SUBTYPE,"img":"icons/sundries/scrolls/scroll-worn-tan.webp"});
         }
-        if (createData.flags["beavers-crafting"]?.subtype === 'anyOf' ) {
+        if (getProperty(createData,`flags.beavers-crafting.subtype`) === 'anyOf' ) {
             doc.updateSource({"flags.beavers-crafting.subtype": Settings.ANYOF_SUBTYPE,"img":"modules/beavers-crafting/icons/anyOf.png"});
         }
     });
