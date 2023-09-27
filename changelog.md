@@ -1,5 +1,7 @@
 # Changelog
 ## 3.2.x simple or
+## 3.2.4
+- fix anyOf: has not used bsa-x implementation was broken on some systems.
 ## 3.2.3
 - some reported module incompatibility fixes
 ## 3.2.2

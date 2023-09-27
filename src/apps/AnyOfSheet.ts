@@ -39,8 +39,7 @@ export class AnyOfSheet {
             return;
         }
         this.anyOfElement = $('<div class="beavers-crafting"></div>');
-        html.find(".sheet-body").empty();
-        html.find(".sheet-body").append(this.anyOfElement);
+        beaversSystemInterface.itemSheetReplaceContent(this.app,html,this.anyOfElement);
         this.render();
     }
 
