@@ -99,15 +99,17 @@ flags.beavers-crafting.status = "created" or "updated"
 AnyOf is an Item that is intended to be used as ingredient to create recipes that do not need a specific ingredient but any ingredient of... e.g. specific type.
 
 Therefor AnyOf Item has an input field to write a macro code that gets executed when a recipe is checked for its ingredients.
-The macro has "item" as input and should return boolean as output. The macro will test if the given item hits the conditions of the AnyOf Ingredient.
+The macro has "item" as input and should return boolean as output. The macro will test if the given item meets the conditions of the AnyOf Ingredient.
 
 You can test your AnyOf Conditions by dropping an item in the dropArea and hit the "test item" button.
 
-To understand the intension of this feature you can have a look at the provided examples:
+To understand the intension of this feature you can use this as examples:
 
-- In the compendium "ingredients" you find an "Any Mushroom" example:
-````return item.system.source === "Ingredients.Mushroom"````
-- In the compendium "recipes" you find a "Random Potion" example that uses Any 5 Mushrooms to produce a random potion.
+````return item.name.startsWith("Test")```` any item that has a name that starts with "Test"
+````return item.type === "weapon" ```` any item of type weapon (if weapon is a type in your system)
+
+The attributes of item depend on your system. To find out what attributes your item has you can test with 
+````console.log(item); return false ````. When you hit f12 the item document structure should be copied to your logs when ever you test this anyOf.
 
 When you use a recipe with AnyOf you can customize it and by doing so define what specific ingredients you want to use for this recipe.
 
