@@ -12,6 +12,7 @@ import {
     migrateRecipeSkillToTests,
     migrateRecipeToOrConditions
 } from "./migration.js";
+import {ActorSheetCraftedInventory} from "./apps/ActorSheetCraftedInventory.js";
 
 Hooks.on("beavers-system-interface.init", async function(){
     beaversSystemInterface.addModule(Settings.NAMESPACE);
@@ -48,7 +49,7 @@ Hooks.once("beavers-system-interface.ready", async function(){
 
     beaversSystemInterface.addExtension(Settings.NAMESPACE,{componentAddFlags:["crafted"]})
 
-    if(Settings.get(Settings.SEPARATE_CRAFTED_ITEMS) === "fully"){
+    if(Settings.get(Settings.SEPARATE_CRAFTED_ITEMS) === "full"){
         beaversSystemInterface.addExtension(Settings.NAMESPACE,{componentIsSame:(a,b,previousResult)=>{
             const aHasFlag = !!getProperty(a,`flags.${Settings.NAMESPACE}.crafted`);
             const bHasFlag = !!getProperty(b,`flags.${Settings.NAMESPACE}.crafted`);
@@ -79,6 +80,7 @@ Hooks.once("beavers-system-interface.ready", async function(){
         if(!Settings.isDisabledActor(app.actor)){
             new ActorSheetTab(app, html, data);
         }
+        new ActorSheetCraftedInventory(app, html, data);
     });
 
 //Recipe remap use action
