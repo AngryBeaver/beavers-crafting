@@ -12,11 +12,9 @@ import {
     migrateRecipeSkillToTests,
     migrateRecipeToOrConditions
 } from "./migration.js";
-import {getToolConfig} from "./apps/ToolConfig";
-
 
 Hooks.on("beavers-system-interface.init", async function(){
-    beaversSystemInterface.addModule("beavers-crafting");
+    beaversSystemInterface.addModule(Settings.NAMESPACE);
 });
 Hooks.on("ready", async function(){
     if(window.beaversSystemInterface === undefined){
@@ -47,6 +45,23 @@ Hooks.once("beavers-system-interface.ready", async function(){
         await migrateRecipeToOrConditions();
     }
     Settings.set(Settings.MAJOR_VERSION,4);
+
+    beaversSystemInterface.addExtension(Settings.NAMESPACE,{componentAddFlags:["crafted"]})
+
+    if(Settings.get(Settings.SEPARATE_CRAFTED_ITEMS) === "fully"){
+        beaversSystemInterface.addExtension(Settings.NAMESPACE,{componentIsSame:(a,b,previousResult)=>{
+            const aHasFlag = !!getProperty(a,`flags.${Settings.NAMESPACE}.crafted`);
+            const bHasFlag = !!getProperty(b,`flags.${Settings.NAMESPACE}.crafted`);
+            return previousResult && aHasFlag === bHasFlag
+            }})
+    }
+    if(Settings.get(Settings.SEPARATE_CRAFTED_ITEMS) === "partial"){
+        beaversSystemInterface.addExtension(Settings.NAMESPACE,{componentIsSame:(a,b,previousResult)=>{
+                const aHasFlag = !!getProperty(a,`flags.${Settings.NAMESPACE}.crafted`);
+                const bHasFlag = !!getProperty(b,`flags.${Settings.NAMESPACE}.crafted`);
+                return previousResult && (!aHasFlag || aHasFlag === bHasFlag)
+            }})
+    }
 
 
     Hooks.on("getActorSheetHeaderButtons", (app, buttons) => {

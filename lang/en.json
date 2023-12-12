@@ -123,6 +123,10 @@
           "instantly": "instantly",
           "interaction": "interaction"
         }
+      },
+      "separateItems": {
+        "name": "Separate crafted Items",
+        "hint": "Here you can set if a crafted item is different then non crafted. When set to full your crafted items are different to uncrafted once (e.g. you can create special recipes that require crafted items). Partial will try to detect what you mean but will and can not always be correct (e.g. when you drag a crafted dagger into your recipe it requires a crafted dagger when you drag a normal dagger it can use a crafted or non crafted dagger)."
       }
     },
     "tool-config": {

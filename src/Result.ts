@@ -227,6 +227,9 @@ export class Result implements ResultApi, ResultData {
     updateComponent(type: ComponentType, componentData: ComponentData, fn: (componentResult: ComponentResult, quantity: number) => void = (componentResult: ComponentResult, quantity: number) => {
         componentResult.component.quantity = componentResult.component.quantity + quantity;
     }): void {
+        if(type === "produced"){
+            setProperty(componentData,`flags.${Settings.NAMESPACE}.crafted`,{byId:this._actor.id,byName:this._actor.name});
+        }
         let componentResult = this._components[type].findComponentResult(componentData);
         if (componentResult === undefined) {
             componentResult = new ComponentResult();

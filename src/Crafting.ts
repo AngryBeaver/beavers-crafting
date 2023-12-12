@@ -1,7 +1,6 @@
 import {Recipe} from "./Recipe.js";
 import {Settings} from "./Settings.js";
 import {RecipeCompendium} from "./apps/RecipeCompendium.js";
-import {AnyOf} from "./AnyOf.js";
 import {Result} from "./Result.js";
 import {TestHandler} from "./TestHandler.js";
 
@@ -268,68 +267,37 @@ export class Crafting implements CraftingData {
         }
     }
 
+    private _processComponentResult(componentResults: ComponentResultsData):Component[]{
+        const componentList:Component[] = [];
+        for (const componentResult of componentResults._data) {
+            let component = beaversSystemInterface.componentCreate(componentResult.component);
+            if (componentResult.userInteraction === "always" || (componentResult.userInteraction === "onSuccess" && !this.result.hasError())) {
+                if (!componentResult.isProcessed){
+                    componentList.push(component);
+                }
+            } else {
+                if (componentResult.isProcessed) {
+                    component.quantity = component.quantity * -1;
+                    this.restore.forEach(r=>{
+                        if(component.isSame(r)){
+                            r.quantity = component.quantity;
+                            component = beaversSystemInterface.componentCreate(r);
+                        }
+                    })
+                    componentList.push(component);
+                }
+            }
+        }
+        return componentList;
+    }
+
     async processAll() {
         if (this.result._hasException) return;
         this.actor = await fromUuid(this.actor.uuid); //refresh Actor
         const componentList: Component[] = [];
-        for (const componentResult of this.result._components.required._data) {
-            let component = beaversSystemInterface.componentCreate(componentResult.component);
-            if (componentResult.userInteraction === "always" || (componentResult.userInteraction === "onSuccess" && !this.result.hasError())) {
-                if (!componentResult.isProcessed){
-                    componentList.push(component);
-                }
-            } else {
-                if (componentResult.isProcessed) {
-                    component.quantity = component.quantity * -1;
-                    this.restore.forEach(r=>{
-                        if(component.isSame(r)){
-                            r.quantity = component.quantity;
-                            r.quantity = component.quantity;
-                            component = beaversSystemInterface.componentCreate(r);
-                        }
-                    })
-                    componentList.push(component);
-                }
-            }
-        }
-        for (const componentResult of this.result._components.consumed._data) {
-            let component = beaversSystemInterface.componentCreate(componentResult.component);
-            if (componentResult.userInteraction === "always" || (componentResult.userInteraction === "onSuccess" && !this.result.hasError())) {
-                if (!componentResult.isProcessed){
-                    componentList.push(component);
-                }
-            } else {
-                if (componentResult.isProcessed) {
-                    component.quantity = component.quantity * -1;
-                    this.restore.forEach(r=>{
-                        if(component.isSame(r)){
-                            r.quantity = component.quantity;
-                            component = beaversSystemInterface.componentCreate(r);
-                        }
-                    })
-                    componentList.push(component);
-                }
-            }
-        }
-        for (const componentResult of this.result._components.produced._data) {
-            let component = beaversSystemInterface.componentCreate(componentResult.component);
-            if (componentResult.userInteraction === "always" || (componentResult.userInteraction === "onSuccess" && !this.result.hasError())) {
-                if (!componentResult.isProcessed){
-                    componentList.push(component);
-                }
-            } else {
-                if (componentResult.isProcessed) {
-                    component.quantity = component.quantity * -1;
-                    this.restore.forEach(r=>{
-                        if(component.isSame(r)){
-                            r.quantity = component.quantity;
-                            component = beaversSystemInterface.componentCreate(r);
-                        }
-                    })
-                    componentList.push(component);
-                }
-            }
-        }
+        componentList.push(...this._processComponentResult(this.result._components.required));
+        componentList.push(...this._processComponentResult(this.result._components.consumed));
+        componentList.push(...this._processComponentResult(this.result._components.produced));
         if (this.result._currencyResult !== undefined) {
             if (!this.recipe.tests?.consume && this.result.hasError()) {
                 this.result.revertPayedCurrency();
@@ -508,12 +476,12 @@ export class Crafting implements CraftingData {
     }
 
     async _getResultComponents(result: Result): Promise<ComponentData[]> {
-        const items = RecipeCompendium._filterData(this.recipe.output,c => c.type === "Item");
+        const resultComponents = RecipeCompendium._filterData(this.recipe.output,c => c.type === "Item");
         const tables = RecipeCompendium._filterData(this.recipe.output,c => c.type === "RollTable");
         for (const component of tables) {
-            items.push(...await this._rollTableToComponents(component, result));
+            resultComponents.push(...await this._rollTableToComponents(component, result));
         }
-        return items;
+        return resultComponents;
     }
 
     async _rollTableToComponents(component: Component, result: Result) {
