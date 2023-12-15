@@ -228,6 +228,7 @@ export class Result implements ResultApi, ResultData {
         componentResult.component.quantity = componentResult.component.quantity + quantity;
     }): void {
         if(type === "produced"){
+            setProperty(componentData,`flags.${Settings.NAMESPACE}.isCrafted`,true);
             setProperty(componentData,`flags.${Settings.NAMESPACE}.crafted`,{byId:this._actor.id,byName:this._actor.name});
         }
         let componentResult = this._components[type].findComponentResult(componentData);

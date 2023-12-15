@@ -13,6 +13,7 @@ import {
     migrateRecipeToOrConditions
 } from "./migration.js";
 import {ActorSheetCraftedInventory} from "./apps/ActorSheetCraftedInventory.js";
+import {CraftedItemSheet} from "./apps/CraftedItemSheet.js";
 
 Hooks.on("beavers-system-interface.init", async function(){
     beaversSystemInterface.addModule(Settings.NAMESPACE);
@@ -47,19 +48,19 @@ Hooks.once("beavers-system-interface.ready", async function(){
     }
     Settings.set(Settings.MAJOR_VERSION,4);
 
-    beaversSystemInterface.addExtension(Settings.NAMESPACE,{componentAddFlags:["crafted"]})
+    beaversSystemInterface.addExtension(Settings.NAMESPACE,{componentAddFlags:["crafted","isCrafted"]})
 
     if(Settings.get(Settings.SEPARATE_CRAFTED_ITEMS) === "full"){
         beaversSystemInterface.addExtension(Settings.NAMESPACE,{componentIsSame:(a,b,previousResult)=>{
-            const aHasFlag = !!getProperty(a,`flags.${Settings.NAMESPACE}.crafted`);
-            const bHasFlag = !!getProperty(b,`flags.${Settings.NAMESPACE}.crafted`);
+            const aHasFlag = getProperty(a,`flags.${Settings.NAMESPACE}.isCrafted`);
+            const bHasFlag = getProperty(b,`flags.${Settings.NAMESPACE}.isCrafted`);
             return previousResult && aHasFlag === bHasFlag
             }})
     }
     if(Settings.get(Settings.SEPARATE_CRAFTED_ITEMS) === "partial"){
         beaversSystemInterface.addExtension(Settings.NAMESPACE,{componentIsSame:(a,b,previousResult)=>{
-                const aHasFlag = !!getProperty(a,`flags.${Settings.NAMESPACE}.crafted`);
-                const bHasFlag = !!getProperty(b,`flags.${Settings.NAMESPACE}.crafted`);
+                const aHasFlag = getProperty(a,`flags.${Settings.NAMESPACE}.isCrafted`);
+                const bHasFlag = getProperty(b,`flags.${Settings.NAMESPACE}.isCrafted`);
                 return previousResult && (!aHasFlag || aHasFlag === bHasFlag)
             }})
     }
@@ -95,6 +96,7 @@ Hooks.once("beavers-system-interface.ready", async function(){
     Hooks.on(`renderItemSheet`, (app, html, data) => {
         RecipeSheet.bind(app, html, data);
         AnyOfSheet.bind(app,html,data);
+        CraftedItemSheet.bind(app,html,data);
     });
 
 
