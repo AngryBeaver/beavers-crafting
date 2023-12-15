@@ -7,13 +7,13 @@
     </div>
     {{#if hasCraftedFlag}}
         {{#if component.flags.beavers-crafting.isCrafted }}
-            <div class="attribute">
+            <div class="attribute flexrow">
                 <img data-type="{{type}}" data-group="{{group}}" data-key="{{key}}" title="crafted"
                      class="beavers-fontsize-svg-img {{#if editable}}editable{{/if}}"
                      src="modules/beavers-crafting/icons/blueDiamond.svg"/>
             </div>
         {{else if editable}}
-            <div class="attribute">
+            <div class="attribute flexrow">
                 <img title="not crafted" data-type="{{type}}" data-group="{{group}}" data-key="{{key}}"
                      class="beavers-fontsize-svg-img {{#if editable}}editable{{/if}}"
                      src="modules/beavers-crafting/icons/diamond.svg"/>
