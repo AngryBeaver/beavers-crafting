@@ -99,6 +99,7 @@ export class RecipeSheet {
                 useAttendants: Settings.get(Settings.USE_ATTENDANTS),
                 canRollTool:Settings.getSystemSetting().hasTool,
                 canRollAbility:beaversSystemInterface.configCanRollAbility,
+                hasCraftedFlag: Settings.get(Settings.SEPARATE_CRAFTED_ITEMS) !== "none",
             });
         let description = await renderTemplate('modules/beavers-crafting/templates/recipe-description.hbs',
             {
@@ -144,6 +145,20 @@ export class RecipeSheet {
     }
 
     handleMainEvents() {
+        this.recipeElement.find('.beavers-fontsize-svg-img').click(e=>{
+            const group = e.target.dataset.group;
+            const type = e.target.dataset.type;
+            const key = e.target.dataset.key;
+            const name=`${type}.${group}.${key}.flags.${Settings.NAMESPACE}.isCrafted`;
+            const value = getProperty(this.recipe,name);
+            if(value){
+                setProperty(this.recipe, name, null);
+            }else {
+                setProperty(this.recipe, name, true);
+            }
+            this.update();
+        });
+
         this.recipeElement.find('.ingredients .item-delete').click(e=>{
             this.recipe.removeInput(e.target.dataset.group,e.target.dataset.id);
             this.update();

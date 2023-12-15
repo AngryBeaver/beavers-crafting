@@ -1,10 +1,28 @@
-<div class="flexrow beavers-component"  data-type="{{type}}" data-group="{{group}}" data-key="{{key}}" data-id="{{component.uuid}}">
-    <div class="flexrow {{#if (eq component.type 'AnyOf')}}chooseAnyOf{{else if clickable}}clickable{{/if}}" data-type="{{type}}" data-group="{{group}}" data-key="{{key}}" data-id="{{component.uuid}}">
+<div class="flexrow beavers-component" data-type="{{type}}" data-group="{{group}}" data-key="{{key}}"
+     data-id="{{component.uuid}}">
+    <div class="flexrow {{#if (eq component.type 'AnyOf')}}chooseAnyOf{{else if clickable}}clickable{{/if}}"
+         data-type="{{type}}" data-group="{{group}}" data-key="{{key}}" data-id="{{component.uuid}}">
         <img src="{{component.img}}"/>
         <span class="name">{{component.name}}</span>
     </div>
+    {{#if hasCraftedFlag}}
+        {{#if component.flags.beavers-crafting.isCrafted }}
+            <div class="attribute flexrow">
+                <img data-type="{{type}}" data-group="{{group}}" data-key="{{key}}" title="crafted"
+                     class="beavers-fontsize-svg-img {{#if editable}}editable{{/if}}"
+                     src="modules/beavers-crafting/icons/blueDiamond.svg"/>
+            </div>
+        {{else if editable}}
+            <div class="attribute flexrow">
+                <img title="not crafted" data-type="{{type}}" data-group="{{group}}" data-key="{{key}}"
+                     class="beavers-fontsize-svg-img {{#if editable}}editable{{/if}}"
+                     src="modules/beavers-crafting/icons/diamond.svg"/>
+            </div>
+        {{/if}}
+    {{/if}}
     <div class="attribute">
-        <input style="width:30px;text-align:right;background: rgba(0, 0, 0, 0)" name="flags.beavers-crafting.recipe.{{type}}.{{group}}.{{key}}.quantity"
+        <input style="width:30px;text-align:right;background: rgba(0, 0, 0, 0)"
+               name="flags.beavers-crafting.recipe.{{type}}.{{group}}.{{key}}.quantity"
                {{#unless editable}}disabled{{/unless}}
                type="number"
                step="any"
@@ -22,10 +40,10 @@
         {{/if}}
     </div>
     {{#if editable}}
-    <div class="attribute flexrow">
-        <a class="item-delete">
-            <i class="fas fa-trash" data-group="{{group}}" data-id="{{key}}"></i>
-        </a>
-    </div>
+        <div class="attribute flexrow">
+            <a class="item-delete">
+                <i class="fas fa-trash" data-group="{{group}}" data-id="{{key}}"></i>
+            </a>
+        </div>
     {{/if}}
 </div>

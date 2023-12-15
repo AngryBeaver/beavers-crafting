@@ -2,7 +2,7 @@
     "title": "Beaver's Crafting Module",
     "description": "A Module for not only Crafting. But also Tracking any activities, Skill challenges, Quest and Progress, Faction reputation and more",
     "id": "beavers-crafting",
-    "version": "3.2.4",
+    "version": "3.3.0",
     "authors": [
       {
         "name": "angryBeaver",
@@ -44,8 +44,8 @@
           "type": "module",
           "manifest": "https://github.com/AngryBeaver/beavers-system-interface/releases/latest/download/module.json",
           "compatibility": {
-            "minimum" : "2.1.2",
-            "verified": "2.1.2"
+            "minimum" : "2.1.6",
+            "verified": "2.1.6"
           }
         }
         ],

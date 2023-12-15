@@ -63,7 +63,7 @@ export class AnyOf {
             const result = await this.executeMacro(item);
             const componentItem = beaversSystemInterface.componentFromEntity(item);
             if(result.value){
-                const same = resultList.filter(component => componentItem.isSame(component))
+                const same = resultList.filter(component => component.isSame(componentItem))
                 if(same.length > 0){
                     same[0].quantity = same[0].quantity + componentItem.quantity;
                 }else{

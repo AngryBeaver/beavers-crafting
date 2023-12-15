@@ -67,7 +67,7 @@
                     </div>
                     <div class="flexcol required section">
                         {{#each chatData.components.required}}
-                            {{>beavers-recipe-component component=this.component key=@key type="required" clickable=../displayIngredients status=this.status}}
+                            {{>beavers-recipe-component component=this.component key=@key type="required" hasCraftedFlag=../hasCraftedFlag clickable=../displayIngredients status=this.status}}
                             {{#unless @last}}
                                 <div class="beavers-seperator"></div>
                             {{/unless}}
@@ -82,7 +82,7 @@
                     </div>
                     <div class="flexcol consumed section">
                         {{#each chatData.components.consumed}}
-                            {{>beavers-recipe-component component=this.component key=@key type="input" clickable=../displayIngredients status=this.status}}
+                            {{>beavers-recipe-component component=this.component key=@key type="input" hasCraftedFlag=../hasCraftedFlag clickable=../displayIngredients status=this.status}}
                             {{#unless @last}}
                                 <div class="beavers-seperator"></div>
                             {{/unless}}
@@ -127,7 +127,7 @@
                                                     <input class="choose" data-type="required" data-key="{{@key}}" data-group="{{@../key}}"
                                                            type="checkbox"/>
                                                 {{/if}}
-                                                {{>beavers-recipe-component component=this key=@key type="required" group=@../key clickable=../../displayResults status=(lookup (lookup ../../precast.required @../key) @key)}}
+                                                {{>beavers-recipe-component component=this key=@key hasCraftedFlag=../../hasCraftedFlag type="required" group=@../key clickable=../../displayResults status=(lookup (lookup ../../precast.required @../key) @key)}}
                                                 {{#if (gt (beavers-objectLen ../this) 1)}}
                                                 </div>
                                                 {{/if}}
@@ -180,7 +180,7 @@
                                                                data-group="{{@../key}}"
                                                                type="radio"/>
                                                     {{/if}}
-                                                    {{>beavers-recipe-component component=this type="input" key=@key group=@../key clickable=../../displayIngredients status=(lookup (lookup ../../precast.input @../key) @key)}}
+                                                    {{>beavers-recipe-component component=this type="input" hasCraftedFlag=../../hasCraftedFlag key=@key group=@../key clickable=../../displayIngredients status=(lookup (lookup ../../precast.input @../key) @key)}}
                                                     {{#if (gt (beavers-objectLen ../this) 1)}}
                                                     </div>
                                                     {{/if}}

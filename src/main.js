@@ -12,11 +12,11 @@ import {
     migrateRecipeSkillToTests,
     migrateRecipeToOrConditions
 } from "./migration.js";
-import {getToolConfig} from "./apps/ToolConfig";
-
+import {ActorSheetCraftedInventory} from "./apps/ActorSheetCraftedInventory.js";
+import {CraftedItemSheet} from "./apps/CraftedItemSheet.js";
 
 Hooks.on("beavers-system-interface.init", async function(){
-    beaversSystemInterface.addModule("beavers-crafting");
+    beaversSystemInterface.addModule(Settings.NAMESPACE);
 });
 Hooks.on("ready", async function(){
     if(window.beaversSystemInterface === undefined){
@@ -48,6 +48,23 @@ Hooks.once("beavers-system-interface.ready", async function(){
     }
     Settings.set(Settings.MAJOR_VERSION,4);
 
+    beaversSystemInterface.addExtension(Settings.NAMESPACE,{componentAddFlags:["crafted","isCrafted"]})
+
+    if(Settings.get(Settings.SEPARATE_CRAFTED_ITEMS) === "full"){
+        beaversSystemInterface.addExtension(Settings.NAMESPACE,{componentIsSame:(a,b,previousResult)=>{
+            const aHasFlag = getProperty(a,`flags.${Settings.NAMESPACE}.isCrafted`);
+            const bHasFlag = getProperty(b,`flags.${Settings.NAMESPACE}.isCrafted`);
+            return previousResult && aHasFlag === bHasFlag
+            }})
+    }
+    if(Settings.get(Settings.SEPARATE_CRAFTED_ITEMS) === "partial"){
+        beaversSystemInterface.addExtension(Settings.NAMESPACE,{componentIsSame:(a,b,previousResult)=>{
+                const aHasFlag = getProperty(a,`flags.${Settings.NAMESPACE}.isCrafted`);
+                const bHasFlag = getProperty(b,`flags.${Settings.NAMESPACE}.isCrafted`);
+                return previousResult && (!aHasFlag || aHasFlag === bHasFlag)
+            }})
+    }
+
 
     Hooks.on("getActorSheetHeaderButtons", (app, buttons) => {
         if(Settings.get(Settings.ADD_HEADER_LINK) && !Settings.isDisabledActor(app.actor)) {
@@ -64,6 +81,7 @@ Hooks.once("beavers-system-interface.ready", async function(){
         if(!Settings.isDisabledActor(app.actor)){
             new ActorSheetTab(app, html, data);
         }
+        new ActorSheetCraftedInventory(app, html, data);
     });
 
 //Recipe remap use action
@@ -78,6 +96,7 @@ Hooks.once("beavers-system-interface.ready", async function(){
     Hooks.on(`renderItemSheet`, (app, html, data) => {
         RecipeSheet.bind(app, html, data);
         AnyOfSheet.bind(app,html,data);
+        CraftedItemSheet.bind(app, html, data);
     });
 
 

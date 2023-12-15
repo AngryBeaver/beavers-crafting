@@ -160,6 +160,21 @@ Every Character will now have access to 50+ recipes to brew potions.
 
 ## Latest features:
 have a look at the changelog.md
+### 3.3.x isCrafted flag
+This module now tracks a isCrafted flag on items. 
+It will only be usefull if you want a crafting system that needs to differentiate between crafted and non crafted items.
+E.g. you want to create recipes that will only work with crafted daggers not bought daggers.
+Per default this setting is disabled. You can enable it in the settings to either full mode or partial mode.
+- In full mode a crafted item is never a normal item. e.g. you need to explicitly make recipes that works with crafted and non crafted items.
+- In partial mode you can create recipes that needs crafted items only but all recipes without crafted items would also accept crafted items.
+You will use non crafted items before crafted ones.
+
+
+- new flags: "beavers-crafting.isCrafted"
+- removed flags: "beavers-crafting.status"
+When this feature is enabled crafted items will be marked with an icon.
+- 
+![img.png](pictures/craftedIcon.png)
 ### 3.0.x progress tracking and multiple tests
 This module now enables tracking of your progress through a series of tests.
 While you can track your crafting this features enables a new purpose of this module.

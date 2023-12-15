@@ -1,4 +1,8 @@
 # Changelog
+## 3.3.x crafted flag
+- add support for recipes that are based on crafted items.
+- remove beavers-crafting.status flag 
+- add beavers-crafting.isCrafted flag
 ## 3.2.x simple or
 ## 3.2.4
 - fix anyOf: has not used bsa-x implementation was broken on some systems.

@@ -679,3 +679,20 @@ actor-sheet
     outline: none;
     box-shadow: 0 0 5px var(--color-shadow-primary);
 }
+
+.beavers-fontsize-svg-img {
+    width: 1em !important;
+    height: 1em !important;
+    position: relative;
+    margin: auto !important;
+    border:0px !important;
+    flex:0 !important;
+}
+
+.beavers-fontsize-svg-img.editable {
+    cursor:pointer;
+}
+
+.beavers-fontsize-svg-img.editable:hover {
+    box-shadow: 0 0 10px var(--color-shadow-primary),inset 0 0 5px var(--color-shadow-primary);
+}
