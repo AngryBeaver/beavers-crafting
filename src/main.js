@@ -96,7 +96,7 @@ Hooks.once("beavers-system-interface.ready", async function(){
     Hooks.on(`renderItemSheet`, (app, html, data) => {
         RecipeSheet.bind(app, html, data);
         AnyOfSheet.bind(app,html,data);
-        CraftedItemSheet.bind(app,html,data);
+        CraftedItemSheet.bind(app, html, data);
     });
 
 

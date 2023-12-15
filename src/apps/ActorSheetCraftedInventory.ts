@@ -9,7 +9,9 @@ export class ActorSheetCraftedInventory{
         this.app = app;
         this.html = html;
         this.data = data;
-        void this.init()
+        if(Settings.get(Settings.SEPARATE_CRAFTED_ITEMS) !== "none") {
+            void this.init()
+        }
     }
 
     async init() {

@@ -123,7 +123,8 @@ export class CraftingApp extends Application {
                 displayResults:Settings.get(Settings.DISPLAY_RESULTS),
                 displayIngredients:Settings.get(Settings.DISPLAY_RESULTS),
                 useTool: Settings.get(Settings.USE_TOOL),
-                useAttendants: Settings.get(Settings.USE_ATTENDANTS)
+                useAttendants: Settings.get(Settings.USE_ATTENDANTS),
+                hasCraftedFlag: Settings.get(Settings.SEPARATE_CRAFTED_ITEMS) !== "none",
             });
         this.element.find(".sheet-body").empty();
         this.element.find(".sheet-body").append(this.data.content);

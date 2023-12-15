@@ -681,13 +681,12 @@ actor-sheet
 }
 
 .beavers-fontsize-svg-img {
-    width: 1em;
-    height: 1em;
+    width: 1em !important;
+    height: 1em !important;
     position: relative;
-    margin: auto;
-    top: 0.25em;
-    border:0px;
-    flex:0;
+    margin: auto !important;
+    border:0px !important;
+    flex:0 !important;
 }
 
 .beavers-fontsize-svg-img.editable {
