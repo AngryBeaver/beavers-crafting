@@ -170,10 +170,7 @@ Per default this setting is disabled. You can enable it in the settings to eithe
 You will use non crafted items before crafted ones.
 
 
-- new flags: "beavers-crafting.isCrafted"
-- removed flags: "beavers-crafting.status"
 When this feature is enabled crafted items will be marked with an icon.
-- 
 ![img.png](pictures/craftedIcon.png)
 ### 3.0.x progress tracking and multiple tests
 This module now enables tracking of your progress through a series of tests.

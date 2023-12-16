@@ -681,11 +681,11 @@ actor-sheet
 }
 
 .beavers-fontsize-svg-img {
-    width: 1em !important;
-    height: 1em !important;
+    height:1.25em !important;
     position: relative;
     margin: auto !important;
     border:0px !important;
+    border-radius:10%;
     flex:0 !important;
 }
 
@@ -694,5 +694,5 @@ actor-sheet
 }
 
 .beavers-fontsize-svg-img.editable:hover {
-    box-shadow: 0 0 10px var(--color-shadow-primary),inset 0 0 5px var(--color-shadow-primary);
+    box-shadow: 0 0 10px var(--color-shadow-primary);
 }
