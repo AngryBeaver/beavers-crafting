@@ -20,7 +20,7 @@ export class ActorSheetCraftedInventory{
             .forEach(i=>{
                 if(!!getProperty(i,`flags.${Settings.NAMESPACE}.crafted`)){
                     this.html.find(`.item[data-item-id=${i.id}] .item-name`)
-                        .append('<img title="crafted" class="beavers-fontsize-svg-img" src="modules/beavers-crafting/icons/blueDiamond.svg"/>')
+                        .append('<img title="crafted" class="beavers-fontsize-svg-img" src="modules/beavers-crafting/icons/tools.svg"/>')
                 }
             })
     }

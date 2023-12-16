@@ -1,5 +1,8 @@
 # Changelog
 ## 3.3.x crafted flag
+## 3.3.1 
+- replace diamond with tools icon
+## 3.3.0
 - add support for recipes that are based on crafted items.
 - remove beavers-crafting.status flag 
 - add beavers-crafting.isCrafted flag

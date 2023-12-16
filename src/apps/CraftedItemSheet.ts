@@ -26,7 +26,7 @@ export class CraftedItemSheet{
         if(!!getProperty(this.item,`flags.${Settings.NAMESPACE}.crafted`)){
             this.html.find(`input[name=name]`).parent().addClass("flexrow");
             this.html.find(`input[name=name]`).after(
-                '<img title="crafted" class="beavers-fontsize-svg-img" src="modules/beavers-crafting/icons/blueDiamond.svg"/>')
+                '<img title="crafted" class="beavers-fontsize-svg-img" src="modules/beavers-crafting/icons/tools.svg"/>')
         }
     }
 
