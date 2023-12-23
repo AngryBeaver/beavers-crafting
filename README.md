@@ -84,18 +84,21 @@ Or can start a crafting process by clicking on a recipe in your inventory (depre
   - it will display you an uneditable recipe and shows you which ingredients are missing.
 - you can hit the craft button to start a craft process.
   - a craft process will ask for the given skill if any and returns with a result
+
 ### Result
+
 ![img.png](pictures/result.png)
 
 You will see a chat message with your result
 
 Items updated or created in a successfull crafting process are flagged:
 ````
-flags.beavers-crafting.status = "created" or "updated"
+flags.beavers-crafting.isCrafted = true
 ````
 
 
 ### AnyOf
+
 AnyOf is an Item that is intended to be used as ingredient to create recipes that do not need a specific ingredient but any ingredient of... e.g. specific type.
 
 Therefor AnyOf Item has an input field to write a macro code that gets executed when a recipe is checked for its ingredients.
@@ -111,12 +114,21 @@ To understand the intension of this feature you can use this as examples:
 The attributes of item depend on your system. To find out what attributes your item has you can test with 
 ````console.log(item); return false ````. When you hit f12 the item document structure should be copied to your logs when ever you test this anyOf.
 
+**For people with 0 code experience** to better filter the item AnyOf we point out the [ItemTags](https://foundryvtt.com/packages/item-tags) a simple and easy module to use and integrates perfectly with this feature all you have to do is insert the following macro:
+
+`return ItemTags.Check(item, ['tag1','tag2'])`
+
+and modify the tag array as you want ['metal','sword'] or ['metal','bow'] etc., major details about this module are on this [API](https://modules.zoty.dev/itemTags/apiReference.html)
+
+this allows you to "draconianly" filter your components with little and definitely more dynamic effort.
+
 When you use a recipe with AnyOf you can customize it and by doing so define what specific ingredients you want to use for this recipe.
 
 ![img.png](pictures/anyOfDrop1.png)
 ![img.png](pictures/anyOfDrop2.png)
 
 **Drag And Drop**
+
 - drag and drop an ingredient (e.g. from your inventar) to "anyOf" ingredient within your recipeCompendium.
 **ChoiceWindow (3.2.x)**
 - clicking the AnyOf will popup a multiple choice dialog of available matching items you can choose from.
@@ -124,7 +136,9 @@ When you use a recipe with AnyOf you can customize it and by doing so define wha
 - it will automatically check if that new ingredient is available in that quantity.
 - none customized AnyOf ingredients will popup a multiple choice dialog of available matching items before starting
 - when you reselect the recipe it will remove your customization and start over with anyOf Items again.
+
 ### Simple Or Condition (3.2.x)
+
 Your recipe can have "or conditions" for required, cost and result items. 
 You can choose one of those or conditions in the RecipeCompendium by selecting on checkbox.
 
