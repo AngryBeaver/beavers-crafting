@@ -12,7 +12,7 @@
             </div>
         </div>
         {{#each craftingFolder}}
-            <div class="flexrow header beavers-line">
+            <h3 class="flexrow header beavers-line">
                 <div class="scale">{{@key}}{{#if (eq @key "")}}...{{/if}}</div>
                 <div class="attribute" style="min-width:150px;text-align:center;">{{localize
                         "beaversCrafting.actorSheet.table.progress"}}</div>
@@ -21,7 +21,7 @@
                 <div class="attribute" style="min-width:50px">
                     <!--a class="addCrafting"><i class="fa-solid fa-circle-plus"></i></a-->
                 </div>
-            </div>
+            </h3>
             {{#each this}}
                 <div class="beavers-crafting-item">
                     <div class="flexrow beavers-line" style="padding:2px 5px;line-height:24px;">

@@ -2,7 +2,7 @@
     "title": "Beaver's Crafting Module",
     "description": "A Module for not only Crafting. But also Tracking any activities, Skill challenges, Quest and Progress, Faction reputation and more",
     "id": "beavers-crafting",
-    "version": "3.3.1",
+    "version": "3.3.2",
     "authors": [
       {
         "name": "angryBeaver",
@@ -45,17 +45,27 @@
           "manifest": "https://github.com/AngryBeaver/beavers-system-interface/releases/latest/download/module.json",
           "compatibility": {
             "minimum" : "2.1.6",
-            "verified": "2.1.6"
+            "verified": "2.1.7"
           }
         }
         ],
       "recommends": [
         {
+          "id": "bsa-cyberpunk-red-core",
+          "type": "module",
+          "manifest": "https://github.com/AngryBeaver/bsa-cyberpunk-red-core/releases/latest/download/module.json"
+        },
+        {
+          "id": "bsa-dnd4e",
+          "type": "module",
+          "manifest": "https://github.com/AngryBeaver/bsa-dnd4e/releases/latest/download/module.json"
+        },
+        {
           "id": "bsa-dnd5e",
           "type": "module",
           "manifest": "https://github.com/AngryBeaver/bsa-dnd5e/releases/latest/download/module.json",
           "compatibility": {
-            "verified": "2.0.1"
+            "verified": "2.4.1"
           }
         },
         {
@@ -81,6 +91,16 @@
           "compatibility": {
             "verified": "1.0.2"
           }
+        },
+        {
+          "id": "bsa-sfrpg",
+          "type": "module",
+          "manifest": "https://github.com/AngryBeaver/bsa-sfrpg/releases/latest/download/module.json"
+        },
+        {
+          "id": "bsa-swnr",
+          "type": "module",
+          "manifest": "https://github.com/AngryBeaver/bsa-swnr/releases/latest/download/module.json"
         }
       ]
     },
