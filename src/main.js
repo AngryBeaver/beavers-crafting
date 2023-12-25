@@ -14,6 +14,7 @@ import {
 } from "./migration.js";
 import {ActorSheetCraftedInventory} from "./apps/ActorSheetCraftedInventory.js";
 import {CraftedItemSheet} from "./apps/CraftedItemSheet.js";
+import "./compatibility/tidy5e.js";
 
 Hooks.on("beavers-system-interface.init", async function(){
     beaversSystemInterface.addModule(Settings.NAMESPACE);

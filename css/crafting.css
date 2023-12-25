@@ -293,6 +293,7 @@ beaver-component
     padding:2px;
     border-radius:5px;
     border:1px solid darkgreen;
+    background-color: rgba(255,255,255,0.5)
 }
 .beavers-crafting .statusbar.success {
     border-color:darkgreen;
@@ -403,8 +404,6 @@ beaver-recipe-test
     line-height: 34px;
     height: 34px;
     max-height:34px;
-    color: #4b4a44;
-    font-weight: 700;
     font-size: 16px;
     font-family: "Modesto Condensed", "Palatino Linotype", serif;
 }
@@ -434,7 +433,7 @@ beaver-folder
 }
 
 .beavers-crafting .beavers-folder .beavers-folder-item span.name {
-    color: #4b4a44;
+    filter: brightness(0.8);
     font-weight: 700;
     font-size: 16px;
     font-family: "Modesto Condensed", "Palatino Linotype", serif;
@@ -496,7 +495,7 @@ beavers-recipe
     font-family: "Modesto Condensed", "Palatino Linotype", serif;
     text-align: left;
     line-height:20px;
-    color: dimgrey;
+    filter: brightness(0.8);
     flex:0;
     min-width:200px;
     width: inherit;
@@ -558,7 +557,7 @@ beavers-recipe
     font-family: "Modesto Condensed", "Palatino Linotype", serif;
     text-align: left;
     line-height:20px;
-    color: dimgrey;
+    filter: brightness(0.8);
     flex:0;
     width: inherit;
     margin: inherit;
@@ -621,14 +620,12 @@ actor-sheet
 .beavers-crafting.actor-tab .header {
     height: 22px;
     align-items: center;
-    background: rgba(0, 0, 0, 0.05);
+    background: rgba(0, 0, 0, 0.2);
     border: 2px groove #eeede0;
-    font-weight: bold;
     padding-left: 5px;
     font-family: "Modesto Condensed", "Palatino Linotype", serif;
     text-align: left;
     line-height:20px;
-    color: dimgrey;
     flex:0;
     min-width:200px;
 }

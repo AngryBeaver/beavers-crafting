@@ -1,5 +1,8 @@
 # Changelog
 ## 3.3.x crafted flag
+## 3.3.2
+- add tidy5e support
+- improve compatiblity to other systems 
 ## 3.3.1 
 - replace diamond with tools icon
 ## 3.3.0
