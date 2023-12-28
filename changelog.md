@@ -1,5 +1,7 @@
 # Changelog
 ## 3.3.x crafted flag
+## 3.3.3
+- create eol branch for v10
 ## 3.3.2
 - add tidy5e support
 - improve compatiblity to other systems 

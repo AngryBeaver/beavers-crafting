@@ -23,6 +23,9 @@ Hooks.on("ready", async function(){
     if(window.beaversSystemInterface === undefined){
         ui.notifications.error("Beavers Crafting | missing module Beavers System Interface", {permanent:true});
     }
+    if(game.version.split(".")[0]<11 && game.user.isGM){
+        ui.notifications.warn("Beavers Crafting | feature freeze for v10, plz migrate to v11");
+    }
 })
 
 Hooks.once("beavers-system-interface.ready", async function(){
