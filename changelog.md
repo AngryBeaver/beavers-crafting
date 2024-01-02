@@ -1,4 +1,9 @@
 # Changelog
+## 3.4.1
+- configurable TabName/TabIcon
+  - Beavers-Crafting is no longer only for Crafting, it is and can be used for various other things like: quest Progress, Tech Trees, Downtime Activities, ...
+- remove deprecated crafting header icon.
+- rework readme
 ## 3.4.x v11+
 - start v11+ branch
 ## 3.3.x crafted flag

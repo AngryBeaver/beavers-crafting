@@ -66,18 +66,6 @@ Hooks.once("beavers-system-interface.ready", async function(){
             }})
     }
 
-
-    Hooks.on("getActorSheetHeaderButtons", (app, buttons) => {
-        if(Settings.get(Settings.ADD_HEADER_LINK) && !Settings.isDisabledActor(app.actor)) {
-            buttons.unshift({
-                label: "beaversCrafting.actorLink",
-                class: "beaversCrafting",
-                icon: "fas fa-scroll",
-                onclick: () => new CraftingApp(app.object).render(true)
-            });
-        }
-    });
-
     Hooks.on("renderActorSheet", (app, html, data)=>{
         if(!Settings.isDisabledActor(app.actor)){
             new ActorSheetTab(app, html, data);
