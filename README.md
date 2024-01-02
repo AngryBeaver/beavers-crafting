@@ -26,6 +26,57 @@ in possibly all Systems: ([List of adaption layers](https://github.com/AngryBeav
 ### DownTimeActivities
 ![downtime.png](pictures/downtime.png)
 
+## TOC
+<!-- TOC -->
+* [Beaver's Crafting Module](#beavers-crafting-module)
+  * [Features](#features)
+    * [Crafting](#crafting)
+    * [Character advancement](#character-advancement)
+    * [DownTimeActivities](#downtimeactivities)
+  * [TOC](#toc)
+  * [HowTo](#howto)
+    * [Create Recipes](#create-recipes)
+    * [Configure Recipe](#configure-recipe)
+      * [requires:](#requires-)
+      * [costs:](#costs-)
+      * [tests:](#tests-)
+        * [TestSection](#testsection)
+      * [results:](#results-)
+      * [instruction:](#instruction-)
+      * [folder:](#folder-)
+      * [macro:](#macro-)
+    * [Executing Recipes](#executing-recipes)
+      * [add](#add)
+        * [Recipe Compendium](#recipe-compendium)
+          * [or Condition](#or-condition)
+      * [list](#list)
+      * [advancement](#advancement)
+        * [result](#result)
+  * [AnyOf](#anyof)
+    * [Example](#example)
+      * [ItemTags](#itemtags)
+    * [test](#test)
+    * [customize Recipes](#customize-recipes)
+      * [Drag And Drop](#drag-and-drop)
+      * [Select available](#select-available)
+      * [reset](#reset)
+  * [Examples](#examples)
+    * [Ingredients](#ingredients)
+    * [Recipes](#recipes)
+  * [Settings](#settings)
+    * [3.3.x isCrafted flag](#33x-iscrafted-flag)
+  * [Notes](#notes)
+    * [Currency reorder](#currency-reorder)
+    * [Items reorder](#items-reorder)
+    * [ItemReference](#itemreference)
+  * [Troubleshooting](#troubleshooting)
+    * [Dont show "RECIPE" in item menu](#dont-show--recipe--in-item-menu)
+      * [Problem:](#problem-)
+      * [Solution:](#solution-)
+      * [Explanation:](#explanation-)
+  * [Credits](#credits)
+<!-- TOC -->
+
 ## HowTo
 ### Create Recipes
 ![img.png](pictures/newItem.png)
@@ -89,7 +140,7 @@ see [RecipeMacro](https://github.com/AngryBeaver/beavers-crafting/blob/main/macr
 On your actor-sheet you will find a new tab.
 #### add
 Initially your sheet will be blank except for the add button.
-you can add a new crafting process by clicking on +Add,  which will open the [Recipe Compendium](#Recipe_Compendium).
+you can add a new crafting process by clicking on +Add,  which will open the [Recipe Compendium](#recipe-compendium).
 ##### Recipe Compendium
 ![img.png](pictures/crafting.png)
 
