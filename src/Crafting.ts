@@ -304,37 +304,28 @@ export class Crafting implements CraftingData {
             }
         }
         try{
-            await beaversSystemInterface.actorComponentListAdd(this.actor,componentList);
+            const itemChange = await beaversSystemInterface.actorComponentListAdd(this.actor,componentList);
+            if(!this.result.hasError()){
+                await this.actor.update(this.result._actorUpdate);
+            }
+            Object.values(this.result._components).forEach(crs=>{
+                for (const componentResult of crs._data) {
+                    if (componentResult.userInteraction === "always" || (componentResult.userInteraction === "onSuccess" && !this.result.hasError())) {
+                        componentResult.setProcessed(true);
+                    } else {
+                        componentResult.setProcessed(false);
+                    }
+                }
+            })
+            Hooks.call(Settings.NAMESPACE+".processed",{recipe:this.recipe,result:this.result,processed:itemChange});
         }catch(e){
             // @ts-ignore
             ui.notifications.error(e.message)
             this.result._hasException = true;
             return;
         }
-        if(!this.result.hasError()){
-            await this.actor.update(this.result._actorUpdate);
-        }
-        for (const componentResult of this.result._components.consumed._data) {
-            if (componentResult.userInteraction === "always" || (componentResult.userInteraction === "onSuccess" && !this.result.hasError())) {
-                componentResult.setProcessed(true);
-            } else {
-                componentResult.setProcessed(false);
-            }
-        }
-        for (const componentResult of this.result._components.required._data) {
-            if (componentResult.userInteraction === "always" || (componentResult.userInteraction === "onSuccess" && !this.result.hasError())) {
-                componentResult.setProcessed(true);
-            } else {
-                componentResult.setProcessed(false);
-            }
-        }
-        for (const componentResult of this.result._components.produced._data) {
-            if (componentResult.userInteraction === "always" || (componentResult.userInteraction === "onSuccess" && !this.result.hasError())) {
-                componentResult.setProcessed(true);
-            } else {
-                componentResult.setProcessed(false);
-            }
-        }
+
+
     }
 
     get chatData(): ChatData {

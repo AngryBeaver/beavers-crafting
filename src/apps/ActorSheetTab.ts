@@ -25,7 +25,8 @@ export class ActorSheetTab {
     }
 
     async init() {
-        const label = game["i18n"].localize("beaversCrafting.actorSheet.tab");
+        const label = Settings.get(Settings.TAB_NAME) || game["i18n"].localize("beaversCrafting.actorSheet.tab");
+        const icon = Settings.get(Settings.TAB_ICON) || "fa-scroll";
         const flag = getProperty(this.app.actor,`flags.${Settings.NAMESPACE}.crafting`) || {};
         const unsortedFolders = {};
         for(const [x,y] of Object.entries(flag)){
@@ -49,6 +50,7 @@ export class ActorSheetTab {
         if(unsortedFolders[""]){
             this.craftingFolder[""] = unsortedFolders[""];
         }
+
         const tabBody = $(await renderTemplate('modules/beavers-crafting/templates/actor-sheet-tab.hbs',
             {
                 craftingFolder:this.craftingFolder,
@@ -56,7 +58,7 @@ export class ActorSheetTab {
                 abilities: beaversSystemInterface.configCanRollAbility?beaversSystemInterface.configAbilities:[],
                 tools: await getToolConfig()
             }));
-        beaversSystemInterface.actorSheetAddTab(this.app, this.html, this.data.actor, { id: Settings.ACTOR_TAB_ID, label: label, html: "<i class=\"fas fa-scroll\"/>" }, tabBody);
+        beaversSystemInterface.actorSheetAddTab(this.app, this.html, this.data.actor, { id: Settings.ACTOR_TAB_ID, label: label, html: `<i class="fas ${icon}"/>` }, tabBody);
         this.activateListeners(tabBody);
     }
 

@@ -24,7 +24,7 @@
         "hits": "hits",
         "hitsHint": "success checks needed before this test is successfully",
         "fails": "fails",
-        "failsHint": "failed checks before crafting fails",
+        "failsHint": "failed checks before process fails",
         "dc": "dc",
         "consume": "consume",
         "consumeHint": "consumes cost on failed tests",
@@ -105,7 +105,15 @@
       },
       "disabledActor": {
         "name": "Disabled Actors",
-        "hint": "Comma separated list of actor types that will not have a crafting tab"
+        "hint": "Comma separated list of actor types that will not have an actor tab"
+      },
+      "tabName": {
+        "name": "TabName",
+        "hint": "Customize Tab name on actor sheets (default: Crafting). Some Systems uses a TabName rather a TabIcon. Why? This module was initially based on crafting but you can use it for various other thing like: Tech Trees, Quest Progress, Downtime Activities"
+      },
+      "tabIcon": {
+        "name": "TabIcon",
+        "hint": "Customize Tab icon on actor sheets (default: A Recipe). Some Systems uses a TabIcon rather a TabName. You can change it to any fontawesome icon that foundry supports"
       },
       "toolButton": {
         "name": "Configure tools available",
@@ -117,16 +125,16 @@
         "hint": "This will add a recipe link on the ActorSheet. Optional since 2.0.x as too many modules polute the Header area of sheets, in some worlds i have problems to find a blank space to drag."
       },
       "timeToCraft": {
-        "name": "TimeToCraft",
-        "hint": "TimeToCraft is used to track the time a crafting process needed. Instantly will not use any time and will instantly finish the process. Interaction will process when the user interacts with the process.",
+        "name": "TimeToProcess",
+        "hint": "TimeToProcess is used to track the time a process needed. Instantly will not use any time and will instantly finish the process. Interaction will process when the user interacts with the process.",
         "choices": {
           "instantly": "instantly",
           "interaction": "interaction"
         }
       },
       "separateItems": {
-        "name": "Separate crafted Items",
-        "hint": "Here you can set if a crafted item is different then non crafted. When set to full your crafted items are different to uncrafted once (e.g. you can create special recipes that require crafted items). Partial will try to detect what you mean but will and can not always be correct (e.g. when you drag a crafted dagger into your recipe it requires a crafted dagger when you drag a normal dagger it can use a crafted or non crafted dagger)."
+        "name": "Separate produced Items",
+        "hint": "Here you can set if a produced item is different then non produced. When set to full your produced items are different to unproduced once (e.g. you can create special recipes that require produced items). Partial will try to detect what you mean but will and can not always be correct (e.g. when you drag a produced dagger into your recipe it requires a produced dagger when you drag a normal dagger it can use a produced or non produced dagger)."
       }
     },
     "tool-config": {

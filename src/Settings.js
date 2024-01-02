@@ -6,7 +6,6 @@ export class Settings {
     static CREATE_ITEM_TITLE = "createItemTitle";
     static DISPLAY_RESULTS = "displayResults";
     static DISPLAY_INGREDIENTS = "displayIngredients";
-    static ADD_HEADER_LINK = "addHeaderLink";
     static TIME_TO_CRAFT = "timeToCraft";
     static USE_TOOL = "useTool";
     static USE_ATTENDANTS = "useAttendants";
@@ -19,6 +18,8 @@ export class Settings {
     static CURRENCY_EXCHANGE = "currencyExchange"
     static DISABLED_ACTOR = "disabledActor";
     static SEPARATE_CRAFTED_ITEMS = "separateCraftedItems";
+    static TAB_NAME = "tabName"
+    static TAB_ICON = "tabIcon";
 
     static init() {
         game.settings.register(this.NAMESPACE, this.CREATE_ITEM_TITLE, {
@@ -29,15 +30,6 @@ export class Settings {
             default: "Create New Item",
             requiresReload: true,
             type: String,
-        });
-        game.settings.register(this.NAMESPACE, this.ADD_HEADER_LINK, {
-            name: game.i18n.localize('beaversCrafting.settings.addHeaderLink.name'),
-            hint: game.i18n.localize('beaversCrafting.settings.addHeaderLink.hint'),
-            scope: "world",
-            config: true,
-            default: false,
-            requiresReload: true,
-            type: Boolean,
         });
         game.settings.register(this.NAMESPACE, this.TIME_TO_CRAFT, {
             name: game.i18n.localize('beaversCrafting.settings.timeToCraft.name'),
@@ -65,7 +57,7 @@ export class Settings {
             hint: game.i18n.localize('beaversCrafting.settings.useAttendants.hint'),
             scope: "world",
             config: true,
-            default: false,
+            default: true,
             requiresReload: true,
             type: Boolean,
         });
@@ -101,6 +93,24 @@ export class Settings {
             default: "npc",
             type: String,
         });
+        game.settings.register(this.NAMESPACE, this.TAB_NAME, {
+            name: game.i18n.localize('beaversCrafting.settings.tabName.name'),
+            hint: game.i18n.localize('beaversCrafting.settings.tabName.hint'),
+            scope: "world",
+            config: true,
+            requiresReload: true,
+            default: game["i18n"].localize("beaversCrafting.actorSheet.tab"),
+            type: String,
+        });
+        game.settings.register(this.NAMESPACE, this.TAB_ICON, {
+            name: game.i18n.localize('beaversCrafting.settings.tabIcon.name'),
+            hint: game.i18n.localize('beaversCrafting.settings.tabIcon.hint'),
+            scope: "world",
+            config: true,
+            requiresReload: true,
+            default: "fa-scroll",
+            type: String,
+        });
         game.settings.register(this.NAMESPACE, this.SEPARATE_CRAFTED_ITEMS, {
             name: game.i18n.localize('beaversCrafting.settings.separateItems.name'),
             hint: game.i18n.localize('beaversCrafting.settings.separateItems.hint'),
@@ -118,7 +128,7 @@ export class Settings {
         game.settings.register(this.NAMESPACE, this.MAJOR_VERSION, {
             scope: "world",
             config: false,
-            default: 0,
+            default: 4,
             type: Number,
         });
         game.settings.register(this.NAMESPACE, this.TOOL_CONFIG, {
