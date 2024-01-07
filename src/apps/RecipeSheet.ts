@@ -17,6 +17,7 @@ export class RecipeSheet {
     }
 
     static bind(app, html, data) {
+        app.recipeSheet = this;
         if(Recipe.isRecipe(app.item)){
             if(!recipeSheets[app.id]){
                 recipeSheets[app.id] = new RecipeSheet(app);
@@ -214,11 +215,12 @@ export class RecipeSheet {
         this.recipeElement.find("select.test-type").on("change",e=>{
                 const and = $(e.currentTarget).data("and");
                 const or = $(e.currentTarget).data("or");
-                if( this.recipe.tests?.ands[and]?.ors[or]?.uuid !== undefined){
+                const type = $(e.currentTarget).val();
+                if(this.recipe.tests?.ands[and]?.ors[or]){
+                    this.recipe.tests.ands[and].ors[or].type = type as TestType;
                     this.recipe.tests.ands[and].ors[or].uuid = "";
-                    this.recipe.tests.ands[and].ors[or].type = "hit";
-                    this.recipeElement.find("[name='flags.beavers-crafting.recipe.tests.ands."+and+".ors."+or+".uuid']").val("");
                 }
+                this.update();
         })
 
         this.recipeElement.find('.results .crafting-item-img').on("click",e=>{
