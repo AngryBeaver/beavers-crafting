@@ -16,6 +16,7 @@ export class ActorSheetTab {
     } = {};
 
     constructor(app, html, data){
+        app.beaversCraftingTabSheet = this;
         this.app = app;
         this.html = html;
         this.data = data;

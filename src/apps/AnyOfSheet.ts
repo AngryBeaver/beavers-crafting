@@ -13,6 +13,7 @@ export class AnyOfSheet {
 
 
     static bind(app, html) {
+        app.anyOf = this;
         if (AnyOf.isAnyOf(app.item)) {
             if (!anyOfSheets[app.id]) {
                 anyOfSheets[app.id] = new AnyOfSheet(app);

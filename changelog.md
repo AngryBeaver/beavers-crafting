@@ -1,4 +1,6 @@
 # Changelog
+## 3.4.3
+- add basic support for a5e in the most evil way (extending svelte with jquery)
 ## 3.4.2
 - fix anyOf (broken macros can hinder rendering of item)
 - feature: advanced macros now access the complete recipe 
