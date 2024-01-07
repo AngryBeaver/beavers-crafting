@@ -51,6 +51,11 @@
         ],
       "recommends": [
         {
+          "id": "bsa-a5e",
+          "type": "module",
+          "manifest": "https://github.com/AngryBeaver/bsa-a5e/releases/latest/download/module.json"
+        },
+        {
           "id": "bsa-cyberpunk-red-core",
           "type": "module",
           "manifest": "https://github.com/AngryBeaver/bsa-cyberpunk-red-core/releases/latest/download/module.json"
