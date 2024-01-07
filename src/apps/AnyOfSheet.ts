@@ -12,21 +12,19 @@ export class AnyOfSheet {
     checkItem?;
 
 
-    static bind(app, html, data) {
+    static bind(app, html) {
         if (AnyOf.isAnyOf(app.item)) {
             if (!anyOfSheets[app.id]) {
-                anyOfSheets[app.id] = new AnyOfSheet(app, data);
+                anyOfSheets[app.id] = new AnyOfSheet(app);
             }
             anyOfSheets[app.id].init(html);
         }
     }
 
-    constructor(app, data) {
+    constructor(app) {
         this.app = app;
         this.item = app.item;
-        this.editable = data.editable;
-        this.addDragDrop();
-
+        this.editable = app.options.editable;
     }
 
     init(html) {
@@ -40,7 +38,7 @@ export class AnyOfSheet {
         }
         this.anyOfElement = $('<div class="beavers-crafting"></div>');
         beaversSystemInterface.itemSheetReplaceContent(this.app,html,this.anyOfElement);
-        this.render();
+        this.render().then(()=>this.addDragDrop());
     }
 
     async render() {
@@ -62,9 +60,9 @@ export class AnyOfSheet {
     }
 
     addDragDrop() {
-        if (this.editable) {
+        if (this.editable &&!this.app._dragDrop?.find(d=>d.name === "anyOfSheet")) {
             const dragDrop = new DragDrop({
-                dropSelector: '.sheet-body',
+                dropSelector: '',
                 permissions: {
                     dragstart: this.app._canDragStart.bind(this.app),
                     drop: this.app._canDragDrop.bind(this.app)
@@ -75,8 +73,9 @@ export class AnyOfSheet {
                     drop: this._onDrop.bind(this)
                 }
             });
+            dragDrop["name"]="anyOfSheet";
             this.app._dragDrop.push(dragDrop);
-            dragDrop.bind(this.app.form);
+            dragDrop.bind(this.anyOfElement[0]);
         }
     }
 

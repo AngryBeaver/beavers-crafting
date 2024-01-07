@@ -41,13 +41,13 @@ export class AnyOf {
 
     async executeMacro(item): Promise<MacroResult<boolean>> {
         const AsyncFunction = (async function () {}).constructor;
-        // @ts-ignore
-        const fn = new AsyncFunction("item", this.macro);
         const result = {
             value:false,
             error: undefined
         }
         try {
+            // @ts-ignore
+            const fn = new AsyncFunction("item", this.macro);
             result.value = await fn(item);
         } catch (err) {
             // @ts-ignore

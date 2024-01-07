@@ -2,7 +2,7 @@
     "title": "Beaver's Crafting Module",
     "description": "A Module for crafting, brewing, harvesting, mining, fabricating, gathering, character advancement, tech tree, skill tree, ability tree, downtime activities, factions / organisation reputation, quest logs, skill training",
     "id": "beavers-crafting",
-    "version": "3.4.1",
+    "version": "3.4.2",
     "authors": [
       {
         "name": "angryBeaver",
@@ -54,6 +54,11 @@
           "id": "bsa-cyberpunk-red-core",
           "type": "module",
           "manifest": "https://github.com/AngryBeaver/bsa-cyberpunk-red-core/releases/latest/download/module.json"
+        },
+        {
+          "id": "bsa-d35e",
+          "type": "module",
+          "manifest": "https://github.com/AngryBeaver/bsa-d35e/releases/latest/download/module.json"
         },
         {
           "id": "bsa-dnd4e",

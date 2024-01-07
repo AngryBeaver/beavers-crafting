@@ -220,7 +220,7 @@ export class Crafting implements CraftingData {
     }
 
     async executeMacro() {
-        const macroResult = await this.recipe.executeMacro(this.recipe.serialize(), this.result, this.actor);
+        const macroResult = await this.recipe.executeMacro(this.recipe, this.result, this.actor);
         if (macroResult.error !== undefined) {
             // @ts-ignore
             ui.notifications.error("Beavers Crafting | recipe Error see logs")

@@ -19,7 +19,7 @@ export class RecipeSheet {
     static bind(app, html, data) {
         if(Recipe.isRecipe(app.item)){
             if(!recipeSheets[app.id]){
-                recipeSheets[app.id] = new RecipeSheet(app,data);
+                recipeSheets[app.id] = new RecipeSheet(app);
             }
             recipeSheets[app.id].init(html);
             if(!app.initialized){
@@ -36,14 +36,13 @@ export class RecipeSheet {
         }
     }
 
-    constructor(app, data) {
+    constructor(app) {
         this.app = app;
         this.item = app.item;
-        this.editable = data.editable;
+        this.editable = app.options.editable;
         this.sheet = {
             active : "main"
         };
-        this.addDragDrop();
     }
 
     init(html){
@@ -57,11 +56,11 @@ export class RecipeSheet {
         this.recipeElement = $('<div class="beavers-crafting recipe"></div>');
         beaversSystemInterface.itemSheetReplaceContent(this.app,html,this.recipeElement);
         this.recipe = Recipe.fromItem(this.item);
-        this.render();
+        this.render().then(i=>this.addDragDrop());
     }
 
     addDragDrop(){
-        if(this.editable) {
+        if(this.editable && !this.app._dragDrop?.find(d=>d.name === "recipeSheet")) {
             const dragDrop = new DragDrop({
                 dropSelector: '',
                 permissions: {
@@ -74,8 +73,9 @@ export class RecipeSheet {
                     drop: this._onDrop.bind(this)
                 }
             });
+            dragDrop["name"]="recipeSheet";
             this.app._dragDrop.push(dragDrop);
-            dragDrop.bind(this.app.form);
+            dragDrop.bind(this.recipeElement[0]);
         }
     }
 
