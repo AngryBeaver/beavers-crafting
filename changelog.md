@@ -1,4 +1,11 @@
 # Changelog
+## 3.4.2
+- fix anyOf (broken macros can hinder rendering of item)
+- feature: advanced macros now access the complete recipe 
+  - this should allow dynamic dcs by manipulating the recipe.test during runtime.
+- prepare recipeSheet and anyOfSheet for systems using sheets with none standard Applications
+  - A5E does not have anything usefull within parameter html or data.
+- add dnd 3.5 support
 ## 3.4.1
 - configurable TabName/TabIcon
   - Beavers-Crafting is no longer only for Crafting, it is and can be used for various other things like: quest Progress, Tech Trees, Downtime Activities, ...

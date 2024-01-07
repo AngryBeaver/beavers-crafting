@@ -340,9 +340,9 @@ export class Recipe implements RecipeData {
         }
         const AsyncFunction = (async function () {
         }).constructor;
-        // @ts-ignore
-        const fn = new AsyncFunction("result", "actor", "recipeData", this.macro);
         try {
+            // @ts-ignore
+            const fn = new AsyncFunction("result", "actor", "recipeData", this.macro);
             macroResult.value = await fn(result, actor, recipeData);
         } catch (err) {
             // @ts-ignore

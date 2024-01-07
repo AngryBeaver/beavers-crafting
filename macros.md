@@ -12,7 +12,7 @@ console.log(actor);
 ### recipeData (!! try not to use !!)
 - recipe will be subject to changes (the module will evolve) -> depending too much on this property will lead to breaking changes.
 
-A copy of recipeData from your actual recipe (readOnly changes will not have any effects)
+The Recipe extending RecipeData from your actual recipe 
 
 see [RecipeData](https://github.com/AngryBeaver/beavers-crafting/blob/main/src/types.ts)
 ```
@@ -136,6 +136,18 @@ Similar to update this will delete all appearance of that component in the craft
 - componentData: [ComponentData](https://github.com/AngryBeaver/beavers-crafting/blob/main/src/types.ts)
 
 ## Examples
+### Dynamic DCs
+with this code your crafting will change the crafting dc based on ingredients used here if Iron is used the dc drops to 1
+````
+//first non null element of first input.
+const metalObject = Object.values(Object.values(recipeData.input)[0]).find(i=>i!==null);
+if(metalObject.name === "Iron"){
+  //first and + or test
+  const test = Object.values(Object.values(recipeData.tests.ands)[0].ors)[0];
+  test.check = 1;
+}
+````
+
 ### Selectively keep ingredients on failed crafting
 with this code your crafting will not consume the first ingredient component when crafting fails. 
 ````javascript
