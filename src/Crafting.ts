@@ -95,7 +95,7 @@ export class Crafting implements CraftingData {
 
     async startCrafting() {
         await this.evaluatePossibilities();
-        Hooks.call(Settings.NAMESPACE+".start",{recipe:this.recipe});
+        Hooks.call(Settings.NAMESPACE+".start",[this.recipe]);
         await this.checkTool();
         await this.checkAttendants();
         RecipeCompendium.validateRecipeToItemList(RecipeCompendium._filterData(this.recipe.input,component=>true), this.actor.items, this.result);
