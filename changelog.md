@@ -1,4 +1,6 @@
 # Changelog
+## 3.4.4
+- Add Hook beavers-crafting.start
 ## 3.4.3
 - add basic support for a5e in the most evil way (extending svelte with jquery)
 ## 3.4.2

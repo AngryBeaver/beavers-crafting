@@ -229,6 +229,18 @@ none customized AnyOf ingredients will popup a multiple choice dialog of availab
 #### reset
 when you reselect the recipe it will remove your customization and start over with unconfigured anyOf Items again.
 
+## Hooks
+### beavers-crafting.start
+This is fired for all crafting processes directly 
+after all components are selected and before anything is actually processed.
+````
+Hooks.on("beavers-crafting.start", (recipe) => {
+  console.log(recipe);  
+});
+````
+Parameters
+- Recipe as reference: You can change the crafting process by manipulating the recipe parameter.
+
 ## Examples
 The easiest way to get started with this module is with some examples.
 
