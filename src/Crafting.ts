@@ -97,7 +97,7 @@ export class Crafting implements CraftingData {
         await this.evaluatePossibilities();
         Hooks.call(Settings.NAMESPACE+".start",this.recipe);
         await this.checkTool();
-        await this.checkAttendants();
+        await this.checkRequired();
         RecipeCompendium.validateRecipeToItemList(RecipeCompendium._filterData(this.recipe.input,component=>true), this.actor.items, this.result);
         await this.payCurrency();
         await this.addOutput();
@@ -191,8 +191,8 @@ export class Crafting implements CraftingData {
         await RecipeCompendium.validateTool(this.recipe, this.actor.items, this.result);
     }
 
-    async checkAttendants() {
-        await RecipeCompendium.validateAttendants(this.recipe, this.result);
+    async checkRequired() {
+        await RecipeCompendium.validateRequired(this.recipe, this.result);
     }
 
     async evaluatePossibilities(){

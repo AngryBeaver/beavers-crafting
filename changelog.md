@@ -1,4 +1,7 @@
 # Changelog
+## 3.5.0
+- add fallout 2d20 support
+- allow AnyOf in required-section
 ## 3.4.4
 - Add Hook beavers-crafting.start
 ## 3.4.3
