@@ -78,11 +78,11 @@ export class RecipeCompendium {
                 returnList.push(recipe);
             } else {
                 const listOfAnyOfIngredients = this._filterData(recipe.input, component => component.type === Settings.ANYOF_SUBTYPE);
-                if (await this.isAnyAnyOfInList(listOfAnyOfIngredients, actor.items)) {                                       //isAvailable or usable ! when any item matches anyOf has the given quantity
+                if (await this.isAnyAnyOfInList(listOfAnyOfIngredients, actor.items)) { //isAvailable or usable ! when any item matches anyOf has the given quantity
                     const listOfIngredientsWithoutAnyOf = this._filterData(recipe.input, component => component.type !== Settings.ANYOF_SUBTYPE);
                     const result = RecipeCompendium.validateRecipeToItemList(listOfIngredientsWithoutAnyOf, actor.items, Result.from(recipe, actor));
                     await RecipeCompendium.validateTool(recipe, actor.items, result);
-                    await RecipeCompendium.validateAttendants(recipe, result);
+                    await RecipeCompendium.filterRequired(actor, recipe,result);
                     if ((filter == FilterType.usable && !result.hasError())
                         || (filter == FilterType.available && result._isAnyConsumedAvailable())) {
                         returnList.push(recipe);
@@ -94,8 +94,17 @@ export class RecipeCompendium {
         return returnList;
     }
 
+    static async filterRequired(actor: Actor, recipe: Recipe,result:Result) {
+        if (Settings.get(Settings.USE_ATTENDANTS)) {
+            const listOfAnyOfRequired = this._filterData(recipe.required, component => component.type === Settings.ANYOF_SUBTYPE);
+            if (await this.isAnyAnyOfInList(listOfAnyOfRequired, actor.items)) {
+                await RecipeCompendium.validateRequired(recipe, result);
+            }
+        }
+    }
+
     static async isAnyAnyOfInList(listOfAnyOfIngredients: Component[], listOfItems) {
-        if(listOfAnyOfIngredients.length === 0){
+        if (listOfAnyOfIngredients.length === 0) {
             return true;
         }
         for (const component of listOfAnyOfIngredients) {
@@ -115,19 +124,18 @@ export class RecipeCompendium {
         return false;
     }
 
-    static async validateAttendants(recipe:Recipe,result : Result): Promise<Result>{
-        if( Settings.get(Settings.USE_ATTENDANTS)) {
-            for(const group of Object.values(recipe.required)){
-                const listOfComponents = Object.values(group);
-                for(const component of listOfComponents){
-                    result.updateComponent("required",component);
-                }
+    static async validateRequired(recipe: Recipe, result: Result): Promise<Result> {
+        if (Settings.get(Settings.USE_ATTENDANTS)) {
+            const listOfRequiredWithoutAnyOf = this._filterData(recipe.required, component => component.type !== Settings.ANYOF_SUBTYPE);
+            for (const component of listOfRequiredWithoutAnyOf) {
+                result.updateComponent("required", component);
             }
         }
         return result;
     }
 
-    static async evaluateOption(type: DataType, recipe:Recipe, group:string ): Promise<string> {
+
+    static async evaluateOption(type: DataType, recipe: Recipe, group: string): Promise<string> {
         const data = recipe[type][group];
         const listOfPossibilities = Object.keys(data);
         let chosen = listOfPossibilities[0];
@@ -142,52 +150,53 @@ export class RecipeCompendium {
         return chosen;
     }
 
-    static async evaluateOptions(type: DataType, recipe:Recipe,actorItems) {
+    static async evaluateOptions(type: DataType, recipe: Recipe, actorItems) {
         for (const [group, data] of Object.entries(recipe[type])) {
             const key = await this.evaluateOption(type, recipe, group);
-            await this.evaluateAnyOf(type, recipe,group,key,actorItems)
+            await this.evaluateAnyOf(type, recipe, group, key, actorItems)
         }
     }
-    static async evaluateAnyOf(type: DataType, recipe:Recipe,group:string,key:string,actorItems){
+
+    static async evaluateAnyOf(type: DataType, recipe: Recipe, group: string, key: string, actorItems) {
         const component = recipe[type][group][key];
-            if(component.type === Settings.ANYOF_SUBTYPE) {
-                const item = await component.getEntity();
-                const anyOf = new AnyOf(item);
-                const components = await anyOf.filter(actorItems)
-                const comps = components.reduce((result, item,index ) => {
-                    result[index.toString()]=item;
-                    return result;
-                },{})
-                const used = await this.chooseComponent(comps);
-                comps[used].quantity = component.quantity;
-                recipe._addData(type,comps[used],comps[used].uuid,group);
-                recipe._removeData(type,group,key);
-            }
+        if (component.type === Settings.ANYOF_SUBTYPE) {
+            const item = await component.getEntity();
+            const anyOf = new AnyOf(item);
+            const components = await anyOf.filter(actorItems)
+            const comps = components.reduce((result, item, index) => {
+                result[index.toString()] = item;
+                return result;
+            }, {})
+            const used = await this.chooseComponent(comps);
+            comps[used].quantity = component.quantity;
+            recipe._addData(type, comps[used], comps[used].uuid, group);
+            recipe._removeData(type, group, key);
+        }
     }
 
 
-    static async chooseComponent(listOfComponents: {[key:string]:Component}):Promise<string>{
+    static async chooseComponent(listOfComponents: { [key: string]: Component }): Promise<string> {
         const selectData: SelectData = {
-            choices:{}
+            choices: {}
         }
-        for(const [key,component] of Object.entries(listOfComponents)){
+        for (const [key, component] of Object.entries(listOfComponents)) {
             selectData.choices[key] = {text: component.name, img: component.img};
         }
         return beaversSystemInterface.uiDialogSelect(selectData);
     }
 
-    static async validateTool(recipe,listOfItems,result : Result): Promise<Result>{
-        if( recipe.tool && Settings.get(Settings.USE_TOOL)) {
+    static async validateTool(recipe, listOfItems, result: Result): Promise<Result> {
+        if (recipe.tool && Settings.get(Settings.USE_TOOL)) {
             const item = await beaversSystemInterface.uuidToDocument(recipe.tool);
             const component = beaversSystemInterface.componentFromEntity(item);
-            result.updateComponent("required",component);
+            result.updateComponent("required", component);
         }
         return result;
     }
 
-    static validateRecipeToItemList(listOfIngredients: Component[], listOfItems, result : Result): Result {
+    static validateRecipeToItemList(listOfIngredients: Component[], listOfItems, result: Result): Result {
         for (const component of listOfIngredients) {
-            result.updateComponent("consumed",component);
+            result.updateComponent("consumed", component);
         }
         return result;
     }
