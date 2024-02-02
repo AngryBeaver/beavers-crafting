@@ -1,4 +1,6 @@
 # Changelog
+## 3.5.1
+- quick fix dnd5 create Item
 ## 3.5.0
 - add fallout 2d20 support
 - allow AnyOf in required-section
