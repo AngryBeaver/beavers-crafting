@@ -99,7 +99,7 @@ Hooks.once("beavers-system-interface.ready", async function(){
         }
     });
 
-//evil
+//evil TODO fix this make recipes own type !
     Hooks.on("renderDialog", (app, html, content) => {
         const title = game.settings.get(Settings.NAMESPACE,Settings.CREATE_ITEM_TITLE)||"Create New Item";
 
@@ -107,26 +107,56 @@ Hooks.once("beavers-system-interface.ready", async function(){
             if (html[0].localName !== "div") {
                 html = $(html[0].parentElement.parentElement);
             }
-            const itemType = beaversSystemInterface.configLootItemType;
-
-            html.find("select[name='type']").append("<option value='"+itemType+"'>📜Recipe📜</option>");
-            html.find("select[name='type']").append("<option value='"+itemType+"'>❔AnyOf❔</option>");
-            if (html.find("input.subtype").length === 0) {
-                html.find("form").append('<input class="subtype" name="flags.beavers-crafting.subtype" style="display:none" value="">');
+            if(game.system.id === "dnd5e"){
+                dnd5e(html);
+                app.setPosition({height:"auto"});
+            }else{
+                legacy(html);
             }
-            html.find("select[name='type']").on("change", function () {
-                const name = $(this).find("option:selected").text();
-                let value = "";
-                if (name === "📜Recipe📜") {
-                    value = "recipe"
-                }
-                if (name === "❔AnyOf❔") {
-                    value = "anyOf"
-                }
-                html.find("input.subtype").val(value);
-            })
         }
     });
+    function legacy(html){
+        const itemType = beaversSystemInterface.configLootItemType;
+
+        html.find("select[name='type']").append("<option value='"+itemType+"'>📜Recipe📜</option>");
+        html.find("select[name='type']").append("<option value='"+itemType+"'>❔AnyOf❔</option>");
+        if (html.find("input.subtype").length === 0) {
+            html.find("form").append('<input class="subtype" name="flags.beavers-crafting.subtype" style="display:none" value="">');
+        }
+        html.find("select[name='type']").on("change", function () {
+            const name = $(this).find("option:selected").text();
+            let value = "";
+            if (name === "📜Recipe📜") {
+                value = "recipe"
+            }
+            if (name === "❔AnyOf❔") {
+                value = "anyOf"
+            }
+            html.find("input.subtype").val(value);
+        })
+    }
+    //temp quickwin
+    function dnd5e(html){
+        const itemType = beaversSystemInterface.configLootItemType;
+        html.find("ol.card").append(`<li>
+            <label>
+                <img src="icons/sundries/scrolls/scroll-worn-tan.webp" alt="Recipe">
+                <span>Recipe</span>
+                <input type="radio" data-subType="recipe" name="type" value="${itemType}">
+            </label>
+        </li><li>
+            <label>
+                <img src="modules/beavers-crafting/icons/anyOf.png" alt="AnyOf">
+                <span>AnyOf</span>
+                <input type="radio" data-subType="anyOf" name="type" value="${itemType}">
+            </label>
+        </li><input class="subtype" name="flags.beavers-crafting.subtype" style="display:none" value="">`)
+        html.find("input[type=radio]").on("click", function () {
+            const subType = $(this).data("subtype");
+            html.find("input.subtype").val(subType);
+        })
+    }
+
     getTemplate('modules/beavers-crafting/templates/beavers-recipe-folders.hbs').then(t=>{
         Handlebars.registerPartial('beavers-recipe-folders', t);
     });
