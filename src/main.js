@@ -107,7 +107,7 @@ Hooks.once("beavers-system-interface.ready", async function(){
             if (html[0].localName !== "div") {
                 html = $(html[0].parentElement.parentElement);
             }
-            if(game.system.id === "dnd5e"){
+            if(game.system.id === "dnd5e" && game["dnd5e"].version.split(".")[0]>=3){
                 dnd5e(html);
                 app.setPosition({height:"auto"});
             }else{

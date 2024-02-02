@@ -1,4 +1,6 @@
 # Changelog
+## 3.5.2
+- fix quick fix for legacy dnd5e < 3.x
 ## 3.5.1
 - quick fix dnd5 create Item
 ## 3.5.0
