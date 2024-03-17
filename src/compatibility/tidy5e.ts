@@ -4,17 +4,17 @@ import {ActorSheetCraftedInventory} from "../apps/ActorSheetCraftedInventory.js"
 
 Hooks.once('tidy5e-sheet.ready', async (api) => {
     applyCompatibility(api);
-    const tabs = game["settings"].get("tidy5e-sheet-kgar", "defaultCharacterSheetTabs");
-    if(!tabs.includes("beavers-crafting-tab")){
+    const tabs = game["settings"].get("tidy5e-sheet", "defaultCharacterSheetTabs");
+    if (!tabs.includes("beavers-crafting-tab")) {
         tabs.push("beavers-crafting-tab");
+        game["settings"].set("tidy5e-sheet", "defaultCharacterSheetTabs", tabs);
     }
-    game["settings"].set("tidy5e-sheet-kgar","defaultCharacterSheetTabs",tabs);
 });
 
 async function applyCompatibility(api) {
     function createCraftingTab(api) {
         return new api.models.HtmlTab({
-            html: '<div class="sheet-body scroll-container"></div>',
+            html: '<div class="sheet-body scroll-container"><section class="tab-body"></section></div>',
             title: 'beaversCrafting.actorSheet.tab',
             tabId: 'beavers-crafting-tab',
             tabContentsClasses: ['beavers-crafting'],
