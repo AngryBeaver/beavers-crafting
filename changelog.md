@@ -1,4 +1,7 @@
 # Changelog
+## 3.5.3
+- v12 ready
+- tidy5e compatiblity
 ## 3.5.2
 - fix quick fix for legacy dnd5e < 3.x
 ## 3.5.1
