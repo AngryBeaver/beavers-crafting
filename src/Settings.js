@@ -1,4 +1,5 @@
 import {ToolConfig} from "./apps/ToolConfig.js";
+import {ModuleConfig} from "./apps/ModuleConfig.js";
 
 export class Settings {
 
@@ -10,6 +11,7 @@ export class Settings {
     static USE_TOOL = "useTool";
     static USE_ATTENDANTS = "useAttendants";
     static TOOL_CONFIG_BUTTON = "toolConfigButton";
+    static MODULE_CONFIG_BUTTON = "moduleConfigButton";
     static TOOL_CONFIG = "toolConfig;"
     static RECIPE_SUBTYPE = "Recipe";
     static ANYOF_SUBTYPE = "AnyOf";
@@ -20,17 +22,35 @@ export class Settings {
     static SEPARATE_CRAFTED_ITEMS = "separateCraftedItems";
     static TAB_NAME = "tabName"
     static TAB_ICON = "tabIcon";
+    static CAPTURE_CREATE_ITEM_TITLE = "captureCreateItemTitle"
 
     static init() {
         game.settings.register(this.NAMESPACE, this.CREATE_ITEM_TITLE, {
             name: game.i18n.localize('beaversCrafting.settings.createItemTitle.name'),
             hint: game.i18n.localize('beaversCrafting.settings.createItemTitle.hint'),
             scope: "world",
-            config: true,
+            config: false,
             default: "Create New Item",
-            requiresReload: true,
+            requiresReload: false,
             type: String,
         });
+        game.settings.register(this.NAMESPACE,this.CAPTURE_CREATE_ITEM_TITLE,{
+            name: game.i18n.localize('beaversCrafting.settings.captureCreateItemTitle.name'),
+            hint: game.i18n.localize('beaversCrafting.settings.captureCreateItemTitle.hint'),
+            scope: "world",
+            config: false,
+            default: false,
+            requiresReload: false,
+            type: Boolean,
+        });
+        game.settings.registerMenu(this.NAMESPACE, this.MODULE_CONFIG_BUTTON, {
+            name: game.i18n.localize('beaversCrafting.settings.moduleButton.name'),
+            label: game.i18n.localize("beaversCrafting.settings.moduleButton.label"),
+            hint: game.i18n.localize('beaversCrafting.settings.moduleButton.hint'),
+            scope: "world",
+            type: ModuleConfig,
+        });
+
         game.settings.register(this.NAMESPACE, this.TIME_TO_CRAFT, {
             name: game.i18n.localize('beaversCrafting.settings.timeToCraft.name'),
             hint: game.i18n.localize('beaversCrafting.settings.timeToCraft.hint'),

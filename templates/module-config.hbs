@@ -1,0 +1,33 @@
+<form class="items-list" autocomplete="off">
+    <div style="box-shadow:0 0 0 1px #a9d5de inset, 0 0 0 0 transparent;    background-color: #f8ffff;
+    color: #276f86;padding:10px;border-radius:5px;margin:2px;">
+        {{localize "beaversCrafting.module-config.info"}}
+    </div>
+    <div class="form-group">
+        <label>{{localize "beaversCrafting.settings.createItemTitle.name"}}</label>
+        <div class="form-fields">
+            <input value="{{title}}" name="title" type="text"/>
+        </div>
+        <p class="notes">{{localize "beaversCrafting.settings.createItemTitle.hint"}}</p>
+    </div>
+    <div class="form-group">
+        <label>{{localize "beaversCrafting.settings.captureCreateItemTitle.name"}}</label>
+        <div class="form-fields">
+            <input {{#if captureTitle}}checked{{/if}} name="captureTitle" type="checkbox"/>
+        </div>
+        <p class="notes">
+            {{localize "beaversCrafting.settings.captureCreateItemTitle.hint"}}
+        </p>
+        <p class="notes">
+            <img src="modules/beavers-crafting/icons/bullseye.png">
+        </p>
+        <p class="notes">
+            {{localize "beaversCrafting.settings.captureCreateItemTitle.hint2"}}
+        </p>
+    </div>
+
+    <button type="submit">
+        <i class="fas fa-save"></i>
+        Save
+    </button>
+</form>

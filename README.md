@@ -298,16 +298,32 @@ When you create recipes be carefully from where you pull your results/costs/requ
 ### Dont show "RECIPE" in item menu
 #### Problem: 
 When creating new Items the drop down menu does not have Recipe or AnyOf.
-#### Solution: 
-You probably have a diffrent language as english you need to type in the exact title of the item creation window in the settings:
-default is english "Create New Item" 
+#### Explanation:
+The module need to detect the window that creates new Items. For this it uses internally the title of that window. 
+If you have the default language the title is most likely "Create New Item".
 
 ![img.png](pictures/newItem.png).
-#### Explanation:
-In V10 it is not possible that a module really add a new item types into a system. So beavers-crafting fake it by listening to an event that opens windows and when the window is 
-the Item Creation Window it adds item types to the drop down list. Yes that is evil and has high risks to break at somepoint but as said there is no other possiblity.
-To filter the right window the module uses the title of the window as there is no real good identification for it and yes I know the title might change in diffrent languages thats why i also added the configuration field.
+#### Solution:
+Enter the title of your item creation window in the module setup.
+
 ![image](https://github.com/AngryBeaver/beavers-crafting/assets/10677192/2161e666-7e5f-4398-bb4c-aa7ecaf62de5)
+
+As of dnd5 v3.x it seems some systems can manipulate the window title to appear different to capture the right window use:
+
+![img.png](pictures/capture-settings.png)
+
+this will add a bullseye to the header:
+
+![img.png](icons/bullseye.png)
+
+click it this will configure this windows as your Item creation window and will add the new subtypes whenever you reopen it.
+
+
+#### Advanced Explanation:
+It is not possible to add a new item subtype into all supported systems, even with this [addition](https://foundryvtt.com/article/module-sub-types/) since v11. So beavers-crafting fake it by listening to an event that opens windows and when the window is
+the Item Creation Window it adds item types to the drop down list. Yes that is evil and has high risks to break at somepoint but as said there is no other possiblity.
+To filter the right window the module uses the title of the window as there is no real good identification.
+
 
 
 ## Credits

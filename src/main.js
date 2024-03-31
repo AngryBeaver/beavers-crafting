@@ -100,6 +100,24 @@ Hooks.once("beavers-system-interface.ready", async function(){
     });
 
 //evil TODO fix this make recipes own type !
+// own type does not yet work for all supported systems.
+
+    Hooks.on("getDialogHeaderButtons", (dialog,buttons) => {
+        if(Settings.get(Settings.CAPTURE_CREATE_ITEM_TITLE)) {
+            buttons.unshift({
+                class: "beavers-crafting-create-recipe",
+                icon: "fas fa-bullseye",
+                label: "",
+                onclick: async (e) => {
+                    ui.notifications.info("Capture and set title of window for beavers-crafting module to "+dialog.data.title);
+                    Settings.set(Settings.CREATE_ITEM_TITLE, dialog.data.title);
+                    Settings.set(Settings.CAPTURE_CREATE_ITEM_TITLE,false);
+                    $(e.currentTarget).parent().find("a.close").trigger("click");
+                }
+            });
+        }
+    });
+
     Hooks.on("renderDialog", (app, html, content) => {
         const title = game.settings.get(Settings.NAMESPACE,Settings.CREATE_ITEM_TITLE)||"Create New Item";
 

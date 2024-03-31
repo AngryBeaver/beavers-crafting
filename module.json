@@ -1,126 +1,114 @@
 {
-    "title": "Beaver's Crafting Module",
-    "description": "A Module for crafting, brewing, harvesting, mining, fabricating, gathering, character advancement, tech tree, skill tree, ability tree, downtime activities, factions / organisation reputation, quest logs, skill training",
-    "id": "beavers-crafting",
-    "version": "3.5.3",
-    "authors": [
-      {
-        "name": "angryBeaver",
-        "url": "https://github.com/angrybeaver"
-      }
-    ],
-    "languages": [
-      {
-        "lang": "en",
-        "name": "English",
-        "path": "lang/en.json"
-      }
-    ],
-    "esmodules": [
-      "src/main.js"
-    ],
-    "styles": [
-      "css/crafting.css"
-    ],
-    "packs": [
-      {
-        "entity": "Item",
-        "label": "ingredients",
-        "name": "ingredients",
-        "path": "./packs/ingredients.db",
-        "module": "beavers-crafting",
-        "system": "dnd5e",
-        "type": "Item",
-        "private": false
-      }
-    ],
-    "url": "https://github.com/AngryBeaver/beavers-crafting",
-    "manifest": "https://github.com/AngryBeaver/beavers-crafting/releases/latest/download/module.json",
-    "download": "https://github.com/AngryBeaver/beavers-crafting/releases/latest/download/beavers-crafting.zip",
-    "relationships": {
-      "requires": [
-        {
-          "id": "beavers-system-interface",
-          "type": "module",
-          "manifest": "https://github.com/AngryBeaver/beavers-system-interface/releases/latest/download/module.json",
-          "compatibility": {
-            "minimum" : "2.1.6",
-            "verified": "2.1.7"
-          }
-        }
-        ],
-      "recommends": [
-        {
-          "id": "bsa-a5e",
-          "type": "module",
-          "manifest": "https://github.com/AngryBeaver/bsa-a5e/releases/latest/download/module.json"
-        },
-        {
-          "id": "bsa-cyberpunk-red-core",
-          "type": "module",
-          "manifest": "https://github.com/AngryBeaver/bsa-cyberpunk-red-core/releases/latest/download/module.json"
-        },
-        {
-          "id": "bsa-d35e",
-          "type": "module",
-          "manifest": "https://github.com/AngryBeaver/bsa-d35e/releases/latest/download/module.json"
-        },
-        {
-          "id": "bsa-dnd4e",
-          "type": "module",
-          "manifest": "https://github.com/AngryBeaver/bsa-dnd4e/releases/latest/download/module.json"
-        },
-        {
-          "id": "bsa-dnd5e",
-          "type": "module",
-          "manifest": "https://github.com/AngryBeaver/bsa-dnd5e/releases/latest/download/module.json",
-          "compatibility": {
-            "verified": "2.4.1"
-          }
-        },
-        {
-          "id": "bsa-fallout",
-          "type": "module",
-          "manifest": "https://github.com/AngryBeaver/bsa-fallout/releases/latest/download/module.json"
-        },
-        {
-          "id": "bsa-pf2e",
-          "type": "module",
-          "manifest": "https://github.com/AngryBeaver/bsa-pf2e/releases/latest/download/module.json",
-          "compatibility": {
-            "verified": "1.0.1"
-          }
-        },
-        {
-          "id": "bsa-pf1",
-          "type": "module",
-          "manifest": "https://github.com/AngryBeaver/bsa-pf1/releases/latest/download/module.json",
-          "compatibility": {
-            "verified": "1.0.1"
-          }
-        },
-        {
-          "id": "bsa-swade",
-          "type": "module",
-          "manifest": "https://github.com/AngryBeaver/bsa-swade/releases/latest/download/module.json",
-          "compatibility": {
-            "verified": "1.0.2"
-          }
-        },
-        {
-          "id": "bsa-sfrpg",
-          "type": "module",
-          "manifest": "https://github.com/AngryBeaver/bsa-sfrpg/releases/latest/download/module.json"
-        },
-        {
-          "id": "bsa-swnr",
-          "type": "module",
-          "manifest": "https://github.com/AngryBeaver/bsa-swnr/releases/latest/download/module.json"
-        }
-      ]
-    },
-    "compatibility": {
-      "minimum": "11",
-      "verified": "12"
+  "title": "Beaver's Crafting Module",
+  "description": "A Module for crafting, brewing, harvesting, mining, fabricating, gathering, character advancement, tech tree, skill tree, ability tree, downtime activities, factions / organisation reputation, quest logs, skill training",
+  "id": "beavers-crafting",
+  "version": "3.5.4",
+  "authors": [
+    {
+      "name": "angryBeaver",
+      "url": "https://github.com/angrybeaver"
     }
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "esmodules": [
+    "src/main.js"
+  ],
+  "styles": [
+    "css/crafting.css"
+  ],
+  "packs": [
+    {
+      "entity": "Item",
+      "label": "ingredients",
+      "name": "ingredients",
+      "path": "./packs/ingredients.db",
+      "module": "beavers-crafting",
+      "system": "dnd5e",
+      "type": "Item",
+      "private": false
+    }
+  ],
+  "url": "https://github.com/AngryBeaver/beavers-crafting",
+  "manifest": "https://github.com/AngryBeaver/beavers-crafting/releases/latest/download/module.json",
+  "download": "https://github.com/AngryBeaver/beavers-crafting/releases/latest/download/beavers-crafting.zip",
+  "relationships": {
+    "requires": [
+      {
+        "id": "beavers-system-interface",
+        "type": "module",
+        "manifest": "https://github.com/AngryBeaver/beavers-system-interface/releases/latest/download/module.json",
+        "compatibility": {
+          "minimum": "2.1.6",
+          "verified": "2.1.9"
+        }
+      }
+    ],
+    "recommends": [
+      {
+        "id": "bsa-a5e",
+        "type": "module",
+        "manifest": "https://github.com/AngryBeaver/bsa-a5e/releases/latest/download/module.json"
+      },
+      {
+        "id": "bsa-cyberpunk-red-core",
+        "type": "module",
+        "manifest": "https://github.com/AngryBeaver/bsa-cyberpunk-red-core/releases/latest/download/module.json"
+      },
+      {
+        "id": "bsa-D35E",
+        "type": "module",
+        "manifest": "https://github.com/AngryBeaver/bsa-d35e/releases/latest/download/module.json"
+      },
+      {
+        "id": "bsa-dnd4e",
+        "type": "module",
+        "manifest": "https://github.com/AngryBeaver/bsa-dnd4e/releases/latest/download/module.json"
+      },
+      {
+        "id": "bsa-dnd5e",
+        "type": "module",
+        "manifest": "https://github.com/AngryBeaver/bsa-dnd5e/releases/latest/download/module.json"
+      },
+      {
+        "id": "bsa-fallout",
+        "type": "module",
+        "manifest": "https://github.com/AngryBeaver/bsa-fallout/releases/latest/download/module.json"
+      },
+      {
+        "id": "bsa-pf2e",
+        "type": "module",
+        "manifest": "https://github.com/AngryBeaver/bsa-pf2e/releases/latest/download/module.json"
+      },
+      {
+        "id": "bsa-pf1",
+        "type": "module",
+        "manifest": "https://github.com/AngryBeaver/bsa-pf1/releases/latest/download/module.json"
+      },
+      {
+        "id": "bsa-swade",
+        "type": "module",
+        "manifest": "https://github.com/AngryBeaver/bsa-swade/releases/latest/download/module.json"
+      },
+      {
+        "id": "bsa-sfrpg",
+        "type": "module",
+        "manifest": "https://github.com/AngryBeaver/bsa-sfrpg/releases/latest/download/module.json"
+      },
+      {
+        "id": "bsa-swnr",
+        "type": "module",
+        "manifest": "https://github.com/AngryBeaver/bsa-swnr/releases/latest/download/module.json"
+      }
+    ]
+  },
+  "compatibility": {
+    "minimum": "11",
+    "verified": "12"
   }
+}

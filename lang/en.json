@@ -79,9 +79,19 @@
       "checks": "Checklist"
     },
     "settings": {
+      "moduleButton": {
+        "name": "Configure module",
+        "hint": "Configure Module e.g. setup item sub types 'Recipe' and 'AnyOf'.",
+        "label": "setup"
+      },
       "createItemTitle": {
-        "name": "Title of Item Creation Dialog",
+        "name": "Title of Item Creation Dialog Window",
         "hint": "This Title is needed to detect the Item Creation Dialog to add 'Recipe' and 'AnyOf' Subtype."
+      },
+      "captureCreateItemTitle": {
+        "name": "Capture Create Item Dialog Window",
+        "hint": "This will enable a bullseye in each dialog header to identify the create Item dialog window.",
+        "hint2": "When you click on it, it will set that window as your item creation window after reopen it."
       },
       "displayResults": {
         "name": "Display result sheet",
@@ -141,6 +151,10 @@
       "title": "Tool Config",
       "dropItem": "drop tool",
       "warn": "Be warned if you manipulate items from this list it will reduce your compatibility to imported/exported recipes. E.g. if you delete tools imported recipes that require this tool might break."
+    },
+    "module-config": {
+      "title": "Module Config",
+      "info": "The module need to detect the window that creates new Items. For this it uses internally the title of that window. If you have the default language the title is most likely 'Create New Item' and you need nothing to do."
     }
   }
 }

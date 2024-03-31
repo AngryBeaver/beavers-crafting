@@ -1,4 +1,7 @@
 # Changelog
+## 3.5.4
+- add setup helper capture target window
+- fix recommend ids
 ## 3.5.3
 - v12 ready
 - tidy5e compatiblity
