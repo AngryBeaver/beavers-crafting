@@ -1,5 +1,5 @@
 .beavers-crafting.recipe {
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .beavers-crafting .recipe .action.result {
@@ -384,7 +384,7 @@ beaver-recipe-test
     font-size: var(--font-size-12);
 }
 .beavers-crafting.crafting-app .sidebar .content{
-    overflow-y: scroll;
+    overflow-y: auto;
     border-top: 2px groove #fff;
     margin-top: 2px;
 }
@@ -394,7 +394,7 @@ beaver-recipe-test
 }
 
 .beavers-crafting.crafting-app .sheet-body .beavers-recipe{
-    overflow-y: scroll;
+    overflow-y: auto;
     border-top: 2px groove #fff;
     margin-top: 2px;
     height:calc( 100% - 64px );
@@ -692,4 +692,20 @@ actor-sheet
 
 .beavers-fontsize-svg-img.editable:hover {
     box-shadow: 0 0 10px var(--color-shadow-primary);
+}
+
+.beavers-crafting .tab {
+    overflow: inherit !important
+}
+
+.pf1.sheet.item form {
+    grid-template-rows: min-content auto 1fr !important;
+}
+
+.pf1.sheet .primary-body {
+    overflow-y:auto;
+    height:100%;
+}
+.pf1.sheet .primary-body .beavers-crafting.recipe{
+    overflow-y:unset !important;
 }

@@ -1,4 +1,7 @@
 # Changelog
+## 3.5.5
+- fix compatibility to pf1
+- removed scrollbars when not needed
 ## 3.5.4
 - add setup helper capture target window
 - fix recommend ids

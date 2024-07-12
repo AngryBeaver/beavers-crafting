@@ -2,7 +2,7 @@
   "title": "Beaver's Crafting Module",
   "description": "A Module for crafting, brewing, harvesting, mining, fabricating, gathering, character advancement, tech tree, skill tree, ability tree, downtime activities, factions / organisation reputation, quest logs, skill training",
   "id": "beavers-crafting",
-  "version": "3.5.4",
+  "version": "3.5.5",
   "authors": [
     {
       "name": "angryBeaver",
@@ -104,7 +104,13 @@
         "id": "bsa-swnr",
         "type": "module",
         "manifest": "https://github.com/AngryBeaver/bsa-swnr/releases/latest/download/module.json"
+      },
+      {
+        "id": "bsa-wfrp4e",
+        "type": "module",
+        "manifest": "https://github.com/AngryBeaver/bsa-wfrp4e/releases/latest/download/module.json"
       }
+
     ]
   },
   "compatibility": {

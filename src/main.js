@@ -133,21 +133,35 @@ Hooks.once("beavers-system-interface.ready", async function(){
             }
         }
     });
+    //pathfinder1
+    Hooks.on("renderItemCreateDialog", (app, html, content) => {
+        legacy(html);
+    });
+
     function legacy(html){
         const itemType = beaversSystemInterface.configLootItemType;
 
         html.find("select[name='type']").append("<option value='"+itemType+"'>📜Recipe📜</option>");
         html.find("select[name='type']").append("<option value='"+itemType+"'>❔AnyOf❔</option>");
         if (html.find("input.subtype").length === 0) {
-            html.find("form").append('<input class="subtype" name="flags.beavers-crafting.subtype" style="display:none" value="">');
+            var form = html.find("form");
+            if(form.length === 0 && html.prop("tagName") === "FORM"){
+                form = html;
+            }
+            form.append('<input class="subtype" name="flags.beavers-crafting.subtype" style="display:none" value="">');
         }
-        html.find("select[name='type']").on("change", function () {
+
+        html.find("select[name='type']").on("change", function (event) {
             const name = $(this).find("option:selected").text();
             let value = "";
             if (name === "📜Recipe📜") {
+                event.stopPropagation();
+                html.find("select[name='system.subType']").parent().parent().remove()
                 value = "recipe"
             }
             if (name === "❔AnyOf❔") {
+                event.stopPropagation();
+                html.find("select[name='system.subType']").parent().parent().remove()
                 value = "anyOf"
             }
             html.find("input.subtype").val(value);
