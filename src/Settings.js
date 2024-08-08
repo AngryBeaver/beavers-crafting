@@ -20,10 +20,10 @@ export class Settings {
     static CURRENCY_EXCHANGE = "currencyExchange"
     static DISABLED_ACTOR = "disabledActor";
     static SEPARATE_CRAFTED_ITEMS = "separateCraftedItems";
-    static TAB_NAME = "tabName"
+    static TAB_NAME = "tabName";
     static TAB_ICON = "tabIcon";
-    static CAPTURE_CREATE_ITEM_TITLE = "captureCreateItemTitle"
-
+    static CAPTURE_CREATE_ITEM_TITLE = "captureCreateItemTitle";
+    static DRAGGABLE_CHAT_RESULT = "draggableChatResult";
     static init() {
         game.settings.register(this.NAMESPACE, this.CREATE_ITEM_TITLE, {
             name: game.i18n.localize('beaversCrafting.settings.createItemTitle.name'),
@@ -95,6 +95,15 @@ export class Settings {
             scope: "world",
             config: true,
             default: true,
+            type: Boolean,
+        });
+        game.settings.register(this.NAMESPACE, this.DRAGGABLE_CHAT_RESULT, {
+            name: game.i18n.localize('beaversCrafting.settings.draggableChatResult.name'),
+            hint: game.i18n.localize('beaversCrafting.settings.draggableChatResult.hint'),
+            scope: "world",
+            config: true,
+            default: false,
+            requiresReload: true,
             type: Boolean,
         });
         game.settings.register(this.NAMESPACE, this.CURRENCY_EXCHANGE, {

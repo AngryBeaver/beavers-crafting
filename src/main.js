@@ -15,6 +15,7 @@ import {
 import {ActorSheetCraftedInventory} from "./apps/ActorSheetCraftedInventory.js";
 import {CraftedItemSheet} from "./apps/CraftedItemSheet.js";
 import "./compatibility/tidy5e.js";
+import { hookChatLog } from "./apps/ChatLog.js";
 
 Hooks.on("beavers-system-interface.init", async function(){
     beaversSystemInterface.addModule(Settings.NAMESPACE);
@@ -26,6 +27,7 @@ Hooks.on("ready", async function(){
 })
 
 Hooks.once("beavers-system-interface.ready", async function(){
+    console.log("ready");
     Settings.init();
     if(!game[Settings.NAMESPACE])game[Settings.NAMESPACE]={};
     game[Settings.NAMESPACE].Crafting = Crafting;
@@ -37,6 +39,7 @@ Hooks.once("beavers-system-interface.ready", async function(){
     game[Settings.NAMESPACE].migrateDeprecateTools= migrateDeprecateTools;
     game[Settings.NAMESPACE].migrateRecipeToOrConditions= migrateRecipeToOrConditions;
 
+    hookChatLog();
     const version = Settings.get(Settings.MAJOR_VERSION);
     if(version == 2){
         await migrateDeprecateTools();

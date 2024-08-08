@@ -101,6 +101,10 @@
         "name": "Display ingredient sheet",
         "hint": "Show ItemSheet when clicking on ingredient items of a recipe."
       },
+      "draggableChatResult": {
+        "name": "Draggable chat result",
+        "hint": "You can drag recipe results from chat to other players inventory"
+      },
       "useTool": {
         "name": "Recipes use tools (deprecated)",
         "hint": "A Recipe can require to have a tool present on actor. Deprecated since 0.7.x in favour of attendants. It will get removed at somePoint in future, you should migrate to attendants."

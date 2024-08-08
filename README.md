@@ -171,6 +171,7 @@ if your recipe has a test/progress involved you can advance it on this tab.
 
 Your process will start by locking the resources needed.
 you can advance or test your progress by clicking on the progress column:
+
 ![advance.png](pictures/advance.png)
 
 when your progress ends by reaching 100% success you will be rewarded with the results of the recipe.
@@ -261,6 +262,7 @@ Every Character will now have access to 50+ recipes to brew potions.
 
 ## Settings
 - Some Settings are currently only available in dnd5e
+
 ![img.png](pictures/toolconfig.png)
 - You can configure the tool list your recipes can select from. 
 (however if you do you might risk incompatibility to others, if the list is missing some default dnd5e tools tell me so)
@@ -276,7 +278,19 @@ Per default this setting is disabled. You can enable it in the settings to eithe
 
 
 When this feature is enabled crafted items will be marked with an icon.
+
 ![img.png](pictures/craftedIcon.png)
+
+### Draggable chat result
+With this setting the results within your chat messages are draggable.
+You then can copy the item over to another character.
+
+### Limitations
+- you copy always only one instance
+- this will create new items beyond what the recipe original output !
+- this only works for items !
+- the item copied in this way are not flagged as "isCrafted" !
+
 
 ## Notes
 ### Currency reorder

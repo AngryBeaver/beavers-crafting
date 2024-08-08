@@ -19,8 +19,6 @@ export class ToolConfig extends FormApplication {
             closeOnSubmit: true,
             resizable:true,
             classes:  ["dnd5e", "beavers-crafting","tool-config"]
-
-
         })
     }
 
