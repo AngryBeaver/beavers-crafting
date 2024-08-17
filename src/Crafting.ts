@@ -115,7 +115,6 @@ export class Crafting implements CraftingData {
     }
 
     async endCrafting() {
-        await this.checkSkill();
         await this.processAll();
         this.end();
         await this._sendToChat();
@@ -158,33 +157,6 @@ export class Crafting implements CraftingData {
             return testHandler.hasAdditionalTests();
         }
         return false;
-    }
-
-    async checkSkill() {
-        if (this.recipe.skill) {
-            const skillParts = this.recipe.skill.name.split("-")
-            let skillName = skillParts[0];
-            let roll;
-            if (skillParts[0] === 'ability') {
-                skillName = skillParts[1];
-                roll = await beaversSystemInterface.actorRollAbility(this.actor,skillParts[1]);
-            } else {
-                roll = await beaversSystemInterface.actorRollSkill(this.actor,this.recipe.skill.name);
-            }
-            let resultValue = roll.total
-
-            if(roll.total >= this.recipe.skill.dc){
-                this.result.updateTests(1,0);
-            }else{
-                this.result.updateTests(0,1);
-            }
-
-            this.result._skill = {
-                dc: this.recipe.skill.dc,
-                name: skillName,
-                total: resultValue
-            }
-        }
     }
 
     async checkTool() {
@@ -325,8 +297,6 @@ export class Crafting implements CraftingData {
             this.result._hasException = true;
             return;
         }
-
-
     }
 
     get chatData(): ChatData {
@@ -417,7 +387,6 @@ export class Crafting implements CraftingData {
             name: this.recipe.name,
             img: this.recipe.img,
             status: status,
-            skill: this.result._skill,
             tests:tests,
             components: components,
         }

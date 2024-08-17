@@ -25,7 +25,6 @@ export class Recipe implements RecipeData {
         }
     }
     tests?: Tests;
-    skill?: Skill;
     currency?: Currency;
     tool?: string;
 
@@ -110,7 +109,6 @@ export class Recipe implements RecipeData {
         this.required = migrate(data.attendants || {}) || deserializeComponents(data.required || {});
         this.input = migrate(data.ingredients || {}) || deserializeComponents(data.input || {});
         this.output = migrate(data.results || {}) || deserializeComponents(data.output || {});
-        this.skill = data.skill;
         this.tests = data.tests;
         this.currency = data.currency;
         this.tool = data.tool;
@@ -143,7 +141,6 @@ export class Recipe implements RecipeData {
             required: this.serializeData("required"),
             input: this.serializeData("input"),
             output: this.serializeData("output"),
-            skill: this.skill,
             currency: this.currency,
             tool: this.tool,
             macro: this.macro,
@@ -153,9 +150,6 @@ export class Recipe implements RecipeData {
         }
         if (!this.tool) {
             serialized["-=tool"] = null;
-        }
-        if (!this.skill) {
-            serialized["-=skill"] = null;
         }
         if (!this.tests) {
             serialized["-=tests"] = null;
@@ -263,11 +257,6 @@ export class Recipe implements RecipeData {
     }
 
     addTestAnd() {
-        if (this.skill) {
-            // @ts-ignore
-            recipeSkillToTests(this);
-            return;
-        }
         if (this.tests == undefined) {
             this.tests = new DefaultTest();
         } else {
@@ -304,14 +293,6 @@ export class Recipe implements RecipeData {
                 this._trash.tests.ors[and]["-=" + or] = null;
             }
         }
-    }
-
-    addSkill() {
-        this.skill = new DefaultSkill();
-    }
-
-    removeSkill() {
-        delete this.skill;
     }
 
     addCurrency() {
@@ -389,12 +370,6 @@ class DefaultOrTest implements TestOr {
     check: number = 8;
     type: TestType = "skill"
     uuid = ""
-}
-
-class DefaultSkill implements Skill {
-    name: string;
-    dc: number = 8;
-    consume: boolean = true;
 }
 
 class DefaultCurrency implements Currency {

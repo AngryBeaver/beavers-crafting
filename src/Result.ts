@@ -11,11 +11,6 @@ export class Result implements ResultApi, ResultData {
         consumed: ComponentResults,
         produced: ComponentResults
     }
-    _skill?: {
-        name: string,
-        dc: number,
-        total: number,
-    };
     _tests: {
         hits:number,
         fails: number,
@@ -61,9 +56,6 @@ export class Result implements ResultApi, ResultData {
         if (resultData._tests) {
             this._tests = resultData._tests;
         }
-        if (resultData._skill) {
-            this._skill = resultData._skill;
-        }
         if (resultData._currencyResult) {
             this._currencyResult = new CurrencyResult(resultData._currencyResult);
         }
@@ -92,7 +84,6 @@ export class Result implements ResultApi, ResultData {
             _actorUpdate: this._actorUpdate,
             _hasException: this._hasException,
             _components: this.serializeComponents(),
-            _skill: this._skill,
             _tests:this._tests,
             _chatAddition: this._chatAddition,
             _recipe: this._recipe,
@@ -101,9 +92,6 @@ export class Result implements ResultApi, ResultData {
             serialized["-=_currencyResult"]
         } else {
             serialized["_currencyResult"] = this._currencyResult.serialize();
-        }
-        if (!this._skill) {
-            serialized["-=_skill"] = null;
         }
         if (!this._tests) {
             serialized["-=_tests"] = null;
@@ -129,11 +117,6 @@ export class Result implements ResultApi, ResultData {
         }
         if(this._testHasError()){
             hasError = true;
-        }
-        if (this._skill !== undefined) {
-            if (this._skill.dc > this._skill.total) {
-                hasError = true;
-            }
         }
         if (this._currencyResult !== undefined) {
             if (this._currencyResult.hasError) {
@@ -249,9 +232,6 @@ export class Result implements ResultApi, ResultData {
         }
         if (type === "consumed") {
             userInteraction = "onSuccess";
-            if (this._recipe.skill?.consume || this._recipe.tests?.consume) {
-                userInteraction = "always";
-            }
         }
         componentResult.userInteraction = userInteraction;
         fn(componentResult, quantity);
@@ -342,10 +322,6 @@ export class ComponentResult implements ComponentResultData {
 
     hasError(): boolean {
         return this.resultQuantity() < 0;
-    }
-
-    isAvailable(): boolean {
-        return this.originalQuantity > 0;
     }
 
     resultQuantity(): number {

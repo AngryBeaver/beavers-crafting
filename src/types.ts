@@ -17,11 +17,6 @@ interface ResultData {
         consumed: ComponentResultsData,
         produced: ComponentResultsData
     }
-    _skill?: {
-        name: string,
-        dc: number,
-        total: number,
-    };
     _tests?: {
         hits: number,
         fails: number,
@@ -85,11 +80,6 @@ interface ChatData {
         produced:ComponentChatData[]
     }
     status: string;
-    skill?: {
-        name: string,
-        dc: number,
-        total: number,
-    }
     tests:{
         maxHits:number,
         maxFails:number,
@@ -132,12 +122,6 @@ interface TestOr {
     check: number,
     type: TestType,
     uuid: string
-}
-
-interface Skill {
-    name: string;
-    dc: number;
-    consume: boolean;
 }
 
 interface Currency {
@@ -185,7 +169,6 @@ interface RecipeData {
         [key: string]: ComponentData
     },
     tests?: Tests;
-    skill?: Skill;
     currency?: Currency;
     tool?: string;
     macro?: string

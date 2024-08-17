@@ -172,14 +172,6 @@ export class RecipeSheet {
             this.recipe.removeRequired(e.target.dataset.group,e.target.dataset.id);
             this.update();
         });
-        this.recipeElement.find('.skills .item-delete').click(e=>{
-            this.recipe.removeSkill();
-            this.update();
-        });
-        this.recipeElement.find('.skills .item-add').click(e=>{
-            this.recipe.addSkill();
-            this.update();
-        });
         this.recipeElement.find('.tools .item-add').click(e=>{
             this.recipe.addTool()
                 .then(()=>this.update());

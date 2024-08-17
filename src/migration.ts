@@ -138,23 +138,28 @@ export async function migrateDeprecateTools() {
 }
 
 export function recipeSkillToTests(recipe: RecipeData) {
+    // @ts-ignore
     if (recipe.skill != undefined) {
         if (recipe.tests != undefined) {
-            throw Error("can't migrate recipe as it already has tests and skill remove one manually");
+            throw Error("can't migrate recipe as it already has tests and skill. Remove one manually");
         }
         recipe.tests = new DefaultTest();
         if (recipe.tests !== undefined) {
+            // @ts-ignore
             recipe.skill.name
+            // @ts-ignore
             const skillParts = recipe.skill.name.split("-")
             let skillName = skillParts[0];
             recipe.tests.ands[1].ors[1].type = "skill";
             recipe.tests.ands[1].ors[1].uuid = skillName;
+            // @ts-ignore
             recipe.tests.ands[1].ors[1].check = recipe.skill.dc;
             if (skillName === 'ability') {
                 recipe.tests.ands[1].ors[1].type = "ability";
                 recipe.tests.ands[1].ors[1].uuid = skillParts[1];
             }
         }
+        // @ts-ignore
         delete recipe.skill;
         recipe["-=skill"] = null;
     }
