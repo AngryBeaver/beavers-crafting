@@ -1,4 +1,6 @@
 # Changelog
+## 3.6.1
+- retag
 ## 3.6.0
 - add [copy results from Chatlog](https://github.com/AngryBeaver/beavers-crafting/issues/143)
   - configurable via Settings
