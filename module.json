@@ -35,8 +35,8 @@
     }
   ],
   "url": "https://github.com/AngryBeaver/beavers-crafting",
-  "manifest": "https://github.com/AngryBeaver/beavers-crafting/releases/tag/v3.x/download/module.json",
-  "download": "https://github.com/AngryBeaver/beavers-crafting/releases/tag/v3.x/download/beavers-crafting.zip",
+  "manifest": "https://github.com/AngryBeaver/beavers-crafting/releases/download/v3.x/module.json",
+  "download": "https://github.com/AngryBeaver/beavers-crafting/releases/download/v3.x/beavers-crafting.zip",
   "relationships": {
     "requires": [
       {
