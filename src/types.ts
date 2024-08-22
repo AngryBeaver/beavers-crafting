@@ -59,8 +59,6 @@ type UserInteraction =  "always" | "never" | "onSuccess";
 type ComponentType = "consumed" | "required" | "produced";
 type DataType = "required" | "input" | "output";
 
-type TestType = "skill" | "tool" | "ability" | "hit";
-
 type ComponentStatus = "success"|"error"|"locked"|"undefined"|"unknown";
 
 
@@ -103,27 +101,6 @@ interface PreCastData {
     currencies?: { status: ComponentStatus }
 }
 
-interface Tests {
-    fails: number,
-    consume: boolean,
-    ands: {
-        [key: number]: TestAnd,
-    }
-}
-
-interface TestAnd {
-    hits: number,
-    ors: {
-        [key: number]: TestOr,
-    }
-}
-
-interface TestOr {
-    check: number,
-    type: TestType,
-    uuid: string
-}
-
 interface Currency {
     name: string;
     value: number;
@@ -141,6 +118,10 @@ interface MacroResult<t> {
 
 interface AnyOfStoreData {
     macro: string
+}
+
+interface BeaversCraftingTests extends BeaversTests{
+    consume: boolean,
 }
 
 interface RecipeData {
@@ -168,10 +149,36 @@ interface RecipeData {
     attendants?: {
         [key: string]: ComponentData
     },
+    beaversTests?: BeaversCraftingTests
     tests?: Tests;
     currency?: Currency;
     tool?: string;
     macro?: string
     folder?: string
     instruction?: string
+}
+
+
+//legacy Test can be removed
+type TestType = "skill" | "tool" | "ability" | "hit";
+
+interface Tests {
+    fails: number,
+    consume: boolean,
+    ands: {
+        [key: number]: TestAnd,
+    }
+}
+
+interface TestAnd {
+    hits: number,
+    ors: {
+        [key: number]: TestOr,
+    }
+}
+
+interface TestOr {
+    check: number,
+    type: TestType,
+    uuid: string
 }

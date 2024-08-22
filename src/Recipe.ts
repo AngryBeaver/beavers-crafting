@@ -24,6 +24,7 @@ export class Recipe implements RecipeData {
             [key: string]: Component
         }
     }
+    beaversTests?: BeaversCraftingTests;
     tests?: Tests;
     currency?: Currency;
     tool?: string;
@@ -351,6 +352,13 @@ export class Recipe implements RecipeData {
     }
 }
 
+
+class DefaultCurrency implements Currency {
+    name = "gp"
+    value = 5;
+}
+
+//legacy Tests can be removed
 export class DefaultTest implements Tests {
     fails: number = 1;
     consume: boolean = true;
@@ -370,9 +378,4 @@ class DefaultOrTest implements TestOr {
     check: number = 8;
     type: TestType = "skill"
     uuid = ""
-}
-
-class DefaultCurrency implements Currency {
-    name = "gp"
-    value = 5;
 }

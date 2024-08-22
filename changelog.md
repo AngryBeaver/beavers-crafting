@@ -1,4 +1,9 @@
 # Changelog
+## 4.0.0
+- rework tests
+  - tests are now modular
+  - different game systems can have their own tests
+  - dev's could register additional tests
 ## 3.6.0
 - add [copy results from Chatlog](https://github.com/AngryBeaver/beavers-crafting/issues/143)
   - configurable via Settings

@@ -1,6 +1,6 @@
 import {Settings} from "./Settings.js";
 import {Crafting} from "./Crafting.js";
-import {DefaultTest, Recipe} from "./Recipe.js";
+import { DefaultTest, Recipe } from "./Recipe.js";
 
 
 export async function migrateRecipeToOrConditions(recipe: Recipe) {
@@ -57,6 +57,43 @@ export async function itemTypeMigration() {
     for (const actor of game["actors"]) {
         for (const recipe of game[Settings.NAMESPACE].RecipeCompendium.getForActor(actor)) {
             await migrateRecipe(recipe);
+        }
+    }
+    ui.notifications?.info("Beavers Crafting | migration: done");
+}
+
+export async function migrateRecipeTestsToBeaversTests() {
+
+    ui.notifications?.info("Beavers Crafting | migration: items");
+    for (const recipe of game[Settings.NAMESPACE].RecipeCompendium.getAllItems()) {
+        try {
+            recipeTestsToBeaversTests(recipe);
+            await recipe.update();
+        } catch (e) {
+            ui.notifications?.warn("Beavers Crafting |" + e);
+        }
+    }
+    ui.notifications?.info("Beavers Crafting | migration: actors");
+    for (const actor of game["actors"]) {
+        for (const recipe of game[Settings.NAMESPACE].RecipeCompendium.getForActor(actor)) {
+            try {
+                recipeTestsToBeaversTests(recipe);
+                await recipe.update();
+            } catch (e) {
+                ui.notifications?.warn("Beavers Crafting |" + e);
+            }
+        }
+        const flag = getProperty(actor, `flags.${Settings.NAMESPACE}.crafting`) || {};
+        for (const [x, y] of Object.entries(flag)) {
+            try {
+                const craftingData = (y as CraftingData);
+                const crafting = new Crafting(craftingData, actor);
+                recipeTestsToBeaversTests(crafting.recipe);
+                recipeTestsToBeaversTests(crafting.result._recipe);
+                await crafting._addToActor()
+            } catch (e) {
+                ui.notifications?.warn("Beavers Crafting |" + e);
+            }
         }
     }
     ui.notifications?.info("Beavers Crafting | migration: done");
@@ -137,6 +174,75 @@ export async function migrateDeprecateTools() {
     ui.notifications?.info("Beavers Crafting | migration: done");
 }
 
+
+export function recipeTestsToBeaversTests(recipe: RecipeData) {
+    if (recipe.tests != undefined) {
+        if (recipe.beaversTests != undefined) {
+            throw Error("can't migrate recipe as it already has beaversTests and tests. Remove one manually");
+        }
+        recipe.beaversTests = { ands:{}, consume:recipe.tests.consume, fails: recipe.tests.fails} as BeaversCraftingTests
+        for (let key in recipe.tests.ands) {
+            recipe.beaversTests.ands[key] = {ors:{},hits:recipe.tests.ands[key].hits} as BeaversTestAnd
+            for (let orKey in recipe.tests.ands[key].ors) {
+                if(recipe.tests.ands[key].ors[orKey].type === "skill") {
+                    if(!beaversSystemInterface.testClasses["SkillTest"]) {
+                        ui.notifications?.error("can't migrate recipe. Missing SkillTest plz upgrade your bsa-x");
+                        throw Error("can't migrate recipe. Missing SkillTest plz upgrade your bsa-x");
+                    }
+                    recipe.beaversTests.ands[key].ors[orKey] = {
+                        id: "SkillTest",
+                        data: {
+                            dc:recipe.tests.ands[key].ors[orKey].check,
+                            skill:recipe.tests.ands[key].ors[orKey].uuid
+                        }
+                    }
+
+                }
+                if(recipe.tests.ands[key].ors[orKey].type === "ability") {
+                    if(!beaversSystemInterface.testClasses["AbilityTest"]) {
+                        ui.notifications?.error("can't migrate recipe. Missing AbilityTest plz upgrade your bsa-x");
+                        throw Error("can't migrate recipe. Missing AbilityTest plz upgrade your bsa-x");
+                    }
+                    recipe.beaversTests.ands[key].ors[orKey] = {
+                        id: "AbilityTest",
+                        data: {
+                            dc:recipe.tests.ands[key].ors[orKey].check,
+                            ability:recipe.tests.ands[key].ors[orKey].uuid
+                        }
+                    }
+                }
+                if(recipe.tests.ands[key].ors[orKey].type === "hit") {
+                    if(!beaversSystemInterface.testClasses["IncrementStep"]) {
+                        ui.notifications?.error("can't migrate recipe. Missing IncrementStep plz upgrade your bsa-x");
+                        throw Error("can't migrate recipe. Missing IncrementStep plz upgrade your bsa-x");
+                    }
+                    recipe.beaversTests.ands[key].ors[orKey] = {
+                        id: "IncrementStep",
+                        data: {
+                            name:recipe.tests.ands[key].ors[orKey].uuid
+                        }
+                    }
+                }
+                if(recipe.tests.ands[key].ors[orKey].type === "tool") {
+                    if(!beaversSystemInterface.testClasses["ToolTest"]) {
+                        ui.notifications?.error("can't migrate recipe. Missing ToolTest plz upgrade your bsa-x");
+                        throw Error("can't migrate recipe. Missing ToolTest plz upgrade your bsa-x");
+                    }
+                    recipe.beaversTests.ands[key].ors[orKey] = {
+                        id: "ToolTest",
+                        data: {
+                            dc: recipe.tests.ands[key].ors[orKey].check,
+                            uuid:recipe.tests.ands[key].ors[orKey].uuid
+                        }
+                    }
+                }
+            }
+        }
+        // @ts-ignore
+        delete recipe.tests;
+        recipe["-=tests"] = null;
+    }
+}
 export function recipeSkillToTests(recipe: RecipeData) {
     // @ts-ignore
     if (recipe.skill != undefined) {
