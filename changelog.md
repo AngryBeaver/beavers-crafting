@@ -1,4 +1,6 @@
 # Changelog
+## 3.6.2
+- fix anyOf for a5e (possibly svelte + textarea ?)
 ## 3.6.1
 - retag
 ## 3.6.0
