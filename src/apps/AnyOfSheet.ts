@@ -1,6 +1,6 @@
-import {getDataFrom} from "../../../beavers-crafting-3.x/src/helpers/Utility.js";
-import {AnyOf} from "../../../beavers-crafting-3.x/src/AnyOf.js";
-import { Settings } from "../../../beavers-crafting-3.x/src/Settings";
+import { AnyOf } from "../AnyOf.js";
+import { getDataFrom } from "../helpers/Utility.js";
+
 
 const anyOfSheets: { [key: string]: AnyOfSheet } = {};
 
@@ -15,8 +15,8 @@ export class AnyOfSheet {
 
 
     static bind(app, html) {
-        app.anyOf = this;
         if (AnyOf.isAnyOf(app.item)) {
+            app.anyOf = this;
             if (!anyOfSheets[app.id]) {
                 anyOfSheets[app.id] = new AnyOfSheet(app);
             }

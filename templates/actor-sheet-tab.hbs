@@ -35,7 +35,7 @@
                             <div class="attribute">
                                 <a class="advanceCrafting beavers-line flexrow" style="width:150px;flex-wrap:nowrap"
                                    data-id="{{this.id}}">
-                                  {{{beavers-test this (beavers-object "disabled" true "minimized" true )}}}
+                                  {{{this.crafting.nextTest}}}
                                     <i class="attribute fas fa-forward-step"
                                        style="width:13px;margin:auto; text-align:center;"></i>
                                 </a>
@@ -45,7 +45,7 @@
                             {{#if (and (not (eq this.chatData.status "success")) (gt this.crafting.recipe.beaversTests.fails 0)) }}
                                 <div class="statusbar error">
                                     <div class="fill"
-                                         style="background: linear-gradient(to right, darkred {{this.chatData.tests.failPer}}%, transparent 0)">
+                                         style="background: linear-gradient(to right, darkred {{this.chatData.beaversTests.failPer}}%, transparent 0)">
                                         {{this.chatData.beaversTests.failPer}}%
                                     </div>
                                 </div>
@@ -53,7 +53,7 @@
                             {{#if (not (eq this.chatData.status "error"))}}
                                 <div class="statusbar success">
                                     <div class="fill"
-                                         style="background: linear-gradient(to right, darkgreen {{this.chatData.tests.hitPer}}%, transparent 0);">
+                                         style="background: linear-gradient(to right, darkgreen {{this.chatData.beaversTests.hitPer}}%, transparent 0);">
                                         {{this.chatData.beaversTests.hitPer}}%
                                     </div>
                                 </div>

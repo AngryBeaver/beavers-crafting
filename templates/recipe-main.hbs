@@ -193,7 +193,7 @@
                             {{#each this.ors}}
                                 <div class="flexrow" style="line-height:20px;margin:2px 0px 2px 10px;">
                                     <div class="flexcol beavers-line" style="flex-wrap:nowrap;">
-                                        {{{beavers-test this (beavers-object "minimized" true "prefixName" (concat "flags.beavers-crafting.recipe.beaversTests.ands."@../key ".ors." @key)) }}}
+                                        {{{beavers-test this (beavers-object "disabled" (not ../../editable) "minimized" true "prefixName" (concat "flags.beavers-crafting.recipe.beaversTests.ands."@../key ".ors." @key)) }}}
                                     </div>
                                     {{#if ../../editable}}
                                         <div class="attribute" style="flex:0;width:30px;flex-basis:auto;margin-top:5px;text-align: center;">

@@ -78,7 +78,7 @@ interface ChatData {
         produced:ComponentChatData[]
     }
     status: string;
-    tests:{
+    beaversTests:{
         maxHits:number,
         maxFails:number,
         hits:number,

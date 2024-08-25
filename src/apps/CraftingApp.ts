@@ -119,7 +119,7 @@ export class CraftingApp extends Application {
                 abilities: beaversSystemInterface.configCanRollAbility?beaversSystemInterface.configAbilities:[],
                 tools: await getToolConfig(),
                 precast: await this.getPrecastFromResult(this.data.result,this.data.recipe),
-                maxHits: this.data.recipe.tests?TestHandler.getMaxHits(this.data.recipe.tests):0,
+                maxHits: this.data.recipe.beaversTests?TestHandler.getMaxHits(this.data.recipe.beaversTests):0,
                 displayResults:Settings.get(Settings.DISPLAY_RESULTS),
                 displayIngredients:Settings.get(Settings.DISPLAY_RESULTS),
                 useTool: Settings.get(Settings.USE_TOOL),

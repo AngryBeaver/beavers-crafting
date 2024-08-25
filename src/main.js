@@ -195,9 +195,6 @@ Hooks.once("beavers-system-interface.ready", async function(){
     getTemplate('modules/beavers-crafting/templates/beavers-recipe-folders.hbs').then(t=>{
         Handlebars.registerPartial('beavers-recipe-folders', t);
     });
-    getTemplate('modules/beavers-crafting/templates/beavers-recipe-test.hbs').then(t=>{
-        Handlebars.registerPartial('beavers-recipe-test', t);
-    });
     getTemplate('modules/beavers-crafting/templates/beavers-recipe-component.hbs').then(t=>{
         Handlebars.registerPartial('beavers-recipe-component', t);
     });
