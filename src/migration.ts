@@ -174,11 +174,11 @@ export async function migrateDeprecateTools() {
     ui.notifications?.info("Beavers Crafting | migration: done");
 }
 
-
 export function recipeTestsToBeaversTests(recipe: RecipeData) {
     if (recipe.tests != undefined) {
+        console.log("migrate recipe ");
         if (recipe.beaversTests != undefined) {
-            throw Error("can't migrate recipe as it already has beaversTests and tests. Remove one manually");
+            console.warn("recipe has both migrated and not migrated data");
         }
         recipe.beaversTests = { ands:{}, consume:recipe.tests.consume, fails: recipe.tests.fails} as BeaversCraftingTests
         for (let key in recipe.tests.ands) {
@@ -190,7 +190,7 @@ export function recipeTestsToBeaversTests(recipe: RecipeData) {
                         throw Error("can't migrate recipe. Missing SkillTest plz upgrade your bsa-x");
                     }
                     recipe.beaversTests.ands[key].ors[orKey] = {
-                        id: "SkillTest",
+                        type: "SkillTest",
                         data: {
                             dc:recipe.tests.ands[key].ors[orKey].check,
                             skill:recipe.tests.ands[key].ors[orKey].uuid
@@ -204,7 +204,7 @@ export function recipeTestsToBeaversTests(recipe: RecipeData) {
                         throw Error("can't migrate recipe. Missing AbilityTest plz upgrade your bsa-x");
                     }
                     recipe.beaversTests.ands[key].ors[orKey] = {
-                        id: "AbilityTest",
+                        type: "AbilityTest",
                         data: {
                             dc:recipe.tests.ands[key].ors[orKey].check,
                             ability:recipe.tests.ands[key].ors[orKey].uuid
@@ -217,7 +217,7 @@ export function recipeTestsToBeaversTests(recipe: RecipeData) {
                         throw Error("can't migrate recipe. Missing IncrementStep plz upgrade your bsa-x");
                     }
                     recipe.beaversTests.ands[key].ors[orKey] = {
-                        id: "IncrementStep",
+                        type: "IncrementStep",
                         data: {
                             name:recipe.tests.ands[key].ors[orKey].uuid
                         }
@@ -229,7 +229,7 @@ export function recipeTestsToBeaversTests(recipe: RecipeData) {
                         throw Error("can't migrate recipe. Missing ToolTest plz upgrade your bsa-x");
                     }
                     recipe.beaversTests.ands[key].ors[orKey] = {
-                        id: "ToolTest",
+                        type: "ToolTest",
                         data: {
                             dc: recipe.tests.ands[key].ors[orKey].check,
                             uuid:recipe.tests.ands[key].ors[orKey].uuid
@@ -241,7 +241,9 @@ export function recipeTestsToBeaversTests(recipe: RecipeData) {
         // @ts-ignore
         delete recipe.tests;
         recipe["-=tests"] = null;
+        return true;
     }
+    return false;
 }
 export function recipeSkillToTests(recipe: RecipeData) {
     // @ts-ignore

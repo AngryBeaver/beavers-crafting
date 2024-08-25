@@ -3,7 +3,7 @@
         {{#each skills}}
             {{#if (eq ../test.uuid this.id)}}
                 <div class="flexrow">
-                     <span class="name">{{localize "beaversCrafting.recipe.tests.skill"}} {{this.label}}</span>
+                     <span class="name">{{localize "beaversCrafting.recipe.beaversTests.skill"}} {{this.label}}</span>
                 </div>
             {{/if}}
         {{/each}}
@@ -12,7 +12,7 @@
         {{#each abilities}}
             {{#if (eq ../test.uuid this.id)}}
                 <div class="flexrow">
-                    <span class="name">{{localize "beaversCrafting.recipe.tests.ability"}} {{this.label}}</span>
+                    <span class="name">{{localize "beaversCrafting.recipe.beaversTests.ability"}} {{this.label}}</span>
                 </div>
             {{/if}}
         {{/each}}
@@ -33,7 +33,7 @@
     </div>
 {{else if test.check}}
         <div class="attribute flexrow">
-            {{localize "beaversCrafting.recipe.tests.dc"}}:{{test.check}}
+            {{localize "beaversCrafting.recipe.beaversTests.dc"}}:{{test.check}}
         </div>
 {{/if}}
 </div>

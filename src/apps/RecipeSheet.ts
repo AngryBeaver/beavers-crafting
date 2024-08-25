@@ -204,13 +204,14 @@ export class RecipeSheet {
             this.update();
         });
 
-        this.recipeElement.find("select.test-type").on("change",e=>{
-                const and = $(e.currentTarget).data("and");
-                const or = $(e.currentTarget).data("or");
-                const type = $(e.currentTarget).val();
-                if(this.recipe.tests?.ands[and]?.ors[or]){
-                    this.recipe.tests.ands[and].ors[or].type = type as TestType;
-                    this.recipe.tests.ands[and].ors[or].uuid = "";
+        this.recipeElement.find(".beavers-test-selection select").on("change",e=>{
+                const name =  e.target.name;
+                const {ands:and, ors:or} = name.split('.').reduce((result, item, index, array) =>
+                  (item === 'ands' || item === 'ors') ? {...result, [item] : array[index + 1]} : result, {});
+                const type = $(e.target).val() as string;
+                if(this.recipe.beaversTests?.ands[and]?.ors[or]){
+                    this.recipe.beaversTests.ands[and].ors[or].type = type
+                    this.recipe.beaversTests.ands[and].ors[or]["-=data"] = null
                 }
                 this.update();
         })

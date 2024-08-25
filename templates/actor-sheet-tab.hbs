@@ -35,18 +35,18 @@
                             <div class="attribute">
                                 <a class="advanceCrafting beavers-line flexrow" style="width:150px;flex-wrap:nowrap"
                                    data-id="{{this.id}}">
-                                    {{>beavers-recipe-test tools=../../tools skills=../../skills abilities=../../abilities test=this.crafting.nextTest}}
+                                  {{{beavers-test this (beavers-object "disabled" true "minimized" true )}}}
                                     <i class="attribute fas fa-forward-step"
                                        style="width:13px;margin:auto; text-align:center;"></i>
                                 </a>
                             </div>
                         {{/if}}
                         <div class="attribute flexrow" style="min-width:100px">
-                            {{#if (and (not (eq this.chatData.status "success")) (gt this.crafting.recipe.tests.fails 0)) }}
+                            {{#if (and (not (eq this.chatData.status "success")) (gt this.crafting.recipe.beaversTests.fails 0)) }}
                                 <div class="statusbar error">
                                     <div class="fill"
                                          style="background: linear-gradient(to right, darkred {{this.chatData.tests.failPer}}%, transparent 0)">
-                                        {{this.chatData.tests.failPer}}%
+                                        {{this.chatData.beaversTests.failPer}}%
                                     </div>
                                 </div>
                             {{/if}}
@@ -54,7 +54,7 @@
                                 <div class="statusbar success">
                                     <div class="fill"
                                          style="background: linear-gradient(to right, darkgreen {{this.chatData.tests.hitPer}}%, transparent 0);">
-                                        {{this.chatData.tests.hitPer}}%
+                                        {{this.chatData.beaversTests.hitPer}}%
                                     </div>
                                 </div>
                             {{/if}}

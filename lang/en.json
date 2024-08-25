@@ -18,7 +18,7 @@
       "ingredients": "Ingredients",
       "quantity": "Quantity",
       "skills": "Skill",
-      "tests": {
+      "beaversTests": {
         "tests": "Tests",
         "test": "test",
         "hits": "hits",

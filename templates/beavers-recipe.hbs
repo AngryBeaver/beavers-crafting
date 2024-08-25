@@ -1,6 +1,6 @@
 <div class="flexrow beavers-recipe">
     <div class="flexrow" style="flex-basis:auto">
-        {{#if (or recipe.tests recipe.instruction)}}
+        {{#if (or recipe.beaversTests recipe.instruction)}}
             {{#if recipe.instruction}}
                 <div class="flexcol" style="min-width:200px">
                     <div class="header">
@@ -11,7 +11,7 @@
                     </div>
                 </div>
             {{/if}}
-            {{#if recipe.tests}}
+            {{#if recipe.beaversTests}}
                 <div class="flexcol" style="min-width:200px">
                     <div class="header">
                         {{localize "beaversCrafting.crafting-app.checks"}}
@@ -23,14 +23,14 @@
                                     <i style="flex:0;margin:5px" class="fas faw fa-clipboard"></i>
                                     <i style="flex:0;margin:5px" class="fas faw fa-clipboard-list-check"></i>
                                     {{localize "beaversCrafting.crafting-app.pass"}} {{maxHits}}
-                                    {{#if (gt recipe.tests.fails 1)}}
-                                        {{localize "beaversCrafting.crafting-app.before"}} {{recipe.tests.fails}}
+                                    {{#if (gt recipe.beaversTests.fails 1)}}
+                                        {{localize "beaversCrafting.crafting-app.before"}} {{recipe.beaversTests.fails}}
                                         {{localize "beaversCrafting.crafting-app.fails"}}
                                     {{/if}}
                                 </div>
                             </div>
                             <div class="folderContent">
-                                {{#each recipe.tests.ands}}
+                                {{#each recipe.beaversTests.ands}}
                                     <div class="flexrow">
                                 <span style="flex:0" class="flexcol">
                                     <span class="border top"></span>
@@ -42,7 +42,7 @@
                                             </div>
                                             {{#each this.ors}}
                                                 <div class="flexrow">
-                                                    {{>beavers-recipe-test test=this abilities=../../abilities skills=../../skills tools=../../tools}}
+                                                    {{{beavers-test this (beavers-object "disabled" true "minimized" true )}}}
                                                 </div>
                                                 {{#unless @last}}
                                                     <div class="beavers-seperator"></div>

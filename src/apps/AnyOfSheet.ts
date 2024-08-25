@@ -1,5 +1,6 @@
-import {getDataFrom} from "../helpers/Utility.js";
-import {AnyOf} from "../AnyOf.js";
+import {getDataFrom} from "../../../beavers-crafting-3.x/src/helpers/Utility.js";
+import {AnyOf} from "../../../beavers-crafting-3.x/src/AnyOf.js";
+import { Settings } from "../../../beavers-crafting-3.x/src/Settings";
 
 const anyOfSheets: { [key: string]: AnyOfSheet } = {};
 
@@ -10,6 +11,7 @@ export class AnyOfSheet {
     anyOf: AnyOf;
     anyOfElement?;
     checkItem?;
+    timeout?;
 
 
     static bind(app, html) {
@@ -58,10 +60,16 @@ export class AnyOfSheet {
         this.anyOfElement.find('button').click(e => {
             return this.render();
         });
+        this.anyOfElement.find('textarea').on("change", (e) => {
+            this.anyOf.macro = e.target.value;
+            this.anyOf.update();
+        });
+
     }
 
     addDragDrop() {
-        if (this.editable &&!this.app._dragDrop?.find(d=>d.name === "anyOfSheet")) {
+        if (this.editable) {
+            this.app._dragDrop = this.app._dragDrop.filter(d=>d.name !== "anyOfSheet")
             const dragDrop = new DragDrop({
                 dropSelector: '',
                 permissions: {
