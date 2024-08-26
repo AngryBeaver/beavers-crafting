@@ -2,7 +2,6 @@ import {Recipe} from "../Recipe.js";
 import {Settings} from "../Settings.js";
 import {getDataFrom} from "../helpers/Utility.js";
 import {AnyOf} from "../AnyOf.js";
-import {getToolConfig} from "./ToolConfig.js";
 
 const recipeSheets: { [key: string]: RecipeSheet } = {};
 
@@ -81,24 +80,14 @@ export class RecipeSheet {
     }
 
     async render(){
-        const tools = await getToolConfig();
-        const toolChoices = {};
-        tools.forEach(tool=>{
-            toolChoices[tool.uuid]={text:tool.name,img:tool.img};
-        })
         let main = await renderTemplate('modules/beavers-crafting/templates/recipe-main.hbs',
             {
                 recipe: this.recipe,
                 currencies: beaversSystemInterface.configCurrencies,
-                skills: beaversSystemInterface.configSkills,
-                abilities: beaversSystemInterface.configCanRollAbility?beaversSystemInterface.configAbilities:[],
-                tools: tools,
-                toolChoices: toolChoices,
                 editable:this.editable,
                 displayResults:Settings.get(Settings.DISPLAY_RESULTS),
                 displayIngredients:Settings.get(Settings.DISPLAY_RESULTS),
                 useAttendants: Settings.get(Settings.USE_ATTENDANTS),
-                canRollTool:Settings.getSystemSetting().hasTool,
                 canRollAbility:beaversSystemInterface.configCanRollAbility,
                 hasCraftedFlag: Settings.get(Settings.SEPARATE_CRAFTED_ITEMS) !== "none",
             });
@@ -172,14 +161,6 @@ export class RecipeSheet {
             this.recipe.removeRequired(e.target.dataset.group,e.target.dataset.id);
             this.update();
         });
-        this.recipeElement.find('.tools .item-add').click(e=>{
-            this.recipe.addTool()
-                .then(()=>this.update());
-        });
-        this.recipeElement.find('.tools .item-delete').click(e=>{
-            this.recipe.removeTool();
-            this.update();
-        });
         this.recipeElement.find('.currencies .item-delete').click(e=>{
             this.recipe.removeCurrency();
             this.update();
@@ -213,7 +194,7 @@ export class RecipeSheet {
                     this.recipe.beaversTests.ands[and].ors[or].type = type
                     this.recipe.beaversTests.ands[and].ors[or]["-=data"] = null
                 }
-                this.update();
+                this.update()
         })
 
         this.recipeElement.find('.results .crafting-item-img').on("click",e=>{

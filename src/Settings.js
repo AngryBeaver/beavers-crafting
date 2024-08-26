@@ -1,4 +1,3 @@
-import {ToolConfig} from "./apps/ToolConfig.js";
 import {ModuleConfig} from "./apps/ModuleConfig.js";
 
 export class Settings {
@@ -8,11 +7,8 @@ export class Settings {
     static DISPLAY_RESULTS = "displayResults";
     static DISPLAY_INGREDIENTS = "displayIngredients";
     static TIME_TO_CRAFT = "timeToCraft";
-    static USE_TOOL = "useTool";
     static USE_ATTENDANTS = "useAttendants";
-    static TOOL_CONFIG_BUTTON = "toolConfigButton";
     static MODULE_CONFIG_BUTTON = "moduleConfigButton";
-    static TOOL_CONFIG = "toolConfig;"
     static RECIPE_SUBTYPE = "Recipe";
     static ANYOF_SUBTYPE = "AnyOf";
     static MAJOR_VERSION = "majorVersion";
@@ -62,15 +58,6 @@ export class Settings {
                 instantly: game.i18n.localize('beaversCrafting.settings.timeToCraft.choices.instantly'),
                 interaction: game.i18n.localize('beaversCrafting.settings.timeToCraft.choices.interaction'),
             }
-        });
-        game.settings.register(this.NAMESPACE, this.USE_TOOL, {
-            name: game.i18n.localize('beaversCrafting.settings.useTool.name'),
-            hint: game.i18n.localize('beaversCrafting.settings.useTool.hint'),
-            scope: "world",
-            config: false,
-            default: false,
-            requiresReload: true,
-            type: Boolean,
         });
         game.settings.register(this.NAMESPACE, this.USE_ATTENDANTS, {
             name: game.i18n.localize('beaversCrafting.settings.useAttendants.name'),
@@ -160,21 +147,13 @@ export class Settings {
             default: 4,
             type: Number,
         });
-        game.settings.register(this.NAMESPACE, this.TOOL_CONFIG, {
-            name: "ToolConfig",
-            scope: "world",
-            config: false,
-            default: Settings.getSystemSetting().toolConfig,
-            type: Object
-        });
-        if (Settings.getSystemSetting().hasTool) {
-            game.settings.registerMenu(this.NAMESPACE, this.TOOL_CONFIG_BUTTON, {
-                name: game.i18n.localize('beaversCrafting.settings.toolButton.name'),
-                label: game.i18n.localize("beaversCrafting.settings.toolButton.label"),
-                hint: game.i18n.localize('beaversCrafting.settings.toolButton.hint'),
+        if (game["system"].id === "dnd5e") {
+            game["settings"].register(this.NAMESPACE, "toolConfig;", {
+                name: "ToolConfig",
                 scope: "world",
-                type: ToolConfig,
-                restricted: true
+                config: false,
+                default: [],
+                type: Object
             });
         }
     }
@@ -189,45 +168,6 @@ export class Settings {
 
     static isDisabledActor(actor) {
         return Settings.get(Settings.DISABLED_ACTOR).split(",").includes(actor.type);
-    }
-
-    static getSystemSetting() {
-        if (game["system"].id === "dnd5e") {
-            return {
-                toolConfig: [
-                    "Compendium.dnd5e.items.8NS6MSOdXtUqD7Ib",
-                    "Compendium.dnd5e.items.rTbVrNcwApnuTz5E",
-                    "Compendium.dnd5e.items.fC0lFK8P4RuhpfaU",
-                    "Compendium.dnd5e.items.YfBwELTgPFHmQdHh",
-                    "Compendium.dnd5e.items.hM84pZnpCqKfi8XH",
-                    "Compendium.dnd5e.items.PUMfwyVUbtyxgYbD",
-                    "Compendium.dnd5e.items.skUih6tBvcBbORzA",
-                    "Compendium.dnd5e.items.YHCmjsiXxZ9UdUhU",
-                    "Compendium.dnd5e.items.hJS8yEVkqgJjwfWa",
-                    "Compendium.dnd5e.items.woWZ1sO5IUVGzo58",
-                    "Compendium.dnd5e.items.KndVe2insuctjIaj",
-                    "Compendium.dnd5e.items.0d08g1i5WXnNrCNA",
-                    "Compendium.dnd5e.items.ap9prThUB2y9lDyj",
-                    "Compendium.dnd5e.items.xKErqkLo4ASYr5EP",
-                    "Compendium.dnd5e.items.SztwZhbhZeCqyAes",
-                    "Compendium.dnd5e.items.Y9S75go1hLMXUD48",
-                    "Compendium.dnd5e.items.jhjo20QoiD5exf09",
-                    "Compendium.dnd5e.items.ccm5xlWhx74d6lsK",
-                    "Compendium.dnd5e.items.ugzwHl8vYaPu2GNd",
-                    "Compendium.dnd5e.items.i89okN7GFTWHsvPy",
-                    "Compendium.dnd5e.items.IBhDAr7WkhWPYLVn",
-                    "Compendium.dnd5e.items.cG3m4YlHfbQlLEOx",
-                    "Compendium.dnd5e.items.il2GNi8C0DvGLL9P",
-                    "Compendium.dnd5e.items.V13fjV5oSmvbRdgP",
-                    "Compendium.dnd5e.items.6rocoBx5jdzG1QQH",
-                ],
-                hasTool: true,
-            }
-        }
-        return {
-            toolConfig: [],
-            hasTool: false,
-        }
     }
 
 }

@@ -27,7 +27,6 @@ Hooks.on("ready", async function(){
 })
 
 Hooks.once("beavers-system-interface.ready", async function(){
-    console.log("ready");
     Settings.init();
     if(!game[Settings.NAMESPACE])game[Settings.NAMESPACE]={};
     game[Settings.NAMESPACE].Crafting = Crafting;

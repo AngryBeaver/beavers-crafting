@@ -1,5 +1,4 @@
 import {Result} from "./Result.js";
-import {getToolConfig} from "./apps/ToolConfig.js";
 
 
 export class TestHandler{

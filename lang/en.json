@@ -105,10 +105,6 @@
         "name": "Draggable chat result",
         "hint": "You can drag recipe results from chat to other players inventory"
       },
-      "useTool": {
-        "name": "Recipes use tools (deprecated)",
-        "hint": "A Recipe can require to have a tool present on actor. Deprecated since 0.7.x in favour of attendants. It will get removed at somePoint in future, you should migrate to attendants."
-      },
       "useAttendants": {
         "name": "Recipes use required Items",
         "hint": "A Recipe can require to have items present on actor that does not get consumed in the process. You can setUp anything your system models as item e.g. for dnd5e feats, class, background, tools etc!"
@@ -129,11 +125,6 @@
         "name": "TabIcon",
         "hint": "Customize Tab icon on actor sheets (default: A Recipe). Some Systems uses a TabIcon rather a TabName. You can change it to any fontawesome icon that foundry supports"
       },
-      "toolButton": {
-        "name": "Configure tools available",
-        "hint": "Configure list of tools that are available in tool dropdown when creating recipes",
-        "label": "configure"
-      },
       "addHeaderLink": {
         "name": "ActorSheetLink",
         "hint": "This will add a recipe link on the ActorSheet. Optional since 2.0.x as too many modules polute the Header area of sheets, in some worlds i have problems to find a blank space to drag."
@@ -150,11 +141,6 @@
         "name": "Separate produced Items",
         "hint": "Here you can set if a produced item is different then non produced. When set to full your produced items are different to unproduced once (e.g. you can create special recipes that require produced items). Partial will try to detect what you mean but will and can not always be correct (e.g. when you drag a produced dagger into your recipe it requires a produced dagger when you drag a normal dagger it can use a produced or non produced dagger)."
       }
-    },
-    "tool-config": {
-      "title": "Tool Config",
-      "dropItem": "drop tool",
-      "warn": "Be warned if you manipulate items from this list it will reduce your compatibility to imported/exported recipes. E.g. if you delete tools imported recipes that require this tool might break."
     },
     "module-config": {
       "title": "Module Config",

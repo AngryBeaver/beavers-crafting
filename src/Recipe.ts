@@ -1,6 +1,5 @@
 import {Settings} from "./Settings.js";
 import {sanitizeUuid} from "./helpers/Utility.js";
-import {getToolConfig} from "./apps/ToolConfig.js";
 import {Result} from "./Result.js";
 import { recipeSkillToTests, recipeTestsToBeaversTests } from "./migration.js";
 
@@ -309,10 +308,6 @@ export class Recipe implements RecipeData {
         delete this.currency;
     }
 
-    async addTool() {
-        const config = await getToolConfig()
-        this.tool = config[0].uuid;
-    }
 
     removeTool() {
         delete this.tool;

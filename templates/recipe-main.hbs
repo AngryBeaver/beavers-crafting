@@ -1,50 +1,5 @@
 <div class="flexrow recipe">
     <div class="sheet-left flexcol">
-        {{#if recipe.tool}}
-            <div class="tools flexcol">
-                <div class="flexrow header">
-                    <div class="name">{{localize "beaversCrafting.recipe.tools"}}</div>
-                    {{#if editable}}
-                        <div class="action flexrow">
-                            {{#unless recipe.tool}}
-                                <a class="item-add">
-                                    <i class="fas fa-plus"></i>
-                                </a>
-                            {{/unless}}
-                        </div>
-                    {{/if}}
-                </div>
-                {{#if recipe.tool}}
-                    <div class="flexrow" style="margin:0 5px;padding:1px 0;background: rgba(0,0,0,0.025)">
-                        <select name="flags.beavers-crafting.recipe.tool"
-                                {{#unless editable}}disabled{{/unless}} class="tool-selection">
-                            {{#select recipe.tool}}
-                                {{#each tools}}
-                                    <option value="{{this.uuid}}">
-                                        {{this.name}}</option>
-                                {{/each}}
-                            {{/select}}
-                        </select>
-                        {{#if result}}
-                            <div style="flex: 0 0 auto; width:20px; line-height: 30px;text-align: center;">
-                                {{#if precast.tool }}
-                                    <i class="fas fa-check"></i>
-                                {{else}}
-                                    <i class="fas fa-times"></i>
-                                {{/if}}
-                            </div>
-                        {{/if}}
-                        {{#if editable}}
-                            <div style="flex: 0 0 auto; width:20px; line-height: 30px;text-align: center;">
-                                <a class="item-delete">
-                                    <i class="fas fa-trash"></i>
-                                </a>
-                            </div>
-                        {{/if}}
-                    </div>
-                {{/if}}
-            </div>
-        {{/if}}
         {{#if useAttendants}}
             <div class="attendants flexcol">
                 <div class="flexrow header">

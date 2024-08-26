@@ -81,7 +81,6 @@ export class RecipeCompendium {
                 if (await this.isAnyAnyOfInList(listOfAnyOfIngredients, actor.items)) { //isAvailable or usable ! when any item matches anyOf has the given quantity
                     const listOfIngredientsWithoutAnyOf = this._filterData(recipe.input, component => component.type !== Settings.ANYOF_SUBTYPE);
                     const result = RecipeCompendium.validateRecipeToItemList(listOfIngredientsWithoutAnyOf, actor.items, Result.from(recipe, actor));
-                    await RecipeCompendium.validateTool(recipe, actor.items, result);
                     await RecipeCompendium.filterRequired(actor, recipe,result);
                     if ((filter == FilterType.usable && !result.hasError())
                         || (filter == FilterType.available && result._isAnyConsumedAvailable())) {
@@ -183,15 +182,6 @@ export class RecipeCompendium {
             selectData.choices[key] = {text: component.name, img: component.img};
         }
         return beaversSystemInterface.uiDialogSelect(selectData);
-    }
-
-    static async validateTool(recipe, listOfItems, result: Result): Promise<Result> {
-        if (recipe.tool && Settings.get(Settings.USE_TOOL)) {
-            const item = await beaversSystemInterface.uuidToDocument(recipe.tool);
-            const component = beaversSystemInterface.componentFromEntity(item);
-            result.updateComponent("required", component);
-        }
-        return result;
     }
 
     static validateRecipeToItemList(listOfIngredients: Component[], listOfItems, result: Result): Result {
