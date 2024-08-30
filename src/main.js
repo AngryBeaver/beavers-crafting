@@ -9,8 +9,8 @@ import {ActorSheetTab} from "./apps/ActorSheetTab.js";
 import {
     itemTypeMigration,
     migrateDeprecateTools,
-    migrateRecipeSkillToTests,
-    migrateRecipeToOrConditions
+    migrateRecipeSkillToTests, migrateRecipeTestsToBeaversTests,
+    migrateRecipeToOrConditions,
 } from "./migration.js";
 import {ActorSheetCraftedInventory} from "./apps/ActorSheetCraftedInventory.js";
 import {CraftedItemSheet} from "./apps/CraftedItemSheet.js";
@@ -37,6 +37,7 @@ Hooks.once("beavers-system-interface.ready", async function(){
     game[Settings.NAMESPACE].migrateRecipeSkillToTests= migrateRecipeSkillToTests;
     game[Settings.NAMESPACE].migrateDeprecateTools= migrateDeprecateTools;
     game[Settings.NAMESPACE].migrateRecipeToOrConditions= migrateRecipeToOrConditions;
+    game[Settings.NAMESPACE].migrateRecipeTestsToBeaversTests= migrateRecipeTestsToBeaversTests;
 
     hookChatLog();
     const version = Settings.get(Settings.MAJOR_VERSION);
@@ -49,7 +50,11 @@ Hooks.once("beavers-system-interface.ready", async function(){
     if(version == 3){
         await migrateRecipeToOrConditions();
     }
-    Settings.set(Settings.MAJOR_VERSION,4);
+    if(version < 400){
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        await migrateRecipeTestsToBeaversTests();
+    }
+    Settings.set(Settings.MAJOR_VERSION,400);
 
     beaversSystemInterface.addExtension(Settings.NAMESPACE,{componentAddFlags:["crafted","isCrafted"]})
 

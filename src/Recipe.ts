@@ -186,8 +186,8 @@ export class Recipe implements RecipeData {
 
     serializeTests() {
         if (this.beaversTests != undefined) {
-            const serialized = {fails: this.beaversTests.fails, consume: this.beaversTests.consume, ands: this.beaversTests.ands};
-            const ands = {...this.beaversTests.ands, ...this._trash.beaversTests.ands}
+            const serialized = {fails: this.beaversTests.fails, consume: this.beaversTests.consume, ands: {}};
+            const ands = {...JSON.parse(JSON.stringify(this.beaversTests.ands)), ...this._trash.beaversTests.ands}
             Object.keys(ands).forEach(key => {
                 if (this._trash.beaversTests.ors[key] !== undefined) {
                     ands[key].ors = {...ands[key].ors, ...this._trash.beaversTests.ors[key]}

@@ -105,6 +105,9 @@ export class RecipeSheet {
         });
         this.recipeElement.find('.recipe').remove();
         this.recipeElement.append(template);
+        if(this.app.scrollToPosition){
+            this.recipeElement.scrollTop(this.app.scrollToPosition)
+        }
         this.handleEvents();
     }
 
@@ -123,14 +126,17 @@ export class RecipeSheet {
         await this._onDropMain(e);
     }
 
-    update() {
+    async update() {
         const flags={};
         flags[Settings.NAMESPACE] = {
             recipe: this.recipe.serialize()
         };
-        this.item.update({
+        await this.item.update({
             "flags": flags
         });
+        if(this.recipeElement) {
+            this.app.scrollToPosition = this.recipeElement.scrollTop();
+        }
         this.render();
     }
 

@@ -40,12 +40,16 @@ export class TestHandler{
         throw Error("no Additional Tests found");
     }
     nextTest():string{
-        const currentTest = this.getCurrentTestAnd();
-        if(Object.keys(currentTest.ors).length == 1){
-            const serializedTest = Object.values(currentTest.ors)[0];
-            return this.getTest(serializedTest).render();
+        try {
+            const currentTest = this.getCurrentTestAnd();
+            if(Object.keys(currentTest.ors).length == 1){
+                const serializedTest = Object.values(currentTest.ors)[0];
+                return this.getTest(serializedTest).render();
+            }
+            return "process";
+        }catch(e){
+            return "process"
         }
-        return "process";
     }
 
     hasAdditionalTests():boolean{
@@ -79,7 +83,7 @@ export class TestHandler{
         const testAnd = this.getCurrentTestAnd();
         //fix name for tool uuid !
         for(const [id,or] of  Object.entries(testAnd.ors)){
-            choices[id] = this.getTest(or).render();
+            choices[id] = {text:this.getTest(or).render()}
         }
         const choice = parseInt(await beaversSystemInterface.uiDialogSelect({choices:choices}));
         return testAnd.ors[choice];

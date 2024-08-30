@@ -144,7 +144,7 @@ export class Settings {
         game.settings.register(this.NAMESPACE, this.MAJOR_VERSION, {
             scope: "world",
             config: false,
-            default: 4,
+            default: 400,
             type: Number,
         });
         if (game["system"].id === "dnd5e") {
