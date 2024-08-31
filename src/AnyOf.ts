@@ -12,13 +12,13 @@ export class AnyOf {
         return (
             item?.type === beaversSystemInterface.configLootItemType && (
                 item?.system?.source === Settings.ANYOF_SUBTYPE ||
-                getProperty(item,`flags.${Settings.NAMESPACE}.subtype`) === Settings.ANYOF_SUBTYPE
+                foundry.utils.getProperty(item,`flags.${Settings.NAMESPACE}.subtype`) === Settings.ANYOF_SUBTYPE
             )
         );
     }
 
     constructor(item) {
-        const flags = getProperty(item,`flags.${Settings.NAMESPACE}.anyOf`) || {};
+        const flags = foundry.utils.getProperty(item,`flags.${Settings.NAMESPACE}.anyOf`) || {};
         const data = mergeObject(this.defaultData(), flags, {inplace: false});
         this.macro = data.macro;
         this.img = item.img;

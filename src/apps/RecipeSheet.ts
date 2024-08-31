@@ -146,7 +146,7 @@ export class RecipeSheet {
             const type = e.target.dataset.type;
             const key = e.target.dataset.key;
             const name=`${type}.${group}.${key}.flags.${Settings.NAMESPACE}.isCrafted`;
-            const value = getProperty(this.recipe,name);
+            const value = foundry.utils.getProperty(this.recipe,name);
             if(value){
                 foundry.utils.setProperty(this.recipe, name, null);
             }else {

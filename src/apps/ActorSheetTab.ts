@@ -27,7 +27,7 @@ export class ActorSheetTab {
     async init() {
         const label = Settings.get(Settings.TAB_NAME) || game["i18n"].localize("beaversCrafting.actorSheet.tab");
         const icon = Settings.get(Settings.TAB_ICON) || "fa-scroll";
-        const flag = getProperty(this.app.actor,`flags.${Settings.NAMESPACE}.crafting`) || {};
+        const flag = foundry.utils.getProperty(this.app.actor,`flags.${Settings.NAMESPACE}.crafting`) || {};
         const unsortedFolders = {};
         for(const [x,y] of Object.entries(flag)){
             const craftingData = (y as CraftingData);

@@ -54,13 +54,13 @@ export class Recipe implements RecipeData {
         // @ts-ignore
         return (item?.type === beaversSystemInterface.configLootItemType && (
                 item?.system?.source === Settings.RECIPE_SUBTYPE ||
-                getProperty(item, `flags.${Settings.NAMESPACE}.subtype`) === Settings.RECIPE_SUBTYPE
+                foundry.utils.getProperty(item, `flags.${Settings.NAMESPACE}.subtype`) === Settings.RECIPE_SUBTYPE
             )
         )
     }
 
     static fromItem(item): Recipe {
-        const flags = getProperty(item,`flags.${Settings.NAMESPACE}.recipe`) || {};
+        const flags = foundry.utils.getProperty(item,`flags.${Settings.NAMESPACE}.recipe`) || {};
         const data = foundry.utils.mergeObject({input: {}, output: {}, required: {}}, flags, {inplace: false});
         return new Recipe(item.uuid, item.id, item.name, item.img, data);
     }

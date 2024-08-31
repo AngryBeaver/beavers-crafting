@@ -83,7 +83,7 @@ export async function migrateRecipeTestsToBeaversTests() {
                 ui.notifications?.warn("Beavers Crafting |" + e);
             }
         }
-        const flag = getProperty(actor, `flags.${Settings.NAMESPACE}.crafting`) || {};
+        const flag = foundry.utils.getProperty(actor, `flags.${Settings.NAMESPACE}.crafting`) || {};
         for (const [x, y] of Object.entries(flag)) {
             try {
                 const craftingData = (y as CraftingData);
@@ -120,7 +120,7 @@ export async function migrateRecipeSkillToTests() {
                 ui.notifications?.warn("Beavers Crafting |" + e);
             }
         }
-        const flag = getProperty(actor, `flags.${Settings.NAMESPACE}.crafting`) || {};
+        const flag = foundry.utils.getProperty(actor, `flags.${Settings.NAMESPACE}.crafting`) || {};
         for (const [x, y] of Object.entries(flag)) {
             try {
                 const craftingData = (y as CraftingData);
@@ -157,7 +157,7 @@ export async function migrateDeprecateTools() {
                 ui.notifications?.warn("Beavers Crafting |" + e);
             }
         }
-        const flag = getProperty(actor, `flags.${Settings.NAMESPACE}.crafting`) || {};
+        const flag = foundry.utils.getProperty(actor, `flags.${Settings.NAMESPACE}.crafting`) || {};
         for (const [x, y] of Object.entries(flag)) {
             try {
                 const craftingData = (y as CraftingData);

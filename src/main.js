@@ -60,15 +60,15 @@ Hooks.once("beavers-system-interface.ready", async function(){
 
     if(Settings.get(Settings.SEPARATE_CRAFTED_ITEMS) === "full"){
         beaversSystemInterface.addExtension(Settings.NAMESPACE,{componentIsSame:(a,b,previousResult)=>{
-            const aHasFlag = getProperty(a,`flags.${Settings.NAMESPACE}.isCrafted`);
-            const bHasFlag = getProperty(b,`flags.${Settings.NAMESPACE}.isCrafted`);
+            const aHasFlag = foundry.utils.getProperty(a,`flags.${Settings.NAMESPACE}.isCrafted`);
+            const bHasFlag = foundry.utils.getProperty(b,`flags.${Settings.NAMESPACE}.isCrafted`);
             return previousResult && aHasFlag === bHasFlag
             }})
     }
     if(Settings.get(Settings.SEPARATE_CRAFTED_ITEMS) === "partial"){
         beaversSystemInterface.addExtension(Settings.NAMESPACE,{componentIsSame:(a,b,previousResult)=>{
-                const aHasFlag = getProperty(a,`flags.${Settings.NAMESPACE}.isCrafted`);
-                const bHasFlag = getProperty(b,`flags.${Settings.NAMESPACE}.isCrafted`);
+                const aHasFlag = foundry.utils.getProperty(a,`flags.${Settings.NAMESPACE}.isCrafted`);
+                const bHasFlag = foundry.utils.getProperty(b,`flags.${Settings.NAMESPACE}.isCrafted`);
                 return previousResult && (!aHasFlag || aHasFlag === bHasFlag)
             }})
     }
@@ -82,7 +82,7 @@ Hooks.once("beavers-system-interface.ready", async function(){
 
 //Recipe remap use action
     Hooks.on(`dnd5e.preUseItem`, (item, config, options) => {
-        if(getProperty(item, `flags.${Settings.NAMESPACE}.recipe`)){
+        if(foundry.utils.getProperty(item, `flags.${Settings.NAMESPACE}.recipe`)){
             Crafting.fromOwned(item).craft();
             return false;
         }
@@ -98,10 +98,10 @@ Hooks.once("beavers-system-interface.ready", async function(){
 
 //add Subtype to create Item
     Hooks.on("preCreateItem", (doc, createData, options, user) => {
-        if (getProperty(createData, `flags.${Settings.NAMESPACE}.subtype`) === 'recipe' ) {
+        if (foundry.utils.getProperty(createData, `flags.${Settings.NAMESPACE}.subtype`) === 'recipe' ) {
             doc.updateSource({"flags.beavers-crafting.subtype": Settings.RECIPE_SUBTYPE,"img":"icons/sundries/scrolls/scroll-worn-tan.webp"});
         }
-        if (getProperty(createData,`flags.${Settings.NAMESPACE}.subtype`) === 'anyOf' ) {
+        if (foundry.utils.getProperty(createData,`flags.${Settings.NAMESPACE}.subtype`) === 'anyOf' ) {
             doc.updateSource({"flags.beavers-crafting.subtype": Settings.ANYOF_SUBTYPE,"img":"modules/beavers-crafting/icons/anyOf.png"});
         }
     });

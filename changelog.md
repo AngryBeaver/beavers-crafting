@@ -1,6 +1,6 @@
 # Changelog
-## 4.0.1
-- fix compatibility error messages for v14
+## 4.0.1 + 4.0.2
+- fix compatibility warnings for v14
 ## 4.0.0
 - rework tests
   - tests are now modular
