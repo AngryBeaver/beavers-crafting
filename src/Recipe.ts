@@ -133,9 +133,7 @@ export class Recipe implements RecipeData {
                 ors: {},
             }
         };
-        if(recipeTestsToBeaversTests(this)){
-            this.update();
-        }
+        recipeTestsToBeaversTests(this)
     }
 
     serialize(): RecipeData {

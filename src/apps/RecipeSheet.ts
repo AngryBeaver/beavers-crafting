@@ -54,6 +54,9 @@ export class RecipeSheet {
             return;
         }
         this.recipeElement = $('<div class="beavers-crafting recipe"></div>');
+        if(!this.app.form){
+            this.recipeElement = $('<form class="beavers-crafting recipe"></form>')
+        }
         beaversSystemInterface.itemSheetReplaceContent(this.app,html,this.recipeElement);
         this.recipe = Recipe.fromItem(this.item);
         this.render().then(i=>this.addDragDrop());
@@ -127,13 +130,20 @@ export class RecipeSheet {
     }
 
     async update() {
-        const flags={};
-        flags[Settings.NAMESPACE] = {
+        let update={flags:{}};
+        update.flags[Settings.NAMESPACE] = {
             recipe: this.recipe.serialize()
         };
-        await this.item.update({
-            "flags": flags
-        });
+        if(!this.app.form){
+            const formData = new FormData(this.recipeElement[0]);
+            // @ts-ignore
+            for (const [key, value] of formData.entries()) {
+                setProperty(update,key,value);
+            }
+        }
+        await this.item.update(update);
+        this.recipe = Recipe.fromItem(this.item);
+
         if(this.recipeElement) {
             this.app.scrollToPosition = this.recipeElement.scrollTop();
         }
