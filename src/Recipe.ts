@@ -1,8 +1,7 @@
 import {Settings} from "./Settings.js";
 import {sanitizeUuid} from "./helpers/Utility.js";
-import {getToolConfig} from "./apps/ToolConfig.js";
 import {Result} from "./Result.js";
-import {recipeSkillToTests} from "./migration.js";
+import { recipeSkillToTests, recipeTestsToBeaversTests } from "./migration.js";
 
 export class Recipe implements RecipeData {
     uuid: string;
@@ -24,6 +23,7 @@ export class Recipe implements RecipeData {
             [key: string]: Component
         }
     }
+    beaversTests?: BeaversCraftingTests;
     tests?: Tests;
     currency?: Currency;
     tool?: string;
@@ -44,7 +44,7 @@ export class Recipe implements RecipeData {
             ands: {},
             ors: {}
         };
-        tests: {
+        beaversTests: {
             ands: {},
             ors: {}
         };
@@ -61,7 +61,7 @@ export class Recipe implements RecipeData {
 
     static fromItem(item): Recipe {
         const flags = getProperty(item,`flags.${Settings.NAMESPACE}.recipe`) || {};
-        const data = mergeObject({input: {}, output: {}, required: {}}, flags, {inplace: false});
+        const data = foundry.utils.mergeObject({input: {}, output: {}, required: {}}, flags, {inplace: false});
         return new Recipe(item.uuid, item.id, item.name, item.img, data);
     }
 
@@ -101,7 +101,6 @@ export class Recipe implements RecipeData {
             return false;
         }
 
-
         this.uuid = uuid;
         this.id = id;
         this.name = name;
@@ -110,6 +109,7 @@ export class Recipe implements RecipeData {
         this.input = migrate(data.ingredients || {}) || deserializeComponents(data.input || {});
         this.output = migrate(data.results || {}) || deserializeComponents(data.output || {});
         this.tests = data.tests;
+        this.beaversTests = data.beaversTests;
         this.currency = data.currency;
         this.tool = data.tool;
         this.macro = data.macro || "";
@@ -128,12 +128,14 @@ export class Recipe implements RecipeData {
                 ands: {},
                 ors: {}
             },
-            tests: {
+            beaversTests: {
                 ands: {},
                 ors: {},
             }
         };
-
+        if(recipeTestsToBeaversTests(this)){
+            this.update();
+        }
     }
 
     serialize(): RecipeData {
@@ -146,13 +148,13 @@ export class Recipe implements RecipeData {
             macro: this.macro,
             folder: this.folder,
             instruction: this.instruction,
-            tests: this.serializeTests()
+            beaversTests: this.serializeTests()
         }
         if (!this.tool) {
             serialized["-=tool"] = null;
         }
-        if (!this.tests) {
-            serialized["-=tests"] = null;
+        if (!this.beaversTests) {
+            serialized["-=beaversTests"] = null;
         }
         if (!this.currency) {
             serialized["-=currency"] = null;
@@ -162,6 +164,9 @@ export class Recipe implements RecipeData {
         }
         if (!this.folder) {
             serialized["-=folder"] = null;
+        }
+        if(!this.tests) {
+            serialized["-=tests"] = null;
         }
         serialized["-=attendants"] = null;
         serialized["-=ingredients"] = null;
@@ -180,12 +185,12 @@ export class Recipe implements RecipeData {
     }
 
     serializeTests() {
-        if (this.tests != undefined) {
-            const serialized = {fails: this.tests.fails, consume: this.tests.consume, ands: this.tests.ands};
-            const ands = {...this.tests.ands, ...this._trash.tests.ands}
+        if (this.beaversTests != undefined) {
+            const serialized = {fails: this.beaversTests.fails, consume: this.beaversTests.consume, ands: {}};
+            const ands = {...JSON.parse(JSON.stringify(this.beaversTests.ands)), ...this._trash.beaversTests.ands}
             Object.keys(ands).forEach(key => {
-                if (this._trash.tests.ors[key] !== undefined) {
-                    ands[key].ors = {...ands[key].ors, ...this._trash.tests.ors[key]}
+                if (this._trash.beaversTests.ors[key] !== undefined) {
+                    ands[key].ors = {...ands[key].ors, ...this._trash.beaversTests.ors[key]}
                 }
             })
             serialized.ands = ands;
@@ -257,40 +262,40 @@ export class Recipe implements RecipeData {
     }
 
     addTestAnd() {
-        if (this.tests == undefined) {
-            this.tests = new DefaultTest();
-        } else {
-            const sorted = Object.keys(this.tests.ands).sort();
+        if (this.beaversTests == undefined) {
+            this.beaversTests = test
+        }else {
+            const sorted = Object.keys(this.beaversTests.ands).sort();
             // @ts-ignore
             const nextId = sorted[sorted.length - 1] - 1 + 2;
-            this.tests.ands[nextId] = new DefaultAndTest;
+            this.beaversTests.ands[nextId] = testAnd;
         }
     }
 
     addTestOr(and) {
-        if (this.tests?.ands[and] != undefined) {
-            const sorted = Object.keys(this.tests?.ands[and].ors).sort();
+        if (this.beaversTests?.ands[and] != undefined) {
+            const sorted = Object.keys(this.beaversTests?.ands[and].ors).sort();
             // @ts-ignore
             const nextId = sorted[sorted.length - 1] - 1 + 2;
-            this.tests.ands[and].ors[nextId] = new DefaultOrTest();
+            this.beaversTests.ands[and].ors[nextId] = {type:"IncrementStep",data:{}}
         }
     }
 
     removeTestOr(and, or) {
-        if (this.tests?.ands[and]?.ors[or] != undefined) {
-            if (Object.keys(this.tests?.ands[and]?.ors).length <= 1) {
-                if (Object.keys(this.tests?.ands).length <= 1) {
-                    this.tests = undefined;
+        if (this.beaversTests?.ands[and]?.ors[or] != undefined) {
+            if (Object.keys(this.beaversTests?.ands[and]?.ors).length <= 1) {
+                if (Object.keys(this.beaversTests?.ands).length <= 1) {
+                    this.beaversTests = undefined;
                 } else {
-                    delete this.tests.ands[and];
-                    this._trash.tests.ands["-=" + and] = null;
+                    delete this.beaversTests.ands[and];
+                    this._trash.beaversTests.ands["-=" + and] = null;
                 }
             } else {
-                delete this.tests.ands[and].ors[or];
-                if (this._trash.tests.ors[and] == undefined) {
-                    this._trash.tests.ors[and] = {};
+                delete this.beaversTests.ands[and].ors[or];
+                if (this._trash.beaversTests.ors[and] == undefined) {
+                    this._trash.beaversTests.ors[and] = {};
                 }
-                this._trash.tests.ors[and]["-=" + or] = null;
+                this._trash.beaversTests.ors[and]["-=" + or] = null;
             }
         }
     }
@@ -303,10 +308,6 @@ export class Recipe implements RecipeData {
         delete this.currency;
     }
 
-    async addTool() {
-        const config = await getToolConfig()
-        this.tool = config[0].uuid;
-    }
 
     removeTool() {
         delete this.tool;
@@ -351,6 +352,28 @@ export class Recipe implements RecipeData {
     }
 }
 
+
+class DefaultCurrency implements Currency {
+    name = "gp"
+    value = 5;
+}
+
+const defaultTest: SerializedTest<any> = {
+    type: "",
+    data: {},
+}
+const testAnd:BeaversTestAnd = {
+    hits: 1,
+    ors: {1:defaultTest},
+}
+
+const test:BeaversCraftingTests = {
+    fails: 1,
+    consume: true,
+    ands: {1: testAnd}
+}
+
+//legacy Tests can be removed
 export class DefaultTest implements Tests {
     fails: number = 1;
     consume: boolean = true;
@@ -370,9 +393,4 @@ class DefaultOrTest implements TestOr {
     check: number = 8;
     type: TestType = "skill"
     uuid = ""
-}
-
-class DefaultCurrency implements Currency {
-    name = "gp"
-    value = 5;
 }

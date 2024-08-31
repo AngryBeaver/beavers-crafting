@@ -1,7 +1,6 @@
 import {CraftingApp} from "./CraftingApp.js";
 import {Crafting} from "../Crafting.js";
 import {Settings} from "../Settings.js";
-import {getToolConfig} from "./ToolConfig.js";
 
 export class ActorSheetTab {
     app;
@@ -55,9 +54,6 @@ export class ActorSheetTab {
         const tabBody = $(await renderTemplate('modules/beavers-crafting/templates/actor-sheet-tab.hbs',
             {
                 craftingFolder:this.craftingFolder,
-                skills: beaversSystemInterface.configSkills,
-                abilities: beaversSystemInterface.configCanRollAbility?beaversSystemInterface.configAbilities:[],
-                tools: await getToolConfig()
             }));
         beaversSystemInterface.actorSheetAddTab(this.app, this.html, this.data.actor, { id: Settings.ACTOR_TAB_ID, label: label, html: `<i class="fas ${icon}"/>` }, tabBody);
         this.activateListeners(tabBody);

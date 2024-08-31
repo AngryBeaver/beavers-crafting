@@ -74,29 +74,17 @@ export class Crafting implements CraftingData {
         return Crafting.fromRecipe(actorId, Recipe.fromItem(item));
     }
 
-    get nextTest():TestOr{
-        let result:TestOr = {
-            check: 0,
-            type: "hit",
-            uuid: "progress"
+    get nextTest():string{
+        if(this.recipe.beaversTests){
+            const testHandler = new TestHandler(this.recipe.beaversTests,this.result,this.actor);
+            return testHandler.nextTest();
         }
-        if(this.recipe.tests){
-            const testHandler = new TestHandler(this.recipe.tests,this.result,this.actor);
-            try {
-                const currentTest = testHandler.getCurrentTestAnd();
-                if(Object.keys(currentTest.ors).length == 1){
-                    return Object.values(currentTest.ors)[0];
-                }
-            }catch(e){
-            }
-        }
-        return result
+        return "progress"
     }
 
     async startCrafting() {
         await this.evaluatePossibilities();
         Hooks.call(Settings.NAMESPACE+".start",this.recipe);
-        await this.checkTool();
         await this.checkRequired();
         RecipeCompendium.validateRecipeToItemList(RecipeCompendium._filterData(this.recipe.input,component=>true), this.actor.items, this.result);
         await this.payCurrency();
@@ -147,8 +135,8 @@ export class Crafting implements CraftingData {
      * returns true if there are further tests.
      */
     async checkTests(){
-        if (this.recipe.tests) {
-            const testHandler = new TestHandler(this.recipe.tests,this.result,this.actor);
+        if (this.recipe.beaversTests) {
+            const testHandler = new TestHandler(this.recipe.beaversTests,this.result,this.actor);
             if(testHandler.hasAdditionalTests()){
                 await testHandler.test();
                 this.lastAt = game["time"].worldTime;
@@ -157,10 +145,6 @@ export class Crafting implements CraftingData {
             return testHandler.hasAdditionalTests();
         }
         return false;
-    }
-
-    async checkTool() {
-        await RecipeCompendium.validateTool(this.recipe, this.actor.items, this.result);
     }
 
     async checkRequired() {
@@ -361,8 +345,8 @@ export class Crafting implements CraftingData {
 
 
         const tests = {maxHits:1,maxFails:1,hits:0,fails:0,hitPer:0,failPer:0}
-        if(this.recipe.tests){
-            TestHandler.initialize(this.result,this.recipe.tests);
+        if(this.recipe.beaversTests){
+            TestHandler.initialize(this.result,this.recipe.beaversTests);
             tests.maxHits = this.result._tests.maxHits;
             tests.maxFails = this.result._tests.maxFails;
             tests.hits = this.result._tests.hits;
@@ -387,7 +371,7 @@ export class Crafting implements CraftingData {
             name: this.recipe.name,
             img: this.recipe.img,
             status: status,
-            tests:tests,
+            beaversTests:tests,
             components: components,
         }
 
@@ -414,7 +398,7 @@ export class Crafting implements CraftingData {
                 }
             }
         };
-        setProperty(update, `flags.${Settings.NAMESPACE}.crafting.${uuid}`, this.serialize());
+        foundry.utils.setProperty(update, `flags.${Settings.NAMESPACE}.crafting.${uuid}`, this.serialize());
         await this.actor.update(update);
     }
 

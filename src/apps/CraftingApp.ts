@@ -2,7 +2,6 @@ import {FilterType, RecipeCompendium} from "./RecipeCompendium.js";
 import {Crafting, getCurrencyComponent} from "../Crafting.js";
 import {getDataFrom, sanitizeUuid} from "../helpers/Utility.js";
 import {Settings} from "../Settings.js";
-import {getToolConfig} from "./ToolConfig.js";
 import {AnyOf} from "../AnyOf.js";
 import {Recipe} from "../Recipe.js";
 import {Result} from "../Result.js";
@@ -41,7 +40,7 @@ export class CraftingApp extends Application {
     }
 
     static get defaultOptions() {
-        return mergeObject(super.defaultOptions, {
+        return foundry.utils.mergeObject(super.defaultOptions, {
             // @ts-ignore
             title: game.i18n.localize(`beaversCrafting.crafting-app.title`),
             width: 700,
@@ -58,7 +57,7 @@ export class CraftingApp extends Application {
     }
 
     async getData(options = {}) {
-        const data: any = mergeObject(this.data, await super.getData(options));
+        const data: any = foundry.utils.mergeObject(this.data, await super.getData(options));
         let recipes = await RecipeCompendium.filterForActor(data.actor, data.filter);
         if(Object.values(data.filterItems).length != 0) {
             recipes = await RecipeCompendium.filterForItems(recipes, Object.values(data.filterItems));
@@ -107,7 +106,6 @@ export class CraftingApp extends Application {
         }
         const crafting = await Crafting.fromRecipe(this.data.actor.id, this.data.recipe);
         RecipeCompendium.validateRecipeToItemList(RecipeCompendium._filterData(this.data.recipe.input,(c)=>c.type==="Item"), this.data.actor.items,crafting.result);
-        await crafting.checkTool();
         await crafting.checkRequired();
         await crafting.checkCurrency();
         this.data.result = crafting.result;
@@ -115,14 +113,10 @@ export class CraftingApp extends Application {
             {
                 recipe: this.data.recipe,
                 currencyComponent: this.data.recipe.currency?getCurrencyComponent(this.data.recipe.currency.name,this.data.recipe.currency.value):undefined,
-                skills: beaversSystemInterface.configSkills,
-                abilities: beaversSystemInterface.configCanRollAbility?beaversSystemInterface.configAbilities:[],
-                tools: await getToolConfig(),
                 precast: await this.getPrecastFromResult(this.data.result,this.data.recipe),
-                maxHits: this.data.recipe.tests?TestHandler.getMaxHits(this.data.recipe.tests):0,
+                maxHits: this.data.recipe.beaversTests?TestHandler.getMaxHits(this.data.recipe.beaversTests):0,
                 displayResults:Settings.get(Settings.DISPLAY_RESULTS),
                 displayIngredients:Settings.get(Settings.DISPLAY_RESULTS),
-                useTool: Settings.get(Settings.USE_TOOL),
                 useAttendants: Settings.get(Settings.USE_ATTENDANTS),
                 hasCraftedFlag: Settings.get(Settings.SEPARATE_CRAFTED_ITEMS) !== "none",
             });

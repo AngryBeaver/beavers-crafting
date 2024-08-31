@@ -211,8 +211,8 @@ export class Result implements ResultApi, ResultData {
         componentResult.component.quantity = componentResult.component.quantity + quantity;
     }): void {
         if(type === "produced"){
-            setProperty(componentData,`flags.${Settings.NAMESPACE}.isCrafted`,true);
-            setProperty(componentData,`flags.${Settings.NAMESPACE}.crafted`,{byId:this._actor.id,byName:this._actor.name});
+            foundry.utils.setProperty(componentData,`flags.${Settings.NAMESPACE}.isCrafted`,true);
+            foundry.utils.setProperty(componentData,`flags.${Settings.NAMESPACE}.crafted`,{byId:this._actor.id,byName:this._actor.name});
         }
         let componentResult = this._components[type].findComponentResult(componentData);
         if (componentResult === undefined) {
@@ -358,7 +358,7 @@ export class CurrencyResult implements CurrencyResultData {
     }
 
     constructor(data) {
-        const config = mergeObject(CurrencyResult.defaultOptions, data);
+        const config = foundry.utils.mergeObject(CurrencyResult.defaultOptions, data);
         this.name = config.name;
         this.value = config.value;
         this.isConsumed = config.isConsumed;

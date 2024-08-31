@@ -6,8 +6,8 @@
                 {{#if (not (eq data.status "error"))}}
                     <div class="statusbar success">
                         <div class="fill"
-                             style="background: linear-gradient(to right, darkgreen {{data.tests.hitPer}}%, transparent 0);">
-                            {{data.tests.hitPer}}%
+                             style="background: linear-gradient(to right, darkgreen {{data.beaversTests.hitPer}}%, transparent 0);">
+                          {{data.beaversTests.hitPer}}%
                         </div>
                     </div>
                 {{/if}}
@@ -15,7 +15,7 @@
                     <div class="statusbar error">
                         <div class="fill"
                              style="background: linear-gradient(to right, darkred {{data.tests.failPer}}%, transparent 0)">
-                            {{data.tests.failPer}}%
+                            {{data.beaversTests.failPer}}%
                         </div>
                     </div>
                 {{/if}}

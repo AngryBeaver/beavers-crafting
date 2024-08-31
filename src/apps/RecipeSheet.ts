@@ -2,7 +2,6 @@ import {Recipe} from "../Recipe.js";
 import {Settings} from "../Settings.js";
 import {getDataFrom} from "../helpers/Utility.js";
 import {AnyOf} from "../AnyOf.js";
-import {getToolConfig} from "./ToolConfig.js";
 
 const recipeSheets: { [key: string]: RecipeSheet } = {};
 
@@ -81,24 +80,14 @@ export class RecipeSheet {
     }
 
     async render(){
-        const tools = await getToolConfig();
-        const toolChoices = {};
-        tools.forEach(tool=>{
-            toolChoices[tool.uuid]={text:tool.name,img:tool.img};
-        })
         let main = await renderTemplate('modules/beavers-crafting/templates/recipe-main.hbs',
             {
                 recipe: this.recipe,
                 currencies: beaversSystemInterface.configCurrencies,
-                skills: beaversSystemInterface.configSkills,
-                abilities: beaversSystemInterface.configCanRollAbility?beaversSystemInterface.configAbilities:[],
-                tools: tools,
-                toolChoices: toolChoices,
                 editable:this.editable,
                 displayResults:Settings.get(Settings.DISPLAY_RESULTS),
                 displayIngredients:Settings.get(Settings.DISPLAY_RESULTS),
                 useAttendants: Settings.get(Settings.USE_ATTENDANTS),
-                canRollTool:Settings.getSystemSetting().hasTool,
                 canRollAbility:beaversSystemInterface.configCanRollAbility,
                 hasCraftedFlag: Settings.get(Settings.SEPARATE_CRAFTED_ITEMS) !== "none",
             });
@@ -116,6 +105,9 @@ export class RecipeSheet {
         });
         this.recipeElement.find('.recipe').remove();
         this.recipeElement.append(template);
+        if(this.app.scrollToPosition){
+            this.recipeElement.scrollTop(this.app.scrollToPosition)
+        }
         this.handleEvents();
     }
 
@@ -134,14 +126,17 @@ export class RecipeSheet {
         await this._onDropMain(e);
     }
 
-    update() {
+    async update() {
         const flags={};
         flags[Settings.NAMESPACE] = {
             recipe: this.recipe.serialize()
         };
-        this.item.update({
+        await this.item.update({
             "flags": flags
         });
+        if(this.recipeElement) {
+            this.app.scrollToPosition = this.recipeElement.scrollTop();
+        }
         this.render();
     }
 
@@ -153,9 +148,9 @@ export class RecipeSheet {
             const name=`${type}.${group}.${key}.flags.${Settings.NAMESPACE}.isCrafted`;
             const value = getProperty(this.recipe,name);
             if(value){
-                setProperty(this.recipe, name, null);
+                foundry.utils.setProperty(this.recipe, name, null);
             }else {
-                setProperty(this.recipe, name, true);
+                foundry.utils.setProperty(this.recipe, name, true);
             }
             this.update();
         });
@@ -170,14 +165,6 @@ export class RecipeSheet {
         });
         this.recipeElement.find('.attendants .item-delete').click(e=>{
             this.recipe.removeRequired(e.target.dataset.group,e.target.dataset.id);
-            this.update();
-        });
-        this.recipeElement.find('.tools .item-add').click(e=>{
-            this.recipe.addTool()
-                .then(()=>this.update());
-        });
-        this.recipeElement.find('.tools .item-delete').click(e=>{
-            this.recipe.removeTool();
             this.update();
         });
         this.recipeElement.find('.currencies .item-delete').click(e=>{
@@ -204,15 +191,16 @@ export class RecipeSheet {
             this.update();
         });
 
-        this.recipeElement.find("select.test-type").on("change",e=>{
-                const and = $(e.currentTarget).data("and");
-                const or = $(e.currentTarget).data("or");
-                const type = $(e.currentTarget).val();
-                if(this.recipe.tests?.ands[and]?.ors[or]){
-                    this.recipe.tests.ands[and].ors[or].type = type as TestType;
-                    this.recipe.tests.ands[and].ors[or].uuid = "";
+        this.recipeElement.find(".beavers-test-selection select").on("change",e=>{
+                const name =  e.target.name;
+                const {ands:and, ors:or} = name.split('.').reduce((result, item, index, array) =>
+                  (item === 'ands' || item === 'ors') ? {...result, [item] : array[index + 1]} : result, {});
+                const type = $(e.target).val() as string;
+                if(this.recipe.beaversTests?.ands[and]?.ors[or]){
+                    this.recipe.beaversTests.ands[and].ors[or].type = type
+                    this.recipe.beaversTests.ands[and].ors[or]["-=data"] = null
                 }
-                this.update();
+                this.update()
         })
 
         this.recipeElement.find('.results .crafting-item-img').on("click",e=>{
