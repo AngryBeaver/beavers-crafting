@@ -398,7 +398,7 @@ export class Crafting implements CraftingData {
                 }
             }
         };
-        setProperty(update, `flags.${Settings.NAMESPACE}.crafting.${uuid}`, this.serialize());
+        foundry.utils.setProperty(update, `flags.${Settings.NAMESPACE}.crafting.${uuid}`, this.serialize());
         await this.actor.update(update);
     }
 

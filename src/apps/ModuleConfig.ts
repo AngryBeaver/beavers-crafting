@@ -10,7 +10,7 @@ export class ModuleConfig extends FormApplication {
     static get defaultOptions(): any {
         // @ts-ignore
         const title = game.i18n.localize("beaversCrafting.module-config.title");
-        return mergeObject(super.defaultOptions, {
+        return foundry.utils.mergeObject(super.defaultOptions, {
             title: title,
             template: "modules/beavers-crafting/templates/module-config.hbs",
             id: "beavers-crafting-module-config",

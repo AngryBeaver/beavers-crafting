@@ -40,7 +40,7 @@ export class CraftingApp extends Application {
     }
 
     static get defaultOptions() {
-        return mergeObject(super.defaultOptions, {
+        return foundry.utils.mergeObject(super.defaultOptions, {
             // @ts-ignore
             title: game.i18n.localize(`beaversCrafting.crafting-app.title`),
             width: 700,
@@ -57,7 +57,7 @@ export class CraftingApp extends Application {
     }
 
     async getData(options = {}) {
-        const data: any = mergeObject(this.data, await super.getData(options));
+        const data: any = foundry.utils.mergeObject(this.data, await super.getData(options));
         let recipes = await RecipeCompendium.filterForActor(data.actor, data.filter);
         if(Object.values(data.filterItems).length != 0) {
             recipes = await RecipeCompendium.filterForItems(recipes, Object.values(data.filterItems));

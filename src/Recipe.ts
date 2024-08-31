@@ -61,7 +61,7 @@ export class Recipe implements RecipeData {
 
     static fromItem(item): Recipe {
         const flags = getProperty(item,`flags.${Settings.NAMESPACE}.recipe`) || {};
-        const data = mergeObject({input: {}, output: {}, required: {}}, flags, {inplace: false});
+        const data = foundry.utils.mergeObject({input: {}, output: {}, required: {}}, flags, {inplace: false});
         return new Recipe(item.uuid, item.id, item.name, item.img, data);
     }
 
