@@ -26,6 +26,24 @@ Hooks.on("ready", async function(){
     }
 })
 
+async function migrate(){
+    const version = Settings.get(Settings.MAJOR_VERSION);
+    if(version == 2){
+        await migrateDeprecateTools();
+        await migrateRecipeSkillToTests();
+        Settings.set(Settings.USE_TOOL,false);
+        Settings.set(Settings.MAJOR_VERSION,3);
+    }
+    if(version == 3){
+        await migrateRecipeToOrConditions();
+    }
+    if(version < 400){
+        await new Promise(resolve => setTimeout(resolve, 10000));
+        await migrateRecipeTestsToBeaversTests();
+    }
+    Settings.set(Settings.MAJOR_VERSION,400);
+}
+
 Hooks.once("beavers-system-interface.ready", async function(){
     Settings.init();
     if(!game[Settings.NAMESPACE])game[Settings.NAMESPACE]={};
@@ -40,22 +58,7 @@ Hooks.once("beavers-system-interface.ready", async function(){
     game[Settings.NAMESPACE].migrateRecipeTestsToBeaversTests= migrateRecipeTestsToBeaversTests;
 
     hookChatLog();
-    const version = Settings.get(Settings.MAJOR_VERSION);
-    if(version == 2){
-        await migrateDeprecateTools();
-        await migrateRecipeSkillToTests();
-        Settings.set(Settings.USE_TOOL,false);
-        Settings.set(Settings.MAJOR_VERSION,3);
-    }
-    if(version == 3){
-        await migrateRecipeToOrConditions();
-    }
-    if(version < 400){
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        await migrateRecipeTestsToBeaversTests();
-    }
-    Settings.set(Settings.MAJOR_VERSION,400);
-
+    migrate();
     beaversSystemInterface.addExtension(Settings.NAMESPACE,{componentAddFlags:["crafted","isCrafted"]})
 
     if(Settings.get(Settings.SEPARATE_CRAFTED_ITEMS) === "full"){

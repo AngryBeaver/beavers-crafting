@@ -1,4 +1,6 @@
 # Changelog
+## 4.0.5
+- migration is now an asynchronous Task that will not break the module.
 ## 4.0.4
 - translated to Brazilian Portuguese by [Andersants](https://github.com/Andersants)
 ## 4.0.3
