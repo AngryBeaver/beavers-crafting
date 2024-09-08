@@ -1,0 +1,150 @@
+{
+  "beaversCrafting": {
+    "actorLink": "Receitas",
+    "actorSheet": {
+      "tab": "Criação",
+      "table": {
+        "name": "Nome",
+        "status": "Status",
+        "progress": "Progresso",
+        "add": "Adicionar"
+      }
+    },
+    "inventory": {
+      "type": "Tipo",
+      "title": "Inventário"
+    },
+    "recipe": {
+      "ingredients": "Ingredientes",
+      "quantity": "Quantidade",
+      "skills": "Habilidade",
+      "beaversTests": {
+        "tests": "Testes",
+        "test": "teste",
+        "hits": "acertos",
+        "hitsHint": "checagens de sucesso necessárias antes que este teste seja concluído com sucesso",
+        "fails": "falhas",
+        "failsHint": "checagens falhadas antes que o processo falhe",
+        "dc": "cd",
+        "consume": "consumir",
+        "consumeHint": "consome o custo em testes falhados",
+        "andTestHint": "adicionar Teste adicional",
+        "orTestHint": "adicionar Teste alternativo",
+        "skill": "Habilidade:",
+        "ability": "Capacidade:"
+      },
+      "tools": "Ferramenta",
+      "dc": "CD",
+      "results": "Resultados",
+      "dropItem": "soltar item",
+      "addItem": "adicionar item",
+      "orItem": "ou item",
+      "currency": "Custo",
+      "consumeOnFailedSaveHint": "Consome o Custo em checagem de Habilidade falhada",
+      "attendants": "Assistentes",
+      "macro": {
+        "button": "salvar"
+      },
+      "folder": "Pasta",
+      "folderHint": "Você pode criar subpastas separando palavras com '.' ex.: Pasta.Subpasta",
+      "folderPlaceHolder": "Pasta.Subpasta"
+    },
+    "anyOf": {
+      "dropItem": "soltar item",
+      "button": "testar item",
+      "error": "uma macro 'anyOf' produziu um erro. Verifique o console (F12)"
+    },
+    "component": {
+      "warning": "Seu Ator controlado não possui um item chamado "
+    },
+    "select-dialog": {
+      "title": "Escolher",
+      "preselection": "escolha"
+    },
+    "crafting-app": {
+      "title": "Compêndio de Receitas do Beaver",
+      "button": "Iniciar",
+      "errors": {
+        "tableNotFound": "Tabela de Rolagem não encontrada para: ",
+        "tableNotValid": "Tabela de Rolagem retornou Objeto inválido: ",
+        "itemNotFound": "Item não encontrado na Tabela de Rolagem para: "
+      },
+      "cost": "Custo",
+      "instruction": "Instrução",
+      "required": "Requerido",
+      "result": "Resultado",
+      "pass": "sucesso",
+      "before": "antes",
+      "fails": "falhas",
+      "checks": "Lista de Checagem"
+    },
+    "settings": {
+      "moduleButton": {
+        "name": "Configurar módulo",
+        "hint": "Configurar Módulo ex.: configurar subtipos de itens 'Recipe' e 'AnyOf'.",
+        "label": "configurar"
+      },
+      "createItemTitle": {
+        "name": "Título da Janela de Criação de Item",
+        "hint": "Este Título é necessário para detectar a Janela de Criação de Item para adicionar os subtipos 'Recipe' e 'AnyOf'."
+      },
+      "captureCreateItemTitle": {
+        "name": "Capturar Janela de Criação de Item",
+        "hint": "Isso habilitará um alvo no cabeçalho de cada diálogo para identificar a janela de criação de item.",
+        "hint2": "Quando você clicar nele, ele definirá essa janela como sua janela de criação de item após reabri-la."
+      },
+      "displayResults": {
+        "name": "Exibir folha de resultados",
+        "hint": "Mostrar ItemSheet ao clicar em itens de resultado de uma receita."
+      },
+      "displayIngredients": {
+        "name": "Exibir folha de ingredientes",
+        "hint": "Mostrar ItemSheet ao clicar em itens de ingredientes de uma receita."
+      },
+      "draggableChatResult": {
+        "name": "Resultado arrastável no chat",
+        "hint": "Você pode arrastar resultados de receitas do chat para o inventário de outros jogadores"
+      },
+      "useAttendants": {
+        "name": "Receitas usam Itens requeridos",
+        "hint": "Uma Receita pode exigir que itens estejam presentes no ator sem serem consumidos no processo. Você pode configurar qualquer coisa que seu sistema modele como item, ex.: façanhas de dnd5e, classe, histórico, ferramentas etc!"
+      },
+      "currencyExchange": {
+        "name": "Trocar moedas",
+        "hint": "se desativado, você precisa possuir a moeda exata para pagar o custo da receita"
+      },
+      "disabledActor": {
+        "name": "Atores Desativados",
+        "hint": "Lista separada por vírgulas de tipos de atores que não terão uma aba de ator"
+      },
+      "tabName": {
+        "name": "Nome da Aba",
+        "hint": "Personalizar o nome da Aba nas fichas de ator (padrão: Crafting). Alguns Sistemas usam um Nome de Aba em vez de um Ícone de Aba. Por quê? Este módulo foi inicialmente baseado na criação, mas você pode usá-lo para várias outras coisas como: Árvore de Tecnologias, Progresso de Missão, Atividades de Tempo Livre"
+      },
+      "tabIcon": {
+        "name": "Ícone da Aba",
+        "hint": "Personalizar o ícone da Aba nas fichas de ator (padrão: A Recipe). Alguns Sistemas usam um Ícone de Aba em vez de um Nome de Aba. Você pode alterá-lo para qualquer ícone incrível de fonte compatível com o Foundry"
+      },
+      "addHeaderLink": {
+        "name": "Link de Ficha de Ator",
+        "hint": "Isso adicionará um link de receita na Ficha de Ator. Opcional desde 2.0.x, pois muitos módulos poluem a área de Cabeçalho das fichas, em alguns mundos tenho problemas para encontrar um espaço vazio para arrastar."
+      },
+      "timeToCraft": {
+        "name": "Tempo de Processamento",
+        "hint": "O Tempo de Processamento é usado para rastrear o tempo necessário para o processo. Instantaneamente não usará nenhum tempo e concluirá o processo imediatamente. Interação processará quando o usuário interagir com o processo.",
+        "choices": {
+          "instantly": "instantaneamente",
+          "interaction": "interação"
+        }
+      },
+      "separateItems": {
+        "name": "Separar Itens Produzidos",
+        "hint": "Aqui você pode definir se um item produzido é diferente de um não produzido. Quando definido como completo, seus itens produzidos são diferentes dos não produzidos (ex.: você pode criar receitas especiais que exigem itens produzidos). Parcial tentará detectar o que você quer dizer, mas não sempre estará correto (ex.: quando você arrasta uma adaga produzida para sua receita, ela exigirá uma adaga produzida, quando você arrasta uma adaga normal, ela pode usar uma adaga produzida ou não produzida)."
+      }
+    },
+    "module-config": {
+      "title": "Configuração do Módulo",
+      "info": "O módulo precisa detectar a janela que cria novos Itens. Para isso, usa internamente o título dessa janela. Se você tiver o idioma padrão, o título é provavelmente 'Criar Novo Item' e você não precisa fazer nada."
+    }
+  }
+}

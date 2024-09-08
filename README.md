@@ -342,3 +342,5 @@ To filter the right window the module uses the title of the window as there is n
 
 ## Credits
 Copy organizational structur from midi-qol (gulpfile,package.json,tsconcig.json)
+
+translated to Brazilian Portuguese by [Andersants](https://github.com/Andersants)

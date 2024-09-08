@@ -1,4 +1,6 @@
 # Changelog
+## 4.0.4
+- translated to Brazilian Portuguese by [Andersants](https://github.com/Andersants)
 ## 4.0.3
 - remove potential bug with migrate scripts.
 - fix recipeSheet for systems without Formapplication e.g. a5e

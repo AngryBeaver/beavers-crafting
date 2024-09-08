@@ -2,7 +2,7 @@
   "title": "Beaver's Crafting Module",
   "description": "A Module for crafting, brewing, harvesting, mining, fabricating, gathering, character advancement, tech tree, skill tree, ability tree, downtime activities, factions / organisation reputation, quest logs, skill training",
   "id": "beavers-crafting",
-  "version": "4.0.3",
+  "version": "4.0.4",
   "authors": [
     {
       "name": "angryBeaver",
@@ -14,6 +14,11 @@
       "lang": "en",
       "name": "English",
       "path": "lang/en.json"
+    },
+    {
+      "lang": "pt-BR",
+      "name": "Português",
+      "path": "lang/pt-BR.json"
     }
   ],
   "esmodules": [
