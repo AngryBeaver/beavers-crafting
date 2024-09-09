@@ -1,4 +1,6 @@
 # Changelog
+## 4.0.6
+- fix ToolTest migration
 ## 4.0.5
 - migration is now an asynchronous Task that will not break the module.
 ## 4.0.4

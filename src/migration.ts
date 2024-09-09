@@ -232,7 +232,7 @@ export function recipeTestsToBeaversTests(recipe: RecipeData) {
                         type: "ToolTest",
                         data: {
                             dc: recipe.tests.ands[key].ors[orKey].check,
-                            uuid:recipe.tests.ands[key].ors[orKey].uuid
+                            tool:recipe.tests.ands[key].ors[orKey].uuid
                         }
                     }
                 }
