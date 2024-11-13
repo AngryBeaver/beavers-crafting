@@ -1,4 +1,6 @@
 # Changelog
+## 4.0.7
+- fix consume money on failed check
 ## 4.0.6
 - fix ToolTest migration
 ## 4.0.5

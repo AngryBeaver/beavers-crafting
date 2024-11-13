@@ -256,8 +256,8 @@ export class Crafting implements CraftingData {
         componentList.push(...this._processComponentResult(this.result._components.consumed));
         componentList.push(...this._processComponentResult(this.result._components.produced));
         if (this.result._currencyResult !== undefined) {
-            if (!this.recipe.tests?.consume && this.result.hasError()) {
-                this.result.revertPayedCurrency();
+            if (!this.recipe.beaversTests?.consume && this.result.hasError()) {
+                await this.result.revertPayedCurrency();
             }
         }
         try{

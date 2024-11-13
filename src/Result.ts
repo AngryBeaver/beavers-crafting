@@ -184,13 +184,14 @@ export class Result implements ResultApi, ResultData {
             return;
         }
         if(this._currencyResult.isConsumed) {
-            const name = this._currencyResult.name;
-            const configCurrency = beaversSystemInterface.configCurrencies.find(c=>c.id===name);
+            const id = this._currencyResult.name;
+            const configCurrency = beaversSystemInterface.configCurrencies.find(c=>c.id===id);
+            let name = configCurrency?.label || "";
             void await this._currencyResult.pay(this._actor, true);
             const component = configCurrency?.component?configCurrency.component:beaversSystemInterface.componentCreate(
                 {
                     type:"Currency",
-                    name:configCurrency?.label,
+                    name:name.replaceAll(".","-"),
                     img:'icons/commodities/currency/coins-assorted-mix-copper-silver-gold.webp'
                 });
             component.quantity = this._currencyResult.value * -1
