@@ -1,4 +1,6 @@
 # Changelog
+## 4.0.8
+- v13 ready 
 ## 4.0.7
 - fix consume money on failed check
 ## 4.0.6
