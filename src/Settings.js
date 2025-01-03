@@ -150,13 +150,13 @@ export class Settings {
             type: Number,
         });
         game.settings.register(this.NAMESPACE, this.CRAFTING_APP_WIDTH, {
-            scope: "client",
+            scope: "user",
             config: false,
             default: 900,
             type: Number,
         });
         game.settings.register(this.NAMESPACE, this.CRAFTING_APP_HEIGHT, {
-            scope: "client",
+            scope: "user",
             config: false,
             default: 450,
             type: Number,
