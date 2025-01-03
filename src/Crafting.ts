@@ -18,7 +18,7 @@ export class Crafting implements CraftingData {
     restore:any[];
 
     constructor(craftingData: CraftingData, actor) {
-        this.uuid = craftingData.uuid || actor.uuid + ".Crafting." + randomID();
+        this.uuid = craftingData.uuid || actor.uuid + ".Crafting." + foundry.utils.randomID();
         this.startAt = craftingData.startAt;
         this.endAt = craftingData.endAt
         this.lastAt = craftingData.lastAt | craftingData.startAt;

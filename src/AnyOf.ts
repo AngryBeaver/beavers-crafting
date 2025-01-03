@@ -19,7 +19,7 @@ export class AnyOf {
 
     constructor(item) {
         const flags = foundry.utils.getProperty(item,`flags.${Settings.NAMESPACE}.anyOf`) || {};
-        const data = mergeObject(this.defaultData(), flags, {inplace: false});
+        const data = foundry.utils.mergeObject(this.defaultData(), flags, {inplace: false});
         this.macro = data.macro;
         this.img = item.img;
         this.name = item.name;

@@ -1,4 +1,11 @@
 # Changelog
+## 4.0.9
+- ui-stuff
+  - crafting-app dimensions from 700 to 900 width
+  - crafting-app sections default to min-width:200px -> 300px.
+  - store crafting-app dimensions per client
+  - fix ui bug crafting-details on actor.
+- v14 compatible changes
 ## 4.0.8
 - v13 ready 
 ## 4.0.7

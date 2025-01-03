@@ -498,14 +498,17 @@ beavers-recipe
     line-height:20px;
     filter: brightness(0.8);
     flex:0;
-    min-width:200px;
     width: inherit;
     margin: inherit;
 }
 
-.beavers-crafting .beavers-recipe .section {
+.beavers-crafting .beavers-recipe .beavers-recipe-body {
     border: 2px groove #eeede0;
     padding: 2px;
+}
+
+.beavers-crafting .beavers-recipe .beavers-recipe-section {
+    min-width: 300px;
 }
 
 .beavers-crafting .beavers-recipe .test-section {

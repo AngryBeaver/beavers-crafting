@@ -39,12 +39,18 @@ export class CraftingApp extends Application {
         }
     }
 
+    async close(options?: Application.CloseOptions){
+        Settings.set(Settings.CRAFTING_APP_WIDTH,this.position.width);
+        Settings.set(Settings.CRAFTING_APP_HEIGHT,this.position.height);
+        return super.close(options);
+    }
+
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
             // @ts-ignore
             title: game.i18n.localize(`beaversCrafting.crafting-app.title`),
-            width: 700,
-            height: 450,
+            width: Settings.get(Settings.CRAFTING_APP_WIDTH),
+            height: Settings.get(Settings.CRAFTING_APP_HEIGHT),
             template: "modules/beavers-crafting/templates/crafting-app.hbs",
             closeOnSubmit: true,
             submitOnClose: true,

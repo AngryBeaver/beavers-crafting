@@ -12,6 +12,8 @@ export class Settings {
     static RECIPE_SUBTYPE = "Recipe";
     static ANYOF_SUBTYPE = "AnyOf";
     static MAJOR_VERSION = "majorVersion";
+    static CRAFTING_APP_WIDTH = "craftingAppWidth";
+    static CRAFTING_APP_HEIGHT = "craftingAppHeight";
     static ACTOR_TAB_ID = "beavers-crafting";
     static CURRENCY_EXCHANGE = "currencyExchange"
     static DISABLED_ACTOR = "disabledActor";
@@ -145,6 +147,18 @@ export class Settings {
             scope: "world",
             config: false,
             default: 400,
+            type: Number,
+        });
+        game.settings.register(this.NAMESPACE, this.CRAFTING_APP_WIDTH, {
+            scope: "client",
+            config: false,
+            default: 900,
+            type: Number,
+        });
+        game.settings.register(this.NAMESPACE, this.CRAFTING_APP_HEIGHT, {
+            scope: "client",
+            config: false,
+            default: 450,
             type: Number,
         });
         if (game["system"].id === "dnd5e") {
