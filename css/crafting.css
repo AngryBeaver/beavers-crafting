@@ -135,6 +135,8 @@
     padding:5px;
     width: calc(100% - 20px);
     margin:10px;
+    min-height: 300px;
+    color:white;
 }
 
 .sheet-body .beavers-crafting {
@@ -170,6 +172,9 @@
 .beavers-crafting .recipe .crafting-item-img{
     width:30px;
     height:30px;
+}
+.beavers-crafting input[type=text],.beavers-crafting input[type=number] {
+    padding-inline:0;
 }
 
 .beavers-crafting .processing{
@@ -500,6 +505,11 @@ beavers-recipe
     flex:0;
     width: inherit;
     margin: inherit;
+}
+
+.beavers-crafting.recipe textarea {
+    min-height:300px;
+    color:white;
 }
 
 .beavers-crafting .beavers-recipe .beavers-recipe-body {

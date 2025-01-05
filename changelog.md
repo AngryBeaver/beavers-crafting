@@ -1,4 +1,19 @@
 # Changelog
+## 4.0.10
+- fix for systems not using formApplication as itemSheet.
+  - fix updating changes for selectBoxes in test section.
+  - fix removing test sections
+  - fix removing currency,
+  - fix updating changes for input boxes just created e.g. currency or tests
+  - fix checkbox for consume tests
+  - fix recipe item macro button reloading the page
+  - fix progress recipes on actor
+- ui changes
+  - remove submit button for recipe macros
+  - use full size for macro textarea
+  - fix text-area color to be also white
+  - dnd5e fix remove borders for recipe creation
+  - a5e fix test hits input not visible
 ## 4.0.9
 - ui-stuff
   - crafting-app dimensions from 700 to 900 width

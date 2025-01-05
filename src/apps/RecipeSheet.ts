@@ -53,9 +53,9 @@ export class RecipeSheet {
         if(exists.length != 0){
             return;
         }
-        this.recipeElement = $('<div class="beavers-crafting recipe"></div>');
+        this.recipeElement = $('<div class="beavers-crafting recipe" style="height:100%;width:100%;padding:15px;"></div>');
         if(!this.app.form){
-            this.recipeElement = $('<form class="beavers-crafting recipe"></form>')
+            this.recipeElement = $('<form class="beavers-crafting recipe" style="height:100%;width:100%;padding:15px;"></form>')
         }
         beaversSystemInterface.itemSheetReplaceContent(this.app,html,this.recipeElement);
         this.recipe = Recipe.fromItem(this.item);
@@ -131,25 +131,57 @@ export class RecipeSheet {
 
     async update() {
         let update={flags:{}};
+        const formData = this.getFormData();
+        // add macro before setting it via serialization to null
+        if(!this.app.form){
+            for (const [key, value] of Object.entries(formData)) {
+                let recipeKey = key.replace("flags.beavers-crafting.recipe.", "");
+                foundry.utils.setProperty(this.recipe,recipeKey,value);
+            }
+        }
         update.flags[Settings.NAMESPACE] = {
             recipe: this.recipe.serialize()
         };
         if(!this.app.form){
-            const formData = new FormData(this.recipeElement[0]);
             // @ts-ignore
-            for (const [key, value] of formData.entries()) {
-                setProperty(update,key,value);
+            for (const [key, value] of Object.entries(formData)) {
+                foundry.utils.setProperty(update,key,value);
             }
         }
-        await this.item.update(update);
+        await this.item.update(update,{ performDeletions:true });
         this.recipe = Recipe.fromItem(this.item);
 
         if(this.recipeElement) {
             this.app.scrollToPosition = this.recipeElement.scrollTop();
         }
-        this.render();
+        await this.render();
     }
 
+    getFormData(){
+        let data = {};
+        for(let el of this.recipeElement[0].elements) {
+            let element = el as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+
+            if(element.name){ //make sure the element has a name attribute.
+                // Check for element type
+                if(element.type === 'number') {
+                    data[element.name] = element.value ? parseFloat(element.value) : null;
+                } else if (element.type === 'checkbox' && element instanceof HTMLInputElement) {
+                    data[element.name] = element.checked;
+                } else if (element.type === 'select-one' || element.type === 'select-multiple') {
+                    let select: HTMLSelectElement = el as HTMLSelectElement;
+                    let selectedValues = Array.from(select.selectedOptions)
+                      .map(option => option.value);
+                    data[element.name] = selectedValues;
+                } else if (element.type === 'textarea') {
+                    data[element.name] = element.value;
+                } else {
+                    data[element.name] = element.value;
+                }
+            }
+        }
+        return data;
+    }
     handleMainEvents() {
         this.recipeElement.find('.beavers-fontsize-svg-img').click(e=>{
             const group = e.target.dataset.group;
@@ -177,8 +209,9 @@ export class RecipeSheet {
             this.recipe.removeRequired(e.target.dataset.group,e.target.dataset.id);
             this.update();
         });
-        this.recipeElement.find('.currencies .item-delete').click(e=>{
+        this.recipeElement.find('.currencies .item-delete').click(async e => {
             this.recipe.removeCurrency();
+            await this.render();
             this.update();
         });
         this.recipeElement.find('.cost .item-add').click(e=>{
@@ -189,29 +222,42 @@ export class RecipeSheet {
             this.recipe.addTestAnd();
             this.update();
         });
-        this.recipeElement.find('.tests .testOr .item-add').click(e=>{
+        this.recipeElement.find('.tests .testOr .item-add').click(async e => {
             const and = $(e.currentTarget).data("and");
             this.recipe.addTestOr(and);
+            //first rerender so we get rid of the old data in form.
+            await this.render();
             this.update();
         });
-        this.recipeElement.find('.tests .item-delete').click(e=>{
+        this.recipeElement.find('.tests .item-delete').click(async e => {
             const and = $(e.currentTarget).data("and");
             const or = $(e.currentTarget).data("or");
-            this.recipe.removeTestOr(and,or);
+            this.recipe.removeTestOr(and, or);
+            //first rerender so we get rid of the old data in form.
+            await this.render();
             this.update();
         });
 
-        this.recipeElement.find(".beavers-test-selection select").on("change",e=>{
-                const name =  e.target.name;
-                const {ands:and, ors:or} = name.split('.').reduce((result, item, index, array) =>
-                  (item === 'ands' || item === 'ors') ? {...result, [item] : array[index + 1]} : result, {});
-                const type = $(e.target).val() as string;
-                if(this.recipe.beaversTests?.ands[and]?.ors[or]){
-                    this.recipe.beaversTests.ands[and].ors[or].type = type
-                    this.recipe.beaversTests.ands[and].ors[or]["-=data"] = null
-                }
-                this.update()
+        this.recipeElement.find(".beavers-test-selection select").on("change",async e => {
+            const name = e.target.name;
+            const { ands: and, ors: or } = name.split('.').reduce((result, item, index, array) =>
+              (item === 'ands' || item === 'ors') ? { ...result, [item]: array[index + 1] } : result, {});
+            const type = $(e.target).val() as string;
+            if (this.recipe.beaversTests?.ands[and]?.ors[or]) {
+                this.recipe.beaversTests.ands[and].ors[or].type = type;
+                this.recipe.beaversTests.ands[and].ors[or].data = {};
+            }
+            //first rerender so we get rid of the old data in form.
+            await this.render();
+            await this.update();
         })
+        //fix some systems e.g. a5e does not update for selects
+        this.recipeElement.find(".beavers-test select:not(.beavers-test .beavers-test-selection select)").on("change",async e => {e
+            await this.update();
+        });
+        this.recipeElement.find("input, .currencies select, .advanced textarea").on("change",async e => {e
+            await this.update();
+        });
 
         this.recipeElement.find('.results .crafting-item-img').on("click",e=>{
             const uuid = $(e.currentTarget).data("id");
