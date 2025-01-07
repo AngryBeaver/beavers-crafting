@@ -159,7 +159,11 @@ export class RecipeSheet {
 
     getFormData(){
         let data = {};
-        for(let el of this.recipeElement[0].elements) {
+        // @ts-ignore
+        const elements = this.recipeElement[0].querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(
+          'input, select, textarea'
+        );
+        for(let el of elements) {
             let element = el as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 
             if(element.name){ //make sure the element has a name attribute.
