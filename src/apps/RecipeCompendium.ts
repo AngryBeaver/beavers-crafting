@@ -14,7 +14,7 @@ export class RecipeCompendium {
 
     static getAllItems(): Recipe[] {
         // @ts-ignore
-        return game.items.directory.documents
+        return game.items
             .filter(item => Recipe.isRecipe(item))
             .map(item => Recipe.fromItem(item));
     }

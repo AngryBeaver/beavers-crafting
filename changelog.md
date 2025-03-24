@@ -1,4 +1,6 @@
 # Changelog
+## 4.0.12
+- fix recipeCompendium for foundry v13.338
 ## 4.0.11
 - fix recipe for some systems using formApplication
 ## 4.0.10
