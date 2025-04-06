@@ -83,14 +83,6 @@ Hooks.once("beavers-system-interface.ready", async function(){
         new ActorSheetCraftedInventory(app, html, data);
     });
 
-//Recipe remap use action
-    Hooks.on(`dnd5e.preUseItem`, (item, config, options) => {
-        if(foundry.utils.getProperty(item, `flags.${Settings.NAMESPACE}.recipe`)){
-            Crafting.fromOwned(item).craft();
-            return false;
-        }
-    });
-
 //SubTypeSheet
     Hooks.on(`renderItemSheet`, (app, html, data) => {
         RecipeSheet.bind(app, html, data);

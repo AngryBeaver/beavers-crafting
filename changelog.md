@@ -1,4 +1,7 @@
 # Changelog
+## 4.0.13
+- remove dnd5.preuseItem (is deprecated, system specific and there is no replacement of that sort)
+- fix adding bastion features.
 ## 4.0.12
 - fix recipeCompendium for foundry v13.338
 ## 4.0.11
