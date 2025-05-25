@@ -17,7 +17,7 @@ export class ActorSheetTab {
     constructor(app, html, data){
         app.beaversCraftingTabSheet = this;
         this.app = app;
-        this.html = html;
+        this.html = html.jquery ? html:$(html);
         this.data = data;
         void this.init().then(()=>{
             this.activateTab()
@@ -61,7 +61,13 @@ export class ActorSheetTab {
 
     activateTab(){
         if(this.app.activeTab !== undefined){
-            this.app._tabs[0].activate(this.app.activeTab);
+            if(this.app._tabs){ //V1
+                this.app._tabs[0].activate(this.app.activeTab);
+            }
+            if(this.app.changeTab){//V2
+                this.app.changeTab(this.app.activeTab,"primary",{force:true});
+            }
+
         }
     }
 
@@ -83,6 +89,7 @@ export class ActorSheetTab {
         });
         this.html.find('nav[data-group="primary"] [data-tab]').click(e => {
             this.app.activeTab = e.currentTarget.dataset.tab;
+            this.app.render();
         });
     }
 

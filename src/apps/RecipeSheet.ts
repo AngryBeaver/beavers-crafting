@@ -8,30 +8,46 @@ const recipeSheets: { [key: string]: RecipeSheet } = {};
 export class RecipeSheet {
     app;
     item;
-    editable:boolean;
     recipe:Recipe;
     recipeElement?;
     sheet:{
         active:string
     }
 
-    static bind(app, html, data) {
-        app.recipeSheet = this;
+    static bind(app, html, data,version) {
         if(Recipe.isRecipe(app.item)){
+            app.recipeSheet = this;
+            app.version = version;
             if(!recipeSheets[app.id]){
                 recipeSheets[app.id] = new RecipeSheet(app);
             }
             recipeSheets[app.id].init(html);
             if(!app.initialized){
-                app.options.height = 500;
-                app.options.width = 700;
-                app.setPosition({height:app.options.height,width:app.options.width});
+                let width = 700;
+                let height:any = 500;
+                if(app.options.position){//applicationV2
+                    if(app.options.position.height != "auto"){
+                        app.options.position.height = height;
+                    }else{
+                        height = "auto";
+                    }
+                    app.options.position.width = width;
+                }else {
+                    app.options.height = height;
+                    app.options.width = width;
+                }
+                app.setPosition({height:height,width:width});
             }
             app.initialized = true;
 
             app._onResize = (e)=>{
-                app.options.height = app.position.height;
-                app.options.width = app.position.width;
+                if(app.options.position){//applicationV2
+                    app.options.position.height = app.position.height;
+                    app.options.position.width = app.position.width;
+                }else {//applicationV1
+                    app.options.height = app.position.height;
+                    app.options.width = app.position.width;
+                }
             }
         }
     }
@@ -39,10 +55,13 @@ export class RecipeSheet {
     constructor(app) {
         this.app = app;
         this.item = app.item;
-        this.editable = app.options.editable;
         this.sheet = {
             active : "main"
         };
+    }
+
+    get editable() {
+        return this.app.options.editable || (this.app.isEditable && this.app._mode == 2) //V2 or DNDv5 ? //apparently it can change in V2
     }
 
     init(html){
@@ -51,7 +70,11 @@ export class RecipeSheet {
         }
         let exists = html.find(".beavers-crafting.recipe");
         if(exists.length != 0){
-            return;
+            if(this.app.version === 1){
+                return; //do not repaint
+            }else{
+                exists.remove(); // repaint everything
+            }
         }
         this.recipeElement = $('<div class="beavers-crafting recipe" style="height:100%;width:100%;padding:15px;"></div>');
         if(!this.app.form){
@@ -63,12 +86,15 @@ export class RecipeSheet {
     }
 
     addDragDrop(){
-        if(this.editable && !this.app._dragDrop?.find(d=>d.name === "recipeSheet")) {
+        if(this.editable) {
+            if (this.app._dragDrop) {
+                this.app._dragDrop = this.app._dragDrop.filter(d => d.name !== "recipeSheet");
+            }
             const dragDrop = new DragDrop({
                 dropSelector: '',
                 permissions: {
-                    dragstart: this.app._canDragStart.bind(this.app),
-                    drop: this.app._canDragDrop.bind(this.app)
+                    dragstart: ()=>true,
+                    drop: ()=>true
                 },
                 callbacks: {
                     dragstart: this.app._onDragStart.bind(this.app),
@@ -77,7 +103,7 @@ export class RecipeSheet {
                 }
             });
             dragDrop["name"]="recipeSheet";
-            this.app._dragDrop.push(dragDrop);
+            this.app?._dragDrop?.push(dragDrop);
             dragDrop.bind(this.recipeElement[0]);
         }
     }
@@ -94,11 +120,20 @@ export class RecipeSheet {
                 canRollAbility:beaversSystemInterface.configCanRollAbility,
                 hasCraftedFlag: Settings.get(Settings.SEPARATE_CRAFTED_ITEMS) !== "none",
             });
-        let description = await renderTemplate('modules/beavers-crafting/templates/recipe-description.hbs',
-            {
-                recipe: this.recipe,
-                editable:this.editable,
-            });
+        let description = "";
+        if(game["version"].split(".")[0]>=12) {
+            description = await renderTemplate('modules/beavers-crafting/templates/recipe-descriptionV12.hbs',
+              {
+                  recipe: this.recipe,
+                  editable: this.editable,
+              });
+        }else{
+            description = await renderTemplate('modules/beavers-crafting/templates/recipe-descriptionV.hbs',
+              {
+                  recipe: this.recipe,
+                  editable: this.editable,
+              });
+        }
         let template = await renderTemplate('modules/beavers-crafting/templates/recipe-sheet.hbs',{
             main: main,
             description: description,
@@ -115,8 +150,9 @@ export class RecipeSheet {
     }
 
     handleEvents(){
-
-        this.app._activateEditor(this.recipeElement.find(".editor-content")[0]);
+        if(game["version"].split(".")[0]<12) {
+            this.app._activateEditor?.(this.recipeElement.find(".editor-content")[0]);
+        }
         this.recipeElement.find('.tabs a').click(e=>{
             this.sheet.active = $(e.currentTarget).data("tab");
             this.render();
@@ -257,6 +293,11 @@ export class RecipeSheet {
         })
         //fix some systems e.g. a5e does not update for selects
         this.recipeElement.find(".beavers-test select:not(.beavers-test .beavers-test-selection select)").on("change",async e => {e
+            //fix also dnd5e v5
+            const name = e.target.name;
+            const value = $(e.target).val() as string;
+            const cleanedString = name.replace("flags.beavers-crafting.recipe.", "");
+            foundry.utils.setProperty(this.recipe,cleanedString,value);
             await this.update();
         });
         this.recipeElement.find("input, .currencies select, .advanced textarea").on("change",async e => {e

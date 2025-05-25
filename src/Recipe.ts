@@ -202,7 +202,7 @@ export class Recipe implements RecipeData {
         if(keys.length == 0){
             return 1;
         }
-        const sorted = keys.sort();
+        const sorted = keys.map(Number).sort((a, b) => a - b);
         // @ts-ignore
         return sorted[sorted.length - 1] - 1 + 2;
     }

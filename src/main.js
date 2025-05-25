@@ -44,6 +44,22 @@ async function migrate(){
     Settings.set(Settings.MAJOR_VERSION,400);
 }
 
+function debug(){
+    const originalCall = Hooks.call;
+    const originalCallAll = Hooks.callAll;
+
+// Override Hooks.call
+    Hooks.call = function (hookName, ...args) {
+        console.log(`Hook executed: ${hookName}`, { args });
+        return originalCall.call(this, hookName, ...args);
+    };
+
+// Override Hooks.callAll
+    Hooks.callAll = function (hookName, ...args) {
+        console.log(`Hook executed (callAll): ${hookName}`, { args });
+        return originalCallAll.call(this, hookName, ...args);
+    };
+}
 Hooks.once("beavers-system-interface.ready", async function(){
     Settings.init();
     if(!game[Settings.NAMESPACE])game[Settings.NAMESPACE]={};
@@ -56,7 +72,6 @@ Hooks.once("beavers-system-interface.ready", async function(){
     game[Settings.NAMESPACE].migrateDeprecateTools= migrateDeprecateTools;
     game[Settings.NAMESPACE].migrateRecipeToOrConditions= migrateRecipeToOrConditions;
     game[Settings.NAMESPACE].migrateRecipeTestsToBeaversTests= migrateRecipeTestsToBeaversTests;
-
     hookChatLog();
     migrate();
     beaversSystemInterface.addExtension(Settings.NAMESPACE,{componentAddFlags:["crafted","isCrafted"]})
@@ -77,17 +92,33 @@ Hooks.once("beavers-system-interface.ready", async function(){
     }
 
     Hooks.on("renderActorSheet", (app, html, data)=>{
-        if(!Settings.isDisabledActor(app.actor)){
-            new ActorSheetTab(app, html, data);
+        if (app instanceof Application) {
+            if (!Settings.isDisabledActor(app.actor)) {
+                new ActorSheetTab(app, html, data);
+            }
+            new ActorSheetCraftedInventory(app, html, data);
         }
-        new ActorSheetCraftedInventory(app, html, data);
     });
 
-//SubTypeSheet
+    //SubTypeSheet
     Hooks.on(`renderItemSheet`, (app, html, data) => {
-        RecipeSheet.bind(app, html, data);
-        AnyOfSheet.bind(app,html,data);
+        if (app instanceof Application) {
+            RecipeSheet.bind(app, html, data, 1);
+            AnyOfSheet.bind(app, html, data);
+            CraftedItemSheet.bind(app, html, data);
+        }
+    });
+
+    Hooks.on(`renderApplicationV2`, (app, html, data, options) => {
+        RecipeSheet.bind(app, html, data,2);
+        AnyOfSheet.bind(app,html,data,2);
         CraftedItemSheet.bind(app, html, data);
+        if(app.actor) {
+            if (!Settings.isDisabledActor(app.actor)) {
+                new ActorSheetTab(app, html, data);
+            }
+            new ActorSheetCraftedInventory(app, html, data);
+        }
     });
 
 

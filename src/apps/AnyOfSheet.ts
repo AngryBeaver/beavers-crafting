@@ -7,16 +7,16 @@ const anyOfSheets: { [key: string]: AnyOfSheet } = {};
 export class AnyOfSheet {
     app;
     item;
-    editable: boolean;
     anyOf: AnyOf;
     anyOfElement?;
     checkItem?;
     timeout?;
 
 
-    static bind(app, html) {
+    static bind(app, html, version) {
         if (AnyOf.isAnyOf(app.item)) {
             app.anyOf = this;
+            app.version = version;
             if (!anyOfSheets[app.id]) {
                 anyOfSheets[app.id] = new AnyOfSheet(app);
             }
@@ -24,10 +24,13 @@ export class AnyOfSheet {
         }
     }
 
+    get editable() {
+        return this.app.options.editable || (this.app.isEditable && this.app._mode == 2) //V2 or DNDv5
+    }
+
     constructor(app) {
         this.app = app;
         this.item = app.item;
-        this.editable = app.options.editable;
     }
 
     init(html) {
@@ -35,11 +38,15 @@ export class AnyOfSheet {
         if (html[0].localName !== "div") {
             html = $(html[0].parentElement.parentElement);
         }
-        let exists = html.find(".sheet-body .beavers-crafting");
-        if (exists.length != 0) {
-            return;
+        let exists = html.find(".beavers-crafting.any-of");
+        if(exists.length != 0){
+            if(this.app.version === 1){
+                return; //do not repaint
+            }else{
+                exists.remove(); // repaint everything
+            }
         }
-        this.anyOfElement = $('<div class="beavers-crafting"></div>');
+        this.anyOfElement = $('<div class="beavers-crafting any-of" style="height:100%;width:100%;padding:15px;"></div>');
         beaversSystemInterface.itemSheetReplaceContent(this.app,html,this.anyOfElement);
         this.render().then(()=>this.addDragDrop());
     }
@@ -69,12 +76,14 @@ export class AnyOfSheet {
 
     addDragDrop() {
         if (this.editable) {
-            this.app._dragDrop = this.app._dragDrop.filter(d=>d.name !== "anyOfSheet")
+            if (this.app._dragDrop) {
+                this.app._dragDrop = this.app._dragDrop.filter(d => d.name !== "anyOfSheet");
+            }
             const dragDrop = new DragDrop({
                 dropSelector: '',
                 permissions: {
-                    dragstart: this.app._canDragStart.bind(this.app),
-                    drop: this.app._canDragDrop.bind(this.app)
+                    dragstart: ()=>true,
+                    drop: ()=>true
                 },
                 callbacks: {
                     dragstart: this.app._onDragStart.bind(this.app),
@@ -83,7 +92,7 @@ export class AnyOfSheet {
                 }
             });
             dragDrop["name"]="anyOfSheet";
-            this.app._dragDrop.push(dragDrop);
+            this.app._dragDrop?.push(dragDrop);
             dragDrop.bind(this.anyOfElement[0]);
         }
     }

@@ -1,9 +1,9 @@
 {
 	"name": "beavers-crafting",
 	"title": "Beaver's Crafting",
-	"version": "4.0.13",
+	"version": "4.0.14",
 	"description": "Crafting",
-	"#devDir": "c:\\vtts\\v13.338\\Data\\modules",
+	"#devDir": "c:\\vtts\\v13.342\\Data\\modules",
 	"devDir": "c:\\vtts\\v12.331\\Data\\modules",
 	"#devDir": "c:\\vtts\\v11.315\\Data\\modules",
 	"main": "src/main.js",
