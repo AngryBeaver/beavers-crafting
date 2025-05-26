@@ -1,7 +1,9 @@
 # Changelog
+## 4.0.15
+- more fixes for ApplicationV2 tested on wfrp4e
 ## 4.0.14
 - fix for ApplicationV2 tested on dnd5 v5
-- fixed problmen with more then 10 items.
+- fixed problmen with more then 10 items.~~
 ## 4.0.13
 - remove dnd5.preuseItem (is deprecated, system specific and there is no replacement of that sort)
 - fix adding bastion features.

@@ -61,7 +61,8 @@ export class RecipeSheet {
     }
 
     get editable() {
-        return this.app.options.editable || (this.app.isEditable && this.app._mode == 2) //V2 or DNDv5 ? //apparently it can change in V2
+        return this.app.options.editable ||
+          (this.app.isEditable && (this.app._mode == undefined || this.app._mode == 2)) //V2 or DNDv5 ? //apparently it can change in V2
     }
 
     init(html){

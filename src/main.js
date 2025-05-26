@@ -60,6 +60,7 @@ function debug(){
         return originalCallAll.call(this, hookName, ...args);
     };
 }
+debug();
 Hooks.once("beavers-system-interface.ready", async function(){
     Settings.init();
     if(!game[Settings.NAMESPACE])game[Settings.NAMESPACE]={};
@@ -136,35 +137,57 @@ Hooks.once("beavers-system-interface.ready", async function(){
 // own type does not yet work for all supported systems.
 
     Hooks.on("getDialogHeaderButtons", (dialog,buttons) => {
-        if(Settings.get(Settings.CAPTURE_CREATE_ITEM_TITLE)) {
-            buttons.unshift({
-                class: "beavers-crafting-create-recipe",
-                icon: "fas fa-bullseye",
-                label: "",
-                onclick: async (e) => {
-                    ui.notifications.info("Capture and set title of window for beavers-crafting module to "+dialog.data.title);
-                    Settings.set(Settings.CREATE_ITEM_TITLE, dialog.data.title);
-                    Settings.set(Settings.CAPTURE_CREATE_ITEM_TITLE,false);
-                    $(e.currentTarget).parent().find("a.close").trigger("click");
-                }
-            });
-        }
+        hookForCatchingDialogTitle(dialog,buttons) //v1
+    });
+    Hooks.on("getHeaderControlsApplicationV2", (dialog,buttons) => {
+        hookForCatchingDialogTitle(dialog,buttons)
     });
 
-    Hooks.on("renderDialog", (app, html, content) => {
-        const title = game.settings.get(Settings.NAMESPACE,Settings.CREATE_ITEM_TITLE)||"Create New Item";
+    function hookForCatchingDialogTitle(dialog, buttons){
+        if(Settings.get(Settings.CAPTURE_CREATE_ITEM_TITLE)) {
+            var title = dialog.data?.title || dialog.options.window.title;
+            var captureItemWindow = (e)=> {
+                ui.notifications.info("Capture and set title of window for beavers-crafting module to "+title);
+                Settings.set(Settings.CREATE_ITEM_TITLE, title);
+                Settings.set(Settings.CAPTURE_CREATE_ITEM_TITLE,false);
+                dialog.close()
+            }
+            buttons.unshift({
+                action: "captureItemWindow",
+                icon: "fas fa-bullseye",
+                label: "capture item creation window",
+                onClick: captureItemWindow,
+                onclick: captureItemWindow
+            });
+        }
+    }
 
-        if (app.data.title === title) {
-            if (html[0].localName !== "div") {
+    function hookForCatchingCreateItemDialog(app, html, version){
+        if (version === 1 || app instanceof foundry.applications?.api?.ApplicationV2) {
+            const title = game.settings.get(Settings.NAMESPACE, Settings.CREATE_ITEM_TITLE) || "Create New Item";
+            if(!html.jquery) html = $(html);
+            if (html[0]?.localName !== "div" && html[0]?.localName !== "dialog") {
                 html = $(html[0].parentElement.parentElement);
             }
-            if(game.system.id === "dnd5e" && game["dnd5e"].version.split(".")[0]>=3){
-                dnd5e(html);
-                app.setPosition({height:"auto"});
-            }else{
-                legacy(html);
+            let windowTitle = app.data?.title;//V1
+            if(!windowTitle) windowTitle = app.options.window.title; //V2
+            if (windowTitle === title || windowTitle === "Create Item" || windowTitle === "Create New Item") {
+                if (game.system.id === "dnd5e" && game["dnd5e"].version.split(".")[0] >= 3) {
+                    dnd5e(html);
+                    app.setPosition({ height: "auto" });
+                } else {
+                    legacy(html);
+                }
             }
         }
+    }
+
+    Hooks.on("renderDialog", (app, html, content) => {
+        hookForCatchingCreateItemDialog(app,html,1);
+    });
+
+    Hooks.on("renderDialogV2", (app, html, content) => {
+        hookForCatchingCreateItemDialog(app,html,2);
     });
     //pathfinder1
     Hooks.on("renderItemCreateDialog", (app, html, content) => {
