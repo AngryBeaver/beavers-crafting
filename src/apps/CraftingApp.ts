@@ -6,6 +6,7 @@ import {AnyOf} from "../AnyOf.js";
 import {Recipe} from "../Recipe.js";
 import {Result} from "../Result.js";
 import {TestHandler} from "../TestHandler.js";
+import { sortByFolder } from "../helpers/Folder.js";
 
 export class CraftingApp extends Application {
     data: {
@@ -68,25 +69,8 @@ export class CraftingApp extends Application {
         if(Object.values(data.filterItems).length != 0) {
             recipes = await RecipeCompendium.filterForItems(recipes, Object.values(data.filterItems));
         }
-        recipes.sort(
-            (a,b)=> {
-                return recursiveSort(a, a.folder, b, b.folder)
-        });
+        data.folders = sortByFolder(recipes);
 
-        function recursiveFolder(data,folder,recipe){
-            if(folder === undefined || folder === ""){
-                data[''] = data[''] || [];
-                data[''].push(recipe);
-            }else{
-                const parts = folder.split(/\.(.*)/s);
-                data[parts[0]] = data[parts[0]] || {folders:{}}
-                recursiveFolder(data[parts[0]].folders,parts[1],recipe);
-            }
-        }
-
-        recipes.forEach(recipe=>{
-            recursiveFolder(data.folders,recipe.folder,recipe);
-        });
         data.recipes = recipes;
         if(!data.selected){
             data.selected = data.recipes[0]?.uuid;
@@ -346,36 +330,5 @@ export class CraftingApp extends Application {
 
     protected _canDragDrop(selector: string): boolean {
         return true;
-    }
-}
-
-
-function recursiveSort(a, afolder:string|undefined,b, bfolder:string|undefined){
-    if(afolder === undefined || afolder === ""){
-        if(bfolder !== undefined && bfolder !== ""){
-            return 1
-        }else{
-            if(a.name < b.name){
-                return -1
-            }
-            if(a.name > b.name){
-                return 1;
-            }
-            return 0
-        }
-    }else{
-        if(bfolder === undefined || bfolder === ""){
-            return -1
-        }else{
-            const aparts = afolder.split(/\.(.*)/s);
-            const bparts = bfolder.split(/\.(.*)/s);
-            if(aparts[0] < bparts[0]){
-                return -1
-            }else if(aparts[0] > bparts[0]){
-                return 1;
-            }else {
-                return recursiveSort(a, aparts[1],b, bparts[1])
-            }
-        }
     }
 }

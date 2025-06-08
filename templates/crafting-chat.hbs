@@ -14,19 +14,10 @@
                 {{#if (not (eq data.status "success"))}}
                     <div class="statusbar error">
                         <div class="fill"
-                             style="background: linear-gradient(to right, darkred {{data.tests.failPer}}%, transparent 0)">
+                             style="background: linear-gradient(to right, darkred {{data.beaversTests.failPer}}%, transparent 0)">
                             {{data.beaversTests.failPer}}%
                         </div>
                     </div>
-                {{/if}}
-            </div>
-            <div class="attribute">
-                {{#if (eq data.status "active") }}
-                    <i class="fas fa-forward-step" style="width:13px; text-align:center;"></i>
-                {{else if (eq data.status "success") }}
-                    <i class="fas fa-check" style="width:13px; text-align:center;color:darkgreen"></i>
-                {{else if (eq data.status "error") }}
-                    <i class="fas fa-times" style="width:13px; text-align:center;color:darkred"></i>
                 {{/if}}
             </div>
         </div>

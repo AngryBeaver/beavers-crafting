@@ -1,85 +1,28 @@
 <div class="beavers-crafting actor-tab" style="overflow:auto">
 
-    <div class="flexcol" style="min-width:470px;">
-        <div class="flexrow beavers-line"
-             style="flex-wrap:nowrap;margin:5px;">
-            <div> </div>
-            <div class="attribute" style="min-width:60px;margin:5px">
-                <div class="addCrafting">
-                        <i class="fas fa-plus"></i>
-                        {{localize "beaversCrafting.actorSheet.table.add" }}
-                </div>
-            </div>
-        </div>
-        {{#each craftingFolder}}
-            <h3 class="flexrow header beavers-line">
-                <div class="scale">{{@key}}{{#if (eq @key "")}}...{{/if}}</div>
-                <div class="attribute" style="min-width:150px;text-align:center;">{{localize
-                        "beaversCrafting.actorSheet.table.progress"}}</div>
-                <div class="attribute" style="min-width:100px;text-align:center">{{localize
-                        "beaversCrafting.actorSheet.table.status"}}</div>
-                <div class="attribute" style="min-width:50px">
-                    <!--a class="addCrafting"><i class="fa-solid fa-circle-plus"></i></a-->
-                </div>
-            </h3>
-            {{#each this}}
-                <div class="beavers-crafting-item">
-                    <div class="flexrow beavers-line" style="padding:2px 5px;line-height:24px;">
-                        <div onclick="$(this).parents('.beavers-crafting-item').toggleClass('describe')">
-                            <div class="crafting-rollIcon"
-                                 style="text-indent:28px;background-repeat:no-repeat; background-size:24px 24px; background-image: url('{{this.chatData.img}}')">
-                                <span style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{this.chatData.name}}</span>
-                            </div>
-                        </div>
-                        {{#if (eq this.chatData.status "active") }}
-                            <div class="attribute">
-                                <a class="advanceCrafting beavers-line flexrow" style="width:150px;flex-wrap:nowrap"
-                                   data-id="{{this.id}}">
-                                  {{{this.crafting.nextTest}}}
-                                    <i class="attribute fas fa-forward-step"
-                                       style="width:13px;margin:auto; text-align:center;"></i>
-                                </a>
-                            </div>
-                        {{/if}}
-                        <div class="attribute flexrow" style="min-width:100px">
-                            {{#if (and (not (eq this.chatData.status "success")) (gt this.crafting.recipe.beaversTests.fails 0)) }}
-                                <div class="statusbar error">
-                                    <div class="fill"
-                                         style="background: linear-gradient(to right, darkred {{this.chatData.beaversTests.failPer}}%, transparent 0)">
-                                        {{this.chatData.beaversTests.failPer}}%
-                                    </div>
-                                </div>
-                            {{/if}}
-                            {{#if (not (eq this.chatData.status "error"))}}
-                                <div class="statusbar success">
-                                    <div class="fill"
-                                         style="background: linear-gradient(to right, darkgreen {{this.chatData.beaversTests.hitPer}}%, transparent 0);">
-                                        {{this.chatData.beaversTests.hitPer}}%
-                                    </div>
-                                </div>
-                            {{/if}}
-                        </div>
-                        <div class="attribute option">
-                            <a class="describeCrafting"
-                               onclick="$(this).parents('.beavers-crafting-item').toggleClass('describe')">
-                                <i class="fas fa-square-chevron-down"></i>
-                                <i class="fas fa-square-chevron-up"></i>
-                            </a>
-                        </div>
-                        <div class="attribute">
-                            <a class="removeCrafting" data-id="{{this.id}}">
-                                <i class="fas fa-trash" data-id="{{this.id}}"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="crafting-description">
-                        {{>beavers-recipe chatData=this.chatData recipe=this.crafting.recipe}}
-                    </div>
-                </div>
-                {{#if (not @last)}}
-                    <div class="beavers-seperator"></div>
-                {{/if}}
-            {{/each}}
-        {{/each}}
+  <div class="flexcol" style="min-width:470px;">
+    <h3 class="flexrow header beavers-line">
+      <div class="scale">{{localize
+        "beaversCrafting.actorSheet.table.name"}}</div>
+      <div class="attribute" style="min-width:150px;text-align:center;">{{localize
+        "beaversCrafting.actorSheet.table.progress"}}</div>
+      <div class="attribute" style="min-width:100px;text-align:center">{{localize
+        "beaversCrafting.actorSheet.table.status"}}</div>
+      <div class="attribute" style="min-width:50px">
+        <!--a class="addCrafting"><i class="fa-solid fa-circle-plus"></i></a-->
+      </div>
+    </h3>
+    <div class="beavers-crafting-item">
+      <div class="flexrow beavers-line" style="padding:2px 5px;line-height:24px;text-align:right">
+        <a class="addCrafting">
+          <div class="crafting-rollIcon">
+            <i class="fa-solid fa-circle-plus"></i>
+            <span>{{localize "beaversCrafting.actorSheet.table.add" }}</span>
+          </div>
+        </a>
+      </div>
     </div>
+  </div>
+  <div class="beavers-seperator"></div>
+    {{>beavers-folders renderTemplate="beavers-actor-folder-item"}}
 </div>

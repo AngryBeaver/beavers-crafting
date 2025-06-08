@@ -60,7 +60,7 @@ function debug(){
         return originalCallAll.call(this, hookName, ...args);
     };
 }
-debug();
+
 Hooks.once("beavers-system-interface.ready", async function(){
     Settings.init();
     if(!game[Settings.NAMESPACE])game[Settings.NAMESPACE]={};
@@ -191,6 +191,7 @@ Hooks.once("beavers-system-interface.ready", async function(){
     });
     //pathfinder1
     Hooks.on("renderItemCreateDialog", (app, html, content) => {
+        if(!html.jquery) html = $(html);
         legacy(html);
     });
 
@@ -245,8 +246,14 @@ Hooks.once("beavers-system-interface.ready", async function(){
         })
     }
 
-    getTemplate('modules/beavers-crafting/templates/beavers-recipe-folders.hbs').then(t=>{
-        Handlebars.registerPartial('beavers-recipe-folders', t);
+    getTemplate('modules/beavers-crafting/templates/beavers-folders.hbs').then(t=>{
+        Handlebars.registerPartial('beavers-folders', t);
+    });
+    getTemplate('modules/beavers-crafting/templates/beavers-recipe-folder-item.hbs').then(t=>{
+        Handlebars.registerPartial('beavers-recipe-folder-item', t);
+    });
+    getTemplate('modules/beavers-crafting/templates/beavers-actor-folder-item.hbs').then(t=>{
+        Handlebars.registerPartial('beavers-actor-folder-item', t);
     });
     getTemplate('modules/beavers-crafting/templates/beavers-recipe-component.hbs').then(t=>{
         Handlebars.registerPartial('beavers-recipe-component', t);
@@ -265,4 +272,10 @@ Handlebars.registerHelper('beavers-isEmpty', function (value, options) {
 
 Handlebars.registerHelper("beavers-objectLen", function(json) {
     return Object.keys(json).length;
+});
+Handlebars.registerHelper('beavers-split', function (input, delimiter) {
+    if (typeof input === 'string') {
+        return input.split(delimiter); // Split the string by the specified delimiter
+    }
+    return []; // Return an empty array if input is not a string
 });

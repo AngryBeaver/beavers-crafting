@@ -69,7 +69,7 @@ export class RecipeSheet {
         if(html[0].localName !== "div") {
             html = $(html[0].parentElement.parentElement);
         }
-        let exists = html.find(".beavers-crafting.recipe");
+        let exists = html.find(".beavers-recipe-sheet");
         if(exists.length != 0){
             if(this.app.version === 1){
                 return; //do not repaint
@@ -77,9 +77,9 @@ export class RecipeSheet {
                 exists.remove(); // repaint everything
             }
         }
-        this.recipeElement = $('<div class="beavers-crafting recipe" style="height:100%;width:100%;padding:15px;"></div>');
+        this.recipeElement = $('<div class="beavers-crafting" style="height:100%;width:100%;padding:15px;"></div>');
         if(!this.app.form){
-            this.recipeElement = $('<form class="beavers-crafting recipe" style="height:100%;width:100%;padding:15px;"></form>')
+            this.recipeElement = $('<form class="beavers-crafting" style="height:100%;width:100%;padding:15px;"></form>')
         }
         beaversSystemInterface.itemSheetReplaceContent(this.app,html,this.recipeElement);
         this.recipe = Recipe.fromItem(this.item);
@@ -87,7 +87,7 @@ export class RecipeSheet {
     }
 
     addDragDrop(){
-        if(this.editable) {
+        if(this.editable && !(this.app.version ==1 && this.app._dragDrop?.find(d=>d.name === "recipeSheet"))) {
             if (this.app._dragDrop) {
                 this.app._dragDrop = this.app._dragDrop.filter(d => d.name !== "recipeSheet");
             }
@@ -142,7 +142,7 @@ export class RecipeSheet {
             advanced: "test",
             recipe: this.recipe
         });
-        this.recipeElement.find('.recipe').remove();
+        this.recipeElement.find('.beavers-recipe-sheet').remove();
         this.recipeElement.append(template);
         if(this.app.scrollToPosition){
             this.recipeElement.scrollTop(this.app.scrollToPosition)
@@ -328,9 +328,9 @@ export class RecipeSheet {
 
     async _onDropMain(e){
         const isDrop = $(e.target).hasClass("drop-area");
-        const isInput = $(e.target).parents(".beavers-crafting.recipe .ingredients").length !==0;
-        const isOutput = $(e.target).parents(".beavers-crafting.recipe .results").length !==0;
-        const isRequired = $(e.target).parents(".beavers-crafting.recipe .attendants").length !==0;
+        const isInput = $(e.target).parents(".beavers-recipe-sheet .ingredients").length !==0;
+        const isOutput = $(e.target).parents(".beavers-recipe-sheet .results").length !==0;
+        const isRequired = $(e.target).parents(".beavers-recipe-sheet .attendants").length !==0;
         if(!isDrop&& !isInput && !isOutput && !isRequired){
             return;
         }

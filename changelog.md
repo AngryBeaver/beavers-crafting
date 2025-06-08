@@ -1,4 +1,8 @@
 # Changelog
+## 4.1.0
+- re-style
+- add color scheme
+- fix drop-area for some applicationV1 systems
 ## 4.0.15
 - more fixes for ApplicationV2 tested on wfrp4e
 ## 4.0.14

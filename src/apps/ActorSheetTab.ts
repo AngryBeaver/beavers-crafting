@@ -1,15 +1,12 @@
 import {CraftingApp} from "./CraftingApp.js";
 import {Crafting} from "../Crafting.js";
 import {Settings} from "../Settings.js";
+import { sortByFolder } from "../helpers/Folder.js";
 
 export class ActorSheetTab {
     app;
     html;
-    data;
     system:System;
-    craftingFolder: {
-        [key:string]:{id:string, crafting:Crafting,chatData:{}}[]
-    } = {}
     craftingList:{
         [key:string]:Crafting
     } = {};
@@ -18,7 +15,6 @@ export class ActorSheetTab {
         app.beaversCraftingTabSheet = this;
         this.app = app;
         this.html = html.jquery ? html:$(html);
-        this.data = data;
         void this.init().then(()=>{
             this.activateTab()
         });
@@ -28,34 +24,26 @@ export class ActorSheetTab {
         const label = Settings.get(Settings.TAB_NAME) || game["i18n"].localize("beaversCrafting.actorSheet.tab");
         const icon = Settings.get(Settings.TAB_ICON) || "fa-scroll";
         const flag = foundry.utils.getProperty(this.app.actor,`flags.${Settings.NAMESPACE}.crafting`) || {};
-        const unsortedFolders = {};
+        const unsortedFolders:Array<{
+            folder: string;
+            [key: string]: any;
+        }> = []
         for(const [x,y] of Object.entries(flag)){
             const craftingData = (y as CraftingData);
             const crafting = new Crafting(craftingData,this.app.actor);
             let folder = "";
             if(crafting.recipe.folder){
-                folder = crafting.recipe.folder.split(".")[0];
+                folder = crafting.recipe.folder;
             }
             this.craftingList[x] = crafting;
-            if(!unsortedFolders[folder] ){
-                unsortedFolders[folder] = [];
-            }
-            unsortedFolders[folder].push({id:x,crafting:crafting, chatData: crafting.getChatData()});
+            unsortedFolders.push({folder:folder,crafting:crafting,chatData:crafting.getChatData(),id:x});
         }
-        Object.keys(unsortedFolders).sort().forEach((k)=> {
-            if (k !== "") {
-                this.craftingFolder[k] = unsortedFolders[k];
-            }
-        })
-        if(unsortedFolders[""]){
-            this.craftingFolder[""] = unsortedFolders[""];
-        }
-
+        const sortedFolders = sortByFolder(unsortedFolders)
         const tabBody = $(await renderTemplate('modules/beavers-crafting/templates/actor-sheet-tab.hbs',
             {
-                craftingFolder:this.craftingFolder,
+                folders:sortedFolders,
             }));
-        beaversSystemInterface.actorSheetAddTab(this.app, this.html, this.data.actor, { id: Settings.ACTOR_TAB_ID, label: label, html: `<i class="fas ${icon}"/>` }, tabBody);
+        beaversSystemInterface.actorSheetAddTab(this.app, this.html, this.app.actor, { id: Settings.ACTOR_TAB_ID, label: label, html: `<i class="fas ${icon}"/>` }, tabBody);
         this.activateListeners(tabBody);
     }
 
@@ -90,6 +78,9 @@ export class ActorSheetTab {
         this.html.find('nav [data-group="primary"][data-tab]').click(e => {
             this.app.activeTab = e.currentTarget.dataset.tab;
             this.app.render();
+        });
+        this.html.find(".folderName").on("click", (e)=>{
+            $(e.currentTarget).parent(".folder").toggleClass(["open","close"]);
         });
     }
 

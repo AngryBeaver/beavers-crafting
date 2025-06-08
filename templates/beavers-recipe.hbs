@@ -29,7 +29,7 @@
                   {{/if}}
                 </div>
               </div>
-              <div class="folderContent">
+              <div class="folderContent" style="padding-left:8px;border-color:transparent">
                 {{#each recipe.beaversTests.ands}}
                   <div class="flexrow">
                                 <span style="flex:0" class="flexcol">
@@ -120,15 +120,11 @@
             <div class="header">
               {{localize "beaversCrafting.crafting-app.required"}}
             </div>
-            <div class="flexcol attendants beavers-recipe-body beavers-folder">
-              <div class="folder open">
+            <div class="flexcol attendants beavers-recipe-body ">
+              <div>
                 {{#each recipe.required}}
-                  <div class="folderContent">
+                  <div>
                     <div class="flexrow">
-                      <div style="flex:0" class="flexcol">
-                        <span class="border top"></span>
-                        {{#if @last}}<span></span>{{else}}<span class="border"></span>{{/if}}
-                      </div>
                       <div class="data-section flexcol">
                         {{#each this}}
                           {{#if (gt (beavers-objectLen ../this) 1)}}
@@ -158,15 +154,10 @@
               {{localize "beaversCrafting.crafting-app.cost"}}
             </div>
             <div class="flexcol ingredients beavers-recipe-body beavers-folder">
-              <div class="folder open">
+              <div>
                 {{#if currencyComponent}}
-                  <div class="folderContent">
+                  <div >
                     <div class="flexrow">
-                      <div style="flex:0" class="flexcol">
-                        <span class="border top"></span>
-                        {{#if (beavers-isEmpty recipe.input)}}<span></span>{{else}}
-                          <span class="border"></span>{{/if}}
-                      </div>
                       <div class="data-section flexcol">
                         {{>beavers-recipe-component type="input" component=currencyComponent status=precast.currencies.status}}
                       </div>
@@ -175,12 +166,8 @@
                 {{/if}}
                 {{#if (not (beavers-isEmpty recipe.input))}}
                   {{#each recipe.input}}
-                    <div class="folderContent">
+                    <div>
                       <div class="flexrow">
-                        <div style="flex:0" class="flexcol">
-                          <span class="border top"></span>
-                          {{#if @last}}<span></span>{{else}}<span class="border"></span>{{/if}}
-                        </div>
                         <div class="data-section flexcol">
                           {{#each this}}
                             {{#if (gt (beavers-objectLen ../this) 1)}}
@@ -212,14 +199,10 @@
               {{localize "beaversCrafting.crafting-app.result"}}
             </div>
             <div class="flexcol results beavers-recipe-body beavers-folder">
-              <div class="folder open">
+              <div>
                 {{#each recipe.output}}
-                  <div class="folderContent">
+                  <div>
                     <div class="flexrow">
-                      <div style="flex:0" class="flexcol">
-                        <span class="border top"></span>
-                        {{#if @last}}<span></span>{{else}}<span class="border"></span>{{/if}}
-                      </div>
                       <div class="data-section flexcol">
                         {{#each this}}
                           {{#if (gt (beavers-objectLen ../this) 1)}}
