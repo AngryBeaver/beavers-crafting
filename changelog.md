@@ -1,4 +1,6 @@
 # Changelog
+## 4.1.1
+- fix a bug with missing hbs file thanks to Matt/WookieeChan to point that out.
 ## 4.1.0
 - re-style
 - add color scheme

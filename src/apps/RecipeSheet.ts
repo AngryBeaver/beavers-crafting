@@ -129,7 +129,7 @@ export class RecipeSheet {
                   editable: this.editable,
               });
         }else{
-            description = await renderTemplate('modules/beavers-crafting/templates/recipe-descriptionV.hbs',
+            description = await renderTemplate('modules/beavers-crafting/templates/recipe-description.hbs',
               {
                   recipe: this.recipe,
                   editable: this.editable,
