@@ -1,4 +1,6 @@
 # Changelog
+## 4.1.2
+- fix a bug with drop-area for dnd applicationV1 system
 ## 4.1.1
 - fix a bug with missing hbs file thanks to Matt/WookieeChan to point that out.
 ## 4.1.0

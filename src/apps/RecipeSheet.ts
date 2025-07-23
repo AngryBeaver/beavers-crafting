@@ -87,12 +87,14 @@ export class RecipeSheet {
     }
 
     addDragDrop(){
-        if(this.editable && !(this.app.version ==1 && this.app._dragDrop?.find(d=>d.name === "recipeSheet"))) {
-            if (this.app._dragDrop) {
-                this.app._dragDrop = this.app._dragDrop.filter(d => d.name !== "recipeSheet");
+        if(this.editable) {
+            var recipeSheetDragDrop = this.app._dragDrop?.filter(d => d.name == "recipeSheet")[0];
+            if (recipeSheetDragDrop && this.app.version === 1) {
+                recipeSheetDragDrop.bind(this.recipeElement[0]);
+                return;
             }
             const dragDrop = new DragDrop({
-                dropSelector: '',
+                dropSelector: '.drop-area',
                 permissions: {
                     dragstart: ()=>true,
                     drop: ()=>true
