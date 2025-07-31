@@ -35,14 +35,14 @@ async function applyCompatibility(api) {
     }
 
     const classicHtml = '<div class="sheet-body scroll-container"><section class="tab-body"></section></div>';
-	const classicLayout = { layout: 'classic' };
-	api.registerCharacterTab(createCraftingTab(api, classicHtml), classicLayout);
-	api.registerNpcTab(createCraftingTab(api, classicHtml), classicLayout);
-	api.registerVehicleTab(createCraftingTab(api, classicHtml), classicLayout);
-	
-	const quadroneHtml = '<section class="tab-body"></section>';
-	const quadroneLayout = { layout: 'quadrone' };
-	api.registerCharacterTab(createCraftingTab(api, quadroneHtml), quadroneLayout);
-	api.registerNpcTab(createCraftingTab(api, quadroneHtml), quadroneLayout);
-	api.registerVehicleTab(createCraftingTab(api, quadroneHtml), quadroneLayout);
+    const classicLayout = { layout: 'classic' };
+    api.registerCharacterTab(createCraftingTab(api, classicHtml), classicLayout);
+    api.registerNpcTab(createCraftingTab(api, classicHtml), classicLayout);
+    api.registerVehicleTab(createCraftingTab(api, classicHtml), classicLayout);
+
+    const quadroneHtml = '<section class="tab-body"></section>';
+    const quadroneLayout = { layout: 'quadrone' };
+    api.registerCharacterTab(createCraftingTab(api, quadroneHtml), quadroneLayout);
+    api.registerNpcTab(createCraftingTab(api, quadroneHtml), quadroneLayout);
+    api.registerVehicleTab(createCraftingTab(api, quadroneHtml), quadroneLayout);
 }
