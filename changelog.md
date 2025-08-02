@@ -1,4 +1,7 @@
 # Changelog
+## 4.1.3
+- fix tidy 5e actor tab
+- fix click to show item preview
 ## 4.1.2
 - fix a bug with drop-area for dnd applicationV1 system
 ## 4.1.1

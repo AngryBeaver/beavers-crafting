@@ -775,3 +775,7 @@ actor-sheet
 .pf1.sheet .primary-body .beavers-crafting.recipe{
     overflow-y:unset !important;
 }
+
+.tidy-tab-contents.active .beavers-crafting-actor-tab {
+    display:block !important;
+}

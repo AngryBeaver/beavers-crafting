@@ -307,22 +307,22 @@ export class RecipeSheet {
             await this.update();
         });
 
-        this.recipeElement.find('.results .crafting-item-img').on("click",e=>{
+        this.recipeElement.find('.results .beavers-component .clickable').on("click",e=>{
             const uuid = $(e.currentTarget).data("id");
             if(Settings.get(Settings.DISPLAY_RESULTS)) {
-                beaversSystemInterface.uuidToDocument(uuid).then(i=>i.sheet._render(true));
+                beaversSystemInterface.uuidToDocument(uuid).then(i=>i.sheet.render(true));
             }
         });
-        this.recipeElement.find('.ingredients .crafting-item-img').on("click",e=>{
+        this.recipeElement.find('.ingredients .beavers-component .clickable').on("click",e=>{
             const uuid = $(e.currentTarget).data("id");
             if(Settings.get(Settings.DISPLAY_INGREDIENTS)) {
-                beaversSystemInterface.uuidToDocument(uuid).then(i=>i.sheet._render(true));
+                beaversSystemInterface.uuidToDocument(uuid).then(i=>i.sheet.render(true));
             }
         });
-        this.recipeElement.find('.attendants .crafting-item-img').on("click",e=>{
+        this.recipeElement.find('.attendants .beavers-component .clickable').on("click",e=>{
             const uuid = $(e.currentTarget).data("id");
             if(Settings.get(Settings.DISPLAY_INGREDIENTS)) {
-                beaversSystemInterface.uuidToDocument(uuid).then(i=>i.sheet._render(true));
+                beaversSystemInterface.uuidToDocument(uuid).then(i=>i.sheet.render(true));
             }
         });
     }
