@@ -12,9 +12,9 @@ Hooks.once('tidy5e-sheet.ready', async (api) => {
 });
 
 async function applyCompatibility(api) {
-    function createCraftingTab(api) {
+    function createCraftingTab(api, html) {
         return new api.models.HtmlTab({
-            html: '<div class="sheet-body scroll-container"><section class="tab-body"></section></div>',
+            html: html,
             title: 'beaversCrafting.actorSheet.tab',
             tabId: 'beavers-crafting-tab',
             tabContentsClasses: ['beavers-crafting'],
@@ -34,7 +34,15 @@ async function applyCompatibility(api) {
         });
     }
 
-    api.registerCharacterTab(createCraftingTab(api));
-    api.registerNpcTab(createCraftingTab(api));
-    api.registerVehicleTab(createCraftingTab(api));
+    const classicHtml = '<div class="sheet-body scroll-container"><section class="tab-body"></section></div>';
+    const classicLayout = { layout: 'classic' };
+    api.registerCharacterTab(createCraftingTab(api, classicHtml), classicLayout);
+    api.registerNpcTab(createCraftingTab(api, classicHtml), classicLayout);
+    api.registerVehicleTab(createCraftingTab(api, classicHtml), classicLayout);
+
+    const quadroneHtml = '<section class="tab-body"></section>';
+    const quadroneLayout = { layout: 'quadrone' };
+    api.registerCharacterTab(createCraftingTab(api, quadroneHtml), quadroneLayout);
+    api.registerNpcTab(createCraftingTab(api, quadroneHtml), quadroneLayout);
+    api.registerVehicleTab(createCraftingTab(api, quadroneHtml), quadroneLayout);
 }
