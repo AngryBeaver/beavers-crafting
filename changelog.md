@@ -1,4 +1,7 @@
 # Changelog
+## 4.1.4
+- fix consume on Error
+- add resizeable to item sheets v2
 ## 4.1.3
 - fix tidy 5e actor tab
 - fix click to show item preview

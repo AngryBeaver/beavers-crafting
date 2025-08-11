@@ -102,24 +102,24 @@ Hooks.once("beavers-system-interface.ready", async function(){
     });
 
     //SubTypeSheet
-    Hooks.on(`renderItemSheet`, (app, html, data) => {
-        if (app instanceof Application) {
-            RecipeSheet.bind(app, html, data, 1);
-            AnyOfSheet.bind(app, html, data);
-            CraftedItemSheet.bind(app, html, data);
-        }
+    Hooks.on(`renderItemSheet`, async (app, html, data) => {
+      if (app instanceof Application) {
+        await RecipeSheet.bind(app, html, data, 1);
+        AnyOfSheet.bind(app, html, data);
+        CraftedItemSheet.bind(app, html, data);
+      }
     });
 
-    Hooks.on(`renderApplicationV2`, (app, html, data, options) => {
-        RecipeSheet.bind(app, html, data,2);
-        AnyOfSheet.bind(app,html,data,2);
-        CraftedItemSheet.bind(app, html, data);
-        if(app.actor) {
-            if (!Settings.isDisabledActor(app.actor)) {
-                new ActorSheetTab(app, html, data);
-            }
-            new ActorSheetCraftedInventory(app, html, data);
+    Hooks.on(`renderApplicationV2`, async (app, html, data, options) => {
+      await RecipeSheet.bind(app, html, data, 2);
+      AnyOfSheet.bind(app, html, data, 2);
+      CraftedItemSheet.bind(app, html, data);
+      if (app.actor) {
+        if (!Settings.isDisabledActor(app.actor)) {
+          new ActorSheetTab(app, html, data);
         }
+        new ActorSheetCraftedInventory(app, html, data);
+      }
     });
 
 

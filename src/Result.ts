@@ -40,7 +40,7 @@ export class Result implements ResultApi, ResultData {
                 }
             },
             _chatAddition: {},
-            _recipe: recipe.serialize()
+            _recipe: recipe.serialize(),
         }
         return new Result(resultData, actor);
     }
@@ -232,7 +232,11 @@ export class Result implements ResultApi, ResultData {
             quantity = quantity * -1;
         }
         if (type === "consumed") {
+          if(this._recipe.beaversTests?.consume){
+            userInteraction = "always";
+          }else {
             userInteraction = "onSuccess";
+          }
         }
         componentResult.userInteraction = userInteraction;
         fn(componentResult, quantity);
