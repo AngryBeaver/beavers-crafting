@@ -147,3 +147,4 @@
       "info": "Le module doit détecter la fenêtre de création d’objet. Pour cela, il utilise le titre de cette fenêtre. Si vous utilisez la langue par défaut, le titre est probablement 'Créer un nouvel objet' et vous n’avez rien à faire."
     }
   }
+}
