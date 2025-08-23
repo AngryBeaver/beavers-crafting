@@ -1,4 +1,6 @@
 # Changelog
+## 4.1.5
+- add fr language thx to [Michel](https://github.com/jehan-michel)
 ## 4.1.4
 - fix consume on Error
 - add resizeable to item sheets v2

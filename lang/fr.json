@@ -1,0 +1,149 @@
+{
+  "beaversCrafting": {
+    "actorLink": "Recettes",
+    "actorSheet": {
+      "tab": "Fabrication",
+      "table": {
+        "name": "Nom",
+        "status": "Statut",
+        "progress": "Progression",
+        "add": "Ajouter"
+      }
+    },
+    "inventory": {
+      "type": "Type",
+      "title": "Inventaire"
+    },
+    "recipe": {
+      "ingredients": "Ingrédients",
+      "quantity": "Quantité",
+      "skills": "Compétence",
+      "beaversTests": {
+        "tests": "Tests",
+        "test": "test",
+        "hits": "réussites",
+        "hitsHint": "nombre de réussites nécessaires avant que ce test soit considéré comme réussi",
+        "fails": "échecs",
+        "failsHint": "nombre d’échecs avant que le processus échoue",
+        "dc": "dd",
+        "consume": "consommer",
+        "consumeHint": "consomme le coût en cas d’échecs",
+        "andTestHint": "ajouter un test supplémentaire",
+        "orTestHint": "ajouter un test alternatif",
+        "skill": "Compétence :",
+        "ability": "Aptitude :"
+      },
+      "tools": "Outil",
+      "dc": "DD",
+      "results": "Résultats",
+      "dropItem": "déposer l’objet",
+      "addItem": "ajouter un objet",
+      "orItem": "ou objet",
+      "currency": "Coût",
+      "consumeOnFailedSaveHint": "Consomme le coût en cas d’échec de la compétence",
+      "attendants": "Assistants",
+      "macro": {
+        "button": "sauvegarder"
+      },
+      "folder": "Dossier",
+      "folderHint": "Vous pouvez créer des sous-dossiers en séparant les mots par des points, ex. : Dossier.SousDossier",
+      "folderPlaceHolder": "Dossier.SousDossier"
+    },
+    "anyOf": {
+      "dropItem": "déposer l’objet",
+      "button": "tester l’objet",
+      "error": "une macro 'anyOf' a produit une erreur. Vérifiez la console (F12)"
+    },
+    "component": {
+      "warning": "Votre acteur contrôlé ne possède pas d’objet nommé "
+    },
+    "select-dialog": {
+      "title": "Choisir",
+      "preselection": "sélection"
+    },
+    "crafting-app": {
+      "title": "Recueil de Recettes du Castor",
+      "button": "Démarrer",
+      "errors": {
+        "tableNotFound": "Table de jet non trouvée pour : ",
+        "tableNotValid": "La table de jet a renvoyé un objet invalide : ",
+        "itemNotFound": "Objet introuvable dans la table de jet pour : "
+      },
+      "cost": "Coût",
+      "instruction": "Instruction",
+      "required": "Requis",
+      "result": "Résultat",
+      "pass": "succès",
+      "before": "avant",
+      "fails": "échecs",
+      "checks": "Liste de vérification"
+    },
+    "settings": {
+      "moduleButton": {
+        "name": "Configurer le module",
+        "hint": "Configurer le module, ex. : configurer les sous-types d’objets 'Recipe' et 'AnyOf'.",
+        "label": "configurer"
+      },
+      "createItemTitle": {
+        "name": "Titre de la fenêtre de création d’objet",
+        "hint": "Ce titre est nécessaire pour détecter la fenêtre de création d’objet afin d’ajouter les sous-types 'Recipe' et 'AnyOf'."
+      },
+      "captureCreateItemTitle": {
+        "name": "Capturer la fenêtre de création d’objet",
+        "hint": "Cela activera une cible dans l’en-tête de chaque dialogue pour identifier la fenêtre de création d’objet.",
+        "hint2": "Lorsque vous cliquez dessus, cela définira cette fenêtre comme votre fenêtre de création d’objet après l’avoir rouverte."
+      },
+      "displayResults": {
+        "name": "Afficher la fiche de résultats",
+        "hint": "Afficher la fiche d’objet en cliquant sur les objets résultats d’une recette."
+      },
+      "displayIngredients": {
+        "name": "Afficher la fiche d’ingrédients",
+        "hint": "Afficher la fiche d’objet en cliquant sur les objets ingrédients d’une recette."
+      },
+      "draggableChatResult": {
+        "name": "Résultat déplaçable dans le chat",
+        "hint": "Vous pouvez glisser les résultats de recettes du chat vers l’inventaire d’autres joueurs"
+      },
+      "useAttendants": {
+        "name": "Les recettes utilisent des objets requis",
+        "hint": "Une recette peut exiger que des objets soient présents sur l’acteur sans être consommés. Vous pouvez configurer tout ce que votre système considère comme un objet, ex. : dons de dnd5e, classe, historique, outils, etc."
+      },
+      "currencyExchange": {
+        "name": "Échanger des pièces",
+        "hint": "si désactivé, vous devez posséder exactement la monnaie requise pour payer le coût de la recette"
+      },
+      "disabledActor": {
+        "name": "Acteurs désactivés",
+        "hint": "Liste séparée par des virgules des types d’acteurs qui n’auront pas d’onglet dédié"
+      },
+      "tabName": {
+        "name": "Nom de l’onglet",
+        "hint": "Personnaliser le nom de l’onglet dans les fiches d’acteur (par défaut : Fabrication). Certains systèmes utilisent un nom d’onglet au lieu d’une icône. Ce module peut aussi servir à d’autres choses : arbre technologique, progression de quête, activités de temps libre"
+      },
+      "tabIcon": {
+        "name": "Icône de l’onglet",
+        "hint": "Personnaliser l’icône de l’onglet dans les fiches d’acteur (par défaut : une recette). Vous pouvez le changer pour n’importe quelle icône compatible avec Foundry"
+      },
+      "addHeaderLink": {
+        "name": "Lien vers la fiche d’acteur",
+        "hint": "Ajoute un lien vers les recettes dans la fiche d’acteur. Optionnel depuis la version 2.0.x, car de nombreux modules encombrent l’en-tête des fiches"
+      },
+      "timeToCraft": {
+        "name": "Temps de fabrication",
+        "hint": "Le temps de fabrication sert à suivre la durée nécessaire au processus. Instantané ne prend aucun temps. Interaction nécessite une action de l’utilisateur.",
+        "choices": {
+          "instantly": "instantané",
+          "interaction": "interaction"
+        }
+      },
+      "separateItems": {
+        "name": "Séparer les objets fabriqués",
+        "hint": "Définit si un objet fabriqué est différent d’un objet non fabriqué. En mode complet, les objets fabriqués sont distincts (ex. : recettes spéciales). En mode partiel, le système tente de deviner, mais peut se tromper."
+      }
+    },
+    "module-config": {
+      "title": "Configuration du module",
+      "info": "Le module doit détecter la fenêtre de création d’objet. Pour cela, il utilise le titre de cette fenêtre. Si vous utilisez la langue par défaut, le titre est probablement 'Créer un nouvel objet' et vous n’avez rien à faire."
+    }
+  }
