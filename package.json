@@ -1,11 +1,11 @@
 {
 	"name": "beavers-crafting",
 	"title": "Beaver's Crafting",
-	"version": "4.1.5",
+	"version": "4.1.6",
 	"description": "Crafting",
-	"#devDir": "c:\\vtts\\v13.347\\Data\\modules",
+	"devDir": "c:\\vtts\\v13.348\\Data\\modules",
 	"#devDir": "c:\\vtts\\v12.331\\Data\\modules",
-	"devDir": "c:\\vtts\\v11.315\\Data\\modules",
+	"#devDir": "c:\\vtts\\v11.315\\Data\\modules",
 	"main": "src/main.js",
 	"scripts": {
 		"build": "npx gulp",

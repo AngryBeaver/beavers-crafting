@@ -189,6 +189,11 @@ Hooks.once("beavers-system-interface.ready", async function(){
     Hooks.on("renderDialogV2", (app, html, content) => {
         hookForCatchingCreateItemDialog(app,html,2);
     });
+    //dnd5e v5.2.x
+    Hooks.on("renderCreateDocumentDialog", (app,html,content) => {
+      hookForCatchingCreateItemDialog(app,html,2);
+    });
+
     //pathfinder1
     Hooks.on("renderItemCreateDialog", (app, html, content) => {
         if(!html.jquery) html = $(html);

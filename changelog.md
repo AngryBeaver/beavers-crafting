@@ -1,4 +1,6 @@
 # Changelog
+## 4.1.6
+- fix create item for dnd5e v5.2.x thx to [Corbeaux12](https://github.com/Corbeaux12)
 ## 4.1.5
 - add fr language thx to [Michel](https://github.com/jehan-michel)
 ## 4.1.4
