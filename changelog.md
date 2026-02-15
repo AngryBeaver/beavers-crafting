@@ -1,4 +1,6 @@
 # Changelog
+## 4.1.7
+- fix ownership of items. At somepoint ownership has been reworked by foundry now i get all items for game.items not only those the user can see.
 ## 4.1.6
 - fix create item for dnd5e v5.2.x thx to [Corbeaux12](https://github.com/Corbeaux12)
 ## 4.1.5

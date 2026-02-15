@@ -3,6 +3,17 @@ import {Settings} from "../Settings.js";
 import {AnyOf} from "../AnyOf.js";
 import {Result} from "../Result.js";
 
+function isAllowedToSee(item:Item):boolean{
+  // @ts-ignore
+  const userId = (game as Game).user.id;
+  // @ts-ignore
+  if (item.ownership[userId] !== undefined) return item.ownership[userId] > 0;
+  // @ts-ignore
+  if (item.ownership.default !== undefined) return item.ownership.default > 0;
+  console.log("can not detect ownership of item", item);
+  return true;
+}
+
 export class RecipeCompendium {
 
     static getForActor(actor): Recipe[] {
@@ -15,7 +26,9 @@ export class RecipeCompendium {
     static getAllItems(): Recipe[] {
         // @ts-ignore
         return game.items
-            .filter(item => Recipe.isRecipe(item))
+            .filter(item => {
+                return isAllowedToSee(item) && Recipe.isRecipe(item)
+            })
             .map(item => Recipe.fromItem(item));
     }
 
