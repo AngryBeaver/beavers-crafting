@@ -188,7 +188,8 @@ export class CraftingApp extends Application {
             const key = $(e.currentTarget).data("key");
             const type = $(e.currentTarget).data("type");
             if(this.data.recipe != undefined) {
-                RecipeCompendium.evaluateAnyOf(type, this.data.recipe, group, key, this.data.actor.items)
+                const pool = type === "output" ? game["items"].contents : this.data.actor.items;
+                RecipeCompendium.evaluateAnyOf(type, this.data.recipe, group, key, pool)
                     .then(()=>window.setTimeout(this.renderRecipeSheet.bind(this),100))
             }
         });

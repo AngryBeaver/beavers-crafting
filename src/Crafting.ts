@@ -154,7 +154,8 @@ export class Crafting implements CraftingData {
     async evaluatePossibilities(){
         await RecipeCompendium.evaluateOptions("required",this.recipe,this.actor.items);
         await RecipeCompendium.evaluateOptions("input",this.recipe,this.actor.items);
-        await RecipeCompendium.evaluateOptions("output",this.recipe,this.actor.items);
+        const outputPool = game["items"].contents;
+        await RecipeCompendium.evaluateOptions("output",this.recipe,outputPool);
     }
 
     async checkCurrency() {

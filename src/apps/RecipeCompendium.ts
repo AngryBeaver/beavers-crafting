@@ -162,19 +162,19 @@ export class RecipeCompendium {
         return chosen;
     }
 
-    static async evaluateOptions(type: DataType, recipe: Recipe, actorItems) {
+    static async evaluateOptions(type: DataType, recipe: Recipe, items) {
         for (const [group, data] of Object.entries(recipe[type])) {
             const key = await this.evaluateOption(type, recipe, group);
-            await this.evaluateAnyOf(type, recipe, group, key, actorItems)
+            await this.evaluateAnyOf(type, recipe, group, key, items);
         }
     }
 
-    static async evaluateAnyOf(type: DataType, recipe: Recipe, group: string, key: string, actorItems) {
+    static async evaluateAnyOf(type: DataType, recipe: Recipe, group: string, key: string, items) {
         const component = recipe[type][group][key];
         if (component.type === Settings.ANYOF_SUBTYPE) {
             const item = await component.getEntity();
             const anyOf = new AnyOf(item);
-            const components = await anyOf.filter(actorItems)
+            const components = await anyOf.filter(items);
             const comps = components.reduce((result, item, index) => {
                 result[index.toString()] = item;
                 return result;

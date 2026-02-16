@@ -1,4 +1,6 @@
 # Changelog
+## 4.2.0
+- enable anyOf for result it will currently use all items of the world regardless of ownership. It will currently not lookup compendiums.
 ## 4.1.7
 - fix ownership of items. At somepoint ownership has been reworked by foundry now i get all items for game.items not only those the user can see.
 ## 4.1.6

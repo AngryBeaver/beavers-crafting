@@ -356,25 +356,27 @@ export class RecipeSheet {
       const entity = await fromUuid(data.uuid);
       if (entity) {
         const isAnyOf = AnyOf.isAnyOf(entity);
-        if (isAnyOf && isOutput) {
-          return;
-        }
         const component = beaversSystemInterface.componentFromEntity(entity);
         component.type = data.type;
         if (isInput) {
           let keyid = data.uuid;
-          if (AnyOf.isAnyOf(entity)) {
+          if (isAnyOf) {
             component.type = Settings.ANYOF_SUBTYPE;
             keyid = foundry.utils.randomID();
           }
           this.recipe.addInput(component, keyid, $(e.target).data("id"));
         }
         if (isOutput) {
-          this.recipe.addOutput(component, data.uuid, $(e.target).data("id"));
+          let keyid = data.uuid;
+          if (isAnyOf) {
+            component.type = Settings.ANYOF_SUBTYPE;
+            keyid = foundry.utils.randomID();
+          }
+          this.recipe.addOutput(component, keyid, $(e.target).data("id"));
         }
         if (isRequired) {
           let keyid = data.uuid;
-          if (AnyOf.isAnyOf(entity)) {
+          if (isAnyOf) {
             component.type = Settings.ANYOF_SUBTYPE;
             keyid = foundry.utils.randomID();
           }
