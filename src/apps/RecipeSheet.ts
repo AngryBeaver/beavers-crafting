@@ -186,13 +186,18 @@ export class RecipeSheet {
         foundry.utils.setProperty(this.recipe, recipeKey, value);
       }
     }
+    const recipeData = this.recipe.serialize();
+    const expandedFormData = foundry.utils.expandObject(formData);
+    const recipeFormData = foundry.utils.getProperty(expandedFormData,`flags.${Settings.NAMESPACE}.recipe`) || {};
     update.flags[Settings.NAMESPACE] = {
-      recipe: this.recipe.serialize(),
+      recipe: foundry.utils.mergeObject(recipeData, recipeFormData, {inplace: false}),
     };
     if (!this.app.form) {
       // @ts-ignore
       for (const [key, value] of Object.entries(formData)) {
-        foundry.utils.setProperty(update, key, value);
+        if(!key.startsWith(`flags.${Settings.NAMESPACE}.recipe`)) {
+          foundry.utils.setProperty(update, key, value);
+        }
       }
     }
     await this.item.update(update, { performDeletions: true });
