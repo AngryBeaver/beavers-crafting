@@ -3,7 +3,11 @@
         <aside class="sidebar flexcol">
             <div style="flex:0;min-height:34px;line-height:34px" class="flexrow">
                 <i style="width:25px;flex: 0;margin: auto;display: block;padding: 0px 5px;" class="fas fa-search"></i>
-                <select class="search">
+                <input class="search" type="text" value="{{search}}" placeholder="Search..." autofocus/>
+            </div>
+            <div style="flex:0;min-height:34px;line-height:34px" class="flexrow">
+                <i style="width:25px;flex: 0;margin: auto;display: block;padding: 0px 5px;" class="fas fa-filter"></i>
+                <select class="filter">
                     {{#select filter}}
                         <option value="2">all</option>
                         <option value="1">available</option>

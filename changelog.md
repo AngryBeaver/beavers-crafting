@@ -1,4 +1,6 @@
 # Changelog
+## 4.3.0
+- feat: add searchbar for recipe compendium: [#146](https://github.com/AngryBeaver/beavers-crafting/issues/146)
 ## 4.2.1
 - fix default value for Tests that has not been stored.
 ## 4.2.0

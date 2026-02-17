@@ -12,6 +12,7 @@ export class CraftingApp extends Application {
     data: {
         actor,
         filter,
+        search: string,
         recipes:Recipe[],
         folders:{
             [key: string]: {
@@ -31,6 +32,7 @@ export class CraftingApp extends Application {
         this.data = {
             actor: actor,
             filter: FilterType.available,
+            search: "",
             recipes: [],
             filterItems: {},
             folders: {},
@@ -68,6 +70,10 @@ export class CraftingApp extends Application {
         let recipes = await RecipeCompendium.filterForActor(data.actor, data.filter);
         if(Object.values(data.filterItems).length != 0) {
             recipes = await RecipeCompendium.filterForItems(recipes, Object.values(data.filterItems));
+        }
+        if (data.search) {
+            const search = data.search.toLowerCase();
+            recipes = recipes.filter(r => r.name.toLowerCase().includes(search));
         }
         data.folders = sortByFolder(recipes);
 
@@ -117,13 +123,27 @@ export class CraftingApp extends Application {
 
     activateListeners(html) {
         super.activateListeners(html);
-        html.find(".sidebar select.search").on("change", (e) => {
+        html.find(".sidebar select.filter").on("change", (e) => {
             this.data.filter = $(e.target).val();
             this.data.selected = null;
             this.data.content = null;
             this.data.folders = {};
             this.render();
         });
+        html.find(".sidebar input.search").on("input", (e) => {
+            this.data.search = $(e.target).val();
+            this.data.selected = null;
+            this.data.content = null;
+            this.data.folders = {};
+            this.render();
+        });
+        if (this.data.search) {
+            const searchInput = html.find(".sidebar input.search");
+            searchInput.focus();
+            const val = searchInput.val();
+            searchInput.val("");
+            searchInput.val(val);
+        }
         html.find(".sidebar .navigation .beavers-folder-item").on("click", (e) => {
             const id = $(e.currentTarget).data().id;
             this.selectRecipe(id);
