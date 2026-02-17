@@ -5,13 +5,7 @@ import {Result} from "../Result.js";
 
 function isAllowedToSee(item:Item):boolean{
   // @ts-ignore
-  const userId = (game as Game).user.id;
-  // @ts-ignore
-  if (item.ownership[userId] !== undefined) return item.ownership[userId] > 0;
-  // @ts-ignore
-  if (item.ownership.default !== undefined) return item.ownership.default > 0;
-  console.log("can not detect ownership of item", item);
-  return true;
+  return item.testUserPermission(game.user, foundry.CONST.DOCUMENT_OWNERSHIP_LEVELS.LIMITED);
 }
 
 export class RecipeCompendium {

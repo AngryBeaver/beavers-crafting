@@ -1,4 +1,8 @@
 # Changelog
+## 4.3.1
+- fix recipe compendium
+  - header style
+  - localisation
 ## 4.3.0
 - feat: add searchbar for recipe compendium: [#146](https://github.com/AngryBeaver/beavers-crafting/issues/146)
 ## 4.2.1

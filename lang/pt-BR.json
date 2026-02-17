@@ -62,6 +62,12 @@
       "preselection": "escolha"
     },
     "crafting-app": {
+      "search": {
+        "all": "todos",
+        "available": "disponível",
+        "usable": "utilizável",
+        "own": "possuído"
+      },
       "title": "Compêndio de Receitas do Beaver",
       "button": "Iniciar",
       "errors": {

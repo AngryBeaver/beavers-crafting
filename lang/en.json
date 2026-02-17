@@ -62,6 +62,12 @@
       "preselection": "choose"
     },
     "crafting-app": {
+      "search":{
+        "all": "all",
+        "available": "available",
+        "usable": "usable",
+        "own": "own"
+      },
       "title": "Beaver's Recipe Compendium",
       "button": "Start",
       "errors": {

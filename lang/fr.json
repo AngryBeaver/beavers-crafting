@@ -62,6 +62,12 @@
       "preselection": "sélection"
     },
     "crafting-app": {
+      "search":{
+        "all": "tout",
+        "available": "disponsible",
+        "usable": "réalisable",
+        "own": "possédé"
+      },
       "title": "Recueil de Recettes du Castor",
       "button": "Démarrer",
       "errors": {
