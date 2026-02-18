@@ -3,6 +3,8 @@ import {Settings} from "./Settings.js";
 import {RecipeCompendium} from "./apps/RecipeCompendium.js";
 import {Result} from "./Result.js";
 import {TestHandler} from "./TestHandler.js";
+import {Container} from "./Container.js";
+import { attachContentsToCreatedContainer, getActorContentPool } from "./ContainerHandler.js";
 
 export class Crafting implements CraftingData {
     uuid: string;
@@ -152,8 +154,9 @@ export class Crafting implements CraftingData {
     }
 
     async evaluatePossibilities(){
-        await RecipeCompendium.evaluateOptions("required",this.recipe,this.actor.items);
-        await RecipeCompendium.evaluateOptions("input",this.recipe,this.actor.items);
+        const pool = await getActorContentPool(this.actor);
+        await RecipeCompendium.evaluateOptions("required",this.recipe,pool);
+        await RecipeCompendium.evaluateOptions("input",this.recipe,pool);
         const outputPool = game["items"].contents;
         await RecipeCompendium.evaluateOptions("output",this.recipe,outputPool);
     }
@@ -204,7 +207,7 @@ export class Crafting implements CraftingData {
             }
         }
         try{
-            const itemChange = await beaversSystemInterface.actorComponentListAdd(this.actor,componentList);
+            const itemChange = await this._addComponentsToActor(componentList);
             this.restore = itemChange.delete;
         }catch(e){
             // @ts-ignore
@@ -262,7 +265,7 @@ export class Crafting implements CraftingData {
             }
         }
         try{
-            const itemChange = await beaversSystemInterface.actorComponentListAdd(this.actor,componentList);
+            const itemChange = await this._addComponentsToActor(componentList);
             if(!this.result.hasError()){
                 await this.actor.update(this.result._actorUpdate);
             }
@@ -277,11 +280,22 @@ export class Crafting implements CraftingData {
             })
             Hooks.call(Settings.NAMESPACE+".processed",{recipe:this.recipe,result:this.result,processed:itemChange});
         }catch(e){
-            // @ts-ignore
-            ui.notifications.error(e.message)
-            this.result._hasException = true;
-            return;
+          // @ts-ignore
+          ui.notifications.error(e.message);
+          this.result._hasException = true;
+          return;
         }
+    }
+
+    async _addComponentsToActor(componentList: Component[]): Promise<ItemChange> {
+        //container should not stack
+        for (const component of componentList) {
+          const item = await component.getEntity();
+          if(Container.isContainer(item)){
+            component.name = "container"+foundry.utils.randomID();
+          }
+        }
+        return await beaversSystemInterface.actorComponentListAdd(this.actor, componentList);
     }
 
     get chatData(): ChatData {

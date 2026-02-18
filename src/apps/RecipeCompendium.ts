@@ -2,6 +2,8 @@ import {Recipe} from "../Recipe.js";
 import {Settings} from "../Settings.js";
 import {AnyOf} from "../AnyOf.js";
 import {Result} from "../Result.js";
+import {Container} from "../Container.js";
+import { getActorContentPool } from "../ContainerHandler.js";
 
 function isAllowedToSee(item:Item):boolean{
   // @ts-ignore
@@ -80,14 +82,15 @@ export class RecipeCompendium {
         const own = RecipeCompendium.getForActor(actor);
         const list = (filter == FilterType.own) ? own : [...items, ...own];
         const returnList: Recipe[] = [];
+        const pool = await getActorContentPool(actor);
         for (const recipe of list) {
             if (filter == FilterType.all || filter == FilterType.own) {
                 returnList.push(recipe);
             } else {
                 const listOfAnyOfIngredients = this._filterData(recipe.input, component => component.type === Settings.ANYOF_SUBTYPE);
-                if (await this.isAnyAnyOfInList(listOfAnyOfIngredients, actor.items)) { //isAvailable or usable ! when any item matches anyOf has the given quantity
+                if (await this.isAnyAnyOfInList(listOfAnyOfIngredients, pool)) { //isAvailable or usable ! when any item matches anyOf has the given quantity
                     const listOfIngredientsWithoutAnyOf = this._filterData(recipe.input, component => component.type !== Settings.ANYOF_SUBTYPE);
-                    const result = RecipeCompendium.validateRecipeToItemList(listOfIngredientsWithoutAnyOf, actor.items, Result.from(recipe, actor));
+                    const result = RecipeCompendium.validateRecipeToItemList(listOfIngredientsWithoutAnyOf, pool, Result.from(recipe, actor));
                     await RecipeCompendium.filterRequired(actor, recipe,result);
                     if ((filter == FilterType.usable && !result.hasError())
                         || (filter == FilterType.available && result._isAnyConsumedAvailable())) {
@@ -103,7 +106,8 @@ export class RecipeCompendium {
     static async filterRequired(actor: Actor, recipe: Recipe,result:Result) {
         if (Settings.get(Settings.USE_ATTENDANTS)) {
             const listOfAnyOfRequired = this._filterData(recipe.required, component => component.type === Settings.ANYOF_SUBTYPE);
-            if (await this.isAnyAnyOfInList(listOfAnyOfRequired, actor.items)) {
+            const pool = await getActorContentPool(actor);
+            if (await this.isAnyAnyOfInList(listOfAnyOfRequired, pool)) {
                 await RecipeCompendium.validateRequired(recipe, result);
             }
         }

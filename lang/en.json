@@ -163,6 +163,18 @@
       "create": "Create",
       "recipe": "Recipe",
       "anyOf": "AnyOf"
+    },
+    "container": {
+      "mode": "Mode",
+      "mode-recipes": "Recipes (Book)",
+      "mode-items": "Physical Items (Bag)",
+      "book": "Book",
+      "bag": "Bag",
+      "remove": "Remove from container",
+      "delete": "Delete Item",
+      "edit": "Edit Item",
+      "empty": "Container is empty",
+      "experimental": "This feature is in an experimental state."
     }
   }
 }

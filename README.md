@@ -26,6 +26,15 @@ in possibly all Systems: ([List of adaption layers](https://github.com/AngryBeav
 ### DownTimeActivities
 ![downtime.png](pictures/downtime.png)
 
+### Containers
+![container.png](pictures/container.png)
+
+- Custom container item subtype for systems that do not provide a native container type (non-dnd5e systems).
+- For dnd5e, use the native system container type; Beaver's Crafting integrates with it.
+- Recipes can now produce containers as results (both the custom subtype and dnd5e native containers are supported).
+- Dropping a Beaver's Crafting container onto an actor automatically copies its predefined contents to the actor and assigns them to the newly created container.
+- The custom container sheet and features are currently experimental.
+
 ## TOC
 <!-- TOC -->
 * [Beaver's Crafting Module](#beavers-crafting-module)
@@ -33,6 +42,7 @@ in possibly all Systems: ([List of adaption layers](https://github.com/AngryBeav
     * [Crafting](#crafting)
     * [Character advancement](#character-advancement)
     * [DownTimeActivities](#downtimeactivities)
+    * [Containers](#containers)
   * [TOC](#toc)
   * [HowTo](#howto)
     * [Create Recipes](#create-recipes)
@@ -123,9 +133,12 @@ meaning:
 - before you have 3 fails overall.
 
 #### results:
-You may add Items or RollTable via drag and drop as result of your process.
-You will receive the result at the end of the progress, if your progress was successfully.
-If you add a RollTable you will get quantity amount of rolls on that table not one roll quantity of times.
+You may add Items, Containers, or RollTables via drag and drop as results of your process.
+- Containers are supported in two forms:
+  - Beaver's Crafting custom container subtype (for systems without native containers)
+  - Native dnd5e containers (when using the dnd5e system)
+You will receive the result at the end of the progress if your progress was successful.
+If you add a RollTable you will get quantity amount of rolls on that table, not one roll quantity of times.
 #### instruction:
 ![description.png](pictures/description.png)
 

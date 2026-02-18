@@ -785,3 +785,7 @@ actor-sheet
 .tidy-tab-contents.active .beavers-crafting-actor-tab {
     display:block !important;
 }
+
+.beavers-hidden-item {
+    display: none !important;
+}
