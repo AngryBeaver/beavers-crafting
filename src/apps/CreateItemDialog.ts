@@ -57,7 +57,10 @@ export async function showCreateItemDialog() {
               },
             };
             // @ts-ignore
-            return Item.create(itemData);
+            const created = await Item.create(itemData);
+            // Open the sheet for the created item
+            try { created?.sheet?.render(true); } catch (e) { console.warn("Beavers Crafting: Failed to open item sheet", e); }
+            return created;
           },
         },
       ],

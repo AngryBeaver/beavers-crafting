@@ -79,6 +79,7 @@ Hooks.once("beavers-system-interface.ready", async function(){
 
     Hooks.on("renderItemDirectory", (app, html, data) => {
         if ((game.version || game.data.version).split(".")[0] >= 12 && Settings.get(Settings.ITEM_DIRECTORY_BUTTON)) {
+            if(!game.user.can("ITEM_CREATE")) return;
             if(!html.find) html = $(html)
             const header = html.find(".header-actions");
             const existing = html.find(".beavers-crafting-create-item");
