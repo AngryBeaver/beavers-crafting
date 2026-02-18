@@ -111,6 +111,10 @@
         "name": "Résultat déplaçable dans le chat",
         "hint": "Vous pouvez glisser les résultats de recettes du chat vers l’inventaire d’autres joueurs"
       },
+      "itemDirectoryButton": {
+        "name": "Ajouter le bouton d’objet Beaver",
+        "hint": "Ajoute un bouton au Répertoire d’objets pour créer directement des objets de Beaver's Crafting (v12+ uniquement)."
+      },
       "useAttendants": {
         "name": "Les recettes utilisent des objets requis",
         "hint": "Une recette peut exiger que des objets soient présents sur l’acteur sans être consommés. Vous pouvez configurer tout ce que votre système considère comme un objet, ex. : dons de dnd5e, classe, historique, outils, etc."
@@ -151,6 +155,26 @@
     "module-config": {
       "title": "Configuration du module",
       "info": "Le module doit détecter la fenêtre de création d’objet. Pour cela, il utilise le titre de cette fenêtre. Si vous utilisez la langue par défaut, le titre est probablement 'Créer un nouvel objet' et vous n’avez rien à faire."
+    },
+    "create-item-dialog": {
+      "title": "Créer un objet Beaver",
+      "name": "Nom de l’objet",
+      "type": "Type d’objet",
+      "create": "Créer",
+      "recipe": "Recette",
+      "anyOf": "AnyOf"
+    },
+    "container": {
+      "mode": "Mode",
+      "mode-recipes": "Recettes (Livre)",
+      "mode-items": "Objets physiques (Sac)",
+      "book": "Livre",
+      "bag": "Sac",
+      "remove": "Retirer du conteneur",
+      "delete": "Supprimer l’objet",
+      "edit": "Modifier l’objet",
+      "empty": "Le conteneur est vide",
+      "experimental": "Cette fonctionnalité est dans un état expérimental."
     }
   }
 }

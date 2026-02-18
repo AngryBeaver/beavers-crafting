@@ -70,10 +70,9 @@ export async function findSourceChildrenComponents(sourceEntity: any): Promise<C
 }
 
 /**
- * Attach discovered source container contents to the created container on the actor,
- * marking each child as crafted and ensuring no merge/stacking occurs.
+ * Attach discovered source container contents to the created container,
  */
-export async function attachContentsToCreatedContainer(actor: Actor, createdContainerItem: Item, sourceComponent: Component): Promise<void> {
+export async function attachContentsToCreatedContainer(createdContainerItem: Item, sourceComponent: Component): Promise<void> {
   const children = await findSourceChildrenComponents(await sourceComponent.getEntity());
   if (children.length === 0) return;
   const cont = new Container(createdContainerItem);
@@ -86,8 +85,18 @@ export async function attachContentsToCreatedContainer(actor: Actor, createdCont
  * Unified read API to get the content pool an actor offers to crafting logic.
  * For now, this simply maps actor.items to components; hiding is a UI concern.
  */
-export function getActorContentPool(actor: Actor): Component[] {
-  return actor.items.map((i: any) => beaversSystemInterface.componentFromEntity(i));
+export function getActorContentPool(actor: Actor, asComponents: boolean = true): Component[] | any[] {
+  const filteredItems = actor.items
+    .filter((i: any) => {
+      const isBeaversContainer = foundry.utils.getProperty(i, `flags.${Settings.NAMESPACE}.subtype`) === 'container';
+      const isNativeDnd5eContainer = ((game as Game).system?.id === 'dnd5e') && i.type === 'container';
+      // Filter OUT containers themselves, but KEEP their contents and regular items
+      return !(isBeaversContainer || isNativeDnd5eContainer);
+    });
+  if (asComponents) {
+    return filteredItems.map((i: any) => beaversSystemInterface.componentFromEntity(i));
+  }
+  return filteredItems;
 }
 
 /**

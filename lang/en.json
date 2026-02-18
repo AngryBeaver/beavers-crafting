@@ -173,7 +173,8 @@
       "remove": "Remove from container",
       "delete": "Delete Item",
       "edit": "Edit Item",
-      "empty": "Container is empty"
+      "empty": "Container is empty",
+      "experimental": "This feature is in an experimental state."
     }
   }
 }

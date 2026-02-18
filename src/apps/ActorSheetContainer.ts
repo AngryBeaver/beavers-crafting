@@ -13,11 +13,13 @@ export class ActorSheetContainer {
     }
 
     async init() {
-        this.app.actor.items
-            .forEach(i => {
-                if (foundry.utils.getProperty(i, `flags.${Settings.NAMESPACE}.containerId`)) {
-                    this.html.find(`.item[data-item-id=${i.id}]`).hide();
-                }
-            })
+        this.app.actor.items.forEach(i => {
+            if (i.getFlag("beavers-crafting", "containerId")) {
+              const element = this.html.find(`[data-item-id="${i.id}"]`);
+              if (element.length > 0) {
+                element.addClass("beavers-hidden-item");
+              }
+            }
+        })
     }
 }

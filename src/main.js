@@ -18,6 +18,7 @@ import {CraftedItemSheet} from "./apps/CraftedItemSheet.js";
 import {ContainerSheet} from "./apps/ContainerSheet.js";
 import "./compatibility/tidy5e.js";
 import { hookChatLog } from "./apps/ChatLog.js";
+import { attachContentsToCreatedContainer } from "./ContainerHandler.js";
 
 Hooks.on("beavers-system-interface.init", async function(){
     beaversSystemInterface.addModule(Settings.NAMESPACE);
@@ -64,6 +65,7 @@ function debug(){
 }
 
 Hooks.once("beavers-system-interface.ready", async function(){
+    debug();
     Settings.init();
     if(!game[Settings.NAMESPACE])game[Settings.NAMESPACE]={};
     game[Settings.NAMESPACE].Crafting = Crafting;
@@ -79,38 +81,41 @@ Hooks.once("beavers-system-interface.ready", async function(){
     migrate();
     beaversSystemInterface.addExtension(Settings.NAMESPACE,{componentAddFlags:["crafted","isCrafted"]})
 
-  Hooks.on("renderItemDirectory", (app, html, data) => {
-    if(!html.find) html = $(html)
-    html.find(".directory-item, .entry").each((index, element) => {
-      const id = element.dataset.documentId || element.dataset.entryId;
-      const item = game.items.get(id);
-      if (item?.getFlag("beavers-crafting", "containerId")) {
-        // Add a custom class or attribute
-        element.classList.add("beavers-hidden-item");
-      }
-    });
-  });
+    function hideDirectory(html){
+      html.find(".directory-item, .entry").each((index, element) => {
+        const id = element.dataset.documentId || element.dataset.entryId;
+        const item = game.items.get(id);
+        if (item?.getFlag("beavers-crafting", "containerId")) {
+          $(element).addClass("beavers-hidden-item");
+        }
+      });
+    }
 
-    Hooks.on("renderItemDirectory", (app, html, data) => {
-        if ((game.version || game.data.version).split(".")[0] >= 12 && Settings.get(Settings.ITEM_DIRECTORY_BUTTON)) {
-            if(!game.user.can("ITEM_CREATE")) return;
-            if(!html.find) html = $(html)
-            const header = html.find(".header-actions");
-            const existing = html.find(".beavers-crafting-create-item");
-            if (existing.length === 0) {
-              const button = $(`<button style="flex:0 0 32px" type="button" title="${game.i18n.localize(
-                "beaversCrafting.create-item-dialog.title",
-              )}" class="beavers-crafting-create-item">
+    function addItemDirectoryButton(html){
+      if ((game.version || game.data.version).split(".")[0] >= 12 && Settings.get(Settings.ITEM_DIRECTORY_BUTTON)) {
+        if (!game.user.can("ITEM_CREATE")) return;
+        const header = html.find(".header-actions");
+        const existing = html.find(".beavers-crafting-create-item");
+        if (existing.length === 0) {
+          const button = $(`<button style="flex:0 0 32px" type="button" title="${game.i18n.localize(
+            "beaversCrafting.create-item-dialog.title",
+          )}" class="beavers-crafting-create-item">
                     <img width="20" src="modules/beavers-crafting/icons/tools.svg" />
                 </button>`);
-              button.on("click", () => {
-                import("./apps/CreateItemDialog.js").then((module) => {
-                  module.showCreateItemDialog();
-                });
-              });
-              header.append(button);
-            }
+          button.on("click", () => {
+            import("./apps/CreateItemDialog.js").then((module) => {
+              module.showCreateItemDialog();
+            });
+          });
+          header.append(button);
         }
+      }
+    }
+
+    Hooks.on("renderItemDirectory", (app, html, data) => {
+      if(!html.find) html = $(html)
+      hideDirectory(html);
+      addItemDirectoryButton(html)
     });
     if (ui.sidebar.tabs?.items?.rendered) {
         ui.sidebar.tabs.items.render(true);
@@ -169,6 +174,7 @@ Hooks.once("beavers-system-interface.ready", async function(){
 
   //add Subtype to create Item
   Hooks.on("preCreateItem", (doc, createData, options, user) => {
+
     if (foundry.utils.getProperty(createData, `flags.${Settings.NAMESPACE}.subtype`) === "recipe") {
       doc.updateSource({
         "flags.beavers-crafting.subtype": Settings.RECIPE_SUBTYPE,
@@ -182,8 +188,12 @@ Hooks.once("beavers-system-interface.ready", async function(){
       });
     }
     if (foundry.utils.getProperty(createData, `flags.${Settings.NAMESPACE}.subtype`) === "container") {
-      // Skip creating beavers-crafting containers on dnd5e — use native dnd5e container type instead
-      if (game.system.id !== "dnd5e") {
+      const srcUuid = createData?.uuid || createData?._stats?.compendiumSource;
+      // Remember source uuid when dropping from packs/world so we can copy contents after creation
+      if (srcUuid) {
+        doc.updateSource({ ["flags.beavers-crafting._sourceUuid"]: srcUuid });
+      }
+      if (!foundry.utils.getProperty(doc, `flags.${Settings.NAMESPACE}.container`)) {
         doc.updateSource({
           "flags.beavers-crafting.subtype": "container",
           "flags.beavers-crafting.container": { mode: "recipes" },
@@ -195,6 +205,28 @@ Hooks.once("beavers-system-interface.ready", async function(){
 
   //evil TODO fix this make recipes own type !
   // own type does not yet work for all supported systems.
+
+  // After a container is created on an actor via drop, copy its predefined contents onto the actor and assign to the created container
+  Hooks.on("createItem", async (doc, options) => {
+    try {
+      const isBeaversContainer = foundry.utils.getProperty(doc, `flags.${Settings.NAMESPACE}.subtype`) === "container";
+      if (!isBeaversContainer) return;
+
+      const srcUuid = doc.getFlag("beavers-crafting", "_sourceUuid");
+      if (!srcUuid) return;
+      const source = await fromUuid(srcUuid).catch(() => undefined);
+      if (!source) return;
+
+      // Build a component from the source container and attach contents to the newly created container on the actor
+      const sourceComp = beaversSystemInterface.componentFromEntity(source);
+      await attachContentsToCreatedContainer(doc, sourceComp);
+
+      // cleanup temp flag
+      try { await doc.update({ ["flags.beavers-crafting.-=_sourceUuid"]: null }); } catch (_) {}
+    } catch (e) {
+      console.warn("Beavers Crafting | create Container post-copy content failure:", e);
+    }
+  });
 
   Hooks.on("getDialogHeaderButtons", (dialog, buttons) => {
     hookForCatchingDialogTitle(dialog, buttons); //v1

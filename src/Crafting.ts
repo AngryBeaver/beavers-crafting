@@ -280,74 +280,22 @@ export class Crafting implements CraftingData {
             })
             Hooks.call(Settings.NAMESPACE+".processed",{recipe:this.recipe,result:this.result,processed:itemChange});
         }catch(e){
-            // @ts-ignore
-            ui.notifications.error(e.message)
-            this.result._hasException = true;
-            return;
+          // @ts-ignore
+          ui.notifications.error(e.message);
+          this.result._hasException = true;
+          return;
         }
     }
 
     async _addComponentsToActor(componentList: Component[]): Promise<ItemChange> {
-        const mainComponents: Component[] = [];
-        
-        for(const component of componentList) {
-            let handled = false;
-            if (component.quantity < 0) {
-                 const actorFindings = beaversSystemInterface.itemListComponentFind(this.actor.items, component);
-                 if (actorFindings.quantity + component.quantity < 0) {
-                      // Need to check if it's in a fallback container (non-dnd5e fake containers)
-                      for(const item of this.actor.items) {
-                          if (Container.isContainer(item) && !((game as Game).system.id === "dnd5e" && item.type === "container")) {
-                              const container = new Container(item);
-                              const contents = await container.getContents();
-                              const found = contents.find(c => c.isSame(component));
-                              if (found) {
-                                  const toRemove = Math.min(found.quantity, component.quantity * -1);
-                                  const removeComp = beaversSystemInterface.componentCreate(found);
-                                  removeComp.quantity = toRemove * -1;
-                                  // This now works with real items
-                                  await container.addContent(removeComp);
-                                  component.quantity += toRemove;
-                                  if (component.quantity === 0) {
-                                      handled = true;
-                                      break;
-                                  }
-                              }
-                          }
-                      }
-                 }
-            }
-            if (!handled) {
-                mainComponents.push(component);
-            }
+        //container should not stack
+        for (const component of componentList) {
+          const item = await component.getEntity();
+          if(Container.isContainer(item)){
+            component.name = "container"+foundry.utils.randomID();
+          }
         }
-        const itemChange = await beaversSystemInterface.actorComponentListAdd(this.actor, mainComponents);
-        
-        // Post-process: if any produced component is a container with predefined contents, attach contents.
-        try {
-            for (const comp of mainComponents) {
-                if (comp.quantity > 0) {
-                    // Find the created container item on actor that matches this component
-                    const createdContainers = (itemChange.create || []) as any[];
-                    for (const created of createdContainers) {
-                        const createdItem = created;
-                        if (!Container.isContainer(createdItem)) continue;
-                        const createdComp = beaversSystemInterface.componentFromEntity(createdItem);
-                        if (!(createdComp.isSame(comp) && comp.isSame(createdComp))) continue;
-
-                        // Attach source contents to the newly created container
-                        try {
-                            await attachContentsToCreatedContainer(this.actor, createdItem, comp);
-                        } catch (inner) {
-                            console.warn('Beavers Crafting | Failed copying container contents from source:', inner);
-                        }
-                    }
-                }
-            }
-        } catch (e) {
-            console.warn("Beavers Crafting | Failed to attach contents to produced container:", e);
-        }
-        return itemChange;
+        return await beaversSystemInterface.actorComponentListAdd(this.actor, componentList);
     }
 
     get chatData(): ChatData {

@@ -1,5 +1,6 @@
 import { Recipe} from "./Recipe.js";
 import {Settings} from "./Settings.js";
+import { getActorContentPool } from "./ContainerHandler.js";
 
 export class Result implements ResultApi, ResultData {
     _actorUpdate: {
@@ -218,7 +219,8 @@ export class Result implements ResultApi, ResultData {
         let componentResult = this._components[type].findComponentResult(componentData);
         if (componentResult === undefined) {
             componentResult = new ComponentResult();
-            const actorFindings = beaversSystemInterface.itemListComponentFind(this._actor.items,componentData);
+            const pool = getActorContentPool(this._actor,false);
+            const actorFindings = beaversSystemInterface.itemListComponentFind(pool, componentData);
             componentResult.component = beaversSystemInterface.componentCreate(componentData);
             componentResult.originalQuantity = actorFindings.quantity;
             componentResult.component.quantity = 0;

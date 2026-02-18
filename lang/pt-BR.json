@@ -111,6 +111,10 @@
         "name": "Resultado arrastável no chat",
         "hint": "Você pode arrastar resultados de receitas do chat para o inventário de outros jogadores"
       },
+      "itemDirectoryButton": {
+        "name": "Adicionar Botão de Item do Beaver",
+        "hint": "Adiciona um botão ao Diretório de Itens para criar itens do Beaver's Crafting diretamente (apenas v12+)."
+      },
       "useAttendants": {
         "name": "Receitas usam Itens requeridos",
         "hint": "Uma Receita pode exigir que itens estejam presentes no ator sem serem consumidos no processo. Você pode configurar qualquer coisa que seu sistema modele como item, ex.: façanhas de dnd5e, classe, histórico, ferramentas etc!"
@@ -151,6 +155,26 @@
     "module-config": {
       "title": "Configuração do Módulo",
       "info": "O módulo precisa detectar a janela que cria novos Itens. Para isso, usa internamente o título dessa janela. Se você tiver o idioma padrão, o título é provavelmente 'Criar Novo Item' e você não precisa fazer nada."
+    },
+    "create-item-dialog": {
+      "title": "Criar Item do Beaver",
+      "name": "Nome do Item",
+      "type": "Tipo de Item",
+      "create": "Criar",
+      "recipe": "Receita",
+      "anyOf": "AnyOf"
+    },
+    "container": {
+      "mode": "Modo",
+      "mode-recipes": "Receitas (Livro)",
+      "mode-items": "Itens Físicos (Bolsa)",
+      "book": "Livro",
+      "bag": "Bolsa",
+      "remove": "Remover do contêiner",
+      "delete": "Excluir Item",
+      "edit": "Editar Item",
+      "empty": "O contêiner está vazio",
+      "experimental": "Este recurso está em estado experimental."
     }
   }
 }
