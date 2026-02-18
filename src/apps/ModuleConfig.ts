@@ -26,13 +26,16 @@ export class ModuleConfig extends FormApplication {
     async getData(options: any): Promise<any> {
         return {
             title: Settings.get(Settings.CREATE_ITEM_TITLE),
-            captureTitle: Settings.get(Settings.CAPTURE_CREATE_ITEM_TITLE)
+            captureTitle: Settings.get(Settings.CAPTURE_CREATE_ITEM_TITLE),
+            itemDirectoryButton: Settings.get(Settings.ITEM_DIRECTORY_BUTTON),
+            isV12: (game as any).version.split(".")[0] >= "12"
         }
     }
 
     async _updateObject(event, formData) {
         Settings.set(Settings.CREATE_ITEM_TITLE,formData.title);
         Settings.set(Settings.CAPTURE_CREATE_ITEM_TITLE,formData.captureTitle);
+        Settings.set(Settings.ITEM_DIRECTORY_BUTTON,formData.itemDirectoryButton);
         this.render();
     }
 

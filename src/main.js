@@ -27,17 +27,6 @@ Hooks.on("ready", async function(){
         ui.notifications.error("Beavers Crafting | missing module Beavers System Interface", {permanent:true});
     }
 })
-Hooks.on("renderItemDirectory", (app, html, data) => {
-  if(!html.find) html = $(html)
-  html.find(".directory-item, .entry").each((index, element) => {
-    const id = element.dataset.documentId || element.dataset.entryId;
-    const item = game.items.get(id);
-    if (item?.getFlag("beavers-crafting", "containerId")) {
-      // Add a custom class or attribute
-      element.classList.add("beavers-hidden-item");
-    }
-  });
-});
 
 async function migrate(){
     const version = Settings.get(Settings.MAJOR_VERSION);
@@ -73,41 +62,76 @@ function debug(){
         return originalCallAll.call(this, hookName, ...args);
     };
 }
-debug();
-Hooks.once("beavers-system-interface.ready", async function () {
-  Settings.init();
-  if (!game[Settings.NAMESPACE]) game[Settings.NAMESPACE] = {};
-  game[Settings.NAMESPACE].Crafting = Crafting;
-  game[Settings.NAMESPACE].RecipeCompendium = RecipeCompendium;
-  game[Settings.NAMESPACE].Recipe = Recipe;
-  game[Settings.NAMESPACE].Settings = Settings;
-  game[Settings.NAMESPACE].migrateRecipeAddItemType = itemTypeMigration;
-  game[Settings.NAMESPACE].migrateRecipeSkillToTests = migrateRecipeSkillToTests;
-  game[Settings.NAMESPACE].migrateDeprecateTools = migrateDeprecateTools;
-  game[Settings.NAMESPACE].migrateRecipeToOrConditions = migrateRecipeToOrConditions;
-  game[Settings.NAMESPACE].migrateRecipeTestsToBeaversTests = migrateRecipeTestsToBeaversTests;
-  hookChatLog();
-  migrate();
-  beaversSystemInterface.addExtension(Settings.NAMESPACE, { componentAddFlags: ["crafted", "isCrafted"] });
 
-  if (Settings.get(Settings.SEPARATE_CRAFTED_ITEMS) === "full") {
-    beaversSystemInterface.addExtension(Settings.NAMESPACE, {
-      componentIsSame: (a, b, previousResult) => {
-        const aHasFlag = foundry.utils.getProperty(a, `flags.${Settings.NAMESPACE}.isCrafted`);
-        const bHasFlag = foundry.utils.getProperty(b, `flags.${Settings.NAMESPACE}.isCrafted`);
-        return previousResult && aHasFlag === bHasFlag;
-      },
+Hooks.once("beavers-system-interface.ready", async function(){
+    Settings.init();
+    if(!game[Settings.NAMESPACE])game[Settings.NAMESPACE]={};
+    game[Settings.NAMESPACE].Crafting = Crafting;
+    game[Settings.NAMESPACE].RecipeCompendium = RecipeCompendium;
+    game[Settings.NAMESPACE].Recipe = Recipe;
+    game[Settings.NAMESPACE].Settings = Settings;
+    game[Settings.NAMESPACE].migrateRecipeAddItemType = itemTypeMigration;
+    game[Settings.NAMESPACE].migrateRecipeSkillToTests= migrateRecipeSkillToTests;
+    game[Settings.NAMESPACE].migrateDeprecateTools= migrateDeprecateTools;
+    game[Settings.NAMESPACE].migrateRecipeToOrConditions= migrateRecipeToOrConditions;
+    game[Settings.NAMESPACE].migrateRecipeTestsToBeaversTests= migrateRecipeTestsToBeaversTests;
+    hookChatLog();
+    migrate();
+    beaversSystemInterface.addExtension(Settings.NAMESPACE,{componentAddFlags:["crafted","isCrafted"]})
+
+  Hooks.on("renderItemDirectory", (app, html, data) => {
+    if(!html.find) html = $(html)
+    html.find(".directory-item, .entry").each((index, element) => {
+      const id = element.dataset.documentId || element.dataset.entryId;
+      const item = game.items.get(id);
+      if (item?.getFlag("beavers-crafting", "containerId")) {
+        // Add a custom class or attribute
+        element.classList.add("beavers-hidden-item");
+      }
     });
-  }
-  if (Settings.get(Settings.SEPARATE_CRAFTED_ITEMS) === "partial") {
-    beaversSystemInterface.addExtension(Settings.NAMESPACE, {
-      componentIsSame: (a, b, previousResult) => {
-        const aHasFlag = foundry.utils.getProperty(a, `flags.${Settings.NAMESPACE}.isCrafted`);
-        const bHasFlag = foundry.utils.getProperty(b, `flags.${Settings.NAMESPACE}.isCrafted`);
-        return previousResult && (!aHasFlag || aHasFlag === bHasFlag);
-      },
+  });
+
+    Hooks.on("renderItemDirectory", (app, html, data) => {
+        if ((game.version || game.data.version).split(".")[0] >= 12 && Settings.get(Settings.ITEM_DIRECTORY_BUTTON)) {
+            if(!game.user.can("ITEM_CREATE")) return;
+            if(!html.find) html = $(html)
+            const header = html.find(".header-actions");
+            const existing = html.find(".beavers-crafting-create-item");
+            if (existing.length === 0) {
+              const button = $(`<button style="flex:0 0 32px" type="button" title="${game.i18n.localize(
+                "beaversCrafting.create-item-dialog.title",
+              )}" class="beavers-crafting-create-item">
+                    <img width="20" src="modules/beavers-crafting/icons/tools.svg" />
+                </button>`);
+              button.on("click", () => {
+                import("./apps/CreateItemDialog.js").then((module) => {
+                  module.showCreateItemDialog();
+                });
+              });
+              header.append(button);
+            }
+        }
     });
-  }
+    if (ui.sidebar.tabs?.items?.rendered) {
+        ui.sidebar.tabs.items.render(true);
+    } else if (ui.items?.rendered) {
+        ui.items.render(true);
+    }
+
+    if(Settings.get(Settings.SEPARATE_CRAFTED_ITEMS) === "full"){
+        beaversSystemInterface.addExtension(Settings.NAMESPACE,{componentIsSame:(a,b,previousResult)=>{
+            const aHasFlag = foundry.utils.getProperty(a,`flags.${Settings.NAMESPACE}.isCrafted`);
+            const bHasFlag = foundry.utils.getProperty(b,`flags.${Settings.NAMESPACE}.isCrafted`);
+            return previousResult && aHasFlag === bHasFlag
+            }})
+    }
+    if(Settings.get(Settings.SEPARATE_CRAFTED_ITEMS) === "partial"){
+        beaversSystemInterface.addExtension(Settings.NAMESPACE,{componentIsSame:(a,b,previousResult)=>{
+                const aHasFlag = foundry.utils.getProperty(a,`flags.${Settings.NAMESPACE}.isCrafted`);
+                const bHasFlag = foundry.utils.getProperty(b,`flags.${Settings.NAMESPACE}.isCrafted`);
+                return previousResult && (!aHasFlag || aHasFlag === bHasFlag)
+            }})
+    }
 
   Hooks.on("renderActorSheet", (app, html, data) => {
     if (app instanceof Application) {
