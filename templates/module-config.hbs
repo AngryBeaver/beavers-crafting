@@ -26,6 +26,16 @@
         </p>
     </div>
 
+    {{#if isV12}}
+    <div class="form-group">
+        <label>{{localize "beaversCrafting.settings.itemDirectoryButton.name"}}</label>
+        <div class="form-fields">
+            <input {{#if itemDirectoryButton}}checked{{/if}} name="itemDirectoryButton" type="checkbox"/>
+        </div>
+        <p class="notes">{{localize "beaversCrafting.settings.itemDirectoryButton.hint"}}</p>
+    </div>
+    {{/if}}
+
     <button type="submit">
         <i class="fas fa-save"></i>
         Save

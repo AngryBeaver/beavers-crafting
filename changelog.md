@@ -1,4 +1,6 @@
 # Changelog
+## 4.3.2
+- possibility to enable a seperate CreateBeaver`sItem dialog button.
 ## 4.3.1
 - fix recipe compendium
   - header style

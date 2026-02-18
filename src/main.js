@@ -20,11 +20,11 @@ import { hookChatLog } from "./apps/ChatLog.js";
 Hooks.on("beavers-system-interface.init", async function(){
     beaversSystemInterface.addModule(Settings.NAMESPACE);
 });
-Hooks.on("ready", async function(){
-    if(window.beaversSystemInterface === undefined){
-        ui.notifications.error("Beavers Crafting | missing module Beavers System Interface", {permanent:true});
-    }
-})
+Hooks.on("ready", async function () {
+  if (window.beaversSystemInterface === undefined) {
+    ui.notifications.error("Beavers Crafting | missing module Beavers System Interface", { permanent: true });
+  }
+});
 
 async function migrate(){
     const version = Settings.get(Settings.MAJOR_VERSION);
@@ -77,6 +77,32 @@ Hooks.once("beavers-system-interface.ready", async function(){
     migrate();
     beaversSystemInterface.addExtension(Settings.NAMESPACE,{componentAddFlags:["crafted","isCrafted"]})
 
+    Hooks.on("renderItemDirectory", (app, html, data) => {
+        if ((game.version || game.data.version).split(".")[0] >= 12 && Settings.get(Settings.ITEM_DIRECTORY_BUTTON)) {
+            if(!html.find) html = $(html)
+            const header = html.find(".header-actions");
+            const existing = html.find(".beavers-crafting-create-item");
+            if (existing.length === 0) {
+              const button = $(`<button style="flex:0 0 32px" type="button" title="${game.i18n.localize(
+                "beaversCrafting.create-item-dialog.title",
+              )}" class="beavers-crafting-create-item">
+                    <img width="20" src="modules/beavers-crafting/icons/tools.svg" />
+                </button>`);
+              button.on("click", () => {
+                import("./apps/CreateItemDialog.js").then((module) => {
+                  module.showCreateItemDialog();
+                });
+              });
+              header.append(button);
+            }
+        }
+    });
+    if (ui.sidebar.tabs?.items?.rendered) {
+        ui.sidebar.tabs.items.render(true);
+    } else if (ui.items?.rendered) {
+        ui.items.render(true);
+    }
+
     if(Settings.get(Settings.SEPARATE_CRAFTED_ITEMS) === "full"){
         beaversSystemInterface.addExtension(Settings.NAMESPACE,{componentIsSame:(a,b,previousResult)=>{
             const aHasFlag = foundry.utils.getProperty(a,`flags.${Settings.NAMESPACE}.isCrafted`);
@@ -109,7 +135,7 @@ Hooks.once("beavers-system-interface.ready", async function(){
         CraftedItemSheet.bind(app, html, data);
       }
     });
-
+    
     Hooks.on(`renderApplicationV2`, async (app, html, data, options) => {
       await RecipeSheet.bind(app, html, data, 2);
       AnyOfSheet.bind(app, html, data, 2);

@@ -111,6 +111,10 @@
         "name": "Draggable chat result",
         "hint": "You can drag recipe results from chat to other players inventory"
       },
+      "itemDirectoryButton": {
+        "name": "Add Beaver's Item Button",
+        "hint": "Adds a button to the Item Directory to create Beaver's Crafting items directly (v12+ only)."
+      },
       "useAttendants": {
         "name": "Recipes use required Items",
         "hint": "A Recipe can require to have items present on actor that does not get consumed in the process. You can setUp anything your system models as item e.g. for dnd5e feats, class, background, tools etc!"
@@ -151,6 +155,14 @@
     "module-config": {
       "title": "Module Config",
       "info": "The module need to detect the window that creates new Items. For this it uses internally the title of that window. If you have the default language the title is most likely 'Create New Item' and you need nothing to do."
+    },
+    "create-item-dialog": {
+      "title": "Create Beaver's Item",
+      "name": "Item Name",
+      "type": "Item Type",
+      "create": "Create",
+      "recipe": "Recipe",
+      "anyOf": "AnyOf"
     }
   }
 }

@@ -64,6 +64,7 @@ in possibly all Systems: ([List of adaption layers](https://github.com/AngryBeav
     * [Ingredients](#ingredients)
     * [Recipes](#recipes)
   * [Settings](#settings)
+    * [Create Beaver's Item Button](#create-beavers-item-button)
     * [3.3.x isCrafted flag](#33x-iscrafted-flag)
   * [Notes](#notes)
     * [Currency reorder](#currency-reorder)
@@ -261,11 +262,12 @@ You can find some example recipes for potions (dnd5e) in the companion module be
 Every Character will now have access to 50+ recipes to brew potions.
 
 ## Settings
-- Some Settings are currently only available in dnd5e
+### Create Beaver's Item Button
+In Foundry VTT v12+, you can enable a button in the Item Directory to quickly create Beaver's Crafting items (Recipes and AnyOf).
 
-![img.png](pictures/toolconfig.png)
-- You can configure the tool list your recipes can select from. 
-(however if you do you might risk incompatibility to others, if the list is missing some default dnd5e tools tell me so)
+![createItemButton.png](pictures/createItemButton.png)
+
+To enable this, go to the module's **Setup** configuration and check the **Add Beaver's Item Button** setting.
 
 ### 3.3.x isCrafted flag
 This module now tracks a isCrafted flag on items.
@@ -331,6 +333,9 @@ this will add a bullseye to the header:
 ![img.png](icons/bullseye.png)
 
 click it this will configure this windows as your Item creation window and will add the new subtypes whenever you reopen it.
+
+**Alternative (v12+):**
+If the above methods fail or if you prefer a more direct approach, you can enable the [Create Beaver's Item Button](#create-beavers-item-button) in the module's setup. This adds a dedicated button to the Item Directory that skips the need for window detection.
 
 
 #### Advanced Explanation:

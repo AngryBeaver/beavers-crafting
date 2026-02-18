@@ -22,6 +22,7 @@ export class Settings {
     static TAB_ICON = "tabIcon";
     static CAPTURE_CREATE_ITEM_TITLE = "captureCreateItemTitle";
     static DRAGGABLE_CHAT_RESULT = "draggableChatResult";
+    static ITEM_DIRECTORY_BUTTON = "itemDirectoryButton";
     static init() {
         game.settings.register(this.NAMESPACE, this.CREATE_ITEM_TITLE, {
             name: game.i18n.localize('beaversCrafting.settings.createItemTitle.name'),
@@ -91,6 +92,15 @@ export class Settings {
             hint: game.i18n.localize('beaversCrafting.settings.draggableChatResult.hint'),
             scope: "world",
             config: true,
+            default: false,
+            requiresReload: true,
+            type: Boolean,
+        });
+        game.settings.register(this.NAMESPACE, this.ITEM_DIRECTORY_BUTTON, {
+            name: game.i18n.localize('beaversCrafting.settings.itemDirectoryButton.name'),
+            hint: game.i18n.localize('beaversCrafting.settings.itemDirectoryButton.hint'),
+            scope: "world",
+            config: false,
             default: false,
             requiresReload: true,
             type: Boolean,
