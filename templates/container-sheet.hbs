@@ -1,0 +1,54 @@
+<div class="beavers-crafting container-sheet">
+    <header class="flexrow" style="margin-bottom: 10px;">
+        <div class="mode-toggle" style="display: flex; align-items: center; gap: 10px;">
+            <label>{{localize "beaversCrafting.container.mode"}}:</label>
+            <select name="flags.beavers-crafting.container.mode" style="flex: 1;">
+                <option value="recipes" {{#if (eq container.mode "recipes")}}selected{{/if}}>{{localize "beaversCrafting.container.book"}}</option>
+                <option value="items" {{#if (eq container.mode "items")}}selected{{/if}}>{{localize "beaversCrafting.container.bag"}}</option>
+            </select>
+        </div>
+    </header>
+
+    <div class="contents-list" style="display: flex; flex-direction: column; gap: 4px;">
+        {{#each contents}}
+            <div class="content-item flexrow" data-id="{{this.id}}" data-uuid="{{this.uuid}}" style="align-items: center; border-bottom: 1px solid #ccc; padding-bottom: 2px; width: 100%;">
+                {{#if ../editable}}
+                    <a class="item-control item-remove" title="{{localize 'beaversCrafting.container.remove'}}" style="margin-right: 5px; flex:0 0 15px">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                {{/if}}
+                <img src="{{this.img}}" width="24" height="24" style="flex: 0 0 24px; margin-right: 5px;"/>
+                <span class="name" style="flex: 1;">{{this.name}}</span>
+                <div class="quantity-controls" style="flex: 0 0 80px; display: flex; align-items: center; justify-content: flex-end; gap: 5px; margin-right: 10px;">
+                    {{#if ../editable}}
+                        <a class="quantity-minus"><i class="fas fa-minus"></i></a>
+                    {{/if}}
+                    <span class="quantity">{{this.quantity}}</span>
+                    {{#if ../editable}}
+                        <a class="quantity-plus"><i class="fas fa-plus"></i></a>
+                    {{/if}}
+                </div>
+                <div class="item-controls" style="flex: 0 0 50px; display: flex; gap: 10px; justify-content: flex-end;">
+                    <a class="item-control item-edit" title="{{localize 'beaversCrafting.container.edit'}}">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    {{#if ../editable}}
+                        <a class="item-control item-delete" title="{{localize 'beaversCrafting.container.delete'}}">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    {{/if}}
+                </div>
+            </div>
+        {{/each}}
+        {{#if (beavers-isEmpty contents)}}
+            <div class="empty-message">{{localize "beaversCrafting.container.empty"}}</div>
+        {{/if}}
+    </div>
+    {{#if editable}}
+        <div class="flexrow" style="margin-top: 5px;">
+            <div class="drop-area" style="min-height:30px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; width: 100%;">
+                {{localize "beaversCrafting.recipe.dropItem"}}
+            </div>
+        </div>
+    {{/if}}
+</div>

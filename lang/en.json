@@ -151,6 +151,17 @@
     "module-config": {
       "title": "Module Config",
       "info": "The module need to detect the window that creates new Items. For this it uses internally the title of that window. If you have the default language the title is most likely 'Create New Item' and you need nothing to do."
+    },
+    "container": {
+      "mode": "Mode",
+      "mode-recipes": "Recipes (Book)",
+      "mode-items": "Physical Items (Bag)",
+      "book": "Book",
+      "bag": "Bag",
+      "remove": "Remove from container",
+      "delete": "Delete Item",
+      "edit": "Edit Item",
+      "empty": "Container is empty"
     }
   }
 }

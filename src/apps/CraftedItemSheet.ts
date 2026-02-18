@@ -9,7 +9,7 @@ export class CraftedItemSheet{
     private constructor(app, html, data) {
         this.app = app;
         this.item = app.item;
-        this.html = html;
+        this.html = html.jquery ? html : $(html);
         this.data = data;
         void this.init()
     }
