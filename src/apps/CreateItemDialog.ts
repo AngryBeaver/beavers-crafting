@@ -4,6 +4,17 @@ declare var foundry: any;
 
 import {Settings} from "../Settings.js";
 
+const images={
+  recipe: "icons/sundries/scrolls/scroll-worn-tan.webp",
+  anyOf: "modules/beavers-crafting/icons/anyOf.png",
+  container: "icons/containers/bags/sack-simple-leather-brown.webp"
+}
+const types = {
+  recipe: Settings.RECIPE_SUBTYPE,
+  anyOf: Settings.ANYOF_SUBTYPE,
+  container: "container"
+}
+
 export async function showCreateItemDialog() {
     const itemType = beaversSystemInterface.configLootItemType;
     const content = `
@@ -17,15 +28,15 @@ export async function showCreateItemDialog() {
         <label>${(game as Game).i18n.localize("beaversCrafting.create-item-dialog.type")}</label>
         <div class="form-fields">
             <select name="type">
-                <option value="recipe">${(game as Game).i18n.localize(
-                  "beaversCrafting.create-item-dialog.recipe",
-                )}</option>
-                <option value="anyOf">${(game as Game).i18n.localize(
-                  "beaversCrafting.create-item-dialog.anyOf",
-                )}</option>
-                <option value="container">${(game as Game).i18n.localize(
-                  "beaversCrafting.create-item-dialog.container",
-                )}</option>
+                <option value="recipe">
+                    ${(game as Game).i18n.localize("beaversCrafting.create-item-dialog.recipe")}
+                </option>
+                <option value="anyOf">
+                    ${(game as Game).i18n.localize("beaversCrafting.create-item-dialog.anyOf")}
+               </option>
+                <option value="container">
+                    ${(game as Game).i18n.localize("beaversCrafting.create-item-dialog.container")}
+                </option>
             </select>
         </div>
     </div>`;
@@ -49,13 +60,10 @@ export async function showCreateItemDialog() {
             const itemData = {
               name: name,
               type: itemType,
-              img:
-                subType === "recipe"
-                  ? "icons/sundries/scrolls/scroll-worn-tan.webp"
-                  : "modules/beavers-crafting/icons/anyOf.png",
+              img: images[subType],
               flags: {
                 [Settings.NAMESPACE]: {
-                  subtype: subType === "recipe" ? Settings.RECIPE_SUBTYPE : Settings.ANYOF_SUBTYPE,
+                  subtype: subType
                 },
               },
             };
