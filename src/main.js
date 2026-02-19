@@ -1,6 +1,6 @@
 import {CraftingApp} from './apps/CraftingApp.js';
 import {RecipeSheet} from './apps/RecipeSheet.js';
-import {Settings} from './Settings.js';
+import { rerenderItemDirectory, Settings} from './Settings.js';
 import {Crafting} from "./Crafting.js";
 import {RecipeCompendium} from "./apps/RecipeCompendium.js";
 import {AnyOfSheet} from "./apps/AnyOfSheet.js";
@@ -98,8 +98,8 @@ Hooks.once("beavers-system-interface.ready", async function(){
     }
 
     function addItemDirectoryButton(html){
+      if (!game.user.can("ITEM_CREATE")) return;
       if ((game.version || game.data.version).split(".")[0] >= 12 && Settings.get(Settings.ITEM_DIRECTORY_BUTTON)) {
-        if (!game.user.can("ITEM_CREATE")) return;
         const header = html.find(".header-actions");
         const existing = html.find(".beavers-crafting-create-item");
         if (existing.length === 0) {
@@ -119,15 +119,11 @@ Hooks.once("beavers-system-interface.ready", async function(){
     }
 
     Hooks.on("renderItemDirectory", (app, html, data) => {
-      if(!html.find) html = $(html)
+      if (!html.find) html = $(html);
       hideDirectory(html);
-      addItemDirectoryButton(html)
+      addItemDirectoryButton(html);
     });
-    if (ui.sidebar.tabs?.items?.rendered) {
-        ui.sidebar.tabs.items.render(true);
-    } else if (ui.items?.rendered) {
-        ui.items.render(true);
-    }
+    rerenderItemDirectory();
 
     if(Settings.get(Settings.SEPARATE_CRAFTED_ITEMS) === "full"){
         beaversSystemInterface.addExtension(Settings.NAMESPACE,{componentIsSame:(a,b,previousResult)=>{

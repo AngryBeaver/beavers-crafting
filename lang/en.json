@@ -30,14 +30,14 @@
         "consumeHint": "consumes cost on failed tests",
         "andTestHint": "add additional Test",
         "orTestHint": "add alternative Test",
-        "skill":"Skill:",
+        "skill": "Skill:",
         "ability": "Ability:"
       },
       "tools": "Tool",
       "dc": "DC",
       "results": "Results",
       "dropItem": "drop item",
-      "addItem" : "add item",
+      "addItem": "add item",
       "orItem": "or item",
       "currency": "Cost",
       "consumeOnFailedSaveHint": "Consumes Cost on failed Skill check",
@@ -47,7 +47,7 @@
       },
       "folder": "Folder",
       "folderHint": "You can create subfolder by separating words with '.' e.g. Folder.Subfolder",
-      "folderPlaceHolder":"Folder.Subfolder"
+      "folderPlaceHolder": "Folder.Subfolder"
     },
     "anyOf": {
       "dropItem": "drop item",
@@ -62,7 +62,7 @@
       "preselection": "choose"
     },
     "crafting-app": {
-      "search":{
+      "search": {
         "all": "all",
         "available": "available",
         "usable": "usable",
@@ -170,8 +170,9 @@
       "name": "Item Name",
       "type": "Item Type",
       "create": "Create",
-      "recipe": "Recipe",
-      "anyOf": "AnyOf"
+      "recipe": "\uD83D\uDCDCRecipe",
+      "anyOf": "❔AnyOf",
+      "container": "\uD83D\uDCE6Container"
     },
     "container": {
       "mode": "Mode",

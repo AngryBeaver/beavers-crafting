@@ -170,8 +170,9 @@
       "name": "Nome do Item",
       "type": "Tipo de Item",
       "create": "Criar",
-      "recipe": "Receita",
-      "anyOf": "AnyOf"
+      "recipe": "\uD83D\uDCDCReceita",
+      "anyOf": "❔AnyOf",
+      "container": "\uD83D\uDCE6Contêiner"
     },
     "container": {
       "mode": "Modo",

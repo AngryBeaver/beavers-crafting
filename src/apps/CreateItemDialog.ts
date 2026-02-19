@@ -23,6 +23,9 @@ export async function showCreateItemDialog() {
                 <option value="anyOf">${(game as Game).i18n.localize(
                   "beaversCrafting.create-item-dialog.anyOf",
                 )}</option>
+                <option value="container">${(game as Game).i18n.localize(
+                  "beaversCrafting.create-item-dialog.container",
+                )}</option>
             </select>
         </div>
     </div>`;

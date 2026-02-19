@@ -62,7 +62,7 @@
       "preselection": "sélection"
     },
     "crafting-app": {
-      "search":{
+      "search": {
         "all": "tout",
         "available": "disponsible",
         "usable": "réalisable",
@@ -170,8 +170,9 @@
       "name": "Nom de l’objet",
       "type": "Type d’objet",
       "create": "Créer",
-      "recipe": "Recette",
-      "anyOf": "AnyOf"
+      "recipe": "\uD83D\uDCDCRecette",
+      "anyOf": "❔AnyOf",
+      "container": "\uD83D\uDCE6Conteneur"
     },
     "container": {
       "mode": "Mode",

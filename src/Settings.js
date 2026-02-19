@@ -207,12 +207,20 @@ export class Settings {
         return game.settings.get(this.NAMESPACE, key);
     };
 
-    static set(key, value) {
-        game.settings.set(this.NAMESPACE, key, value);
+    static async set(key, value) {
+        return game.settings.set(this.NAMESPACE, key, value);
     }
 
     static isDisabledActor(actor) {
         return Settings.get(Settings.DISABLED_ACTOR).split(",").includes(actor.type);
     }
 
+}
+
+export function rerenderItemDirectory(){
+  if (ui.sidebar.tabs?.items?.rendered) {
+    ui.sidebar.tabs.items.render(true);
+  } else if (ui.items?.rendered) {
+    ui.items.render(true);
+  }
 }

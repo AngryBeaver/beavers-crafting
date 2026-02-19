@@ -1,4 +1,8 @@
 # Changelog
+## 4.4,2
+- fix beavers item button
+  - add container
+  - enable disable will repaint itemDirectory accordingly.
 ## 4.4.1
 - fix deletion of container
   - handle content of those container gracefully.
