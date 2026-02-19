@@ -105,3 +105,56 @@ export function getActorContentPool(actor: Actor, asComponents: boolean = true):
 export function isBeaversContainer(item: Item): boolean {
   return foundry.utils.getProperty(item, `flags.${Settings.NAMESPACE}.subtype`) === 'container';
 }
+
+/**
+ * Cleanup script to remove containerId flags from items that no longer have a valid container.
+ */
+export async function runCleanup() {
+  if (!(game as Game)?.user?.isGM) return;
+  console.log("Beavers Crafting | Running cleanup...");
+
+  // 1. World Items
+  const worldItems = (game as Game)?.items?.contents || [];
+  const worldContainerIds = new Set(
+    worldItems
+      .filter(i => Container.isContainer(i))
+      .map(i => i.id)
+  );
+  await _cleanupItems(worldItems, (game as Game)?.items, worldContainerIds);
+
+  // 2. PC Actor Items
+  const pcActors = (game as Game)?.actors?.filter(a => a.type === "character" || a.hasPlayerOwner) || [];
+  for (const actor of pcActors) {
+    const actorItems = actor.items.contents;
+    const actorContainerIds = new Set(
+      actorItems
+        .filter(i => Container.isContainer(i))
+        .map(i => i.id)
+    );
+    await _cleanupItems(actorItems, actor, actorContainerIds);
+  }
+
+  console.log("Beavers Crafting | Cleanup finished.");
+  Settings.set(Settings.LAST_CLEANUP_TIMESTAMP, Date.now());
+}
+
+async function _cleanupItems(items, parent, validContainerIds: Set<string | null>) {
+  const updates = [];
+  for (const item of items) {
+    const containerId = foundry.utils.getProperty(item, `flags.${Settings.NAMESPACE}.containerId`);
+    if (containerId && !validContainerIds.has(containerId)) {
+      // @ts-ignore
+      updates.push({ _id: item.id, [`flags.${Settings.NAMESPACE}.-=containerId`]: null });
+    }
+  }
+
+  if (updates.length > 0) {
+    if (parent instanceof Actor) {
+      await parent.updateEmbeddedDocuments("Item", updates);
+    } else {
+      await Item.updateDocuments(updates);
+    }
+  }
+}
+
+

@@ -23,6 +23,8 @@ export class Settings {
     static CAPTURE_CREATE_ITEM_TITLE = "captureCreateItemTitle";
     static DRAGGABLE_CHAT_RESULT = "draggableChatResult";
     static ITEM_DIRECTORY_BUTTON = "itemDirectoryButton";
+    static CONTAINER_CONTENT_HANDLING = "containerContentHandling";
+    static LAST_CLEANUP_TIMESTAMP = "lastCleanupTimestamp";
     static init() {
         game.settings.register(this.NAMESPACE, this.CREATE_ITEM_TITLE, {
             name: game.i18n.localize('beaversCrafting.settings.createItemTitle.name'),
@@ -152,6 +154,25 @@ export class Settings {
                 partial: "partial ",
                 full: "full"
             }
+        });
+        game.settings.register(this.NAMESPACE, this.CONTAINER_CONTENT_HANDLING, {
+            name: game.i18n.localize('beaversCrafting.settings.containerContentHandling.name'),
+            hint: game.i18n.localize('beaversCrafting.settings.containerContentHandling.hint'),
+            scope: "world",
+            config: true,
+            default: "ask",
+            type: String,
+            choices: {
+                ask: game.i18n.localize('beaversCrafting.settings.containerContentHandling.choices.ask'),
+                remove: game.i18n.localize('beaversCrafting.settings.containerContentHandling.choices.remove'),
+                move: game.i18n.localize('beaversCrafting.settings.containerContentHandling.choices.move'),
+            }
+        });
+        game.settings.register(this.NAMESPACE, this.LAST_CLEANUP_TIMESTAMP, {
+            scope: "world",
+            config: false,
+            default: 0,
+            type: Number,
         });
         game.settings.register(this.NAMESPACE, this.MAJOR_VERSION, {
             scope: "world",

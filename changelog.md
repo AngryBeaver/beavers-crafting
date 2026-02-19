@@ -1,4 +1,8 @@
 # Changelog
+## 4.4.1
+- fix deletion of container
+  - handle content of those container gracefully.
+  - periodically check for abandoned containers and release its content.
 ## 4.4.0
 - add experimental container
 ## 4.3.3

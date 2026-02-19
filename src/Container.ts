@@ -48,4 +48,66 @@ export class Container {
       await item.update({ [`flags.${Settings.NAMESPACE}.-=containerId`]: null });
     }
   }
+
+  static async preDeleteItem(item, options, userId) {
+    if (userId !== (game as Game)?.user?.id) return true;
+    if (!Container.isContainer(item)) return true;
+
+    const contents = await findSourceChildrenComponents(item);
+    if (contents.length === 0) return true;
+
+    let action = Settings.get(Settings.CONTAINER_CONTENT_HANDLING);
+
+    if (action === "ask") {
+      // @ts-ignore
+      action = await foundry.applications.api.DialogV2.wait({
+        window: { title: (game as Game).i18n.localize("beaversCrafting.container.deleteDialog.title") },
+        content: (game as Game).i18n.format("beaversCrafting.container.deleteDialog.content", { name: item.name }),
+        buttons: [
+          {
+            action: "move",
+            icon: "fas fa-suitcase",
+            label: (game as Game).i18n.localize("beaversCrafting.container.deleteDialog.move"),
+            default: true,
+          },
+          {
+            action: "remove",
+            icon: "fas fa-trash",
+            label: (game as Game).i18n.localize("beaversCrafting.container.deleteDialog.remove"),
+          },
+        ],
+        rejectClose: false,
+      });
+    }
+
+    if (action === "move" || (Settings.get(Settings.CONTAINER_CONTENT_HANDLING) === "ask" && (action === null || action === undefined))) {
+      const itemCollection = item.actor ? item.actor.items : (game as any).items;
+      const updates = [];
+      for (const componentData of contents) {
+        const contentItem = itemCollection.get(componentData.id);
+        if (contentItem) {
+          // @ts-ignore
+          updates.push({ _id: contentItem.id, [`flags.${Settings.NAMESPACE}.-=containerId`]: null });
+        }
+      }
+      if (updates.length > 0) {
+        if (item.actor) {
+          await item.actor.updateEmbeddedDocuments("Item", updates);
+        } else {
+          await Item.updateDocuments(updates);
+        }
+      }
+    } else if (action === "remove") {
+      const itemCollection = item.actor ? item.actor.items : (game as any).items;
+      const idsToRemove = contents.map(c => c.id).filter(id => itemCollection.has(id));
+      if (idsToRemove.length > 0) {
+        if (item.actor) {
+          await item.actor.deleteEmbeddedDocuments("Item", idsToRemove);
+        } else {
+          await Item.deleteDocuments(idsToRemove);
+        }
+      }
+    }
+    return true;
+  }
 }

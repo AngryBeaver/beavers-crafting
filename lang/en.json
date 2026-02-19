@@ -150,6 +150,15 @@
       "separateItems": {
         "name": "Separate produced Items",
         "hint": "Here you can set if a produced item is different then non produced. When set to full your produced items are different to unproduced once (e.g. you can create special recipes that require produced items). Partial will try to detect what you mean but will and can not always be correct (e.g. when you drag a produced dagger into your recipe it requires a produced dagger when you drag a normal dagger it can use a produced or non produced dagger)."
+      },
+      "containerContentHandling": {
+        "name": "Container content handling",
+        "hint": "What should happen with items in a container when the container is deleted?",
+        "choices": {
+          "ask": "Ask",
+          "remove": "Delete items",
+          "move": "Move items"
+        }
       }
     },
     "module-config": {
@@ -174,7 +183,13 @@
       "delete": "Delete Item",
       "edit": "Edit Item",
       "empty": "Container is empty",
-      "experimental": "This feature is in an experimental state."
+      "experimental": "This feature is in an experimental state.",
+      "deleteDialog": {
+        "title": "Delete Container",
+        "content": "The container '{name}' contains items. What should happen with them?",
+        "remove": "Delete items",
+        "move": "Move items"
+      }
     }
   }
 }

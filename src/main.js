@@ -12,13 +12,14 @@ import {
     migrateRecipeSkillToTests, migrateRecipeTestsToBeaversTests,
     migrateRecipeToOrConditions,
 } from "./migration.js";
+import {Container} from "./Container.js";
 import {ActorSheetCraftedInventory} from "./apps/ActorSheetCraftedInventory.js";
 import {ActorSheetContainer} from "./apps/ActorSheetContainer.js";
 import {CraftedItemSheet} from "./apps/CraftedItemSheet.js";
 import {ContainerSheet} from "./apps/ContainerSheet.js";
 import "./compatibility/tidy5e.js";
 import { hookChatLog } from "./apps/ChatLog.js";
-import { attachContentsToCreatedContainer } from "./ContainerHandler.js";
+import { attachContentsToCreatedContainer, runCleanup } from "./ContainerHandler.js";
 
 Hooks.on("beavers-system-interface.init", async function(){
     beaversSystemInterface.addModule(Settings.NAMESPACE);
@@ -65,7 +66,6 @@ function debug(){
 }
 
 Hooks.once("beavers-system-interface.ready", async function(){
-    debug();
     Settings.init();
     if(!game[Settings.NAMESPACE])game[Settings.NAMESPACE]={};
     game[Settings.NAMESPACE].Crafting = Crafting;
@@ -80,6 +80,12 @@ Hooks.once("beavers-system-interface.ready", async function(){
     hookChatLog();
     migrate();
     beaversSystemInterface.addExtension(Settings.NAMESPACE,{componentAddFlags:["crafted","isCrafted"]})
+
+    const lastCleanup = Settings.get(Settings.LAST_CLEANUP_TIMESTAMP);
+    const now = Date.now();
+    if (now - lastCleanup > 24 * 60 * 60 * 1000) {
+        runCleanup();
+    }
 
     function hideDirectory(html){
       html.find(".directory-item, .entry").each((index, element) => {
@@ -206,7 +212,7 @@ Hooks.once("beavers-system-interface.ready", async function(){
   //evil TODO fix this make recipes own type !
   // own type does not yet work for all supported systems.
 
-  // After a container is created on an actor via drop, copy its predefined contents onto the actor and assign to the created container
+  // After a container is created, copy its predefined contents over and assign to the created container
   Hooks.on("createItem", async (doc, options) => {
     try {
       const isBeaversContainer = foundry.utils.getProperty(doc, `flags.${Settings.NAMESPACE}.subtype`) === "container";
@@ -233,6 +239,10 @@ Hooks.once("beavers-system-interface.ready", async function(){
   });
   Hooks.on("getHeaderControlsApplicationV2", (dialog, buttons) => {
     hookForCatchingDialogTitle(dialog, buttons);
+  });
+
+  Hooks.on("preDeleteItem", (item, options, userId) => {
+    return Container.preDeleteItem(item, options, userId);
   });
 
   function hookForCatchingDialogTitle(dialog, buttons) {

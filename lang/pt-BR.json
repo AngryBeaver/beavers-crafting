@@ -150,6 +150,15 @@
       "separateItems": {
         "name": "Separar Itens Produzidos",
         "hint": "Aqui você pode definir se um item produzido é diferente de um não produzido. Quando definido como completo, seus itens produzidos são diferentes dos não produzidos (ex.: você pode criar receitas especiais que exigem itens produzidos). Parcial tentará detectar o que você quer dizer, mas não sempre estará correto (ex.: quando você arrasta uma adaga produzida para sua receita, ela exigirá uma adaga produzida, quando você arrasta uma adaga normal, ela pode usar uma adaga produzida ou não produzida)."
+      },
+      "containerContentHandling": {
+        "name": "Gerenciamento de conteúdo do contêiner",
+        "hint": "O que deve acontecer com os itens em um contêiner quando o contêiner for excluído?",
+        "choices": {
+          "ask": "Perguntar",
+          "remove": "Remover itens",
+          "move": "Mover itens"
+        }
       }
     },
     "module-config": {
@@ -174,7 +183,13 @@
       "delete": "Excluir Item",
       "edit": "Editar Item",
       "empty": "O contêiner está vazio",
-      "experimental": "Este recurso está em estado experimental."
+      "experimental": "Este recurso está em estado experimental.",
+      "deleteDialog": {
+        "title": "Excluir Contêiner",
+        "content": "O contêiner '{name}' contém itens. O que deve acontecer com eles?",
+        "remove": "Remover itens",
+        "move": "Mover itens"
+      }
     }
   }
 }

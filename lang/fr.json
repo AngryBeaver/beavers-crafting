@@ -150,6 +150,15 @@
       "separateItems": {
         "name": "Séparer les objets fabriqués",
         "hint": "Définit si un objet fabriqué est différent d’un objet non fabriqué. En mode complet, les objets fabriqués sont distincts (ex. : recettes spéciales). En mode partiel, le système tente de deviner, mais peut se tromper."
+      },
+      "containerContentHandling": {
+        "name": "Gestion du contenu du conteneur",
+        "hint": "Que doit-il se passer avec les objets d'un conteneur lorsque celui-ci est supprimé ?",
+        "choices": {
+          "ask": "Demander",
+          "remove": "Supprimer les objets",
+          "move": "Déplacer les objets"
+        }
       }
     },
     "module-config": {
@@ -174,7 +183,13 @@
       "delete": "Supprimer l’objet",
       "edit": "Modifier l’objet",
       "empty": "Le conteneur est vide",
-      "experimental": "Cette fonctionnalité est dans un état expérimental."
+      "experimental": "Cette fonctionnalité est dans un état expérimental.",
+      "deleteDialog": {
+        "title": "Supprimer le conteneur",
+        "content": "Le conteneur '{name}' contient des objets. Que doit-il se passer avec eux ?",
+        "remove": "Supprimer les objets",
+        "move": "Déplacer les objets"
+      }
     }
   }
 }
