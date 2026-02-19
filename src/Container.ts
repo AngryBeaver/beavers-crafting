@@ -1,4 +1,4 @@
-import {Settings} from "./Settings.js";
+import { rerenderItemDirectory, Settings } from "./Settings.js";
 import { findSourceChildrenComponents } from "./ContainerHandler.js";
 
 export class Container {
@@ -28,7 +28,6 @@ export class Container {
   async addContent(componentData) {
     const component = beaversSystemInterface.componentCreate(componentData);
     const content = await beaversSystemInterface.uuidToDocument(component.uuid);
-    
     if (content.actor === this.item.actor) {
       await content.update({ [`flags.${Settings.NAMESPACE}.containerId`]: this.item.id });
     } else if (this.item.actor && !content.actor) {
@@ -39,6 +38,9 @@ export class Container {
     } else if (!this.item.actor && content.actor) {
       console.warn("Beavers Crafting | Cannot add an actor item to a world container.");
     }
+    if (!this.item.actor) {
+      rerenderItemDirectory();
+    }
   }
 
   async removeContent(componentData) {
@@ -46,6 +48,9 @@ export class Container {
     const item = itemCollection.find(i => i.id === componentData.id && foundry.utils.getProperty(i, `flags.${Settings.NAMESPACE}.containerId`) === this.item.id);
     if (item) {
       await item.update({ [`flags.${Settings.NAMESPACE}.-=containerId`]: null });
+    }
+    if (!this.item.actor) {
+      rerenderItemDirectory();
     }
   }
 

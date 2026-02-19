@@ -1,4 +1,7 @@
 # Changelog
+## 4.4.4
+- fix beavers container in some systems
+  - when adding or removing items to containers those are not hidden or disabled in itemDirectory instantly accordingly.
 ## 4.4.3
 - fix recipe compendium
   - add container !!

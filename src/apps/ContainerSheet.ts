@@ -1,6 +1,6 @@
 import {Container} from "../Container.js";
 import {getDataFrom} from "../helpers/Utility.js";
-import {Settings} from "../Settings.js";
+import {rerenderItemDirectory, Settings} from "../Settings.js";
 
 export class ContainerSheet {
     app;
