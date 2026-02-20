@@ -1,4 +1,6 @@
 # Changelog
+## 4.4.5
+- fix tab toggle in some systems e.g. pf2e
 ## 4.4.4
 - fix beavers container in some systems
   - when adding or removing items to containers those are not hidden or disabled in itemDirectory instantly accordingly.

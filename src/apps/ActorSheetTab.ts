@@ -75,7 +75,7 @@ export class ActorSheetTab {
                 this.app.render();
             });
         });
-        this.html.find('nav [data-group="primary"][data-tab]').click(e => {
+        this.html.find('[data-group="primary"] [data-tab]').click(e => {
             this.app.activeTab = e.currentTarget.dataset.tab;
             this.app.render();
         });

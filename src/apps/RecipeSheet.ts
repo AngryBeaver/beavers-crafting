@@ -49,7 +49,7 @@ export class RecipeSheet {
           app.options.width = app.position.width;
         }
       };
-      if (app.options.window.resizable !== undefined) {
+      if (app.options?.window?.resizable !== undefined) {
         if (app.options.window.resizable !== true) {
           app.options.window.resizable = true;
           await app.close({ animate: false }).catch(() => {
