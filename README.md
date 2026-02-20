@@ -133,10 +133,12 @@ meaning:
 - before you have 3 fails overall.
 
 #### results:
-You may add Items, Containers, or RollTables via drag and drop as results of your process.
+You may add Items, Containers, RollTables, or Macros via drag and drop as results of your process.
 - Containers are supported in two forms:
   - Beaver's Crafting custom container subtype (for systems without native containers)
   - Native dnd5e containers (when using the dnd5e system)
+- Macros dropped into the result section will be executed upon successful crafting.
+  They receive the same parameters as the recipe macro. See [OutputMacro](https://github.com/AngryBeaver/beavers-crafting/blob/main/macros.md#output-macros)
 You will receive the result at the end of the progress if your progress was successful.
 If you add a RollTable you will get quantity amount of rolls on that table, not one roll quantity of times.
 #### instruction:

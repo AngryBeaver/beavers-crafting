@@ -26,9 +26,6 @@ Non underscored objects are considered stable and you will get a breaking change
 see [ResultApi](https://github.com/AngryBeaver/beavers-crafting/blob/main/src/types.ts)
 ````javascript
 interface ResultApi {
-    actorUpdate: {
-        [key: string]: any
-    },
     hasError: ()=>boolean,
     updateActorProperty:(key:string,value:any)=>void,
     addChatComponent: (componentChatData:ComponentChatData)=>void,
@@ -55,13 +52,13 @@ parameter:
 interface ComponentChatData {
   component: ComponentData,
   type: ComponentType,
-  hasError: boolean
+  status: ComponentStatus
 }
 ```
 - 
   - component: [ComponentData](https://github.com/AngryBeaver/beavers-crafting/blob/main/src/types.ts) used to display a Component
   - type: [ComponentType](https://github.com/AngryBeaver/beavers-crafting/blob/main/src/types.ts) used to mark components by type e.g. consumed in this crafting.
-  - hasError: is used to mark a component that has failed in this crafting
+  - status: [ComponentStatus](https://github.com/AngryBeaver/beavers-crafting/blob/main/src/types.ts) used to mark a component status in this crafting e.g. "error" if failed.
 #### payCurrency
 is used to pay the actor currency correctly e.g. exchanging money.
 it will return true when actor is able to pay.
@@ -138,12 +135,13 @@ Similar to update this will delete all appearance of that component in the craft
 ## Examples
 ### Dynamic DCs
 with this code your crafting will change the crafting dc based on ingredients used here if Iron is used the dc drops to 1
-````
-//first non null element of first input.
-const metalObject = Object.values(Object.values(recipeData.input)[0]).find(i=>i!==null);
+````javascript
+//first non null element of first input group.
+const firstGroup = Object.values(recipeData.input)[0];
+const metalObject = Object.values(firstGroup).find(i=>i!==null);
 if(metalObject.name === "Iron"){
   //first and + or test
-  const test = Object.values(Object.values(recipeData.tests.ands)[0].ors)[0];
+  const test = Object.values(Object.values(recipeData.beaversTests.ands)[0].ors)[0];
   test.check = 1;
 }
 ````
@@ -151,7 +149,8 @@ if(metalObject.name === "Iron"){
 ### Selectively keep ingredients on failed crafting
 with this code your crafting will not consume the first ingredient component when crafting fails. 
 ````javascript
-const ingredient1 = Object.values(recipeData.input)[0];
+const firstGroup = Object.values(recipeData.input)[0];
+const ingredient1 = Object.values(firstGroup)[0];
 result.updateComponent("consumed",ingredient1,
   (componentResult, quantity) => {
     componentResult.userInteraction = "onSuccess"
@@ -159,7 +158,8 @@ result.updateComponent("consumed",ingredient1,
 ````
 or the other way it will explicitly consume the first ingredient component also on failed crafting checks.
 ````javascript
-const ingredient1 = Object.values(recipeData.input)[0];
+const firstGroup = Object.values(recipeData.input)[0];
+const ingredient1 = Object.values(firstGroup)[0];
 result.updateComponent("consumed",ingredient1,
   (componentResult, quantity) => {
     componentResult.userInteraction = "always"
@@ -200,7 +200,7 @@ if(!result.hasError()){
       img: 'icons/commodities/gems/pearl-water.webp',
       quantity: xp
     },
-    isAvailable: true,
+    status: "success",
     type: "produced"
   });
 }
@@ -238,4 +238,24 @@ you can transform a real Item into a Component by using:
 const entity // real item e.g. fromUuid(uuid) 
 const component = game["beavers-system-interface"].system.createComponent(entity);
 ````
+
+## Output Macros
+Macros that are added as results to a recipe are executed at the end of a successful crafting process.
+They receive the same parameters: `actor`, `recipeData`, and `result`.
+
+### Example: Add first cost item as result
+This macro will take the first item from the recipe's cost (input) and add it as a result of the crafting process.
+This is useful if you want to "return" an item that was consumed or used as a template.
+
+```javascript
+// Get the first cost item (from input)
+const inputKey = Object.keys(recipeData.input)[0];
+if (inputKey) {
+    const firstInput = Object.values(recipeData.input[inputKey])[0];
+    if (firstInput) {
+        // Add it to the produced components
+        result.updateComponent("produced", firstInput);
+    }
+}
+```
 

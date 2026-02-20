@@ -318,8 +318,8 @@ export class Recipe implements RecipeData {
         if (this.macro === undefined || this.macro === "") {
             return macroResult;
         }
-        const AsyncFunction = (async function () {
-        }).constructor;
+
+        const AsyncFunction = (async function () { }).constructor;
         try {
             // @ts-ignore
             const fn = new AsyncFunction("result", "actor", "recipeData", this.macro);

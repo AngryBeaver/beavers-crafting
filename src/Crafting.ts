@@ -105,6 +105,9 @@ export class Crafting implements CraftingData {
     }
 
     async endCrafting() {
+        if(!this.result.hasError()){
+            await this.executeOutputMacros();
+        }
         await this.processAll();
         this.end();
         await this._sendToChat();
@@ -187,6 +190,30 @@ export class Crafting implements CraftingData {
             ui.notifications.error("Beavers Crafting | recipe Error see logs")
             console.error("Beavers Crafting | recipe Error:", macroResult.error);
             this.result._hasException = true;
+        }
+    }
+
+    async executeOutputMacros() {
+        const macroComponents = RecipeCompendium._filterData(this.recipe.output, c => c.type === "Macro");
+        for (const component of macroComponents) {
+            try {
+                // Prefer UUID-based macros
+                const doc = component.uuid ? await beaversSystemInterface.uuidToDocument(component.uuid) : undefined;
+                // @ts-ignore
+                if (doc?.execute instanceof Function) {
+                    const quantity = Math.max(1, Number(component.quantity) || 1);
+                    for (let i = 0; i < quantity; i++) {
+                        await doc.execute({ actor: this.actor, recipeData: this.recipe, result: this.result });
+                    }
+                    continue;
+                }
+            } catch (e) {
+                // @ts-ignore
+                ui.notifications.error("Beavers Crafting | macro Error see logs")
+                console.error("Beavers Crafting | macro Error:", e);
+                this.result._hasException = true;
+                return;
+            }
         }
     }
 

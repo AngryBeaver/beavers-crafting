@@ -353,10 +353,29 @@ export class RecipeSheet {
       return;
     }
     const data = getDataFrom(e);
-    if (data &&
-      (data.type === "Item" ||
-        (data.type === "RollTable" && isOutput)
-      )
+    if (!data) return;
+
+    // Allow dropping Macros into the output section as components (multiple supported)
+    if (isOutput && data.type === "Macro" && data.uuid) {
+      const macroDoc:any = await fromUuid(data.uuid);
+      if (macroDoc) {
+        const component: any = {
+          type: "Macro",
+          uuid: data.uuid,
+          name: macroDoc?.name || data.name || "Macro",
+          img: macroDoc?.img || macroDoc?.icon || "icons/svg/dice-target.svg",
+          quantity: 1,
+        };
+        const keyid = data.uuid;
+        this.recipe.addOutput(component, keyid, $(e.target).data("id"));
+        this.update();
+      }
+      return;
+    }
+
+    if (
+      (data.type === "Item") ||
+      (isOutput && data.type === "RollTable")
     ) {
       const entity = await fromUuid(data.uuid);
       if (entity) {

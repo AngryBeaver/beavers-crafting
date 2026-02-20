@@ -1,4 +1,6 @@
 # Changelog
+## 4.5.0
+- add support for macro output
 ## 4.4.5
 - fix tab toggle in some systems e.g. pf2e
 ## 4.4.4
