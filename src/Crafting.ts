@@ -4,7 +4,7 @@ import {RecipeCompendium} from "./apps/RecipeCompendium.js";
 import {Result} from "./Result.js";
 import {TestHandler} from "./TestHandler.js";
 import {Container} from "./Container.js";
-import { attachContentsToCreatedContainer, getActorContentPool } from "./ContainerHandler.js";
+import { attachContentsToCreatedContainer, dnd5eCopyContent, getActorContentPool } from "./ContainerHandler.js";
 
 export class Crafting implements CraftingData {
     uuid: string;
@@ -322,7 +322,9 @@ export class Crafting implements CraftingData {
             component.name = "container"+foundry.utils.randomID();
           }
         }
-        return await beaversSystemInterface.actorComponentListAdd(this.actor, componentList);
+        const itemChange =  await beaversSystemInterface.actorComponentListAdd(this.actor, componentList);
+        await dnd5eCopyContent(componentList,itemChange);
+        return itemChange;
     }
 
     get chatData(): ChatData {

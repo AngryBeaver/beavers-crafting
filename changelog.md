@@ -1,4 +1,6 @@
 # Changelog
+## 4.5.1
+- readd dnd5e container support
 ## 4.5.0
 - add support for macro output
 ## 4.4.5

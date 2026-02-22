@@ -12,8 +12,8 @@ import { Settings } from "./Settings.js";
  * - `flags.beavers-crafting.containerId === source.id` (Beaver's Crafting)
  * Returns Components for convenience.
  */
-export async function findSourceChildrenComponents(sourceEntity: any): Promise<Component[]> {
-  if (!Container.isContainer(sourceEntity)) return [];
+export async function findSourceChildrenComponents(sourceEntity: any, property = `flags.${Settings.NAMESPACE}.containerId`): Promise<Component[]> {
+  if (!(Container.isContainer(sourceEntity) || isDnd5eContainer(sourceEntity))) return [];
 
   const srcId = sourceEntity.id;
   const uuid: string = sourceEntity.uuid;
@@ -27,7 +27,7 @@ export async function findSourceChildrenComponents(sourceEntity: any): Promise<C
       if (actor && actor.items) {
         sourceChildren = actor.items.filter((i: any) => {
           if (i.id === srcId) return false;
-          const beaversContainerId = foundry.utils.getProperty(i, `flags.${Settings.NAMESPACE}.containerId`);
+          const beaversContainerId = foundry.utils.getProperty(i, property);
           return beaversContainerId === srcId;
         });
       }
@@ -47,7 +47,7 @@ export async function findSourceChildrenComponents(sourceEntity: any): Promise<C
         const docs = await pack.getDocuments();
         sourceChildren = docs.filter((i: any) => {
           if (i.id === srcId) return false;
-          const beaversContainerId = foundry.utils.getProperty(i, `flags.${Settings.NAMESPACE}.containerId`);
+          const beaversContainerId = foundry.utils.getProperty(i, property);
           return beaversContainerId === srcId;
         });
       }
@@ -61,7 +61,7 @@ export async function findSourceChildrenComponents(sourceEntity: any): Promise<C
     const worldItems = (game as Game)?.items?.contents || [];
     sourceChildren = worldItems.filter((i: any) => {
       if (i.id === srcId) return false;
-      const beaversContainerId = foundry.utils.getProperty(i, `flags.${Settings.NAMESPACE}.containerId`);
+      const beaversContainerId = foundry.utils.getProperty(i, property);
       return beaversContainerId === srcId;
     });
   }
@@ -72,12 +72,12 @@ export async function findSourceChildrenComponents(sourceEntity: any): Promise<C
 /**
  * Attach discovered source container contents to the created container,
  */
-export async function attachContentsToCreatedContainer(createdContainerItem: Item, sourceComponent: Component): Promise<void> {
-  const children = await findSourceChildrenComponents(await sourceComponent.getEntity());
+export async function attachContentsToCreatedContainer(createdContainerItem: Item, sourceComponent: Component,property?:string): Promise<void> {
+  const children = await findSourceChildrenComponents(await sourceComponent.getEntity(),property);
   if (children.length === 0) return;
   const cont = new Container(createdContainerItem);
   for (const cc of children) {
-    await cont.addContent(cc);
+    await cont.addContent(cc,property);
   }
 }
 
@@ -104,6 +104,10 @@ export function getActorContentPool(actor: Actor, asComponents: boolean = true):
  */
 export function isBeaversContainer(item: Item): boolean {
   return foundry.utils.getProperty(item, `flags.${Settings.NAMESPACE}.subtype`) === 'container';
+}
+
+export function isDnd5eContainer(item: Item): boolean {
+  return (game as Game).system.id === 'dnd5e' && item.type === 'container';
 }
 
 /**
@@ -158,3 +162,28 @@ async function _cleanupItems(items, parent, validContainerIds: Set<string | null
 }
 
 
+export async function dnd5eCopyContent(componentList:Component[], itemChange: ItemChange) {
+  if ((game as Game).system.id !== "dnd5e") {
+    return
+  }
+  try {
+    for (const component of componentList) {
+      if (component.quantity > 0) {
+        // Find the created container item that matches this component
+        const createdItems = (itemChange.create || []) as any[];
+        for (const createdItem of createdItems) {
+          if (createdItem.type !== "container") continue;
+          const createdComp = beaversSystemInterface.componentFromEntity(createdItem);
+          if (!(createdComp.isSame(component) && component.isSame(createdComp))) continue;
+          try {
+            await attachContentsToCreatedContainer(createdItem, component,`system.container`);
+          } catch (inner) {
+            console.warn('Beavers Crafting | Failed copying container contents from source:', inner);
+          }
+        }
+      }
+    }
+  } catch (e) {
+    console.warn("Beavers Crafting | Failed to attach contents to produced container:", e);
+  }
+}

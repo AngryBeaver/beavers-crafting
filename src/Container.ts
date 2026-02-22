@@ -25,14 +25,14 @@ export class Container {
      return findSourceChildrenComponents(this.item);
   }
 
-  async addContent(componentData) {
+  async addContent(componentData,property:string = `flags.${Settings.NAMESPACE}.containerId`) {
     const component = beaversSystemInterface.componentCreate(componentData);
     const content = await beaversSystemInterface.uuidToDocument(component.uuid);
     if (content.actor === this.item.actor) {
-      await content.update({ [`flags.${Settings.NAMESPACE}.containerId`]: this.item.id });
+      await content.update({ [property]: this.item.id });
     } else if (this.item.actor && !content.actor) {
       const itemData = content.toObject();
-      foundry.utils.setProperty(itemData, `flags.${Settings.NAMESPACE}.containerId`, this.item.id);
+      foundry.utils.setProperty(itemData, property, this.item.id);
       beaversSystemInterface.objectAttributeSet(itemData, beaversSystemInterface.itemQuantityAttribute, component.quantity);
       await this.item.actor.createEmbeddedDocuments("Item", [itemData]);
     } else if (!this.item.actor && content.actor) {
