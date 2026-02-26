@@ -1,4 +1,7 @@
 # Changelog
+## 4.5.2
+- fix tab for pf1e
+- remove unsupported v14 handlebar modules
 ## 4.5.1
 - readd dnd5e container support
 ## 4.5.0
