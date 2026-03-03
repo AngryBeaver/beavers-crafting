@@ -75,14 +75,24 @@
                         {{/each}}
                         {{#if ../editable}}
                             <div class="flexrow">
-                                <div class="drop-area" data-id="{{@key}}">{{localize "beaversCrafting.recipe.orItem"}}</div>
+                                <div class="drop-area" data-id="{{@key}}">
+                                  <span style="flex:1;text-align:center">{{localize "beaversCrafting.recipe.orItem"}}</span>
+                                  <a class="item-add" style="flex: 0 0 30px;border-left: 1px solid var(--beavers-item-border-color-highlight);text-align:center;">
+                                    <i class="fa-solid fa-coins"></i>
+                                  </a>
+                                </div>
                             </div>
                         {{/if}}
                     </div>
                     {{/each}}
                     {{#if editable}}
                         <div class="flexrow">
-                            <div class="drop-area" data-id="">{{localize "beaversCrafting.recipe.addItem"}}</div>
+                            <div class="drop-area" data-id="">
+                              <span style="flex:1;text-align:center">{{localize "beaversCrafting.recipe.addItem"}}</span>
+                              <a class="item-add" style="flex: 0 0 30px;border-left: 1px solid var(--beavers-item-border-color-highlight);text-align:center;">
+                                <i class="fa-solid fa-coins"></i>
+                              </a>
+                            </div>
                         </div>
                     {{/if}}
                 </div>
@@ -179,14 +189,24 @@
                         {{/each}}
                         {{#if ../editable}}
                             <div class="flexrow">
-                                <div class="drop-area" data-id="{{@key}}">{{localize "beaversCrafting.recipe.orItem"}}</div>
+                                <div class="drop-area" data-id="{{@key}}">
+                                  <span style="flex:1;text-align:center">{{localize "beaversCrafting.recipe.orItem"}}</span>
+                                  <a class="item-add" style="flex: 0 0 30px;border-left: 1px solid var(--beavers-item-border-color-highlight);text-align:center;">
+                                    <i class="fa-solid fa-coins"></i>
+                                  </a>
+                                </div>
                             </div>
                         {{/if}}
                     </div>
                     {{/each}}
                     {{#if editable}}
                         <div class="flexrow">
-                            <div class="drop-area" data-id="">{{localize "beaversCrafting.recipe.addItem"}}</div>
+                            <div class="drop-area" data-id="">
+                              <span style="flex:1;text-align:center">{{localize "beaversCrafting.recipe.addItem"}}</span>
+                              <a class="item-add" style="flex: 0 0 30px;border-left: 1px solid var(--beavers-item-border-color-highlight);text-align:center;">
+                                <i class="fa-solid fa-coins"></i>
+                              </a>
+                            </div>
                         </div>
                     {{/if}}
             </div>

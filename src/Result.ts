@@ -2,6 +2,14 @@ import { Recipe} from "./Recipe.js";
 import {Settings} from "./Settings.js";
 import { getActorContentPool } from "./ContainerHandler.js";
 
+
+//todo currencies can be stored and can come in.
+//in resultData is stored the orignalQuantity when started this then calculates if it hasError.
+//when you processItems as you go you would need to change here something.
+//as is it can not be serialized without beeing processed so the check for true is fine if we store originalQuantity.
+//how to store OriginalQuantity. idea sumUp currencies as they come in if the combinedCurrency is valid originalQuantity = quantity needed.
+//the check if the money is fine is then done automatically in the item and stored as all other as well.
+
 export class Result implements ResultApi, ResultData {
     _actorUpdate: {
         [key: string]: string
@@ -19,6 +27,8 @@ export class Result implements ResultApi, ResultData {
         maxFails: number
     }
     _currencyResult?: CurrencyResult
+    //sumUpCurrencies as they come in. is not serialized as it is also in the components !
+    _currencyCombined: Currencies;
     _chatAddition: {
         [key: string]: ComponentChatData
     }
@@ -47,6 +57,8 @@ export class Result implements ResultApi, ResultData {
     }
 
     constructor(resultData: ResultData, actor) {
+        this._currencyCombined = {};
+        this._recipe = resultData._recipe;
         this._actorUpdate = resultData._actorUpdate;
         this._hasException = resultData._hasException;
         this._components = {
@@ -59,9 +71,17 @@ export class Result implements ResultApi, ResultData {
         }
         if (resultData._currencyResult) {
             this._currencyResult = new CurrencyResult(resultData._currencyResult);
+        }else{
+            if(this._recipe.currency){
+                this._currencyResult = new CurrencyResult(this._recipe.currency);
+            }
         }
+        if(this._currencyResult){
+            this._addCurrencie({name: this._currencyResult.name, value: this._currencyResult.value * -1 });
+        }
+
         this._chatAddition = resultData._chatAddition;
-        this._recipe = resultData._recipe;
+
         this._actor = actor;
         resultData._components.consumed._data.forEach(componentResultData => {
             this._components.consumed.addComponentResult(
@@ -158,6 +178,9 @@ export class Result implements ResultApi, ResultData {
         this._tests.maxHits=maxHits;
         this._tests.maxFails=maxFails;
     }
+    _addCurrencie(currency:Currency){
+        this._currencyCombined[currency.name] = (this._currencyCombined[currency.name] || 0 )+ currency.value
+    }
 
     updateTests(hits:number, fails:number=0){
         if(!this._tests){
@@ -167,17 +190,16 @@ export class Result implements ResultApi, ResultData {
         this._tests.fails +=fails;
     }
 
-    async payCurrency(currency: Currency) {
-        if(this._currencyResult?.isConsumed){
-            void await this._currencyResult.pay(this._actor,true)
+    async payCurrency() {
+        if(this._currencyResult && !this._currencyResult.isConsumed){
+            void await this._currencyResult.pay(this._actor)
         }
-        this._currencyResult = new CurrencyResult(currency);
-        void await this._currencyResult.pay(this._actor);
     }
 
-    async checkCurrency(currency: Currency) {
-        this._currencyResult = new CurrencyResult(currency);
-        void await this._currencyResult.canPay(this._actor);
+    async checkCurrency() {
+        if(this._currencyResult) {
+            void await this._currencyResult.canPay(this._actor);
+        }
     }
 
     async revertPayedCurrency() {
@@ -216,29 +238,44 @@ export class Result implements ResultApi, ResultData {
             foundry.utils.setProperty(componentData,`flags.${Settings.NAMESPACE}.isCrafted`,true);
             foundry.utils.setProperty(componentData,`flags.${Settings.NAMESPACE}.crafted`,{byId:this._actor.id,byName:this._actor.name});
         }
-        let componentResult = this._components[type].findComponentResult(componentData);
+        let componentResult
+        if (componentData.flags?.[Settings.NAMESPACE]?.subtype !== "money") { //stack existings but not money.
+            componentResult = this._components[type].findComponentResult(componentData);
+        }
         if (componentResult === undefined) {
             componentResult = new ComponentResult();
-            const pool = getActorContentPool(this._actor,false);
-            const actorFindings = beaversSystemInterface.itemListComponentFind(pool, componentData);
+            let originalQuantity = 0;
+            if (componentData.flags?.[Settings.NAMESPACE]?.subtype !== "money") {
+                const pool = getActorContentPool(this._actor, false);
+                const actorFindings = beaversSystemInterface.itemListComponentFind(pool, componentData);
+                originalQuantity = actorFindings.quantity;
+            }
             componentResult.component = beaversSystemInterface.componentCreate(componentData);
-            componentResult.originalQuantity = actorFindings.quantity;
+            componentResult.originalQuantity = originalQuantity;
             componentResult.component.quantity = 0;
             componentResult.isProcessed = false;
             this._components[type].addComponentResult(componentResult);
         }
-        let userInteraction: UserInteraction = "never";
         let quantity = componentData.quantity * -1;
         if (type === "produced") {
-            userInteraction = "onSuccess";
             quantity = quantity * -1;
         }
-        if (type === "consumed") {
-          if(this._recipe.beaversTests?.consume){
-            userInteraction = "always";
-          }else {
+        let userInteraction: UserInteraction = "never";
+        if (type === "produced") {
             userInteraction = "onSuccess";
-          }
+        } else if (type === "consumed") {
+            if (componentData.flags?.[Settings.NAMESPACE]?.subtype === "money") {
+                this._addCurrencie({ name: componentData.id, value: quantity});
+                if(beaversSystemInterface.actorCurrenciesCanAdd(this._actor,this._currencyCombined)){
+                    componentResult.originalQuantity = Math.abs(quantity);
+                }
+            }
+            if (this._recipe.beaversTests?.consume) {
+                userInteraction = "always";
+            } else {
+                userInteraction = "onSuccess";
+            }
+
         }
         componentResult.userInteraction = userInteraction;
         fn(componentResult, quantity);
@@ -307,7 +344,7 @@ export class ComponentResult implements ComponentResultData {
     component: Component;
     originalQuantity: number;
     userInteraction: UserInteraction;
-    isProcessed: boolean = true;
+    isProcessed: boolean = false;
 
     static from(componentResultData: ComponentResultData): ComponentResult {
         const componentResult = new ComponentResult();
@@ -316,6 +353,9 @@ export class ComponentResult implements ComponentResultData {
         componentResult.userInteraction = componentResultData.userInteraction;
         componentResult.isProcessed = componentResultData.isProcessed;
         return componentResult;
+    }
+
+    constructor() {
     }
 
     serialize():ComponentResultData{
@@ -376,7 +416,7 @@ export class CurrencyResult implements CurrencyResultData {
         const currencies = {};
         currencies[this.name] = this.value*-1;
         const canPay = await beaversSystemInterface.actorCurrenciesCanAdd(actor, currencies);
-        this.hasError = canPay;
+        this.hasError = !canPay;
         return canPay;
     }
 

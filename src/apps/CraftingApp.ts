@@ -101,9 +101,9 @@ export class CraftingApp extends Application {
             return;
         }
         const crafting = await Crafting.fromRecipe(this.data.actor.id, this.data.recipe);
+        await crafting.checkCurrency();
         RecipeCompendium.validateRecipeToItemList(RecipeCompendium._filterData(this.data.recipe.input,(c)=>c.type==="Item"), this.data.actor.items,crafting.result);
         await crafting.checkRequired();
-        await crafting.checkCurrency();
         this.data.result = crafting.result;
         this.data.content = await renderTemplate('modules/beavers-crafting/templates/crafting-app-main.hbs',
             {

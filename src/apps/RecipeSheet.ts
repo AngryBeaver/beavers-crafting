@@ -271,7 +271,7 @@ export class RecipeSheet {
       await this.render();
       this.update();
     });
-    this.recipeElement.find(".cost .item-add").click(e => {
+    this.recipeElement.find(".cost .header .item-add").click(e => {
       this.recipe.addCurrency();
       this.update();
     });
@@ -341,14 +341,60 @@ export class RecipeSheet {
         beaversSystemInterface.uuidToDocument(uuid).then(i => i.sheet.render(true));
       }
     });
+    this.recipeElement.find(".drop-area .item-add").click(e => {
+      this._onAddMoney(e);
+    });
   }
 
+  async _onAddMoney(e) {
+    const dropArea = $(e.target).parents(".drop-area");
+    const group = dropArea.data("id");
+    const isInput = dropArea.parents(".ingredients").length !== 0;
+    const isOutput = dropArea.parents(".results").length !== 0;
+    const isRequired = dropArea.parents(".attendants").length !== 0;
+
+    const currencies = beaversSystemInterface.configCurrencies;
+    let currencyId = currencies[0]?.id;
+    if (currencies.length > 1) {
+      const choices = {};
+      currencies.forEach(c => {
+        choices[c.id] = { text: c.label, img: c.component?.img };
+      });
+      currencyId = await beaversSystemInterface.uiDialogSelect({
+        choices: choices,
+      });
+    }
+    if (!currencyId) return;
+    const currency = currencies.find(c => c.id === currencyId);
+
+    const component = beaversSystemInterface.componentCreate({
+      id: currency.id,
+      name: currency.label,
+      img: "icons/commodities/currency/coins-assorted-mix-copper-silver-gold.webp",
+      type: "item",
+      quantity: 1,
+      flags: {
+        "beavers-crafting": {
+          "subtype": "money"
+        }
+      }
+    });
+
+    if (isInput) {
+      this.recipe.addInput(component, component.id, group);
+    } else if (isOutput) {
+      this.recipe.addOutput(component, component.id, group);
+    } else if (isRequired) {
+      this.recipe.addRequired(component, component.id, group);
+    }
+    this.update();
+  }
 
   async _onDropMain(e) {
     const isDrop = $(e.target).hasClass("drop-area");
-    const isInput = $(e.target).parents(".beavers-recipe-sheet .ingredients").length !== 0;
-    const isOutput = $(e.target).parents(".beavers-recipe-sheet .results").length !== 0;
-    const isRequired = $(e.target).parents(".beavers-recipe-sheet .attendants").length !== 0;
+    const isInput = $(e.target).parents(".ingredients").length !== 0;
+    const isOutput = $(e.target).parents(".results").length !== 0;
+    const isRequired = $(e.target).parents(".attendants").length !== 0;
     if (!isDrop && !isInput && !isOutput && !isRequired) {
       return;
     }

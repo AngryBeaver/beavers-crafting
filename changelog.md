@@ -1,4 +1,8 @@
 # Changelog
+## 4.6.0
+- start support for currency as virtual item.
+  - currency can now be used optional
+  - currency can now be used as a result of the recipe.
 ## 4.5.2
 - fix tab for pf1e
 - remove unsupported v14 handlebar modules
