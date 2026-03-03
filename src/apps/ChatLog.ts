@@ -10,6 +10,7 @@ export function hookChatLog(){
 }
 
 function addDraggAble(html){
+  html = html.jquery ? html:$(html);
   html.find(".beavers-crafting .beavers-component .flexrow[data-type='output']")
     .attr("draggable", "true")
     .addClass("draggable")

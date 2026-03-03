@@ -1,4 +1,6 @@
 # Changelog
+## 4.6.1
+- fix chatLog feature to drag items from it.
 ## 4.6.0
 - start support for currency as virtual item.
   - currency can now be used optional
