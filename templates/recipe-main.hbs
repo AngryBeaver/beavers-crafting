@@ -9,7 +9,7 @@
                     {{#each recipe.required}}
                         <div class="section flexcol" style="margin-left:20px">
                             {{#each this}}
-                                {{>beavers-recipe-component component=this key=@key type="required" group=@../key clickable=../../displayIngredients hasCraftedFlag=../../hasCraftedFlag editable=../../editable}}
+                                {{>beavers-recipe-component component=this key=@key type="required" group=@../key clickable=../../displayIngredients hasCraftedFlag=../../hasCraftedFlag editable=../../editable currencies=../../currencies}}
                                 <div class="beavers-seperator"></div>
                             {{/each}}
                             {{#if ../editable}}
@@ -70,7 +70,7 @@
                     {{#each recipe.input}}
                     <div class="section flexcol" style="margin-left:20px">
                         {{#each this}}
-                            {{>beavers-recipe-component component=this key=@key type="input" group=@../key clickable=../../displayIngredients hasCraftedFlag=../../hasCraftedFlag editable=../../editable}}
+                            {{>beavers-recipe-component component=this key=@key type="input" group=@../key clickable=../../displayIngredients hasCraftedFlag=../../hasCraftedFlag editable=../../editable currencies=../../currencies}}
                             <div class="beavers-seperator"></div>
                         {{/each}}
                         {{#if ../editable}}
@@ -184,7 +184,7 @@
                     {{#each recipe.output}}
                     <div class="section flexcol" style="margin-left:20px">
                         {{#each this}}
-                            {{>beavers-recipe-component component=this key=@key type="output" group=@../key hasCraftedFlag=false clickable=../../displayResults editable=../../editable}}
+                            {{>beavers-recipe-component component=this key=@key type="output" group=@../key hasCraftedFlag=false clickable=../../displayResults editable=../../editable currencies=../../currencies}}
                             <div class="beavers-seperator"></div>
                         {{/each}}
                         {{#if ../editable}}

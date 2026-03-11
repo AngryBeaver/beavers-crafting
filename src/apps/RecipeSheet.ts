@@ -344,6 +344,27 @@ export class RecipeSheet {
     this.recipeElement.find(".drop-area .item-add").click(e => {
       this._onAddMoney(e);
     });
+    this.recipeElement.find(".currency-selector").on("change", async e => {
+      const name = e.target.name;
+      const newCurrencyId = $(e.target).val() as string;
+      const currencies = beaversSystemInterface.configCurrencies;
+      const newCurrency = currencies.find(c => c.id === newCurrencyId);
+
+      if (newCurrency) {
+        // Update the component with the new currency data
+        const cleanedString = name.replace("flags.beavers-crafting.recipe.", "").replace(".id", "");
+        const component = foundry.utils.getProperty(this.recipe, cleanedString);
+
+        if (component) {
+          component.id = newCurrency.id;
+          component.name = newCurrency.label;
+          component.img = newCurrency.component?.img || component.img;
+        }
+      }
+
+      await this.update();
+    });
+
   }
 
   async _onAddMoney(e) {
@@ -354,18 +375,10 @@ export class RecipeSheet {
     const isRequired = dropArea.parents(".attendants").length !== 0;
 
     const currencies = beaversSystemInterface.configCurrencies;
-    let currencyId = currencies[0]?.id;
-    if (currencies.length > 1) {
-      const choices = {};
-      currencies.forEach(c => {
-        choices[c.id] = { text: c.label, img: c.component?.img };
-      });
-      currencyId = await beaversSystemInterface.uiDialogSelect({
-        choices: choices,
-      });
-    }
-    if (!currencyId) return;
-    const currency = currencies.find(c => c.id === currencyId);
+    if (!currencies || currencies.length === 0) return;
+
+    // Always use the first currency - no dialog
+    const currency = currencies[0];
 
     const component = beaversSystemInterface.componentCreate({
       id: currency.id,
@@ -387,7 +400,7 @@ export class RecipeSheet {
     } else if (isRequired) {
       this.recipe.addRequired(component, component.id, group);
     }
-    this.update();
+    void this.update();
   }
 
   async _onDropMain(e) {
