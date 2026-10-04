@@ -1,5 +1,6 @@
 import { Container } from "./Container.js";
 import { Settings } from "./Settings.js";
+import { markDeleted } from "./helpers/Compat.js";
 
 /**
  * Container handling utilities abstracted for both native dnd5e containers and
@@ -144,7 +145,7 @@ async function _cleanupItems(items, parent, validContainerIds: Set<string | null
     const containerId = foundry.utils.getProperty(item, `flags.${Settings.NAMESPACE}.containerId`);
     if (containerId && !validContainerIds.has(containerId)) {
       // @ts-ignore
-      updates.push({ _id: item.id, [`flags.${Settings.NAMESPACE}.-=containerId`]: null });
+      updates.push(markDeleted({ _id: item.id }, `flags.${Settings.NAMESPACE}.containerId`));
     }
   }
 

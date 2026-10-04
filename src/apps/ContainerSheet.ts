@@ -1,6 +1,7 @@
 import {Container} from "../Container.js";
 import {getDataFrom} from "../helpers/Utility.js";
 import {rerenderItemDirectory, Settings} from "../Settings.js";
+import { createDragDrop, renderTemplate } from "../helpers/Compat.js";
 
 export class ContainerSheet {
     app;
@@ -118,7 +119,7 @@ export class ContainerSheet {
 
     addDragDrop() {
         if (this.editable) {
-            const dragDrop = new DragDrop({
+            const dragDrop = createDragDrop({
                 dropSelector: '.drop-area',
                 permissions: {
                     dragstart: () => true,

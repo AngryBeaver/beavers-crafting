@@ -20,6 +20,7 @@ import {ContainerSheet} from "./apps/ContainerSheet.js";
 import "./compatibility/tidy5e.js";
 import { hookChatLog } from "./apps/ChatLog.js";
 import { attachContentsToCreatedContainer, runCleanup } from "./ContainerHandler.js";
+import { getTemplate, markDeleted } from "./helpers/Compat.js";
 
 Hooks.on("beavers-system-interface.init", async function(){
     beaversSystemInterface.addModule(Settings.NAMESPACE);
@@ -224,7 +225,7 @@ Hooks.once("beavers-system-interface.ready", async function(){
       await attachContentsToCreatedContainer(doc, sourceComp);
 
       // cleanup temp flag
-      try { await doc.update({ ["flags.beavers-crafting.-=_sourceUuid"]: null }); } catch (_) {}
+      try { await doc.update(markDeleted({}, "flags.beavers-crafting._sourceUuid")); } catch (_) {}
     } catch (e) {
       console.warn("Beavers Crafting | create Container post-copy content failure:", e);
     }
@@ -378,6 +379,13 @@ Handlebars.registerHelper('beavers-isEmpty', function (value, options) {
     return value === undefined ||
     (value instanceof Object && Object.keys(value).length === 0) ||
     (value instanceof Array && value.length === 0)
+});
+
+//core removed its {{#select}} helper in v14
+Handlebars.registerHelper("beavers-select", function (selected, options) {
+    const escapedValue = RegExp.escape(Handlebars.escapeExpression(selected));
+    const rgx = new RegExp(` value=["']${escapedValue}["']`);
+    return options.fn(this).replace(rgx, "$& selected");
 });
 
 Handlebars.registerHelper("beavers-objectLen", function(json) {

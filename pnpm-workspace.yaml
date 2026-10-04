@@ -1,0 +1,3 @@
+# Only install package versions that have been published for at least 2 weeks (in minutes),
+# so malicious releases have time to be detected and pulled from the registry.
+minimumReleaseAge: 20160

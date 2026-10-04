@@ -2,11 +2,11 @@ import {CraftingApp} from "./CraftingApp.js";
 import {Crafting} from "../Crafting.js";
 import {Settings} from "../Settings.js";
 import { sortByFolder } from "../helpers/Folder.js";
+import { markDeleted, renderTemplate } from "../helpers/Compat.js";
 
 export class ActorSheetTab {
     app;
     html;
-    system:System;
     craftingList:{
         [key:string]:Crafting
     } = {};
@@ -65,9 +65,7 @@ export class ActorSheetTab {
         });
         tabBody.find(".removeCrafting").on("click",(e)=>{
             const id = e.target.dataset.id;
-            const flags = {}
-            flags["beavers-crafting.crafting.-="+id] = null;
-            void this.app.actor.update({flags:flags});
+            void this.app.actor.update(markDeleted({}, `flags.${Settings.NAMESPACE}.crafting.${id}`));
         });
         tabBody.find(".advanceCrafting").on("click",(e)=>{
             const id = (e.currentTarget.dataset.id as string);

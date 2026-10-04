@@ -1,5 +1,6 @@
 import { AnyOf } from "../AnyOf.js";
 import { getDataFrom } from "../helpers/Utility.js";
+import { createDragDrop, renderTemplate } from "../helpers/Compat.js";
 
 
 const anyOfSheets: { [key: string]: AnyOfSheet } = {};
@@ -79,15 +80,15 @@ export class AnyOfSheet {
             if (this.app._dragDrop) {
                 this.app._dragDrop = this.app._dragDrop.filter(d => d.name !== "anyOfSheet");
             }
-            const dragDrop = new DragDrop({
+            const dragDrop = createDragDrop({
                 dropSelector: '',
                 permissions: {
                     dragstart: ()=>true,
                     drop: ()=>true
                 },
                 callbacks: {
-                    dragstart: this.app._onDragStart.bind(this.app),
-                    dragover: this.app._onDragOver.bind(this.app),
+                    dragstart: this.app._onDragStart?.bind(this.app),
+                    dragover: this.app._onDragOver?.bind(this.app),
                     drop: this._onDrop.bind(this)
                 }
             });

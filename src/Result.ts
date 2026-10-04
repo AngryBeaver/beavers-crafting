@@ -85,17 +85,14 @@ export class Result implements ResultApi, ResultData {
             _actorUpdate: this._actorUpdate,
             _hasException: this._hasException,
             _components: this.serializeComponents(),
-            _tests:this._tests,
             _chatAddition: this._chatAddition,
             _recipe: this._recipe,
         }
-        if (this._currencyResult === undefined) {
-            serialized["-=_currencyResult"]
-        } else {
+        if (this._currencyResult !== undefined) {
             serialized["_currencyResult"] = this._currencyResult.serialize();
         }
-        if (!this._tests) {
-            serialized["-=_tests"] = null;
+        if (this._tests) {
+            serialized["_tests"] = this._tests;
         }
         return serialized;
     }

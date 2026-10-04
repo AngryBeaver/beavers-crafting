@@ -1,0 +1,150 @@
+name: Release
+
+# A commit on main whose message starts with "release v1.2.3" builds the module as version 1.2.3 and publishes it
+# as the GitHub release v1.2.3. Foundry's manifest URL points at the latest release, so users get the update.
+#
+# Three jobs, so a failure is visible on its own and can be retried with "Re-run failed jobs":
+#   release  builds and creates the GitHub release
+#   publish  registers the version on foundryvtt.com
+#   bump     commits the version to package.json on main
+# publish and bump only depend on release, not on each other.
+
+on:
+  push:
+    branches: [main]
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    if: startsWith(github.event.head_commit.message, 'release v')
+
+    permissions:
+      contents: write
+
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
+      num: ${{ steps.version.outputs.num }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract version from commit message
+        id: version
+        env:
+          MSG: ${{ github.event.head_commit.message }}
+        run: |
+          VERSION=$(echo "$MSG" | head -1 | grep -oP 'v\d+\.\d+\.\d+')
+          if [ -z "$VERSION" ]; then
+            echo "Could not parse version from commit message: $MSG"
+            exit 1
+          fi
+          echo "tag=$VERSION" >> $GITHUB_OUTPUT
+          echo "num=${VERSION#v}" >> $GITHUB_OUTPUT
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "pnpm"
+          cache-dependency-path: pnpm-lock.yaml
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Set version in package.json
+        run: npm pkg set version=${{ steps.version.outputs.num }}
+
+      - name: Build release zip
+        run: pnpm release
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: ${{ steps.version.outputs.tag }}
+          make_latest: true
+          generate_release_notes: true
+          files: |
+            package/beavers-crafting.zip
+            package/module.json
+
+  # Registers the version on foundryvtt.com so it shows up in Foundry's package browser.
+  # The manifest URL is pinned to this release's tag, as Foundry requires a version specific manifest.
+  publish:
+    runs-on: ubuntu-latest
+    needs: release
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Download module.json from the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.release.outputs.tag }}
+        run: gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern module.json
+
+      - name: Publish to Foundry
+        env:
+          FOUNDRY_RELEASE_TOKEN: ${{ secrets.FOUNDRY_RELEASE_TOKEN }}
+          REPO_URL: ${{ github.server_url }}/${{ github.repository }}
+          TAG: ${{ needs.release.outputs.tag }}
+          VERSION: ${{ needs.release.outputs.num }}
+        run: |
+          if [ -z "$FOUNDRY_RELEASE_TOKEN" ]; then
+            echo "FOUNDRY_RELEASE_TOKEN secret is not set"
+            exit 1
+          fi
+          PAYLOAD=$(jq -n \
+            --slurpfile m module.json \
+            --arg version "$VERSION" \
+            --arg manifest "$REPO_URL/releases/download/$TAG/module.json" \
+            --arg notes "$REPO_URL/releases/tag/$TAG" \
+            '{
+              id: $m[0].id,
+              release: {
+                version: $version,
+                manifest: $manifest,
+                notes: $notes,
+                compatibility: $m[0].compatibility
+              }
+            }')
+          echo "$PAYLOAD"
+          curl --fail-with-body -sS -X POST "https://foundryvtt.com/_api/packages/release_version/" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: $FOUNDRY_RELEASE_TOKEN" \
+            -d "$PAYLOAD"
+
+  # Pushes made with the workflow's GITHUB_TOKEN never start another workflow run, [skip ci] is a second guard.
+  bump:
+    runs-on: ubuntu-latest
+    needs: release
+
+    permissions:
+      contents: write
+
+    steps:
+      # main, not the release commit: the push must not be rejected when main moved on in the meantime.
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Commit version bump to main
+        env:
+          VERSION: ${{ needs.release.outputs.num }}
+        run: |
+          npm pkg set version="$VERSION"
+          if git diff --quiet -- package.json; then
+            echo "package.json is already at $VERSION"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "bump version to $VERSION [skip ci]" -- package.json
+          git push origin HEAD:main

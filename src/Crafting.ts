@@ -5,6 +5,7 @@ import {Result} from "./Result.js";
 import {TestHandler} from "./TestHandler.js";
 import {Container} from "./Container.js";
 import { attachContentsToCreatedContainer, getActorContentPool } from "./ContainerHandler.js";
+import { bringToFront, enrichHTML, markReplaced, renderTemplate } from "./helpers/Compat.js";
 
 export class Crafting implements CraftingData {
     uuid: string;
@@ -130,7 +131,7 @@ export class Crafting implements CraftingData {
             }
             this.actor.sheet.activeTab = Settings.ACTOR_TAB_ID;
             await this.actor.sheet.render(true);
-            this.actor.sheet.bringToTop();
+            bringToFront(this.actor.sheet);
         }
         return this.result;
 
@@ -424,7 +425,7 @@ export class Crafting implements CraftingData {
             {
                 data: this.getChatData(),
             })
-        content = await TextEditor.enrichHTML(content);
+        content = await enrichHTML(content);
         await ChatMessage.create({
             content: content,
             speaker: {actor: this.actor.id},
@@ -433,15 +434,9 @@ export class Crafting implements CraftingData {
 
     async _addToActor() {
         const uuid = this.uuid.replace(/\./g, '-')
-        const update = {
-            flags: {
-                "beavers-crafting": {
-                    crafting: {}
-                }
-            }
-        };
-        foundry.utils.setProperty(update, `flags.${Settings.NAMESPACE}.crafting.${uuid}`, this.serialize());
-        await this.actor.update(update);
+        //replace instead of merge so removed parts do not survive
+        const crafting = markReplaced({}, uuid, this.serialize());
+        await this.actor.update({flags: {[Settings.NAMESPACE]: {crafting: crafting}}});
     }
 
     async _getResultComponents(result: Result): Promise<ComponentData[]> {
@@ -465,16 +460,24 @@ export class Crafting implements CraftingData {
         for (let x = 0; x < component.quantity; x++) {
             const object = await table.roll();
             for (const r of object.results) {
-                let uuid = r.documentCollection + "." + r.documentId;
-                if (r.documentCollection !== "Item") {
-                    const parts = r.documentCollection.split(".");
-                    if (parts.length < 2) {
-                        // @ts-ignore
-                        ui.notifications.error(game.i18n.localize(`beaversCrafting.crafting-app.errors.tableNotValid`) + r.name);
-                        result._hasException = true;
-                        return [];
+                //v13+ stores the uuid directly, documentCollection and documentId are removed in v15
+                let uuid = r.documentUuid;
+                if (uuid === undefined) {
+                    uuid = r.documentCollection + "." + r.documentId;
+                    if (r.documentCollection !== "Item") {
+                        const parts = r.documentCollection.split(".");
+                        if (parts.length < 2) {
+                            uuid = null;
+                        } else {
+                            uuid = "Compendium." + uuid;
+                        }
                     }
-                    uuid = "Compendium." + uuid;
+                }
+                if (!uuid) {
+                    // @ts-ignore
+                    ui.notifications.error(game.i18n.localize(`beaversCrafting.crafting-app.errors.tableNotValid`) + r.name);
+                    result._hasException = true;
+                    return [];
                 }
                 const item = await beaversSystemInterface.uuidToDocument(uuid)
                 if (!item) {

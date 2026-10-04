@@ -240,7 +240,6 @@ export function recipeTestsToBeaversTests(recipe: RecipeData) {
         }
         // @ts-ignore
         delete recipe.tests;
-        recipe["-=tests"] = null;
         return true;
     }
     return false;
@@ -269,7 +268,6 @@ export function recipeSkillToTests(recipe: RecipeData) {
         }
         // @ts-ignore
         delete recipe.skill;
-        recipe["-=skill"] = null;
     }
 }
 

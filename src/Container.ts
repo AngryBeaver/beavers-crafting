@@ -1,5 +1,6 @@
 import { rerenderItemDirectory, Settings } from "./Settings.js";
 import { findSourceChildrenComponents } from "./ContainerHandler.js";
+import { markDeleted } from "./helpers/Compat.js";
 
 export class Container {
   item;
@@ -47,7 +48,7 @@ export class Container {
     const itemCollection = this.item.actor ? this.item.actor.items : (game as any).items;
     const item = itemCollection.find(i => i.id === componentData.id && foundry.utils.getProperty(i, `flags.${Settings.NAMESPACE}.containerId`) === this.item.id);
     if (item) {
-      await item.update({ [`flags.${Settings.NAMESPACE}.-=containerId`]: null });
+      await item.update(markDeleted({}, `flags.${Settings.NAMESPACE}.containerId`));
     }
     if (!this.item.actor) {
       rerenderItemDirectory();
@@ -92,7 +93,7 @@ export class Container {
         const contentItem = itemCollection.get(componentData.id);
         if (contentItem) {
           // @ts-ignore
-          updates.push({ _id: contentItem.id, [`flags.${Settings.NAMESPACE}.-=containerId`]: null });
+          updates.push(markDeleted({ _id: contentItem.id }, `flags.${Settings.NAMESPACE}.containerId`));
         }
       }
       if (updates.length > 0) {

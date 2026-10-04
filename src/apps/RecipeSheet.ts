@@ -2,6 +2,7 @@ import { Recipe } from "../Recipe.js";
 import { Settings } from "../Settings.js";
 import { getDataFrom } from "../helpers/Utility.js";
 import { AnyOf } from "../AnyOf.js";
+import { createDragDrop, markReplaced, renderTemplate } from "../helpers/Compat.js";
 
 const recipeSheets: { [key: string]: RecipeSheet } = {};
 
@@ -101,15 +102,15 @@ export class RecipeSheet {
         recipeSheetDragDrop.bind(this.recipeElement[0]);
         return;
       }
-      const dragDrop = new DragDrop({
+      const dragDrop = createDragDrop({
         dropSelector: ".drop-area",
         permissions: {
           dragstart: () => true,
           drop: () => true,
         },
         callbacks: {
-          dragstart: this.app._onDragStart.bind(this.app),
-          dragover: this.app._onDragOver.bind(this.app),
+          dragstart: this.app._onDragStart?.bind(this.app),
+          dragover: this.app._onDragOver?.bind(this.app),
           drop: this._onDrop.bind(this),
         },
       });
@@ -177,7 +178,7 @@ export class RecipeSheet {
   }
 
   async update() {
-    let update = { flags: {} };
+    const update = { flags: {} };
     const formData = this.getFormData();
     // add macro before setting it via serialization to null
     if (!this.app.form) {
@@ -189,9 +190,22 @@ export class RecipeSheet {
     const recipeData = this.recipe.serialize();
     const expandedFormData = foundry.utils.expandObject(formData);
     const recipeFormData = foundry.utils.getProperty(expandedFormData,`flags.${Settings.NAMESPACE}.recipe`) || {};
-    update.flags[Settings.NAMESPACE] = {
-      recipe: foundry.utils.mergeObject(recipeData, recipeFormData, {inplace: false}),
-    };
+    //the form may still show components that have just been removed from the recipe
+    for (const type of ["required", "input", "output"]) {
+      for (const [group, components] of Object.entries(recipeFormData[type] || {})) {
+        for (const id of Object.keys(components as object)) {
+          if (recipeData[type]?.[group]?.[id] === undefined) {
+            delete recipeFormData[type][group][id];
+          }
+        }
+        if (Object.keys(components as object).length === 0) {
+          delete recipeFormData[type][group];
+        }
+      }
+    }
+    //replace instead of merge so removed parts do not survive
+    update.flags[Settings.NAMESPACE] = markReplaced({}, "recipe",
+      foundry.utils.mergeObject(recipeData, recipeFormData, {inplace: false}));
     if (!this.app.form) {
       // @ts-ignore
       for (const [key, value] of Object.entries(formData)) {
@@ -200,7 +214,7 @@ export class RecipeSheet {
         }
       }
     }
-    await this.item.update(update, { performDeletions: true });
+    await this.item.update(update);
     this.recipe = Recipe.fromItem(this.item);
 
     if (this.recipeElement) {

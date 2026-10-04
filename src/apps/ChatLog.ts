@@ -4,13 +4,16 @@ export function hookChatLog(){
   if(game[Settings.NAMESPACE].Settings.get(Settings.DRAGGABLE_CHAT_RESULT)) {
     addDraggAble(ui.chat?.element);
   }
-  Hooks.on("renderChatMessage",(msg,html,option)=>{
+  //v13+ renders chat messages as HTMLElement, the jquery renderChatMessage hook is removed in v15
+  const hook = game["version"].split(".")[0] >= 13 ? "renderChatMessageHTML" : "renderChatMessage";
+  Hooks.on(hook,(msg,html,option)=>{
     addDraggAble(html);
   });
 }
 
 function addDraggAble(html){
-  html.find(".beavers-crafting .beavers-component .flexrow[data-type='output']")
+  if(!html) return;
+  $(html).find(".beavers-crafting .beavers-component .flexrow[data-type='output']")
     .attr("draggable", "true")
     .addClass("draggable")
     .on("dragstart",

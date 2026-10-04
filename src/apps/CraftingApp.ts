@@ -7,6 +7,7 @@ import {Recipe} from "../Recipe.js";
 import {Result} from "../Result.js";
 import {TestHandler} from "../TestHandler.js";
 import { sortByFolder } from "../helpers/Folder.js";
+import { createDragDrop, renderTemplate } from "../helpers/Compat.js";
 
 export class CraftingApp extends Application {
     data: {
@@ -226,7 +227,7 @@ export class CraftingApp extends Application {
     }
 
     addDragDrop(html) {
-        const dropFilter = new DragDrop({
+        const dropFilter = createDragDrop({
             dropSelector: '.drop-area, .ingredients .flexrow',
             permissions: {
                 dragstart: this._canDragStart.bind(this),
