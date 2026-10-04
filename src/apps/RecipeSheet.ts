@@ -285,7 +285,7 @@ export class RecipeSheet {
       await this.render();
       this.update();
     });
-    this.recipeElement.find(".cost .item-add").click(e => {
+    this.recipeElement.find(".cost .header .item-add").click(e => {
       this.recipe.addCurrency();
       this.update();
     });
@@ -355,14 +355,73 @@ export class RecipeSheet {
         beaversSystemInterface.uuidToDocument(uuid).then(i => i.sheet.render(true));
       }
     });
+    this.recipeElement.find(".drop-area .item-add").click(e => {
+      this._onAddMoney(e);
+    });
+    this.recipeElement.find(".currency-selector").on("change", async e => {
+      const name = e.target.name;
+      const newCurrencyId = $(e.target).val() as string;
+      const currencies = beaversSystemInterface.configCurrencies;
+      const newCurrency = currencies.find(c => c.id === newCurrencyId);
+
+      if (newCurrency) {
+        // Update the component with the new currency data
+        const cleanedString = name.replace("flags.beavers-crafting.recipe.", "").replace(".id", "");
+        const component = foundry.utils.getProperty(this.recipe, cleanedString);
+
+        if (component) {
+          component.id = newCurrency.id;
+          component.name = newCurrency.label;
+          component.img = newCurrency.component?.img || component.img;
+        }
+      }
+
+      await this.update();
+    });
+
   }
 
+  async _onAddMoney(e) {
+    const dropArea = $(e.target).parents(".drop-area");
+    const group = dropArea.data("id");
+    const isInput = dropArea.parents(".ingredients").length !== 0;
+    const isOutput = dropArea.parents(".results").length !== 0;
+    const isRequired = dropArea.parents(".attendants").length !== 0;
+
+    const currencies = beaversSystemInterface.configCurrencies;
+    if (!currencies || currencies.length === 0) return;
+
+    // Always use the first currency - no dialog
+    const currency = currencies[0];
+
+    const component = beaversSystemInterface.componentCreate({
+      id: currency.id,
+      name: currency.label,
+      img: "icons/commodities/currency/coins-assorted-mix-copper-silver-gold.webp",
+      type: "item",
+      quantity: 1,
+      flags: {
+        "beavers-crafting": {
+          "subtype": "money"
+        }
+      }
+    });
+
+    if (isInput) {
+      this.recipe.addInput(component, component.id, group);
+    } else if (isOutput) {
+      this.recipe.addOutput(component, component.id, group);
+    } else if (isRequired) {
+      this.recipe.addRequired(component, component.id, group);
+    }
+    void this.update();
+  }
 
   async _onDropMain(e) {
     const isDrop = $(e.target).hasClass("drop-area");
-    const isInput = $(e.target).parents(".beavers-recipe-sheet .ingredients").length !== 0;
-    const isOutput = $(e.target).parents(".beavers-recipe-sheet .results").length !== 0;
-    const isRequired = $(e.target).parents(".beavers-recipe-sheet .attendants").length !== 0;
+    const isInput = $(e.target).parents(".ingredients").length !== 0;
+    const isOutput = $(e.target).parents(".results").length !== 0;
+    const isRequired = $(e.target).parents(".attendants").length !== 0;
     if (!isDrop && !isInput && !isOutput && !isRequired) {
       return;
     }

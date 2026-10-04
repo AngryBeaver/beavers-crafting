@@ -1,4 +1,17 @@
 # Changelog
+## 4.6.2
+- currency-component have a dropdown on edit.
+## 4.6.1
+- fix chatLog feature to drag items from it.
+## 4.6.0
+- start support for currency as virtual item.
+  - currency can now be used optional
+  - currency can now be used as a result of the recipe.
+## 4.5.2
+- fix tab for pf1e
+- remove unsupported v14 handlebar modules
+## 4.5.1
+- readd dnd5e container support
 ## 4.5.0
 - add support for macro output
 ## 4.4.5

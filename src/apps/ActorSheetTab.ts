@@ -73,8 +73,11 @@ export class ActorSheetTab {
                 this.app.render();
             });
         });
-        this.html.find('[data-group="primary"] [data-tab]').click(e => {
-            this.app.activeTab = e.currentTarget.dataset.tab;
+
+        this.html.find(beaversSystemInterface.actorSheetTabSelector).click(e => {
+            if(e.currentTarget.dataset?.tab !== undefined) {
+                this.app.activeTab = e.currentTarget.dataset.tab;
+            }
             this.app.render();
         });
         this.html.find(".folderName").on("click", (e)=>{

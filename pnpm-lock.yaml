@@ -21,7 +21,7 @@ importers:
         specifier: ^7.0.1
         version: 7.0.1
       beavers-system-interface:
-        specifier: ^2.2.0
+        specifier: ^2.3.4
         version: 2.3.4
       esbuild:
         specifier: ^0.25.1
@@ -278,7 +278,6 @@ packages:
 
   '@pixi/graphics-smooth@0.0.22':
     resolution: {integrity: sha512-qq2u+BJBIDBuuSTc2Xzm1D/8RiiKBdxnVDiMb7Go5v8achnV5ctC6m+rf8Mq0sWm66mbOqu1aq/9efT4A4sPrA==}
-    engines: {node: '>=14', npm: '>=7'}
     peerDependencies:
       '@pixi/constants': ^6.0.4
       '@pixi/core': ^6.0.4

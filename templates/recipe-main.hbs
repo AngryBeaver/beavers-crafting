@@ -9,7 +9,7 @@
                     {{#each recipe.required}}
                         <div class="section flexcol" style="margin-left:20px">
                             {{#each this}}
-                                {{>beavers-recipe-component component=this key=@key type="required" group=@../key clickable=../../displayIngredients hasCraftedFlag=../../hasCraftedFlag editable=../../editable}}
+                                {{>beavers-recipe-component component=this key=@key type="required" group=@../key clickable=../../displayIngredients hasCraftedFlag=../../hasCraftedFlag editable=../../editable currencies=../../currencies}}
                                 <div class="beavers-seperator"></div>
                             {{/each}}
                             {{#if ../editable}}
@@ -46,11 +46,7 @@
                         <div class="flexrow beavers-component">
                             <select {{#unless editable}}disabled{{/unless}}
                                     name="flags.beavers-crafting.recipe.currency.name" class="name">
-                                {{#beavers-select recipe.currency.name}}
-                                    {{#each currencies}}
-                                        <option value="{{this.id}}">{{this.label}}</option>
-                                    {{/each}}
-                                {{/beavers-select}}
+                              {{selectOptions currencies selected=recipe.currency.name labelAttr="label" valueAttr="id"}}
                             </select>
                             <div class="attribute" style="min-width: 60px;text-align: right;">
                                 <input {{#unless editable}}disabled{{/unless}}
@@ -74,19 +70,29 @@
                     {{#each recipe.input}}
                     <div class="section flexcol" style="margin-left:20px">
                         {{#each this}}
-                            {{>beavers-recipe-component component=this key=@key type="input" group=@../key clickable=../../displayIngredients hasCraftedFlag=../../hasCraftedFlag editable=../../editable}}
+                            {{>beavers-recipe-component component=this key=@key type="input" group=@../key clickable=../../displayIngredients hasCraftedFlag=../../hasCraftedFlag editable=../../editable currencies=../../currencies}}
                             <div class="beavers-seperator"></div>
                         {{/each}}
                         {{#if ../editable}}
                             <div class="flexrow">
-                                <div class="drop-area" data-id="{{@key}}">{{localize "beaversCrafting.recipe.orItem"}}</div>
+                                <div class="drop-area" data-id="{{@key}}">
+                                  <span style="flex:1;text-align:center">{{localize "beaversCrafting.recipe.orItem"}}</span>
+                                  <a class="item-add" style="flex: 0 0 30px;border-left: 1px solid var(--beavers-item-border-color-highlight);text-align:center;">
+                                    <i class="fa-solid fa-coins"></i>
+                                  </a>
+                                </div>
                             </div>
                         {{/if}}
                     </div>
                     {{/each}}
                     {{#if editable}}
                         <div class="flexrow">
-                            <div class="drop-area" data-id="">{{localize "beaversCrafting.recipe.addItem"}}</div>
+                            <div class="drop-area" data-id="">
+                              <span style="flex:1;text-align:center">{{localize "beaversCrafting.recipe.addItem"}}</span>
+                              <a class="item-add" style="flex: 0 0 30px;border-left: 1px solid var(--beavers-item-border-color-highlight);text-align:center;">
+                                <i class="fa-solid fa-coins"></i>
+                              </a>
+                            </div>
                         </div>
                     {{/if}}
                 </div>
@@ -178,19 +184,29 @@
                     {{#each recipe.output}}
                     <div class="section flexcol" style="margin-left:20px">
                         {{#each this}}
-                            {{>beavers-recipe-component component=this key=@key type="output" group=@../key hasCraftedFlag=false clickable=../../displayResults editable=../../editable}}
+                            {{>beavers-recipe-component component=this key=@key type="output" group=@../key hasCraftedFlag=false clickable=../../displayResults editable=../../editable currencies=../../currencies}}
                             <div class="beavers-seperator"></div>
                         {{/each}}
                         {{#if ../editable}}
                             <div class="flexrow">
-                                <div class="drop-area" data-id="{{@key}}">{{localize "beaversCrafting.recipe.orItem"}}</div>
+                                <div class="drop-area" data-id="{{@key}}">
+                                  <span style="flex:1;text-align:center">{{localize "beaversCrafting.recipe.orItem"}}</span>
+                                  <a class="item-add" style="flex: 0 0 30px;border-left: 1px solid var(--beavers-item-border-color-highlight);text-align:center;">
+                                    <i class="fa-solid fa-coins"></i>
+                                  </a>
+                                </div>
                             </div>
                         {{/if}}
                     </div>
                     {{/each}}
                     {{#if editable}}
                         <div class="flexrow">
-                            <div class="drop-area" data-id="">{{localize "beaversCrafting.recipe.addItem"}}</div>
+                            <div class="drop-area" data-id="">
+                              <span style="flex:1;text-align:center">{{localize "beaversCrafting.recipe.addItem"}}</span>
+                              <a class="item-add" style="flex: 0 0 30px;border-left: 1px solid var(--beavers-item-border-color-highlight);text-align:center;">
+                                <i class="fa-solid fa-coins"></i>
+                              </a>
+                            </div>
                         </div>
                     {{/if}}
             </div>

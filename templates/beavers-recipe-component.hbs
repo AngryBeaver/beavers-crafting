@@ -3,7 +3,14 @@
     <div class="flexrow {{#if (eq component.type 'AnyOf')}}chooseAnyOf{{else if clickable}}clickable{{/if}}"
          data-type="{{type}}" data-group="{{group}}" data-key="{{key}}" data-id="{{component.uuid}}">
         <img src="{{component.img}}"/>
+        {{#if (and editable (eq component.flags.beavers-crafting.subtype "money"))}}
+        <select name="{{#if group}}flags.beavers-crafting.recipe.{{type}}.{{group}}.{{key}}.id{{else}}flags.beavers-crafting.recipe.{{type}}.{{key}}.id{{/if}}"
+            class="currency-selector name">
+          {{selectOptions currencies selected=component.id labelAttr="label" valueAttr="id"}}
+        </select>
+        {{else}}
         <span class="name">{{component.name}}</span>
+        {{/if}}
     </div>
     {{#if hasCraftedFlag}}
         {{#if component.flags.beavers-crafting.isCrafted }}

@@ -381,13 +381,6 @@ Handlebars.registerHelper('beavers-isEmpty', function (value, options) {
     (value instanceof Array && value.length === 0)
 });
 
-//core removed its {{#select}} helper in v14
-Handlebars.registerHelper("beavers-select", function (selected, options) {
-    const escapedValue = RegExp.escape(Handlebars.escapeExpression(selected));
-    const rgx = new RegExp(` value=["']${escapedValue}["']`);
-    return options.fn(this).replace(rgx, "$& selected");
-});
-
 Handlebars.registerHelper("beavers-objectLen", function(json) {
     return Object.keys(json).length;
 });
