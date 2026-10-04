@@ -1,4 +1,9 @@
 # Changelog
+## 4.7.0
+- foundry v14 support
+  - replace deprecated deletion keys, globals and hooks
+  - minimum foundry version is now 13
+- build with esbuild and pnpm instead of gulp, releases via github workflow
 ## 4.6.2
 - currency-component have a dropdown on edit.
 ## 4.6.1
