@@ -238,11 +238,12 @@ export class RecipeSheet {
           data[element.name] = element.value ? parseFloat(element.value) : null;
         } else if (element.type === "checkbox" && element instanceof HTMLInputElement) {
           data[element.name] = element.checked;
-        } else if (element.type === "select-one" || element.type === "select-multiple") {
-          let select: HTMLSelectElement = el as HTMLSelectElement;
-          let selectedValues = Array.from(select.selectedOptions)
+        } else if (element.type === "select-one") {
+          data[element.name] = element.value;
+        } else if (element.type === "select-multiple") {
+          const select = element as HTMLSelectElement;
+          data[element.name] = Array.from(select.selectedOptions)
             .map(option => option.value);
-          data[element.name] = selectedValues;
         } else if (element.type === "textarea") {
           data[element.name] = element.value;
         } else {
