@@ -1,0 +1,1018 @@
+/*
+ * Crafting window (CraftingApp).
+ * Mockup: design/crafting-window.html
+ * Theme: Foundry forces .theme-light on ApplicationV1; CraftingApp adds .theme-dark itself
+ * when the user's application color scheme is dark.
+ * Textures are Foundry core files (public/ui/*), relative to modules/beavers-crafting/css/.
+ */
+
+/* ---------------- tokens: light (default) ---------------- */
+.beavers-crafting.crafting-app {
+    --bc-fg: #2a241d;
+    --bc-muted: #5f5345;
+    --bc-bg-base: #efe9de;
+    --bc-line: rgba(70, 50, 25, .14);
+    --bc-line-strong: rgba(70, 50, 25, .28);
+    --bc-accent: #94490f;
+    --bc-accent-fg: #fff8ee;
+    --bc-hover: rgba(255, 252, 245, .45);
+    --bc-sel: rgba(148, 73, 15, .11);
+    --bc-slot: rgba(255, 252, 245, .8);
+    --bc-slot-border: rgba(70, 50, 25, .22);
+    --bc-ok: #2c7531;
+    --bc-bad: #a92c26;
+    --bc-unknown: #2f5f8f;
+    --bc-bad-tint: rgba(169, 44, 38, .07);
+    --bc-bad-line: rgba(169, 44, 38, .42);
+    --bc-chip: rgba(70, 50, 25, .06);
+    --bc-input: rgba(255, 253, 248, .85);
+    --bc-foot: rgba(255, 250, 240, .55);
+    --bc-shadow: rgba(60, 40, 20, .25);
+    --bc-side-bg: linear-gradient(rgba(252, 249, 242, .55), rgba(252, 249, 242, .55)), url("../../../ui/parchment.jpg");
+    --bc-main-bg: url("../../../ui/parchment.jpg");
+    --bc-head-bg: #e2d9c8;
+    --bc-head-fg: #2a241d;
+    --bc-option-bg: #f7f2e8;
+    --bc-option-sel: #e6d6bd;
+    --bc-scheme: light;
+    --bc-font-display: "Modesto Condensed", "Palatino Linotype", serif;
+    min-width: 560px;
+}
+
+/* ---------------- tokens: dark ---------------- */
+.beavers-crafting.crafting-app.theme-dark {
+    --bc-fg: #ece6da;
+    --bc-muted: #b3aa9a;
+    --bc-bg-base: #1c1b1a;
+    --bc-line: rgba(255, 240, 215, .13);
+    --bc-line-strong: rgba(255, 240, 215, .26);
+    --bc-accent: #e3a548;
+    --bc-accent-fg: #1d1408;
+    --bc-hover: rgba(255, 240, 215, .05);
+    --bc-sel: rgba(227, 165, 72, .16);
+    --bc-slot: rgba(0, 0, 0, .35);
+    --bc-slot-border: rgba(255, 240, 215, .2);
+    --bc-ok: #7cc47f;
+    --bc-bad: #f08a83;
+    --bc-unknown: #8fb4e0;
+    --bc-bad-tint: rgba(240, 138, 131, .10);
+    --bc-bad-line: rgba(240, 138, 131, .45);
+    --bc-chip: rgba(255, 240, 215, .08);
+    --bc-input: rgba(0, 0, 0, .4);
+    --bc-foot: rgba(0, 0, 0, .4);
+    --bc-shadow: rgba(0, 0, 0, .5);
+    --bc-side-bg: linear-gradient(rgba(10, 9, 8, .6), rgba(10, 9, 8, .6)), url("../../../ui/denim075.png");
+    --bc-main-bg: linear-gradient(rgba(32, 30, 27, .8), rgba(32, 30, 27, .8)), url("../../../ui/denim075.png");
+    --bc-head-bg: #0f0e0d;
+    --bc-head-fg: #f0e6d2;
+    --bc-option-bg: #23211f;
+    --bc-option-sel: #4a3a22;
+    --bc-scheme: dark;
+}
+
+/* ---------------- window frame (opaque, like the AppV2 layout) ---------------- */
+.beavers-crafting.crafting-app.window-app {
+    background: var(--bc-bg-base);
+    border: 1px solid var(--bc-line-strong);
+    border-radius: 6px;
+    box-shadow: 0 0 10px #000;
+    overflow: hidden;
+}
+
+.beavers-crafting.crafting-app .window-header {
+    flex: 0 0 36px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0 8px 0 10px;
+    background: var(--bc-head-bg);
+    color: var(--bc-head-fg);
+    border-bottom: 1px solid var(--bc-line-strong);
+    font-size: var(--font-size-13, 13px);
+}
+
+.beavers-crafting.crafting-app .window-header .window-title {
+    flex: 1;
+    margin: 0;
+    padding: 0;
+    border: none;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: 600;
+    line-height: 36px;
+    color: inherit;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.beavers-crafting.crafting-app .window-header a.header-button {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0 0 0 8px;
+    line-height: 36px;
+    color: inherit;
+}
+
+.beavers-crafting.crafting-app .window-header a.header-button:hover {
+    color: var(--bc-accent);
+    text-shadow: none;
+}
+
+/* Foundry's default (AppV2) resize corner instead of the legacy boxed arrow icon */
+.beavers-crafting.crafting-app .window-resizable-handle {
+    position: absolute;
+    inset: auto 1px 1px auto;
+    width: 11px;
+    height: 11px;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background: transparent url("../../../ui/resize-handle.webp") no-repeat center / contain;
+    cursor: nwse-resize;
+}
+
+.beavers-crafting.crafting-app .window-resizable-handle i {
+    display: none;
+}
+
+.beavers-crafting.crafting-app.theme-dark .window-resizable-handle {
+    filter: invert(1);
+}
+
+/* ---------------- window ---------------- */
+.beavers-crafting.crafting-app .window-content {
+    padding: 0;
+    overflow: hidden;
+    background: var(--bc-bg-base);
+    color: var(--bc-fg);
+}
+
+.beavers-crafting.crafting-app .bc-body {
+    display: grid;
+    grid-template-columns: 232px minmax(0, 1fr);
+    height: 100%;
+    width: 100%;
+    min-height: 0;
+    font-size: 14px;
+    color: var(--bc-fg);
+}
+
+.beavers-crafting.crafting-app .bc-body * {
+    box-sizing: border-box;
+}
+
+.beavers-crafting.crafting-app .bc-body img {
+    border: 1px solid var(--bc-slot-border);
+    flex: none;
+    object-fit: cover;
+}
+
+/* status icons: neutralise the generic .beavers-crafting .fa-* rules */
+.beavers-crafting.crafting-app .bc-body .fa-check,
+.beavers-crafting.crafting-app .bc-body .fa-question,
+.beavers-crafting.crafting-app .bc-body .fa-xmark {
+    color: inherit;
+    margin: 0;
+    padding: 0;
+    width: auto;
+    font-size: inherit;
+}
+
+/* ---------------- sidebar ---------------- */
+.beavers-crafting.crafting-app .bc-side {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    background: var(--bc-side-bg);
+    border-right: 1px solid var(--bc-line-strong);
+}
+
+.beavers-crafting.crafting-app .bc-tools {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-bottom: 1px solid var(--bc-line);
+}
+
+.beavers-crafting.crafting-app .bc-field {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 8px;
+    background: var(--bc-input);
+    border: 1px solid var(--bc-line-strong);
+    border-radius: 5px;
+    color: var(--bc-muted);
+    min-width: 0;
+    flex: none;
+}
+
+.beavers-crafting.crafting-app .bc-trow .bc-field {
+    flex: 1;
+}
+
+.beavers-crafting.crafting-app .bc-field input,
+.beavers-crafting.crafting-app .bc-field select {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background: none;
+    border: none;
+    box-shadow: none;
+    outline: none;
+    color: var(--bc-fg);
+    font: inherit;
+}
+
+/* the opened dropdown list is drawn by the browser: give it the theme's colors */
+.beavers-crafting.crafting-app .bc-field select {
+    color-scheme: var(--bc-scheme);
+    cursor: pointer;
+}
+
+.beavers-crafting.crafting-app .bc-field select option {
+    background-color: var(--bc-option-bg);
+    color: var(--bc-fg);
+}
+
+.beavers-crafting.crafting-app .bc-field select option:checked {
+    background-color: var(--bc-option-sel);
+    color: var(--bc-fg);
+}
+
+/*
+ * Chromium 135+ (Foundry desktop app, Chrome/Edge): fully styled dropdown list that looks like the field
+ * and opens aligned below the whole field. Other browsers keep the native list (colored above).
+ */
+/* the select fills the whole field (icon sits on its left padding) so the opened list lines up with the field */
+.beavers-crafting.crafting-app .bc-trow .bc-field {
+    position: relative;
+    padding: 0;
+}
+
+.beavers-crafting.crafting-app .bc-trow .bc-field > i {
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.beavers-crafting.crafting-app .bc-trow .bc-field select {
+    width: 100%;
+    padding: 0 8px 0 30px;
+}
+
+@supports (appearance: base-select) {
+    .beavers-crafting.crafting-app .bc-trow .bc-field select,
+    .beavers-crafting.crafting-app .bc-trow .bc-field select::picker(select) {
+        appearance: base-select;
+    }
+
+    .beavers-crafting.crafting-app .bc-trow .bc-field select {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        min-block-size: 0;
+        padding: 0 8px 0 30px;
+        border: none;
+        background: none;
+        color: var(--bc-fg);
+    }
+
+    .beavers-crafting.crafting-app .bc-trow .bc-field select::picker-icon {
+        color: var(--bc-muted);
+        transition: rotate .15s ease;
+    }
+
+    .beavers-crafting.crafting-app .bc-trow .bc-field select:open::picker-icon {
+        rotate: 180deg;
+    }
+
+    .beavers-crafting.crafting-app .bc-trow .bc-field select::picker(select) {
+        /* the select sits inside the field's 1px border: widen/shift to the field's outer edge */
+        width: calc(anchor-size(width) + 2px);
+        margin: 4px 0 0 -1px;
+        padding: 4px;
+        border: 1px solid var(--bc-accent);
+        border-radius: 5px;
+        background: var(--bc-option-bg);
+        color: var(--bc-fg);
+        box-shadow: 0 6px 18px var(--bc-shadow);
+        font: inherit;
+    }
+
+    .beavers-crafting.crafting-app .bc-trow .bc-field select option {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 8px;
+        border-radius: 4px;
+        background: transparent;
+        color: var(--bc-fg);
+        cursor: pointer;
+    }
+
+    .beavers-crafting.crafting-app .bc-trow .bc-field select option:hover,
+    .beavers-crafting.crafting-app .bc-trow .bc-field select option:focus-visible {
+        background: var(--bc-sel);
+        outline: none;
+    }
+
+    .beavers-crafting.crafting-app .bc-trow .bc-field select option:checked {
+        background: var(--bc-option-sel);
+        font-weight: 600;
+    }
+
+    .beavers-crafting.crafting-app .bc-trow .bc-field select option::checkmark {
+        color: var(--bc-accent);
+    }
+}
+
+.beavers-crafting.crafting-app .bc-field:focus-within {
+    border-color: var(--bc-accent);
+}
+
+.beavers-crafting.crafting-app .bc-trow {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.beavers-crafting.crafting-app .bc-ib {
+    appearance: none;
+    transition: background-color .15s, border-color .15s, color .15s;
+    flex: none;
+    width: 32px;
+    height: 32px;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bc-input);
+    border: 1px solid var(--bc-line-strong);
+    border-radius: 5px;
+    box-shadow: none;
+    color: var(--bc-muted);
+    cursor: pointer;
+}
+
+.beavers-crafting.crafting-app .bc-ib:hover {
+    color: var(--bc-fg);
+    border-color: var(--bc-accent);
+}
+
+.beavers-crafting.crafting-app .bc-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 6px 6px 6px 4px;
+}
+
+.beavers-crafting.crafting-app .bc-fold {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 6px 4px;
+    color: var(--bc-muted);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.beavers-crafting.crafting-app .bc-fold:hover {
+    color: var(--bc-fg);
+    text-shadow: none;
+}
+
+.beavers-crafting.crafting-app .bc-fold .bc-n {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.beavers-crafting.crafting-app .bc-fold .bc-c {
+    font-weight: 400;
+}
+
+.beavers-crafting.crafting-app .bc-fold .fa-chevron-down {
+    font-size: 10px;
+    transition: transform .15s ease;
+}
+
+.beavers-crafting.crafting-app .bc-folder.collapsed > .bc-fold .fa-chevron-down {
+    transform: rotate(-90deg);
+}
+
+.beavers-crafting.crafting-app .bc-folder.collapsed > .bc-folder-content {
+    display: none;
+}
+
+/* sub folders and their recipes are indented one step per level */
+.beavers-crafting.crafting-app .bc-folder-content {
+    padding-left: 8px;
+}
+
+.beavers-crafting.crafting-app .bc-folder-content .bc-folder-content {
+    border-left: 1px solid var(--bc-line);
+    margin-left: 6px;
+}
+
+.beavers-crafting.crafting-app .bc-rec {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 8px;
+    margin: 1px 0;
+    border-radius: 5px;
+    color: var(--bc-fg);
+    cursor: pointer;
+}
+
+.beavers-crafting.crafting-app .bc-rec:hover {
+    background: var(--bc-hover);
+    text-shadow: none;
+}
+
+.beavers-crafting.crafting-app .bc-rec.selected {
+    background: var(--bc-sel);
+    box-shadow: inset 3px 0 0 var(--bc-accent);
+}
+
+.beavers-crafting.crafting-app .bc-rec img {
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+}
+
+.beavers-crafting.crafting-app .bc-rec .bc-n {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: var(--bc-font-display);
+    font-size: 16px;
+}
+
+.beavers-crafting.crafting-app .bc-dot {
+    flex: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.beavers-crafting.crafting-app .bc-dot.ok {
+    background: var(--bc-ok);
+}
+
+.beavers-crafting.crafting-app .bc-dot.no {
+    border: 1.5px solid var(--bc-muted);
+}
+
+.beavers-crafting.crafting-app .bc-sfoot {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-top: 1px solid var(--bc-line);
+    font-size: 12px;
+    color: var(--bc-muted);
+}
+
+/* ---------------- main panel ---------------- */
+.beavers-crafting.crafting-app .bc-main {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    min-width: 0;
+    background: var(--bc-main-bg);
+    container-type: inline-size;
+}
+
+.beavers-crafting.crafting-app .bc-rh {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px 14px;
+    border-bottom: 1px solid var(--bc-line);
+}
+
+.beavers-crafting.crafting-app .bc-rh .bc-big {
+    width: 64px;
+    height: 64px;
+    border-radius: 8px;
+    border-color: var(--bc-line-strong);
+    background: var(--bc-slot);
+    box-shadow: 0 3px 10px var(--bc-shadow);
+}
+
+.beavers-crafting.crafting-app .bc-rh-text {
+    min-width: 0;
+}
+
+.beavers-crafting.crafting-app .bc-rh h1 {
+    margin: 0;
+    padding: 0;
+    border: none;
+    font-family: var(--bc-font-display);
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.05;
+    color: var(--bc-fg);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.beavers-crafting.crafting-app .bc-meta {
+    margin-top: 3px;
+    font-size: 13px;
+    color: var(--bc-muted);
+}
+
+.beavers-crafting.crafting-app .bc-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.beavers-crafting.crafting-app .bc-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 9px 2px 7px;
+    font-size: 12px;
+    background: var(--bc-chip);
+    border: 1px solid var(--bc-line);
+    border-radius: 999px;
+}
+
+.beavers-crafting.crafting-app .bc-tag i {
+    font-size: 11px;
+    color: var(--bc-muted);
+}
+
+.beavers-crafting.crafting-app .bc-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 14px 20px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.beavers-crafting.crafting-app .bc-flow {
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) 32px minmax(0, 1fr);
+    gap: 10px;
+    align-items: stretch;
+}
+
+.beavers-crafting.crafting-app .bc-col {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+}
+
+.beavers-crafting.crafting-app .bc-sec {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.beavers-crafting.crafting-app .bc-sh {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding-bottom: 5px;
+    font-family: var(--bc-font-display);
+    font-size: 17px;
+    font-weight: 700;
+    background: linear-gradient(to right, var(--bc-line-strong), transparent) left bottom / 100% 1px no-repeat;
+}
+
+.beavers-crafting.crafting-app .bc-sh > i {
+    color: var(--bc-accent);
+    font-size: 14px;
+}
+
+.beavers-crafting.crafting-app .bc-sh .bc-cnt {
+    margin-left: auto;
+    font-family: var(--font-primary, inherit);
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--bc-muted);
+}
+
+/* ingredient / tool slot */
+.beavers-crafting.crafting-app .bc-slot {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 8px 4px 4px;
+    border: 1px solid var(--bc-line);
+    border-radius: 6px;
+    background: var(--bc-hover);
+}
+
+.beavers-crafting.crafting-app .bc-slot img {
+    width: 36px;
+    height: 36px;
+    border-radius: 5px;
+    background: var(--bc-slot);
+}
+
+.beavers-crafting.crafting-app .bc-slot img.bc-crafted {
+    width: 16px;
+    height: 16px;
+    border: none;
+    background: none;
+}
+
+.beavers-crafting.crafting-app .bc-slot .bc-n,
+.beavers-crafting.crafting-app .bc-opt .bc-n {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.beavers-crafting.crafting-app .bc-slot.missing {
+    background: var(--bc-bad-tint);
+    border-color: var(--bc-bad-line);
+}
+
+.beavers-crafting.crafting-app .bc-qty {
+    font-size: 13px;
+    color: var(--bc-muted);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.beavers-crafting.crafting-app .bc-qty b {
+    color: var(--bc-fg);
+    font-weight: 600;
+}
+
+.beavers-crafting.crafting-app .missing .bc-qty b {
+    color: var(--bc-bad);
+}
+
+.beavers-crafting.crafting-app .bc-st {
+    width: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.beavers-crafting.crafting-app .bc-st.ok {
+    color: var(--bc-ok);
+}
+
+.beavers-crafting.crafting-app .bc-st.bad {
+    color: var(--bc-bad);
+}
+
+.beavers-crafting.crafting-app .bc-st.unk {
+    color: var(--bc-unknown);
+}
+
+.beavers-crafting.crafting-app .open-sheet,
+.beavers-crafting.crafting-app .chooseAnyOf {
+    cursor: pointer;
+}
+
+.beavers-crafting.crafting-app .bc-slot.open-sheet:hover,
+.beavers-crafting.crafting-app .bc-slot.chooseAnyOf:hover,
+.beavers-crafting.crafting-app .bc-res.open-sheet:hover,
+.beavers-crafting.crafting-app .bc-res.chooseAnyOf:hover {
+    border-color: var(--bc-accent);
+}
+
+.beavers-crafting.crafting-app .bc-slot.chooseAnyOf {
+    border-style: dashed;
+}
+
+/* drag over for AnyOf drop */
+.beavers-crafting.crafting-app .bc-slot.drag-over,
+.beavers-crafting.crafting-app .bc-slot.chooseAnyOf.droppable {
+    border-color: var(--bc-accent);
+}
+
+/* "choose one" group */
+.beavers-crafting.crafting-app .bc-grp {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 5px;
+    border: 1px dashed var(--bc-line-strong);
+    border-radius: 8px;
+}
+
+.beavers-crafting.crafting-app .bc-grp-l {
+    padding: 1px 3px 0;
+    font-size: 11px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--bc-muted);
+}
+
+.beavers-crafting.crafting-app .bc-opts {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 5px;
+}
+
+.beavers-crafting.crafting-app .bc-opt {
+    appearance: none;
+    transition: background-color .15s, border-color .15s, color .15s;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
+    height: auto;
+    min-height: 0;
+    margin: 0;
+    padding: 4px 7px 4px 4px;
+    background: var(--bc-hover);
+    border: 1px solid var(--bc-line);
+    border-radius: 6px;
+    box-shadow: none;
+    color: var(--bc-fg);
+    font: inherit;
+    font-size: 13px;
+    line-height: normal;
+    text-align: left;
+    cursor: pointer;
+}
+
+.beavers-crafting.crafting-app .bc-opt:hover {
+    border-color: var(--bc-accent);
+    background: var(--bc-sel);
+}
+
+.beavers-crafting.crafting-app .bc-opt.missing {
+    border-color: var(--bc-bad-line);
+}
+
+.beavers-crafting.crafting-app .bc-opt img {
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+}
+
+/* arrow between inputs and result */
+.beavers-crafting.crafting-app .bc-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--bc-accent);
+    font-size: 22px;
+}
+
+/* result tile */
+.beavers-crafting.crafting-app .bc-res {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 18px 12px 14px;
+    text-align: center;
+    background: var(--bc-hover);
+    border: 1px solid var(--bc-line-strong);
+    border-radius: 10px;
+}
+
+.beavers-crafting.crafting-app .bc-res img {
+    width: 76px;
+    height: 76px;
+    border-radius: 9px;
+    background: var(--bc-slot);
+    box-shadow: 0 4px 14px var(--bc-shadow);
+}
+
+.beavers-crafting.crafting-app .bc-res .bc-n {
+    font-family: var(--bc-font-display);
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.beavers-crafting.crafting-app .bc-res .bc-q {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 1px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--bc-chip);
+    border: 1px solid var(--bc-line);
+    border-radius: 999px;
+}
+
+/* checks */
+.beavers-crafting.crafting-app .bc-checks {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.beavers-crafting.crafting-app .bc-and {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+}
+
+.beavers-crafting.crafting-app .bc-hits,
+.beavers-crafting.crafting-app .bc-or {
+    font-size: 12px;
+    color: var(--bc-muted);
+}
+
+.beavers-crafting.crafting-app .bc-chk {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    max-width: 100%;
+    padding: 4px 10px 4px 8px;
+    line-height: 22px;
+    background: var(--bc-hover);
+    border: 1px solid var(--bc-line);
+    border-radius: 6px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.beavers-crafting.crafting-app .bc-chk .beavers-test {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+}
+
+.beavers-crafting.crafting-app .bc-chk img {
+    width: 18px;
+    height: 18px;
+    border: none;
+}
+
+.beavers-crafting.crafting-app .bc-rule {
+    font-size: 12px;
+    color: var(--bc-muted);
+}
+
+/* instruction */
+.beavers-crafting.crafting-app .bc-instruction {
+    border: 1px solid var(--bc-line);
+    border-radius: 6px;
+    background: var(--bc-hover);
+}
+
+.beavers-crafting.crafting-app .bc-instruction summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    list-style: none;
+    cursor: pointer;
+}
+
+.beavers-crafting.crafting-app .bc-instruction summary::-webkit-details-marker {
+    display: none;
+}
+
+.beavers-crafting.crafting-app .bc-instruction summary > i {
+    color: var(--bc-accent);
+}
+
+.beavers-crafting.crafting-app .bc-instruction .bc-x {
+    flex: none;
+    font-family: var(--bc-font-display);
+    font-size: 17px;
+    font-weight: 700;
+}
+
+/* plain text preview, only while collapsed */
+.beavers-crafting.crafting-app .bc-instruction .bc-p {
+    flex: 1;
+    min-width: 0;
+    margin-left: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12px;
+    color: var(--bc-muted);
+}
+
+.beavers-crafting.crafting-app .bc-instruction[open] .bc-p {
+    visibility: hidden;
+}
+
+.beavers-crafting.crafting-app .bc-instruction .bc-chev {
+    transition: transform .15s ease;
+}
+
+.beavers-crafting.crafting-app .bc-instruction:not([open]) .bc-chev {
+    transform: rotate(-90deg);
+}
+
+.beavers-crafting.crafting-app .bc-instruction-body {
+    padding: 0 12px 10px;
+}
+
+/* ---------------- footer ---------------- */
+.beavers-crafting.crafting-app .bc-ft {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px 10px 20px;
+    border-top: 1px solid var(--bc-line-strong);
+    background: var(--bc-foot);
+}
+
+.beavers-crafting.crafting-app .bc-warn {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--bc-bad);
+}
+
+.beavers-crafting.crafting-app .bc-warn span {
+    color: var(--bc-fg);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.beavers-crafting.crafting-app .bc-warn b {
+    color: var(--bc-bad);
+}
+
+.beavers-crafting.crafting-app .bc-craft {
+    appearance: none;
+    transition: background-color .15s, border-color .15s, color .15s;
+    flex: none;
+    width: auto;
+    height: 38px;
+    min-height: 0;
+    margin: 0;
+    padding: 0 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: 1px solid var(--bc-accent);
+    border-radius: 6px;
+    box-shadow: none;
+    color: var(--bc-accent);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.beavers-crafting.crafting-app .bc-craft:hover {
+    background: var(--bc-sel);
+}
+
+.beavers-crafting.crafting-app .bc-craft.go {
+    background: var(--bc-accent);
+    color: var(--bc-accent-fg);
+}
+
+.beavers-crafting.crafting-app .bc-craft.go:hover {
+    filter: brightness(1.1);
+}
+
+/* ---------------- narrow window: stack inputs above the result ---------------- */
+@container (max-width: 540px) {
+    .beavers-crafting.crafting-app .bc-flow {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .beavers-crafting.crafting-app .bc-arrow {
+        transform: rotate(90deg);
+        height: 24px;
+    }
+}

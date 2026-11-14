@@ -360,6 +360,9 @@ Hooks.once("beavers-system-interface.ready", async function(){
   getTemplate("modules/beavers-crafting/templates/beavers-folders.hbs").then((t) => {
     Handlebars.registerPartial("beavers-folders", t);
   });
+  getTemplate("modules/beavers-crafting/templates/crafting-app-folders.hbs").then((t) => {
+    Handlebars.registerPartial("beavers-crafting-app-folders", t);
+  });
   getTemplate("modules/beavers-crafting/templates/beavers-recipe-folder-item.hbs").then((t) => {
     Handlebars.registerPartial("beavers-recipe-folder-item", t);
   });

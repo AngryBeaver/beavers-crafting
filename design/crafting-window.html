@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crafting Window Redesign</title>
+<!--
+  Mockup of the redesigned crafting window (dark + light theme).
+  Foundry core textures/icons are loaded from assets/foundry/ (git-ignored, copied from the
+  Foundry install: resources/app/public/ui/* and resources/app/public/icons/*).
+  In the module they are referenced as url("/ui/parchment.jpg") etc.
+  Alegreya SC stands in for Foundry's bundled "Modesto Condensed".
+-->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Signika:wght@400;600&family=Alegreya+SC:wght@500;700&display=swap">
+<style>
+body{margin:0;padding:32px;background:#3a3836;font-family:'Signika',sans-serif;display:flex;flex-wrap:wrap;gap:40px;justify-content:center}
+.board{display:flex;flex-direction:column;gap:8px}
+.board>h2{margin:0;color:#ddd;font-size:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+
+.bc{width:920px;height:640px;display:flex;flex-direction:column;font-size:14px;color:var(--fg);border-radius:8px;overflow:hidden;background:var(--bg-base);box-shadow:0 10px 40px rgba(0,0,0,.55)}
+.bc *{box-sizing:border-box}
+
+/* ---------- theme tokens ---------- */
+.dark{--fg:#ece6da;--muted:#b3aa9a;--bg-base:#1c1b1a;--head-bg:#0f0e0d;--head-fg:#f0e6d2;--line:rgba(255,240,215,.13);--line-strong:rgba(255,240,215,.26);--accent:#e3a548;--accent-fg:#1d1408;--hover:rgba(255,240,215,.05);--sel:rgba(227,165,72,.16);--slot:rgba(0,0,0,.35);--slot-border:rgba(255,240,215,.2);--ok:#7cc47f;--bad:#f08a83;--bad-tint:rgba(240,138,131,.10);--bad-line:rgba(240,138,131,.45);--chip:rgba(255,240,215,.08);--input:rgba(0,0,0,.4);--foot:rgba(0,0,0,.4);--shadow:rgba(0,0,0,.5)}
+.dark .side{background:linear-gradient(rgba(10,9,8,.6),rgba(10,9,8,.6)),url(assets/foundry/denim075.png)}
+.dark .main{background:linear-gradient(rgba(32,30,27,.8),rgba(32,30,27,.8)),url(assets/foundry/denim075.png)}
+
+.light{--fg:#2a241d;--muted:#5f5345;--bg-base:#efe9de;--head-bg:#e2d9c8;--head-fg:#2a241d;--line:rgba(70,50,25,.14);--line-strong:rgba(70,50,25,.28);--accent:#94490f;--accent-fg:#fff8ee;--hover:rgba(255,252,245,.45);--sel:rgba(148,73,15,.11);--slot:rgba(255,252,245,.8);--slot-border:rgba(70,50,25,.22);--ok:#2c7531;--bad:#a92c26;--bad-tint:rgba(169,44,38,.07);--bad-line:rgba(169,44,38,.42);--chip:rgba(70,50,25,.06);--input:rgba(255,253,248,.85);--foot:rgba(255,250,240,.55);--shadow:rgba(60,40,20,.25)}
+/* light: both panels parchment; sidebar a shade brighter so item art keeps its colour */
+.light .side{background:linear-gradient(rgba(252,249,242,.55),rgba(252,249,242,.55)),url(assets/foundry/parchment.jpg)}
+.light .main{background:url(assets/foundry/parchment.jpg)}
+
+/* ---------- layout ---------- */
+svg.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.wh{height:34px;flex:none;display:flex;align-items:center;gap:8px;padding:0 6px 0 12px;background:var(--head-bg);color:var(--head-fg);border-bottom:1px solid var(--line-strong);font-weight:600}
+.wh .t{flex:1}
+.ib{width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;border:0;background:transparent;color:inherit;border-radius:4px;padding:0;cursor:pointer}
+.ib:hover{background:var(--hover)}
+.wb{flex:1;display:grid;grid-template-columns:232px minmax(0,1fr);min-height:0}
+.side{display:flex;flex-direction:column;border-right:1px solid var(--line-strong);min-height:0}
+.tools{padding:10px;display:flex;flex-direction:column;gap:8px;border-bottom:1px solid var(--line)}
+.field{display:flex;align-items:center;gap:6px;height:32px;padding:0 8px;background:var(--input);border:1px solid var(--line-strong);border-radius:5px;color:var(--muted);flex:1;min-width:0}
+.field input,.field select{flex:1;min-width:0;background:transparent;border:0;color:var(--fg);font:inherit;outline:none;padding:0}
+.field select option{color:#222}
+.tools>.field{flex:none}
+.trow{display:flex;gap:6px;align-items:center}
+.trow .ib{border:1px solid var(--line-strong);background:var(--input);color:var(--muted);height:32px;width:32px}
+.list{flex:1;overflow:auto;padding:6px 6px 6px 4px;display:flex;flex-direction:column;gap:1px}
+.fold{display:flex;align-items:center;gap:6px;padding:8px 6px 4px;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+.fold .c{margin-left:auto;font-weight:400}
+.rec{display:flex;align-items:center;gap:8px;padding:3px 8px;border-radius:5px;margin-left:8px;text-decoration:none;color:inherit}
+.rec:hover{background:var(--hover)}
+.rec img{width:32px;height:32px;border-radius:4px;border:1px solid var(--slot-border);flex:none}
+.rec .n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'Alegreya SC',serif;font-size:15px;font-weight:500}
+.rec.sel{background:var(--sel);box-shadow:inset 3px 0 0 var(--accent)}
+.rec.top{margin-left:0}
+.dot{width:8px;height:8px;border-radius:50%;flex:none}
+.dot.ok{background:var(--ok)}
+.dot.no{border:1.5px solid var(--muted)}
+.sfoot{padding:8px 12px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.main{display:flex;flex-direction:column;min-height:0}
+.rh{display:flex;gap:14px;align-items:center;padding:16px 20px 14px;border-bottom:1px solid var(--line)}
+.rh .big{width:64px;height:64px;border-radius:8px;border:1px solid var(--line-strong);box-shadow:0 3px 10px var(--shadow);background:var(--slot)}
+.rh h1{margin:0;font-family:'Alegreya SC',serif;font-size:27px;font-weight:700;line-height:1.05}
+.meta{color:var(--muted);font-size:13px;margin-top:3px}
+.tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.tag{font-size:12px;padding:2px 9px 2px 7px;border-radius:999px;background:var(--chip);border:1px solid var(--line);display:inline-flex;gap:5px;align-items:center}
+.tag svg.i{width:13px;height:13px}
+.scroll{flex:1;overflow:auto;padding:14px 20px 16px;display:flex;flex-direction:column;gap:16px}
+.flow{display:grid;grid-template-columns:minmax(0,1.3fr) 32px minmax(0,1fr);gap:10px;align-items:stretch}
+.col{display:flex;flex-direction:column;gap:14px}
+.sec{display:flex;flex-direction:column;gap:6px}
+.sh{display:flex;align-items:center;gap:7px;font-family:'Alegreya SC',serif;font-size:15px;font-weight:700;padding-bottom:5px;background:linear-gradient(to right,var(--line-strong),transparent) left bottom/100% 1px no-repeat}
+.sh svg.i{color:var(--accent)}
+.sh .cnt{margin-left:auto;font-family:'Signika',sans-serif;font-size:12px;font-weight:400;color:var(--muted)}
+.slot{display:flex;align-items:center;gap:10px;padding:4px 8px 4px 4px;border-radius:6px;border:1px solid var(--line);background:var(--hover)}
+.slot img{width:36px;height:36px;border-radius:5px;border:1px solid var(--slot-border);background:var(--slot);flex:none}
+.slot .n{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qty{font-variant-numeric:tabular-nums;font-size:13px;color:var(--muted);white-space:nowrap}
+.qty b{color:var(--fg);font-weight:600}
+.st{width:20px;display:flex;justify-content:center}
+.st.ok{color:var(--ok)}
+.st.bad{color:var(--bad)}
+.slot.miss{background:var(--bad-tint);border-color:var(--bad-line)}
+.slot.miss .qty b{color:var(--bad)}
+.grp{border:1px dashed var(--line-strong);border-radius:8px;padding:5px;display:flex;flex-direction:column;gap:5px}
+.grp-l{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:1px 3px 0}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.opt{display:flex;align-items:center;gap:7px;padding:4px 7px 4px 4px;border-radius:6px;border:1px solid var(--line);cursor:pointer;font-size:13px;min-width:0;position:relative}
+.opt.on{border-color:var(--accent);background:var(--sel)}
+.opt img{width:30px;height:30px;border-radius:4px;border:1px solid var(--slot-border);flex:none}
+.opt .n{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.opt input{position:absolute;opacity:0;width:1px;height:1px}
+.arrow{display:flex;align-items:center;justify-content:center;color:var(--accent)}
+.arrow svg.i{width:26px;height:26px;stroke-width:1.75}
+.res{display:flex;flex-direction:column;align-items:center;gap:8px;padding:18px 12px 14px;border:1px solid var(--line-strong);border-radius:10px;background:var(--hover);text-align:center;position:relative}
+.res img{width:76px;height:76px;border-radius:9px;border:1px solid var(--slot-border);box-shadow:0 4px 14px var(--shadow);background:var(--slot)}
+.res .n{font-family:'Alegreya SC',serif;font-size:19px;font-weight:700;line-height:1.1}
+.res .q{position:absolute;top:10px;right:10px;font-size:12px;font-weight:600;padding:1px 8px;border-radius:999px;background:var(--chip);border:1px solid var(--line)}
+.res .d{font-size:12px;color:var(--muted);line-height:1.35;max-width:220px}
+.checks{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chk{display:flex;align-items:center;gap:8px;padding:5px 10px 5px 8px;border-radius:6px;border:1px solid var(--line);background:var(--hover)}
+.chk .dc{font-weight:600;color:var(--accent)}
+.rule{font-size:12px;color:var(--muted)}
+.instr{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;border:1px solid var(--line);background:var(--hover);color:var(--fg);font:inherit;width:100%;text-align:left;cursor:pointer}
+.instr .x{flex:1;font-family:'Alegreya SC',serif;font-weight:700;font-size:15px}
+.instr .p{color:var(--muted);font-size:12px;font-family:'Signika',sans-serif;font-weight:400;margin-left:6px}
+.instr svg.i{color:var(--accent)}
+.ft{display:flex;align-items:center;gap:12px;padding:10px 16px 10px 20px;border-top:1px solid var(--line-strong);background:var(--foot)}
+.warn{flex:1;display:flex;align-items:center;gap:8px;color:var(--bad);font-size:13px;min-width:0}
+.warn span{color:var(--fg)}
+.warn b{color:var(--bad)}
+.craft{height:38px;padding:0 18px;border-radius:6px;font:inherit;font-weight:600;display:inline-flex;gap:8px;align-items:center;cursor:pointer;border:1px solid var(--accent);background:transparent;color:var(--accent)}
+.craft:hover{background:var(--sel)}
+.craft.go{background:var(--accent);color:var(--accent-fg)}
+</style>
+</head>
+<body>
+<div class="board"><h2>Dark theme</h2><div class="bc dark" data-window></div></div>
+<div class="board"><h2>Light theme</h2><div class="bc light" data-window></div></div>
+
+<template id="window">
+  <header class="wh">
+    <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 12-8.5 8.5a2.1 2.1 0 0 1-3-3L12 9"/><path d="M17.6 15 22 10.6 13.4 2 9 6.4z"/></svg>
+    <span class="t">Beaver's Recipe Compendium</span>
+    <button class="ib" type="button" aria-label="Close"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </header>
+  <div class="wb">
+    <aside class="side">
+      <div class="tools">
+        <label class="field">
+          <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input type="text" placeholder="Search recipes…" aria-label="Search recipes">
+        </label>
+        <div class="trow">
+          <label class="field">
+            <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg>
+            <select aria-label="Filter recipes"><option>Available</option><option>All</option><option>Usable</option><option>Own</option></select>
+          </label>
+          <button class="ib" type="button" aria-label="Collapse all folders"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 11 5-5 5 5M7 18l5-5 5 5"/></svg></button>
+        </div>
+      </div>
+      <nav class="list" aria-label="Recipes">
+        <div class="fold"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>Potions<span class="c">3</span></div>
+        <a class="rec sel" href="#"><img src="assets/foundry/potion-bottle-labeled-stopped-purple.webp" alt=""><span class="n">Keen Sense</span><span class="dot no" title="Missing ingredients"></span></a>
+        <a class="rec" href="#"><img src="assets/foundry/scroll-bound-red-tan.webp" alt=""><span class="n">Life Shell</span><span class="dot ok" title="Can craft now"></span></a>
+        <a class="rec" href="#"><img src="assets/foundry/scroll-bound-green.webp" alt=""><span class="n">Tree Friend</span><span class="dot ok" title="Can craft now"></span></a>
+        <div class="fold"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>Gathering<span class="c">2</span></div>
+        <a class="rec" href="#"><img src="assets/foundry/gem-faceted-rough-purple.webp" alt=""><span class="n">Gather Essence</span><span class="dot ok" title="Can craft now"></span></a>
+        <a class="rec" href="#"><img src="assets/foundry/scroll-bound-blue-tan.webp" alt=""><span class="n">Bug Shield</span><span class="dot no" title="Missing ingredients"></span></a>
+        <div class="fold"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>Downtime<span class="c">4</span></div>
+        <a class="rec top" href="#"><img src="assets/foundry/scroll-bound-gold-tan.webp" alt=""><span class="n">Casters Overtime</span><span class="dot no" title="Missing ingredients"></span></a>
+      </nav>
+      <div class="sfoot"><span class="dot ok"></span>3 of 10 craftable now</div>
+    </aside>
+    <section class="main">
+      <div class="rh">
+        <img class="big" src="assets/foundry/potion-bottle-labeled-stopped-purple.webp" alt="">
+        <div>
+          <h1>Keen Sense</h1>
+          <div class="meta">Potions · produces 1 item</div>
+          <div class="tags">
+            <span class="tag"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 21 7v10l-9 5-9-5V7z"/><path d="M12 2 7 12h10zM7 12l5 10 5-10"/></svg>1 check</span>
+            <span class="tag"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg>1 tool</span>
+            <span class="tag"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/></svg>50 gp + 3 ingredients</span>
+          </div>
+        </div>
+      </div>
+      <div class="scroll">
+        <div class="flow">
+          <div class="col">
+            <div class="sec">
+              <div class="sh"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg>Required<span class="cnt">not consumed</span></div>
+              <div class="slot"><img src="assets/foundry/potion-flask-corked-green.webp" alt=""><span class="n">Alchemist's Supplies</span><span class="qty"><b>1</b> / 1</span><span class="st ok"><svg class="i" viewBox="0 0 24 24" role="img" aria-label="Available"><path d="m5 12 5 5L20 7"/></svg></span></div>
+            </div>
+            <div class="sec">
+              <div class="sh"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/></svg>Cost<span class="cnt">have / need</span></div>
+              <div class="slot"><img src="assets/foundry/coins-assorted-mix-copper-silver-gold.webp" alt=""><span class="n">Gold</span><span class="qty"><b>120</b> / 50</span><span class="st ok"><svg class="i" viewBox="0 0 24 24" role="img" aria-label="Enough"><path d="m5 12 5 5L20 7"/></svg></span></div>
+              <div class="slot miss"><img src="assets/foundry/conical-mushroom-poison-red.webp" alt=""><span class="n">Tiny Maw</span><span class="qty"><b>2</b> / 5</span><span class="st bad"><svg class="i" viewBox="0 0 24 24" role="img" aria-label="Missing"><path d="M6 6l12 12M18 6 6 18"/></svg></span></div>
+              <div class="grp" role="radiogroup" aria-label="Choose one">
+                <div class="grp-l">Choose one</div>
+                <div class="opts">
+                  <label class="opt on"><input type="radio" checked><img src="../icons/mushroom/30.png" alt=""><span class="n">Jelly Bag Cap</span><span class="qty"><b>5</b>/5</span></label>
+                  <label class="opt"><input type="radio"><img src="../icons/mushroom/12.png" alt=""><span class="n">Firecap</span><span class="qty"><b>0</b>/5</span></label>
+                </div>
+              </div>
+              <div class="slot"><img src="assets/foundry/gem-faceted-rough-purple.webp" alt=""><span class="n">Magical Essence</span><span class="qty"><b>1</b> / 1</span><span class="st ok"><svg class="i" viewBox="0 0 24 24" role="img" aria-label="Enough"><path d="m5 12 5 5L20 7"/></svg></span></div>
+            </div>
+          </div>
+          <div class="arrow"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></div>
+          <div class="col">
+            <div class="sec">
+              <div class="sh"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6L4.5 18.5A1.7 1.7 0 0 0 6 21h12a1.7 1.7 0 0 0 1.5-2.5L14 9V3"/><path d="M7 15h10"/></svg>Result</div>
+              <div class="res">
+                <span class="q">×1</span>
+                <img src="assets/foundry/potion-bottle-labeled-stopped-purple.webp" alt="">
+                <span class="n">Keen Sense</span>
+                <span class="d">Click to open the item sheet</span>
+              </div>
+            </div>
+            <div class="sec">
+              <div class="sh"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 21 7v10l-9 5-9-5V7z"/><path d="M12 2 7 12h10zM7 12l5 10 5-10"/></svg>Checks</div>
+              <div class="checks">
+                <div class="chk"><span>Survival</span><span class="dc">DC 10</span></div>
+                <span class="rule">pass 1 before 2 fails</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="instr" type="button" aria-expanded="false">
+          <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21a2 2 0 0 1 2-2h13"/></svg>
+          <span class="x">Instructions<span class="p">Grind the maw, steep the cap at dusk…</span></span>
+          <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+      </div>
+      <footer class="ft">
+        <div class="warn">
+          <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 21h20z"/><path d="M12 10v5M12 18h.01"/></svg>
+          <span>Missing <b>3× Tiny Maw</b></span>
+        </div>
+        <button class="craft" type="button">
+          <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 12-8.5 8.5a2.1 2.1 0 0 1-3-3L12 9"/><path d="M17.6 15 22 10.6 13.4 2 9 6.4z"/></svg>
+          Craft
+        </button>
+      </footer>
+    </section>
+  </div>
+</template>
+<script>
+  const tpl = document.getElementById('window');
+  document.querySelectorAll('[data-window]').forEach((host, i) => {
+    host.appendChild(tpl.content.cloneNode(true));
+    host.querySelectorAll('input[type=radio]').forEach(r => r.name = 'choice-' + i);
+  });
+</script>
+</body>
+</html>

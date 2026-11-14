@@ -1,0 +1,23 @@
+{{#each recipes}}
+  <a class="bc-rec {{#if selected}}selected{{/if}}" data-id="{{uuid}}">
+    <img src="{{img}}" alt="">
+    <span class="bc-n">{{name}}</span>
+    {{#if craftable}}
+      <span class="bc-dot ok" data-tooltip="{{localize 'beaversCrafting.crafting-app.craftableNow'}}"></span>
+    {{else}}
+      <span class="bc-dot no" data-tooltip="{{localize 'beaversCrafting.crafting-app.notCraftable'}}"></span>
+    {{/if}}
+  </a>
+{{/each}}
+{{#each folders}}
+  <div class="bc-folder {{#if collapsed}}collapsed{{/if}}" data-path="{{path}}">
+    <a class="bc-fold">
+      <i class="fas fa-chevron-down fa-fw"></i>
+      <span class="bc-n">{{name}}</span>
+      <span class="bc-c">{{count}}</span>
+    </a>
+    <div class="bc-folder-content">
+      {{> beavers-crafting-app-folders this}}
+    </div>
+  </div>
+{{/each}}

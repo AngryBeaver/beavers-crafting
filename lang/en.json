@@ -82,7 +82,28 @@
       "pass": "pass",
       "before": "before",
       "fails": "fails",
-      "checks": "Checklist"
+      "checks": "Checklist",
+      "searchPlaceholder": "Search recipes…",
+      "filter": "Filter recipes",
+      "collapseAll": "Collapse / expand all folders",
+      "craftableCount": "{count} of {total} craftable now",
+      "craftableNow": "Can be crafted now",
+      "notCraftable": "Missing ingredients, tools or currency",
+      "notConsumed": "not consumed",
+      "haveNeed": "have / need",
+      "chooseOne": "Choose one",
+      "missing": "Missing",
+      "anyOfHint": "Click or drop an item to choose",
+      "summary": {
+        "producesOne": "produces {count} item",
+        "producesMany": "produces {count} items",
+        "checkOne": "{count} check",
+        "checkMany": "{count} checks",
+        "toolOne": "{count} tool",
+        "toolMany": "{count} tools",
+        "ingredientOne": "{count} ingredient",
+        "ingredientMany": "{count} ingredients"
+      }
     },
     "settings": {
       "moduleButton": {

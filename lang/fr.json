@@ -82,7 +82,28 @@
       "pass": "succès",
       "before": "avant",
       "fails": "échecs",
-      "checks": "Liste de vérification"
+      "checks": "Liste de vérification",
+      "searchPlaceholder": "Rechercher des recettes…",
+      "filter": "Filtrer les recettes",
+      "collapseAll": "Replier / déplier tous les dossiers",
+      "craftableCount": "{count} sur {total} réalisables maintenant",
+      "craftableNow": "Réalisable maintenant",
+      "notCraftable": "Ingrédients, outils ou monnaie manquants",
+      "notConsumed": "non consommé",
+      "haveNeed": "possédé / requis",
+      "chooseOne": "Choisissez-en un",
+      "missing": "Manquant",
+      "anyOfHint": "Cliquez ou déposez un objet pour choisir",
+      "summary": {
+        "producesOne": "produit {count} objet",
+        "producesMany": "produit {count} objets",
+        "checkOne": "{count} test",
+        "checkMany": "{count} tests",
+        "toolOne": "{count} outil",
+        "toolMany": "{count} outils",
+        "ingredientOne": "{count} ingrédient",
+        "ingredientMany": "{count} ingrédients"
+      }
     },
     "settings": {
       "moduleButton": {

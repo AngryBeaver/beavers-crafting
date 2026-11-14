@@ -1,35 +1,38 @@
-<div class="flexcol" style="height:100%">
-    <div class="flexrow" style="height:calc( 100% - 40px)">
-        <aside class="sidebar flexcol">
-            <div style="flex:0;min-height:34px;line-height:34px" class="flexrow">
-                <i style="width:25px;flex: 0;margin: auto;display: block;padding: 0px 5px;" class="fas fa-search"></i>
-                <input class="search" type="text" value="{{search}}" placeholder="Search..." autofocus/>
-            </div>
-            <div style="flex:0;min-height:34px;line-height:34px" class="flexrow">
-                <i style="width:25px;flex: 0;margin: auto;display: block;padding: 0px 5px;" class="fas fa-filter"></i>
-                <select class="filter">
-                  {{selectOptions
-                    (beavers-object
-                      "2" (localize "beaversCrafting.crafting-app.search.all")
-                      "1" (localize "beaversCrafting.crafting-app.search.available")
-                      "0" (localize "beaversCrafting.crafting-app.search.usable")
-                      "3" (localize "beaversCrafting.crafting-app.search.own")
-                    )
-                    selected=filter
-                  }}
-                </select>
-                <a style="width:25px;flex: 0;margin: auto;display: block;padding: 0px 5px;"
-                   class="fas fa-sort-amount-up fa-fw"></a>
-            </div>
-            <div class="content">
-                <nav class="navigation">
-                    {{>beavers-folders renderTemplate="beavers-recipe-folder-item"}}
-                </nav>
-            </div>
-        </aside>
-        <section style="height:100%" class="sheet-body">
-
-        </section>
+<div class="bc-body">
+  <aside class="bc-side">
+    <div class="bc-tools">
+      <label class="bc-field">
+        <i class="fas fa-magnifying-glass fa-fw"></i>
+        <input class="search" type="text" value="{{search}}"
+               placeholder="{{localize 'beaversCrafting.crafting-app.searchPlaceholder'}}"
+               aria-label="{{localize 'beaversCrafting.crafting-app.searchPlaceholder'}}" autofocus/>
+      </label>
+      <div class="bc-trow">
+        <label class="bc-field">
+          <i class="fas fa-filter fa-fw"></i>
+          <select class="filter" aria-label="{{localize 'beaversCrafting.crafting-app.filter'}}">
+            {{selectOptions
+              (beavers-object
+                "2" (localize "beaversCrafting.crafting-app.search.all")
+                "1" (localize "beaversCrafting.crafting-app.search.available")
+                "0" (localize "beaversCrafting.crafting-app.search.usable")
+                "3" (localize "beaversCrafting.crafting-app.search.own")
+              )
+              selected=filter
+            }}
+          </select>
+        </label>
+        <button type="button" class="bc-ib collapse-all"
+                data-tooltip="{{localize 'beaversCrafting.crafting-app.collapseAll'}}"
+                aria-label="{{localize 'beaversCrafting.crafting-app.collapseAll'}}">
+          <i class="fas fa-angles-up fa-fw"></i>
+        </button>
+      </div>
     </div>
+    <nav class="bc-list">
+      {{> beavers-crafting-app-folders tree}}
+    </nav>
+    <div class="bc-sfoot"><span class="bc-dot ok"></span>{{craftableText}}</div>
+  </aside>
+  <section class="bc-main"></section>
 </div>
-

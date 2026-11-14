@@ -82,7 +82,28 @@
       "pass": "sucesso",
       "before": "antes",
       "fails": "falhas",
-      "checks": "Lista de Checagem"
+      "checks": "Lista de Checagem",
+      "searchPlaceholder": "Buscar receitas…",
+      "filter": "Filtrar receitas",
+      "collapseAll": "Recolher / expandir todas as pastas",
+      "craftableCount": "{count} de {total} disponíveis para criar agora",
+      "craftableNow": "Pode ser criado agora",
+      "notCraftable": "Faltam ingredientes, ferramentas ou moedas",
+      "notConsumed": "não consumido",
+      "haveNeed": "possui / precisa",
+      "chooseOne": "Escolha um",
+      "missing": "Faltando",
+      "anyOfHint": "Clique ou solte um item para escolher",
+      "summary": {
+        "producesOne": "produz {count} item",
+        "producesMany": "produz {count} itens",
+        "checkOne": "{count} teste",
+        "checkMany": "{count} testes",
+        "toolOne": "{count} ferramenta",
+        "toolMany": "{count} ferramentas",
+        "ingredientOne": "{count} ingrediente",
+        "ingredientMany": "{count} ingredientes"
+      }
     },
     "settings": {
       "moduleButton": {

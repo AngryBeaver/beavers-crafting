@@ -189,7 +189,7 @@ export class Settings {
         game.settings.register(this.NAMESPACE, this.CRAFTING_APP_HEIGHT, {
             scope: "user",
             config: false,
-            default: 450,
+            default: 640,
             type: Number,
         });
         if (game["system"].id === "dnd5e") {

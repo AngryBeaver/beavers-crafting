@@ -77,30 +77,48 @@ export class RecipeCompendium {
         return returnList;
     }
 
-    static async filterForActor(actor, filter) {
+    /**
+     * @param craftable optional map that gets filled with uuid -> "can be crafted right now" (incl. currency).
+     */
+    static async filterForActor(actor, filter, craftable?: Map<string, boolean>) {
         const items = RecipeCompendium.getAllItems();
         const own = RecipeCompendium.getForActor(actor);
         const list = (filter == FilterType.own) ? own : [...items, ...own];
         const returnList: Recipe[] = [];
         const pool = await getActorContentPool(actor);
         for (const recipe of list) {
-            if (filter == FilterType.all || filter == FilterType.own) {
+            const needsEvaluation = craftable !== undefined || (filter != FilterType.all && filter != FilterType.own);
+            const status = needsEvaluation ? await this.evaluateForActor(actor, recipe, pool) : undefined;
+            if (craftable !== undefined && status !== undefined) {
+                craftable.set(recipe.uuid, status.usable && await this._canPay(recipe, actor));
+            }
+            if (filter == FilterType.all || filter == FilterType.own
+                || (filter == FilterType.usable && status?.usable)
+                || (filter == FilterType.available && status?.available)) {
                 returnList.push(recipe);
-            } else {
-                const listOfAnyOfIngredients = this._filterData(recipe.input, component => component.type === Settings.ANYOF_SUBTYPE);
-                if (await this.isAnyAnyOfInList(listOfAnyOfIngredients, pool)) { //isAvailable or usable ! when any item matches anyOf has the given quantity
-                    const listOfIngredientsWithoutAnyOf = this._filterData(recipe.input, component => component.type !== Settings.ANYOF_SUBTYPE);
-                    const result = RecipeCompendium.validateRecipeToItemList(listOfIngredientsWithoutAnyOf, pool, Result.from(recipe, actor));
-                    await RecipeCompendium.filterRequired(actor, recipe,result);
-                    if ((filter == FilterType.usable && !result.hasError())
-                        || (filter == FilterType.available && result._isAnyConsumedAvailable())) {
-                        returnList.push(recipe);
-                    }
-                }
-
             }
         }
         return returnList;
+    }
+
+    static async evaluateForActor(actor, recipe: Recipe, pool): Promise<{ available: boolean, usable: boolean }> {
+        const listOfAnyOfIngredients = this._filterData(recipe.input, component => component.type === Settings.ANYOF_SUBTYPE);
+        if (!await this.isAnyAnyOfInList(listOfAnyOfIngredients, pool)) { //isAvailable or usable ! when any item matches anyOf has the given quantity
+            return {available: false, usable: false};
+        }
+        const listOfIngredientsWithoutAnyOf = this._filterData(recipe.input, component => component.type !== Settings.ANYOF_SUBTYPE);
+        const result = RecipeCompendium.validateRecipeToItemList(listOfIngredientsWithoutAnyOf, pool, Result.from(recipe, actor));
+        await RecipeCompendium.filterRequired(actor, recipe, result);
+        return {available: result._isAnyConsumedAvailable(), usable: !result.hasError()};
+    }
+
+    static async _canPay(recipe: Recipe, actor): Promise<boolean> {
+        if (!recipe.currency) {
+            return true;
+        }
+        const result = Result.from(recipe, actor);
+        await result.checkCurrency();
+        return !result._currencyResult?.hasError;
     }
 
     static async filterRequired(actor: Actor, recipe: Recipe,result:Result) {
