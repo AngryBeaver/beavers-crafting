@@ -1,5 +1,6 @@
 # Changelog
-# 
+## 4.8.0
+- redesign crafting compendium
 ## 4.7.0
 - foundry v14 support
   - replace deprecated deletion keys, globals and hooks
