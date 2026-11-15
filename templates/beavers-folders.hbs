@@ -8,11 +8,7 @@
             {{#if (and @../last @last)}}<span></span>{{else}}<span class="border"></span>{{/if}}
           </span>
           <div class="flexcol">
-            {{#if (eq ../../renderTemplate "beavers-actor-folder-item")}}
-              {{> beavers-actor-folder-item this selected=../../selected}}
-            {{else}}
-              {{> beavers-recipe-folder-item this selected=../../selected}}
-            {{/if}}
+            {{> beavers-recipe-folder-item this selected=../../selected}}
             {{#if (not @last)}}
               <div class="beavers-seperator"></div>
             {{/if}}

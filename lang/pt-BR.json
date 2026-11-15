@@ -3,11 +3,36 @@
     "actorLink": "Receitas",
     "actorSheet": {
       "tab": "Criação",
-      "table": {
-        "name": "Nome",
-        "status": "Status",
-        "progress": "Progresso",
-        "add": "Adicionar"
+      "add": "Criar…",
+      "remove": "Remover",
+      "done": "Concluído",
+      "failed": "Falhou",
+      "roll": "Rolar",
+      "proceed": "Prosseguir",
+      "finish": "Finalizar",
+      "next": "Próximo: {test}",
+      "ready": "Pronto para finalizar",
+      "crafted": "Criado: {items}",
+      "completed": "Concluído",
+      "missing": "Faltando: {items}",
+      "tooManyFails": "Testes falhos demais",
+      "emptyHint": "Escolha uma receita para começar. Criações em andamento e concluídas aparecem aqui.",
+      "summary": {
+        "none": "Nada criado ainda",
+        "active": "{count} em andamento",
+        "success": "{count} concluído(s)",
+        "error": "{count} falhou(aram)"
+      },
+      "progress": {
+        "hits": "{hits} de {maxHits}",
+        "fails": "{count} falhas",
+        "tip": "{hits}/{maxHits} testes aprovados · {fails}/{maxFails} falhos"
+      },
+      "details": {
+        "toggle": "Detalhes",
+        "required": "Usado",
+        "consumed": "Consumido",
+        "produced": "Produz"
       }
     },
     "inventory": {

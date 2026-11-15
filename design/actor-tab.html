@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Actor Crafting Tab</title>
+<!--
+  Mockup of the redesigned crafting tab inside actor sheets.
+  The tab never paints its own background: it inherits colour and font from the sheet
+  and derives lines / hovers from currentColor, so it sits on any system's sheet.
+  Only the status hues (green / red / amber) are fixed, used as chip fills with white text.
+  The four frames below only simulate different system sheets around the tab.
+  Font Awesome + textures come from assets/foundry/ (git-ignored copies of Foundry files).
+-->
+<link rel="stylesheet" href="assets/foundry/fontawesome/css/all.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Signika:wght@400;600&family=Roboto:wght@400;500;700&family=Gelasio:wght@400;600&display=swap">
+<style>
+/* ---------------- page + simulated sheets (not part of the design) ---------------- */
+body{margin:0;padding:24px;background:#2c4a33 radial-gradient(#4a6b3a,#1d2b1f) fixed;font:14px Signika,sans-serif;color:#eee;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(600px,1fr));gap:24px}
+h2.cap{grid-column:1/-1;margin:0;font:600 15px Signika;color:#dfe8d6}
+.frame{display:flex;flex-direction:column;gap:6px}
+.frame>small{color:#cfd8c6;font-size:12px}
+.sheet{display:flex;height:470px;border-radius:6px;overflow:hidden;box-shadow:0 8px 30px #0008}
+.sheet .side{width:150px;flex:none}
+.sheet .tabbody{flex:1;overflow:auto;padding:10px 14px}
+/* dnd5e v4 dark */
+.s-5e-dark{background:#1c1b1a url(assets/foundry/denim075.png);color:#d9d3c7;font-family:Roboto,sans-serif;font-size:13px}
+.s-5e-dark .side{background:#262a36}
+/* dnd5e v4 light */
+.s-5e-light{background:#f4efe6;color:#4b4a44;font-family:Roboto,sans-serif;font-size:13px}
+.s-5e-light .side{background:#e8e0d0 url(assets/foundry/parchment-white.jpg)}
+/* core-styled sheet on parchment (simple worldbuilding, pf1, many others) */
+.s-core{background:url(assets/foundry/parchment.jpg);color:#191813;font-family:Signika,sans-serif;font-size:14px}
+.s-core .side{background:#0001;border-right:1px solid #7a7971}
+/* a strongly coloured dark sheet (pf2e-like) */
+.s-red{background:linear-gradient(#3a1b1b,#241312);color:#eadcc8;font-family:Gelasio,serif;font-size:13px}
+.s-red .side{background:#5c1f1f}
+
+/* ================= the design: crafting tab ================= */
+.bct{
+  --bct-line: color-mix(in srgb, currentColor 18%, transparent);
+  --bct-line-strong: color-mix(in srgb, currentColor 35%, transparent);
+  --bct-muted: color-mix(in srgb, currentColor 68%, transparent);
+  --bct-hover: color-mix(in srgb, currentColor 7%, transparent);
+  --bct-card: color-mix(in srgb, currentColor 4%, transparent);
+  --bct-ok: #3e8e48; --bct-bad: #b2443b; --bct-run: #b7802a;
+  color: inherit; font: inherit; display:flex; flex-direction:column; gap:8px; min-width:0;
+}
+.bct button{font:inherit;color:inherit;cursor:pointer}
+.bct i.fas{line-height:1}
+
+/* toolbar */
+.bct-bar{display:flex;align-items:center;gap:10px;padding-bottom:8px;border-bottom:1px solid var(--bct-line-strong)}
+.bct-sum{flex:1;display:flex;gap:12px;flex-wrap:wrap;color:var(--bct-muted);font-size:.92em}
+.bct-sum span{display:inline-flex;align-items:center;gap:5px}
+.bct-sum .d{width:8px;height:8px;border-radius:50%}
+.bct-add{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 12px;border-radius:5px;
+  border:1px solid var(--bct-line-strong);background:var(--bct-hover);font-weight:600;white-space:nowrap}
+.bct-add:hover{background:color-mix(in srgb,currentColor 14%,transparent);border-color:currentColor}
+
+/* folders */
+.bct-fold{display:flex;align-items:center;gap:7px;width:100%;padding:5px 4px;border:0;background:none;text-align:left;
+  font-weight:600;color:var(--bct-muted);border-radius:4px}
+.bct-fold:hover{background:var(--bct-hover);color:inherit}
+.bct-fold .c{margin-left:auto;font-weight:400;font-size:.85em;padding:0 7px;border-radius:9px;background:var(--bct-hover)}
+.bct-fold .chev{transition:rotate .15s;font-size:.8em;width:12px}
+.bct-folder.collapsed>.bct-fold .chev{rotate:-90deg}
+.bct-folder.collapsed>.bct-content{display:none}
+.bct-content{margin-left:9px;padding-left:9px;border-left:1px solid var(--bct-line);display:flex;flex-direction:column;gap:6px;padding-top:2px}
+
+/* entry card */
+.bct-list{display:flex;flex-direction:column;gap:6px}
+.bct-entry{border:1px solid var(--bct-line);border-radius:6px;background:var(--bct-card);overflow:hidden}
+.bct-row{display:grid;grid-template-columns:36px minmax(0,1fr) auto auto auto;align-items:center;gap:10px;padding:6px 8px}
+.bct-row>img{width:36px;height:36px;border-radius:4px;border:1px solid var(--bct-line-strong);object-fit:cover}
+.bct-title{min-width:0;cursor:pointer}
+.bct-title .n{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bct-title .s{font-size:.86em;color:var(--bct-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;gap:5px;align-items:center}
+
+/* progress: one pip per required success, one per allowed failure */
+.bct-prog{display:flex;flex-direction:column;align-items:flex-end;gap:3px;min-width:0}
+.bct-pips{display:flex;gap:3px;align-items:center}
+.bct-pips i{width:12px;height:7px;border-radius:2px;background:var(--bct-line-strong)}
+.bct-pips i.ok{background:var(--bct-ok)} .bct-pips i.bad{background:var(--bct-bad)}
+.bct-pips .sep{width:1px;height:11px;background:var(--bct-line-strong);margin:0 3px}
+.bct-prog small{font-size:.8em;color:var(--bct-muted);font-variant-numeric:tabular-nums}
+
+/* state: a button while running, a chip when finished */
+.bct-go{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 11px;border-radius:5px;border:0;
+  background:var(--bct-run);color:#fff !important;font-weight:600;white-space:nowrap;box-shadow:0 1px 2px #0004}
+.bct-go:hover{filter:brightness(1.12)}
+.bct-chip{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 9px;border-radius:12px;color:#fff;font-size:.86em;font-weight:600;white-space:nowrap}
+.bct-chip.ok{background:var(--bct-ok)} .bct-chip.bad{background:var(--bct-bad)}
+.bct-state{min-width:84px;display:flex;justify-content:center}
+
+.bct-ic{width:26px;height:26px;display:grid;place-items:center;border:0;border-radius:4px;background:none;color:var(--bct-muted)}
+.bct-ic:hover{background:var(--bct-hover);color:inherit}
+.bct-ic.del:hover{color:var(--bct-bad)}
+.bct-ic.exp .fas{transition:rotate .15s}
+.bct-entry.open .bct-ic.exp .fas{rotate:180deg}
+.bct-acts{display:flex;gap:2px}
+
+/* details */
+.bct-det{display:none;padding:8px 10px 10px 54px;border-top:1px solid var(--bct-line);gap:10px;flex-direction:column}
+.bct-entry.open .bct-det{display:flex}
+.bct-grp{display:flex;gap:8px;align-items:flex-start}
+.bct-grp>b{flex:0 0 74px;font-size:.8em;text-transform:uppercase;letter-spacing:.04em;color:var(--bct-muted);padding-top:4px}
+.bct-items{display:flex;flex-wrap:wrap;gap:5px}
+.bct-it{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 8px 0 3px;border:1px solid var(--bct-line);border-radius:12px;font-size:.88em}
+.bct-it img{width:18px;height:18px;border-radius:50%;object-fit:cover}
+.bct-it .fas{font-size:.85em}
+.bct-it.ok .fas{color:var(--bct-ok)} .bct-it.bad{border-color:var(--bct-bad)} .bct-it.bad .fas{color:var(--bct-bad)}
+.bct-it.wait{opacity:.6}
+.bct-ins{font-size:.92em;color:var(--bct-muted);line-height:1.4}
+
+.bct-empty{display:flex;flex-direction:column;align-items:center;gap:10px;padding:40px 10px;color:var(--bct-muted);text-align:center}
+.bct-empty .fas{font-size:28px;opacity:.6}
+
+/* narrow sheets: progress text drops, state shrinks */
+@container (max-width:420px){ .bct-prog small{display:none} .bct-prog,.bct-state{min-width:0} }
+.tabbody{container-type:inline-size}
+</style>
+</head>
+<body>
+
+<template id="tab">
+<div class="bct">
+  <div class="bct-bar">
+    <div class="bct-sum">
+      <span><span class="d" style="background:var(--bct-run)"></span>2 in progress</span>
+      <span><span class="d" style="background:var(--bct-ok)"></span>3 done</span>
+      <span><span class="d" style="background:var(--bct-bad)"></span>1 failed</span>
+    </div>
+    <button class="bct-add"><i class="fas fa-hammer"></i> Craft…</button>
+  </div>
+
+  <div class="bct-list">
+    <!-- running, expanded -->
+    <div class="bct-entry open">
+      <div class="bct-row">
+        <img src="assets/foundry/potion-bottle-labeled-stopped-purple.webp" alt="">
+        <div class="bct-title"><div class="n">Keen Sense</div><div class="s"><i class="fas fa-dice-d20"></i>Next: Survival DC 12</div></div>
+        <div class="bct-prog"><div class="bct-pips"><i class="ok"></i><i></i><i></i><span class="sep"></span><i class="bad"></i><i></i></div><small>1 of 3</small></div>
+        <div class="bct-state"><button class="bct-go"><i class="fas fa-dice-d20"></i>Roll</button></div>
+        <div class="bct-acts"><button class="bct-ic exp" title="Details"><i class="fas fa-chevron-down"></i></button><button class="bct-ic del" title="Remove"><i class="fas fa-trash"></i></button></div>
+      </div>
+      <div class="bct-det">
+        <div class="bct-ins">Grind the maw, steep the cap at dusk and stir until the brew turns violet…</div>
+        <div class="bct-grp"><b>Used</b><div class="bct-items"><span class="bct-it ok"><img src="assets/foundry/potion-flask-corked-green.webp" alt="">Alchemist's Supplies<i class="fas fa-check"></i></span></div></div>
+        <div class="bct-grp"><b>Consumed</b><div class="bct-items">
+          <span class="bct-it ok"><img src="assets/foundry/coins-assorted-mix-copper-silver-gold.webp" alt="">50 gp<i class="fas fa-check"></i></span>
+          <span class="bct-it ok"><img src="assets/foundry/conical-mushroom-poison-red.webp" alt="">5× Tiny Maw<i class="fas fa-check"></i></span>
+          <span class="bct-it ok"><img src="../icons/mushroom/30.png" alt="">5× Jelly Bag Cap<i class="fas fa-check"></i></span></div></div>
+        <div class="bct-grp"><b>Produces</b><div class="bct-items"><span class="bct-it wait"><img src="assets/foundry/potion-bottle-labeled-stopped-purple.webp" alt="">1× Keen Sense<i class="fas fa-lock"></i></span></div></div>
+      </div>
+    </div>
+
+    <!-- running, no checks -->
+    <div class="bct-entry">
+      <div class="bct-row">
+        <img src="assets/foundry/scroll-bound-gold-tan.webp" alt="">
+        <div class="bct-title"><div class="n">Casters Overtime</div><div class="s"><i class="fas fa-hourglass-half"></i>Ready to finish</div></div>
+        <div class="bct-prog"><div class="bct-pips"><i></i></div></div>
+        <div class="bct-state"><button class="bct-go"><i class="fas fa-forward-step"></i>Finish</button></div>
+        <div class="bct-acts"><button class="bct-ic exp"><i class="fas fa-chevron-down"></i></button><button class="bct-ic del"><i class="fas fa-trash"></i></button></div>
+      </div>
+    </div>
+
+    <div class="bct-folder">
+      <button class="bct-fold"><i class="fas fa-chevron-down chev"></i><i class="fas fa-folder-open"></i>Gear<span class="c">3</span></button>
+      <div class="bct-content">
+        <div class="bct-entry">
+          <div class="bct-row">
+            <img src="assets/foundry/scroll-bound-blue-tan.webp" alt="">
+            <div class="bct-title"><div class="n">Ladder</div><div class="s">Crafted 1× Ladder</div></div>
+            <div class="bct-prog"><div class="bct-pips"><i class="ok"></i><i class="ok"></i></div><small>2 of 2</small></div>
+            <div class="bct-state"><span class="bct-chip ok"><i class="fas fa-check"></i>Done</span></div>
+            <div class="bct-acts"><button class="bct-ic exp"><i class="fas fa-chevron-down"></i></button><button class="bct-ic del"><i class="fas fa-trash"></i></button></div>
+          </div>
+        </div>
+        <div class="bct-entry">
+          <div class="bct-row">
+            <img src="assets/foundry/scroll-bound-green.webp" alt="">
+            <div class="bct-title"><div class="n">Chest</div><div class="s">Crafted 1× Chest</div></div>
+            <div class="bct-prog"><div class="bct-pips"><i class="ok"></i></div><small>1 of 1</small></div>
+            <div class="bct-state"><span class="bct-chip ok"><i class="fas fa-check"></i>Done</span></div>
+            <div class="bct-acts"><button class="bct-ic exp"><i class="fas fa-chevron-down"></i></button><button class="bct-ic del"><i class="fas fa-trash"></i></button></div>
+          </div>
+        </div>
+        <div class="bct-entry">
+          <div class="bct-row">
+            <img src="assets/foundry/conical-mushroom-poison-red.webp" alt="">
+            <div class="bct-title"><div class="n">Tiny Bite</div><div class="s">Too many failed checks</div></div>
+            <div class="bct-prog"><div class="bct-pips"><i class="ok"></i><i></i><span class="sep"></span><i class="bad"></i><i class="bad"></i></div><small>2 fails</small></div>
+            <div class="bct-state"><span class="bct-chip bad"><i class="fas fa-xmark"></i>Failed</span></div>
+            <div class="bct-acts"><button class="bct-ic exp"><i class="fas fa-chevron-down"></i></button><button class="bct-ic del"><i class="fas fa-trash"></i></button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bct-folder collapsed">
+      <button class="bct-fold"><i class="fas fa-chevron-down chev"></i><i class="fas fa-folder"></i>Loot<span class="c">1</span></button>
+      <div class="bct-content"></div>
+    </div>
+  </div>
+</div>
+</template>
+
+<template id="empty">
+<div class="bct">
+  <div class="bct-bar"><div class="bct-sum"><span>Nothing crafted yet</span></div><button class="bct-add"><i class="fas fa-hammer"></i> Craft…</button></div>
+  <div class="bct-empty"><i class="fas fa-scroll"></i>Pick a recipe to start crafting.<br>Running and finished crafts are listed here.</div>
+</div>
+</template>
+
+<h2 class="cap">Crafting tab: the same markup inside four different system sheets</h2>
+<div class="frame"><small>dnd5e (dark)</small><div class="sheet s-5e-dark"><div class="side"></div><div class="tabbody" data-t="tab"></div></div></div>
+<div class="frame"><small>dnd5e (light)</small><div class="sheet s-5e-light"><div class="side"></div><div class="tabbody" data-t="tab"></div></div></div>
+<div class="frame"><small>core-styled sheet on parchment</small><div class="sheet s-core"><div class="side"></div><div class="tabbody" data-t="tab"></div></div></div>
+<div class="frame"><small>strongly coloured dark sheet, narrow, empty state</small><div class="sheet s-red" style="max-width:520px"><div class="side"></div><div class="tabbody" data-t="empty"></div></div></div>
+
+<script>
+document.querySelectorAll("[data-t]").forEach(el => el.append(document.getElementById(el.dataset.t).content.cloneNode(true)));
+document.addEventListener("click", e => {
+  const exp = e.target.closest(".bct-ic.exp, .bct-title"); if (exp) exp.closest(".bct-entry").classList.toggle("open");
+  const f = e.target.closest(".bct-fold"); if (f) f.parentElement.classList.toggle("collapsed");
+});
+</script>
+</body>
+</html>

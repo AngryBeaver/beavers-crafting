@@ -3,11 +3,36 @@
     "actorLink": "Recettes",
     "actorSheet": {
       "tab": "Fabrication",
-      "table": {
-        "name": "Nom",
-        "status": "Statut",
-        "progress": "Progression",
-        "add": "Ajouter"
+      "add": "Fabriquer…",
+      "remove": "Supprimer",
+      "done": "Terminé",
+      "failed": "Échoué",
+      "roll": "Lancer",
+      "proceed": "Continuer",
+      "finish": "Terminer",
+      "next": "Suivant : {test}",
+      "ready": "Prêt à terminer",
+      "crafted": "Fabriqué : {items}",
+      "completed": "Terminé",
+      "missing": "Manquant : {items}",
+      "tooManyFails": "Trop de tests échoués",
+      "emptyHint": "Choisissez une recette pour commencer. Les fabrications en cours et terminées apparaissent ici.",
+      "summary": {
+        "none": "Rien de fabriqué pour l'instant",
+        "active": "{count} en cours",
+        "success": "{count} terminé(s)",
+        "error": "{count} échoué(s)"
+      },
+      "progress": {
+        "hits": "{hits} sur {maxHits}",
+        "fails": "{count} échecs",
+        "tip": "{hits}/{maxHits} tests réussis · {fails}/{maxFails} échoués"
+      },
+      "details": {
+        "toggle": "Détails",
+        "required": "Utilisé",
+        "consumed": "Consommé",
+        "produced": "Produit"
       }
     },
     "inventory": {

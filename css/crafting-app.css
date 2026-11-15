@@ -936,7 +936,13 @@
 }
 
 .beavers-crafting.crafting-app .bc-instruction-body {
+    display: flow-root;
     padding: 0 12px 10px;
+}
+
+.beavers-crafting.crafting-app .bc-instruction-body img {
+    max-width: 100%;
+    height: auto;
 }
 
 /* ---------------- footer ---------------- */

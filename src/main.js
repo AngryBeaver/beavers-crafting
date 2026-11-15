@@ -366,8 +366,8 @@ Hooks.once("beavers-system-interface.ready", async function(){
   getTemplate("modules/beavers-crafting/templates/beavers-recipe-folder-item.hbs").then((t) => {
     Handlebars.registerPartial("beavers-recipe-folder-item", t);
   });
-  getTemplate("modules/beavers-crafting/templates/beavers-actor-folder-item.hbs").then((t) => {
-    Handlebars.registerPartial("beavers-actor-folder-item", t);
+  getTemplate("modules/beavers-crafting/templates/actor-sheet-tab-folders.hbs").then((t) => {
+    Handlebars.registerPartial("beavers-actor-tab-folders", t);
   });
   getTemplate("modules/beavers-crafting/templates/beavers-recipe-component.hbs").then((t) => {
     Handlebars.registerPartial("beavers-recipe-component", t);

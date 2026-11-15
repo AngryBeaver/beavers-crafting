@@ -1,0 +1,288 @@
+/*
+  Crafting tab inside actor sheets (templates/actor-sheet-tab.hbs).
+  It lives on every system's sheet, so it never paints a background of its own:
+  text colour and font come from the sheet, lines and hovers are mixed from currentColor.
+  Only the status hues are fixed; they are used as fills with white text.
+*/
+.beavers-crafting.bct {
+    --bct-line: color-mix(in srgb, currentColor 18%, transparent);
+    --bct-line-strong: color-mix(in srgb, currentColor 35%, transparent);
+    --bct-muted: color-mix(in srgb, currentColor 68%, transparent);
+    --bct-hover: color-mix(in srgb, currentColor 7%, transparent);
+    --bct-hover-strong: color-mix(in srgb, currentColor 14%, transparent);
+    --bct-card: color-mix(in srgb, currentColor 4%, transparent);
+    --bct-ok: #3e8e48;
+    --bct-bad: #b2443b;
+    --bct-run: #b7802a;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+    padding: 4px 2px;
+    color: inherit;
+    font: inherit;
+    container-type: inline-size;
+}
+
+.beavers-crafting.bct button {
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: auto;
+    min-height: 0;
+    margin: 0;
+    font: inherit;
+    line-height: 1;
+    color: inherit;
+    text-shadow: none;
+    text-transform: none;
+    letter-spacing: normal;
+    box-shadow: none;
+    cursor: pointer;
+    transition: background-color .15s, border-color .15s, color .15s, filter .15s;
+}
+.beavers-crafting.bct button > i { margin: 0; }
+/* crafting.css colours .fa-check / .fa-lock / .fa-times globally inside .beavers-crafting */
+.beavers-crafting.bct i.fas { color: inherit; margin: 0; width: auto; padding: 0; }
+.beavers-crafting.bct .bct-row > img,
+.beavers-crafting.bct .bct-it img { border: none; box-shadow: none; flex: none; max-width: none; }
+
+/* toolbar */
+.beavers-crafting.bct .bct-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--bct-line-strong);
+}
+.beavers-crafting.bct .bct-sum {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    color: var(--bct-muted);
+    font-size: .92em;
+}
+.beavers-crafting.bct .bct-sum > span { display: inline-flex; align-items: center; gap: 5px; }
+.beavers-crafting.bct .bct-d { width: 8px; height: 8px; border-radius: 50%; }
+.beavers-crafting.bct .bct-d.run { background: var(--bct-run); }
+.beavers-crafting.bct .bct-d.ok { background: var(--bct-ok); }
+.beavers-crafting.bct .bct-d.bad { background: var(--bct-bad); }
+.beavers-crafting.bct button.bct-add {
+    height: 28px;
+    padding: 0 12px;
+    border: 1px solid var(--bct-line-strong);
+    border-radius: 5px;
+    background: var(--bct-hover);
+    font-weight: 600;
+    white-space: nowrap;
+}
+.beavers-crafting.bct button.bct-add:hover {
+    background: var(--bct-hover-strong);
+    border-color: currentColor;
+    box-shadow: none;
+}
+
+/* list + folders */
+.beavers-crafting.bct .bct-list,
+.beavers-crafting.bct .bct-content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.beavers-crafting.bct .bct-content {
+    margin-left: 9px;
+    padding: 2px 0 0 9px;
+    border-left: 1px solid var(--bct-line);
+}
+.beavers-crafting.bct button.bct-fold {
+    justify-content: flex-start;
+    gap: 7px;
+    width: 100%;
+    height: auto;
+    padding: 5px 4px;
+    border: none;
+    border-radius: 4px;
+    background: none;
+    color: var(--bct-muted);
+    font-weight: 600;
+    text-align: left;
+}
+.beavers-crafting.bct button.bct-fold:hover { background: var(--bct-hover); color: inherit; box-shadow: none; }
+.beavers-crafting.bct .bct-fn { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.beavers-crafting.bct .bct-c {
+    padding: 2px 7px;
+    border-radius: 9px;
+    background: var(--bct-hover);
+    font-size: .85em;
+    font-weight: 400;
+}
+.beavers-crafting.bct .bct-chev { width: 12px; font-size: .8em; transition: rotate .15s; }
+.beavers-crafting.bct .bct-folder.collapsed > .bct-fold .bct-chev { rotate: -90deg; }
+.beavers-crafting.bct .bct-folder.collapsed > .bct-content { display: none; }
+.beavers-crafting.bct .bct-folder .bct-fc,
+.beavers-crafting.bct .bct-folder.collapsed > .bct-fold .bct-fo { display: none; }
+.beavers-crafting.bct .bct-folder.collapsed > .bct-fold .bct-fc { display: inline-block; }
+
+/* entry card */
+.beavers-crafting.bct .bct-entry {
+    border: 1px solid var(--bct-line);
+    border-radius: 6px;
+    background: var(--bct-card);
+    overflow: hidden;
+}
+.beavers-crafting.bct .bct-row {
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr) auto auto auto;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px;
+}
+.beavers-crafting.bct .bct-row > img {
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--bct-line-strong);
+    border-radius: 4px;
+    object-fit: cover;
+}
+.beavers-crafting.bct .bct-title { min-width: 0; cursor: pointer; }
+.beavers-crafting.bct .bct-n { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.beavers-crafting.bct .bct-s {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+    color: var(--bct-muted);
+    font-size: .86em;
+}
+.beavers-crafting.bct .bct-s > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.beavers-crafting.bct .bct-entry.error .bct-s { color: color-mix(in srgb, var(--bct-bad) 70%, currentColor); }
+
+/* progress: one pip per needed success, then one per allowed failure */
+.beavers-crafting.bct .bct-prog { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+.beavers-crafting.bct .bct-pips { display: flex; align-items: center; gap: 3px; }
+.beavers-crafting.bct .bct-pips i { width: 12px; height: 7px; border-radius: 2px; background: var(--bct-line-strong); }
+.beavers-crafting.bct .bct-pips i.ok { background: var(--bct-ok); }
+.beavers-crafting.bct .bct-pips i.bad { background: var(--bct-bad); }
+.beavers-crafting.bct .bct-pips .sep { width: 1px; height: 11px; margin: 0 3px; background: var(--bct-line-strong); }
+.beavers-crafting.bct .bct-bar-prog {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: 80px;
+}
+.beavers-crafting.bct .bct-bar-prog .trk { display: block; height: 4px; border-radius: 2px; background: var(--bct-line-strong); overflow: hidden; }
+.beavers-crafting.bct .bct-bar-prog .trk > span { display: block; height: 100%; }
+.beavers-crafting.bct .bct-bar-prog .ok { background: var(--bct-ok); }
+.beavers-crafting.bct .bct-bar-prog .bad { background: var(--bct-bad); }
+.beavers-crafting.bct .bct-prog small { color: var(--bct-muted); font-size: .8em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* state: a button while running, a chip once it is over */
+.beavers-crafting.bct .bct-state { display: flex; justify-content: center; min-width: 84px; }
+.beavers-crafting.bct button.bct-go {
+    height: 28px;
+    padding: 0 11px;
+    border: none;
+    border-radius: 5px;
+    background: var(--bct-run);
+    color: #fff;
+    font-weight: 600;
+    white-space: nowrap;
+    box-shadow: 0 1px 2px #0004;
+}
+.beavers-crafting.bct button.bct-go:hover { filter: brightness(1.12); box-shadow: 0 1px 2px #0004; }
+.beavers-crafting.bct button.bct-go:disabled { filter: grayscale(.6); cursor: progress; }
+.beavers-crafting.bct .bct-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 24px;
+    padding: 0 9px;
+    border-radius: 12px;
+    color: #fff;
+    font-size: .86em;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.beavers-crafting.bct .bct-chip.ok { background: var(--bct-ok); }
+.beavers-crafting.bct .bct-chip.bad { background: var(--bct-bad); }
+
+.beavers-crafting.bct .bct-acts { display: flex; gap: 2px; }
+.beavers-crafting.bct button.bct-ic {
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+    background: none;
+    color: var(--bct-muted);
+}
+.beavers-crafting.bct button.bct-ic:hover { background: var(--bct-hover); color: inherit; box-shadow: none; }
+.beavers-crafting.bct button.bct-ic.del:hover { color: var(--bct-bad); }
+.beavers-crafting.bct button.bct-ic.exp i { transition: rotate .15s; }
+.beavers-crafting.bct .bct-entry.open button.bct-ic.exp i { rotate: 180deg; }
+
+/* details */
+.beavers-crafting.bct .bct-det {
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px 10px 10px 54px;
+    border-top: 1px solid var(--bct-line);
+}
+.beavers-crafting.bct .bct-entry.open .bct-det { display: flex; }
+/* the instruction is the recipe's own HTML (images, layout) */
+.beavers-crafting.bct .bct-ins { display: flow-root; line-height: 1.4; overflow-wrap: anywhere; }
+.beavers-crafting.bct .bct-ins > :first-child { margin-top: 0; }
+.beavers-crafting.bct .bct-ins > :last-child { margin-bottom: 0; }
+.beavers-crafting.bct .bct-ins img { max-width: 100%; height: auto; }
+.beavers-crafting.bct .bct-grp { display: flex; align-items: flex-start; gap: 8px; }
+.beavers-crafting.bct .bct-grp > b {
+    flex: 0 0 74px;
+    padding-top: 5px;
+    color: var(--bct-muted);
+    font-size: .78em;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+.beavers-crafting.bct .bct-items { display: flex; flex-wrap: wrap; gap: 5px; min-width: 0; }
+.beavers-crafting.bct .bct-it {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 24px;
+    max-width: 100%;
+    padding: 0 8px 0 3px;
+    border: 1px solid var(--bct-line);
+    border-radius: 12px;
+    font-size: .88em;
+    white-space: nowrap;
+}
+.beavers-crafting.bct .bct-it img { width: 18px; height: 18px; border-radius: 50%; object-fit: cover; }
+.beavers-crafting.bct .bct-it i { font-size: .85em; }
+.beavers-crafting.bct .bct-it.ok i { color: var(--bct-ok); }
+.beavers-crafting.bct .bct-it.bad { border-color: var(--bct-bad); }
+.beavers-crafting.bct .bct-it.bad i { color: var(--bct-bad); }
+.beavers-crafting.bct .bct-it.wait { opacity: .6; }
+
+.beavers-crafting.bct .bct-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 40px 10px;
+    color: var(--bct-muted);
+    text-align: center;
+}
+.beavers-crafting.bct .bct-empty i { font-size: 28px; opacity: .6; }
+
+/* narrow sheets */
+@container (max-width: 420px) {
+    .beavers-crafting.bct .bct-prog small { display: none; }
+    .beavers-crafting.bct .bct-state { min-width: 0; }
+    .beavers-crafting.bct .bct-det { padding-left: 10px; }
+    .beavers-crafting.bct .bct-grp { flex-direction: column; gap: 4px; }
+    .beavers-crafting.bct .bct-grp > b { flex: none; padding: 0; }
+}

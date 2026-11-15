@@ -1,4 +1,9 @@
 # Changelog
+## 4.8.1
+- redesign crafting tab in actor sheets
+  - adapts to the colors and fonts of each system's sheet
+  - progress of checks, next check and roll/finish button per crafting
+  - collapsible folders and details
 ## 4.8.0
 - redesign crafting compendium
 ## 4.7.0

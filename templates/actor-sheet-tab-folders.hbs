@@ -1,0 +1,67 @@
+{{#each entries}}
+  <div class="bct-entry {{state}} {{#if open}}open{{/if}}" data-id="{{id}}">
+    <div class="bct-row">
+      <img src="{{img}}" alt="">
+      <div class="bct-title bct-toggle">
+        <div class="bct-n">{{name}}</div>
+        {{#if sub}}<div class="bct-s">{{#if subIcon}}<i class="fas {{subIcon}} fa-fw"></i>{{/if}}<span>{{sub}}</span></div>{{/if}}
+      </div>
+      <div class="bct-prog" {{#if progressTip}}data-tooltip="{{progressTip}}"{{/if}}>
+        {{#if pips}}
+          <div class="bct-pips">{{#each pips}}{{#if sep}}<span class="sep"></span>{{else}}<i class="{{cls}}"></i>{{/if}}{{/each}}</div>
+        {{else if bar}}
+          <div class="bct-bar-prog">
+            <span class="trk"><span class="ok" style="width:{{bar.hit}}%"></span></span>
+            {{#if hasFails}}<span class="trk"><span class="bad" style="width:{{bar.fail}}%"></span></span>{{/if}}
+          </div>
+        {{/if}}
+        {{#if progress}}<small>{{progress}}</small>{{/if}}
+      </div>
+      <div class="bct-state">
+        {{#if (eq state "active")}}
+          <button type="button" class="bct-go advanceCrafting" data-id="{{id}}">
+            <i class="fas {{actionIcon}}"></i>{{actionLabel}}
+          </button>
+        {{else if (eq state "success")}}
+          <span class="bct-chip ok"><i class="fas fa-check"></i>{{localize "beaversCrafting.actorSheet.done"}}</span>
+        {{else}}
+          <span class="bct-chip bad"><i class="fas fa-xmark"></i>{{localize "beaversCrafting.actorSheet.failed"}}</span>
+        {{/if}}
+      </div>
+      <div class="bct-acts">
+        <button type="button" class="bct-ic bct-toggle exp" data-tooltip="{{localize 'beaversCrafting.actorSheet.details.toggle'}}">
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <button type="button" class="bct-ic del removeCrafting" data-id="{{id}}" data-tooltip="{{localize 'beaversCrafting.actorSheet.remove'}}">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    </div>
+    <div class="bct-det">
+      {{#if instruction}}<div class="bct-ins">{{{instruction}}}</div>{{/if}}
+      {{#each groups}}
+        <div class="bct-grp">
+          <b>{{label}}</b>
+          <div class="bct-items">
+            {{#each items}}
+              <span class="bct-it {{cls}}"><img src="{{img}}" alt="">{{name}}{{#if icon}}<i class="fas {{icon}}"></i>{{/if}}</span>
+            {{/each}}
+          </div>
+        </div>
+      {{/each}}
+    </div>
+  </div>
+{{/each}}
+{{#each folders}}
+  <div class="bct-folder {{#if collapsed}}collapsed{{/if}}" data-path="{{path}}">
+    <button type="button" class="bct-fold">
+      <i class="fas fa-chevron-down bct-chev"></i>
+      <i class="fas fa-folder-open bct-fo"></i><i class="fas fa-folder bct-fc"></i>
+      <span class="bct-fn">{{name}}</span>
+      <span class="bct-c">{{count}}</span>
+    </button>
+    <div class="bct-content">
+      {{> beavers-actor-tab-folders this}}
+    </div>
+  </div>
+{{/each}}

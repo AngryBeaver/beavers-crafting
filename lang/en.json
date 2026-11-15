@@ -3,11 +3,36 @@
     "actorLink": "Recipes",
     "actorSheet": {
       "tab": "Crafting",
-      "table": {
-        "name": "Name",
-        "status": "Status",
-        "progress": "Progress",
-        "add": "Add"
+      "add": "Craft…",
+      "remove": "Remove",
+      "done": "Done",
+      "failed": "Failed",
+      "roll": "Roll",
+      "proceed": "Proceed",
+      "finish": "Finish",
+      "next": "Next: {test}",
+      "ready": "Ready to finish",
+      "crafted": "Crafted {items}",
+      "completed": "Completed",
+      "missing": "Missing: {items}",
+      "tooManyFails": "Too many failed checks",
+      "emptyHint": "Pick a recipe to start crafting. Running and finished crafts are listed here.",
+      "summary": {
+        "none": "Nothing crafted yet",
+        "active": "{count} in progress",
+        "success": "{count} done",
+        "error": "{count} failed"
+      },
+      "progress": {
+        "hits": "{hits} of {maxHits}",
+        "fails": "{count} fails",
+        "tip": "{hits}/{maxHits} checks passed · {fails}/{maxFails} failed"
+      },
+      "details": {
+        "toggle": "Details",
+        "required": "Used",
+        "consumed": "Consumed",
+        "produced": "Produces"
       }
     },
     "inventory": {
