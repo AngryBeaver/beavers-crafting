@@ -1,0 +1,237 @@
+/*
+  Chat message posted when a crafting ends (templates/crafting-chat.hbs).
+  Like the actor tab it paints no background of its own: colour and font come from the chat message
+  (dark / light theme, system chat styles), lines and tints are mixed from currentColor.
+  Only the status hues are fixed. Old messages keep their stored .chat markup and styles in crafting.css.
+*/
+.beavers-crafting.bcc {
+    --bcc-line: color-mix(in srgb, currentColor 18%, transparent);
+    --bcc-line-strong: color-mix(in srgb, currentColor 35%, transparent);
+    --bcc-muted: color-mix(in srgb, currentColor 68%, transparent);
+    --bcc-card: color-mix(in srgb, currentColor 5%, transparent);
+    --bcc-ok: #3e8e48;
+    --bcc-bad: #b2443b;
+    --bcc-state: var(--bcc-ok);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+    padding: 8px;
+    color: inherit;
+    font: inherit;
+    line-height: 1.3;
+    border: 1px solid var(--bcc-line);
+    border-top: 3px solid var(--bcc-state);
+    border-radius: 6px;
+    background: var(--bcc-card);
+}
+.beavers-crafting.bcc.bad {
+    --bcc-state: var(--bcc-bad);
+}
+
+/* chat and system styles reach into message content; crafting.css colours .fa-check globally */
+.beavers-crafting.bcc img {
+    display: block;
+    flex: none;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    object-fit: cover;
+    box-shadow: none;
+}
+.beavers-crafting.bcc i.fas {
+    color: inherit;
+    line-height: 1;
+    margin: 0;
+    width: auto;
+}
+
+/* head: recipe and outcome */
+.beavers-crafting.bcc .bcc-head {
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+    gap: 8px;
+    align-items: center;
+}
+.beavers-crafting.bcc .bcc-head > img {
+    width: 36px;
+    height: 36px;
+    border-radius: 4px;
+    border: 1px solid var(--bcc-line-strong);
+}
+.beavers-crafting.bcc .bcc-t {
+    min-width: 0;
+}
+.beavers-crafting.bcc .bcc-t .n {
+    font-weight: 600;
+    font-size: 1.05em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.beavers-crafting.bcc .bcc-t .s {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 6px;
+    row-gap: 2px;
+    font-size: .82em;
+    color: var(--bcc-muted);
+    white-space: nowrap;
+}
+.beavers-crafting.bcc .bcc-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 22px;
+    padding: 0 9px;
+    border-radius: 11px;
+    background: var(--bcc-state);
+    color: #fff;
+    font-size: .82em;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.beavers-crafting.bcc .bcc-chip i.fas {
+    color: #fff;
+}
+
+/* checks: one pip per required success, one per allowed failure */
+.beavers-crafting.bcc .bcc-pips {
+    display: flex;
+    gap: 3px;
+    align-items: center;
+}
+.beavers-crafting.bcc .bcc-pips i {
+    width: 10px;
+    height: 6px;
+    border-radius: 2px;
+    background: var(--bcc-line-strong);
+}
+.beavers-crafting.bcc .bcc-pips i.ok {
+    background: var(--bcc-ok);
+}
+.beavers-crafting.bcc .bcc-pips i.bad {
+    background: var(--bcc-bad);
+}
+.beavers-crafting.bcc .bcc-pips .sep {
+    width: 1px;
+    height: 9px;
+    margin: 0 2px;
+    background: var(--bcc-line-strong);
+}
+
+/* why it failed */
+.beavers-crafting.bcc .bcc-why {
+    display: flex;
+    gap: 6px;
+    align-items: flex-start;
+    padding: 4px 7px;
+    font-size: .88em;
+    border-left: 3px solid var(--bcc-bad);
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--bcc-bad) 14%, transparent);
+}
+.beavers-crafting.bcc .bcc-why i.fas {
+    color: var(--bcc-bad);
+    margin-top: 2px;
+}
+
+/* produced items: the point of the message */
+.beavers-crafting.bcc .bcc-out {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.beavers-crafting.bcc .bcc-prod {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr) auto;
+    gap: 8px;
+    align-items: center;
+    padding: 3px 6px 3px 3px;
+    border: 1px solid var(--bcc-line);
+    border-radius: 5px;
+}
+.beavers-crafting.bcc .bcc-prod img {
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+}
+.beavers-crafting.bcc .bcc-prod .n {
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.beavers-crafting.bcc .bcc-prod .q {
+    font-size: .9em;
+    color: var(--bcc-muted);
+    font-variant-numeric: tabular-nums;
+}
+.beavers-crafting.bcc .bcc-prod.lost {
+    opacity: .55;
+}
+.beavers-crafting.bcc .bcc-prod.lost .n {
+    font-weight: 400;
+    text-decoration: line-through;
+}
+/* "draggable chat result" setting */
+.beavers-crafting.bcc .bcc-prod.draggable {
+    cursor: grab;
+}
+.beavers-crafting.bcc .bcc-prod.draggable:hover {
+    border-color: var(--bcc-line-strong);
+    background: var(--bcc-card);
+}
+
+/* used items and tools */
+.beavers-crafting.bcc .bcc-grp {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.beavers-crafting.bcc .bcc-grp > b {
+    font-size: .72em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--bcc-muted);
+}
+.beavers-crafting.bcc .bcc-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+.beavers-crafting.bcc .bcc-it {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    max-width: 100%;
+    height: 22px;
+    padding: 0 7px 0 2px;
+    border: 1px solid var(--bcc-line);
+    border-radius: 11px;
+    font-size: .84em;
+}
+.beavers-crafting.bcc .bcc-it img {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+}
+.beavers-crafting.bcc .bcc-it span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.beavers-crafting.bcc .bcc-it.bad {
+    border-color: var(--bcc-bad);
+    background: color-mix(in srgb, var(--bcc-bad) 14%, transparent);
+}
+.beavers-crafting.bcc .bcc-it.bad i.fas {
+    color: var(--bcc-bad);
+    font-size: .85em;
+}
+.beavers-crafting.bcc .bcc-it.kept {
+    opacity: .55;
+}

@@ -1,42 +1,53 @@
-<div class="beavers-crafting chat flexcol">
-    <div class="flexrow header beavers-line">
-        {{>beavers-recipe-component type="recipe" component=data}}
-        <div class="attribute flexrow">
-            <div class="flexrow beavers-line" style="margin:auto">
-                {{#if (not (eq data.status "error"))}}
-                    <div class="statusbar success">
-                        <div class="fill"
-                             style="background: linear-gradient(to right, darkgreen {{data.beaversTests.hitPer}}%, transparent 0);">
-                          {{data.beaversTests.hitPer}}%
-                        </div>
-                    </div>
+{{#*inline "bcc-chip"}}
+    <span class="bcc-it {{cls}}"><img src="{{img}}" alt=""><span>{{name}}</span>{{#if (eq cls "bad")}}<i class="fas fa-xmark"></i>{{/if}}</span>
+{{/inline}}
+
+<div class="beavers-crafting bcc {{#unless card.ok}}bad{{/unless}}">
+    <div class="bcc-head">
+        <img src="{{card.img}}" alt="">
+        <div class="bcc-t">
+            <div class="n">{{card.name}}</div>
+            <div class="s">
+                {{#if card.pips}}
+                    <span class="bcc-pips">{{#each card.pips}}{{#if sep}}<span class="sep"></span>{{else}}<i class="{{cls}}"></i>{{/if}}{{/each}}</span>
                 {{/if}}
-                {{#if (not (eq data.status "success"))}}
-                    <div class="statusbar error">
-                        <div class="fill"
-                             style="background: linear-gradient(to right, darkred {{data.beaversTests.failPer}}%, transparent 0)">
-                            {{data.beaversTests.failPer}}%
-                        </div>
-                    </div>
-                {{/if}}
+                <span>{{card.sub}}</span>
             </div>
         </div>
+        {{#if card.ok}}
+            <span class="bcc-chip"><i class="fas fa-check"></i>{{localize "beaversCrafting.actorSheet.done"}}</span>
+        {{else}}
+            <span class="bcc-chip"><i class="fas fa-xmark"></i>{{localize "beaversCrafting.actorSheet.failed"}}</span>
+        {{/if}}
     </div>
-    <div class="flexrow beavers-chat-info">
-        <div class="left flexcol">
-            {{#each data.components.consumed}}
-                {{>beavers-recipe-component type="input" component=this.component status=this.status }}
-            {{/each}}
-        </div>
-        <div class="right flexcol">
-            <div class="results">
-                <div class="title">
-                    <div class="name">{{localize "beaversCrafting.recipe.results"}}</div>
+    {{#if card.reason}}
+        <div class="bcc-why"><i class="fas fa-triangle-exclamation"></i><span>{{card.reason}}</span></div>
+    {{/if}}
+    {{#if card.produced.length}}
+        <div class="bcc-out">
+            {{#each card.produced}}
+                <div class="bcc-prod {{#if lost}}lost{{/if}}" data-type="output" data-id="{{uuid}}">
+                    <img src="{{img}}" alt="">
+                    <span class="n">{{name}}</span>
+                    <span class="q">×{{quantity}}</span>
                 </div>
-            </div>
-            {{#each data.components.produced}}
-                    {{>beavers-recipe-component type="output" component=this.component status=this.status }}
             {{/each}}
         </div>
-    </div>
+    {{/if}}
+    {{#if card.used.length}}
+        <div class="bcc-grp">
+            <b>{{localize "beaversCrafting.chat.used"}}</b>
+            <div class="bcc-items">
+                {{#each card.used}}{{> bcc-chip}}{{/each}}
+            </div>
+        </div>
+    {{/if}}
+    {{#if card.tools.length}}
+        <div class="bcc-grp">
+            <b>{{localize "beaversCrafting.chat.tools"}}</b>
+            <div class="bcc-items">
+                {{#each card.tools}}{{> bcc-chip}}{{/each}}
+            </div>
+        </div>
+    {{/if}}
 </div>

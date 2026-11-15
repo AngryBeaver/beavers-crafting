@@ -13,7 +13,8 @@ export function hookChatLog(){
 
 function addDraggAble(html){
   if(!html) return;
-  $(html).find(".beavers-crafting .beavers-component .flexrow[data-type='output']")
+  //old messages keep their stored markup, so both the old and the new chat card are supported
+  $(html).find(".beavers-crafting .beavers-component .flexrow[data-type='output'], .beavers-crafting.bcc .bcc-prod[data-id]")
     .attr("draggable", "true")
     .addClass("draggable")
     .on("dragstart",

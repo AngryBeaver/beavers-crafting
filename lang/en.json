@@ -1,6 +1,13 @@
 {
   "beaversCrafting": {
     "actorLink": "Recipes",
+    "chat": {
+      "crafted": "Crafted",
+      "notCrafted": "Not crafted",
+      "checks": "{hits} of {maxHits} checks",
+      "used": "Used",
+      "tools": "Tools"
+    },
     "actorSheet": {
       "tab": "Crafting",
       "add": "Craft…",

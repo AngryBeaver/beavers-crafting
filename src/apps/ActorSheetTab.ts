@@ -4,12 +4,10 @@ import {Settings} from "../Settings.js";
 import {TestHandler} from "../TestHandler.js";
 import { sortByFolder } from "../helpers/Folder.js";
 import { markDeleted, renderTemplate } from "../helpers/Compat.js";
+import { Pip, progressPips } from "../helpers/Progress.js";
 
-const MAX_PIPS = 12;
 /** beavers-system-interface test types that need no roll, they just count as passed */
 const NO_ROLL_TESTS = ["IncrementStep"];
-
-type Pip = { cls: "ok" | "bad" | "" } | { sep: true };
 
 interface EntryView {
     id: string;
@@ -146,15 +144,8 @@ export class ActorSheetTab {
             const hits = Math.min(tests.hits, tests.maxHits);
             const fails = Math.min(tests.fails, tests.maxFails);
             view.progressTip = f("progress.tip", {hits, maxHits: tests.maxHits, fails, maxFails: tests.maxFails});
-            if (tests.maxHits + tests.maxFails <= MAX_PIPS) {
-                const pips: Pip[] = [];
-                for (let i = 0; i < tests.maxHits; i++) pips.push({cls: i < hits ? "ok" : ""});
-                if (tests.maxFails > 0) {
-                    pips.push({sep: true});
-                    for (let i = 0; i < tests.maxFails; i++) pips.push({cls: i < fails ? "bad" : ""});
-                }
-                view.pips = pips;
-            } else {
+            view.pips = progressPips(hits, tests.maxHits, fails, tests.maxFails);
+            if (!view.pips) {
                 view.bar = {
                     hit: Math.round(hits * 100 / tests.maxHits),
                     fail: tests.maxFails > 0 ? Math.round(fails * 100 / tests.maxFails) : 0,

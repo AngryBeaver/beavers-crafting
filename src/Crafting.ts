@@ -6,6 +6,7 @@ import { TestHandler } from "./TestHandler.js";
 import { Container } from "./Container.js";
 import { dnd5eCopyContent, getActorContentPool } from "./ContainerHandler.js";
 import { bringToFront, enrichHTML, markReplaced, renderTemplate } from "./helpers/Compat.js";
+import { chatCardView } from "./apps/ChatCard.js";
 
 export class Crafting implements CraftingData {
   uuid: string;
@@ -447,7 +448,7 @@ export class Crafting implements CraftingData {
   async _sendToChat() {
     let content = await renderTemplate(`modules/${Settings.NAMESPACE}/templates/crafting-chat.hbs`,
       {
-        data: this.getChatData(),
+        card: chatCardView(this.getChatData(), !!this.recipe.beaversTests),
       });
     content = await enrichHTML(content);
     await ChatMessage.create({

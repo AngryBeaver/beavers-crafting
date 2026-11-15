@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.8.3
+- redesign crafting chat message
+  - adapts to dark / light mode and the system's chat style
+  - outcome, checks, results, used items and tools at a glance; the reason when it fails
+  - "draggable chat result" works on the new message too
+
 ## 4.8.2
 - crafting compendium: open decisions are made inline instead of in a popup
   - "choose one" and "any of" are highlighted when crafting while still undecided

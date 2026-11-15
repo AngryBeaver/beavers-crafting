@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crafting Chat Card</title>
+<!--
+  Mockup of the redesigned chat message that is posted when a crafting ends.
+  Same rules as the actor tab: no own background, colour + font inherited from the chat message,
+  lines derived from currentColor, only the status hues are fixed.
+  New root class (.bcc) so old messages that are stored with the old markup keep their old look.
+  The frames only simulate different chat logs around the card.
+-->
+<link rel="stylesheet" href="assets/foundry/fontawesome/css/all.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Signika:wght@400;600&family=Roboto:wght@400;500;700&family=Gelasio:wght@400;600&display=swap">
+<style>
+/* ---------------- page + simulated chat logs (not part of the design) ---------------- */
+body{margin:0;padding:24px;background:#2c4a33 radial-gradient(#4a6b3a,#1d2b1f) fixed;font:14px Signika,sans-serif;color:#eee;
+  display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start}
+h2.cap{flex:0 0 100%;margin:0;font:600 15px Signika;color:#dfe8d6}
+.frame{display:flex;flex-direction:column;gap:6px;width:300px}
+.frame>small{color:#cfd8c6;font-size:12px}
+.log{padding:6px;border-radius:6px;display:flex;flex-direction:column;gap:6px;box-shadow:0 8px 30px #0008}
+.msg{border-radius:5px;padding:6px 8px 8px}
+.msg .mh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.msg .mh b{font-size:1.1em} .msg .mh span{font-size:.75em;opacity:.7}
+.msg .who{font-size:.8em;opacity:.7;margin:-6px 0 6px}
+/* foundry v13 dark */
+.l-dark{background:#0e0e12}
+.l-dark .msg{background:#1d1d24;color:#e7e1d5;border:1px solid #393946}
+/* foundry v13 light */
+.l-light{background:#c9c7b8 url(assets/foundry/parchment.jpg)}
+.l-light .msg{background:#fffb;color:#191813;border:1px solid #7a7971}
+/* dnd5e-ish card */
+.l-5e{background:#e8e0d0 url(assets/foundry/parchment-white.jpg)}
+.l-5e .msg{background:#f4efe6;color:#4b4a44;border:1px solid #c9c0b0;font-family:Roboto,sans-serif;font-size:13px}
+/* strongly coloured */
+.l-red{background:#241312}
+.l-red .msg{background:linear-gradient(#3a1b1b,#2a1514);color:#eadcc8;border:1px solid #6b3030;font-family:Gelasio,serif;font-size:13px}
+
+/* ================= the design: crafting chat card ================= */
+.bcc{
+  --bcc-line: color-mix(in srgb, currentColor 18%, transparent);
+  --bcc-line-strong: color-mix(in srgb, currentColor 35%, transparent);
+  --bcc-muted: color-mix(in srgb, currentColor 68%, transparent);
+  --bcc-card: color-mix(in srgb, currentColor 5%, transparent);
+  --bcc-ok: #3e8e48; --bcc-bad: #b2443b;
+  --bcc-state: var(--bcc-ok);
+  color:inherit;font:inherit;display:flex;flex-direction:column;gap:8px;min-width:0;
+  border:1px solid var(--bcc-line);border-top:3px solid var(--bcc-state);border-radius:6px;background:var(--bcc-card);padding:8px;
+}
+.bcc.bad{--bcc-state:var(--bcc-bad)}
+.bcc i.fas{line-height:1;color:inherit}
+
+/* head: recipe, outcome */
+.bcc-head{display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:8px;align-items:center}
+.bcc-head>img{width:36px;height:36px;border-radius:4px;border:1px solid var(--bcc-line-strong);object-fit:cover}
+.bcc-t .n{font-weight:600;font-size:1.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bcc-t .s{font-size:.82em;color:var(--bcc-muted);display:flex;flex-wrap:wrap;column-gap:6px;row-gap:2px;align-items:center;white-space:nowrap}
+.bcc-chip{display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:11px;color:#fff;
+  font-size:.82em;font-weight:600;white-space:nowrap;background:var(--bcc-state)}
+.bcc-chip i.fas{color:#fff}
+
+/* checks */
+.bcc-pips{display:flex;gap:3px;align-items:center}
+.bcc-pips i{width:10px;height:6px;border-radius:2px;background:var(--bcc-line-strong)}
+.bcc-pips i.ok{background:var(--bcc-ok)} .bcc-pips i.bad{background:var(--bcc-bad)}
+.bcc-pips .sep{width:1px;height:9px;background:var(--bcc-line-strong);margin:0 2px}
+
+/* reason of a failure */
+.bcc-why{display:flex;gap:6px;align-items:flex-start;font-size:.88em;padding:4px 7px;border-radius:4px;border-left:3px solid var(--bcc-bad);background:color-mix(in srgb,var(--bcc-bad) 14%,transparent)}
+.bcc-why i.fas{color:var(--bcc-bad);margin-top:2px}
+
+/* produced: the reason for the message, prominent */
+.bcc-out{display:flex;flex-direction:column;gap:4px}
+.bcc-prod{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:8px;align-items:center;
+  padding:3px 6px 3px 3px;border:1px solid var(--bcc-line);border-radius:5px}
+.bcc-prod img{width:28px;height:28px;border-radius:4px;object-fit:cover}
+.bcc-prod .n{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bcc-prod .q{font-variant-numeric:tabular-nums;color:var(--bcc-muted);font-size:.9em}
+.bcc-prod.lost{opacity:.55} .bcc-prod.lost .n{text-decoration:line-through;font-weight:400}
+
+/* used + tools */
+.bcc-grp{display:flex;flex-direction:column;gap:4px}
+.bcc-grp>b{font-size:.72em;text-transform:uppercase;letter-spacing:.05em;color:var(--bcc-muted);font-weight:600}
+.bcc-items{display:flex;flex-wrap:wrap;gap:4px}
+.bcc-it{display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 7px 0 2px;border:1px solid var(--bcc-line);border-radius:11px;font-size:.84em;max-width:100%}
+.bcc-it img{width:18px;height:18px;border-radius:50%;object-fit:cover;flex:none}
+.bcc-it span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bcc-it.bad{border-color:var(--bcc-bad);background:color-mix(in srgb,var(--bcc-bad) 14%,transparent)} .bcc-it.bad i.fas{color:var(--bcc-bad)}
+.bcc-it.kept{opacity:.55}
+.bcc-it i.fas{font-size:.85em}
+</style>
+</head>
+<body>
+
+<template id="cards">
+  <!-- 1: your screenshot, money only, no checks -->
+  <div class="msg"><div class="mh"><b>Klovarek Ukelstein</b><span>4h 41m ago</span></div><div class="who">Gamemaster</div>
+    <div class="beavers-crafting bcc ok">
+      <div class="bcc-head">
+        <img src="assets/foundry/scroll-bound-gold-tan.webp" alt="">
+        <div class="bcc-t"><div class="n">Loot</div><div class="s">Crafted</div></div>
+        <span class="bcc-chip"><i class="fas fa-check"></i>Done</span>
+      </div>
+      <div class="bcc-out">
+        <div class="bcc-prod"><img src="assets/foundry/ladder.webp" alt=""><span class="n">Ladder</span><span class="q">×1</span></div>
+      </div>
+      <div class="bcc-grp"><b>Used</b><div class="bcc-items">
+        <span class="bcc-it"><img src="assets/foundry/coins-assorted-mix-copper-silver-gold.webp" alt=""><span>5× Silver</span></span>
+      </div></div>
+    </div>
+  </div>
+
+  <!-- 2: checks, tools, several results -->
+  <div class="msg"><div class="mh"><b>Mira Fenwood</b><span>2m ago</span></div>
+    <div class="beavers-crafting bcc ok">
+      <div class="bcc-head">
+        <img src="assets/foundry/potion-bottle-labeled-stopped-purple.webp" alt="">
+        <div class="bcc-t"><div class="n">Keen Sense</div>
+          <div class="s"><span class="bcc-pips"><i class="ok"></i><i class="ok"></i><i class="ok"></i><span class="sep"></span><i class="bad"></i><i></i></span>3 of 3 checks</div></div>
+        <span class="bcc-chip"><i class="fas fa-check"></i>Done</span>
+      </div>
+      <div class="bcc-out">
+        <div class="bcc-prod"><img src="assets/foundry/potion-bottle-labeled-stopped-purple.webp" alt=""><span class="n">Potion of Keen Sense</span><span class="q">×2</span></div>
+      </div>
+      <div class="bcc-grp"><b>Used</b><div class="bcc-items">
+        <span class="bcc-it"><img src="assets/foundry/coins-assorted-mix-copper-silver-gold.webp" alt=""><span>50 gp</span></span>
+        <span class="bcc-it"><img src="assets/foundry/conical-mushroom-poison-red.webp" alt=""><span>5× Tiny Maw</span></span>
+        <span class="bcc-it"><img src="assets/foundry/gem-faceted-rough-purple.webp" alt=""><span>Rough Amethyst</span></span>
+        <span class="bcc-it"><img src="assets/foundry/potion-flask-corked-green.webp" alt=""><span>Empty Flask</span></span>
+      </div></div>
+      <div class="bcc-grp"><b>Tools</b><div class="bcc-items">
+        <span class="bcc-it"><img src="assets/foundry/potion-flask-corked-green.webp" alt=""><span>Alchemist's Supplies</span></span>
+      </div></div>
+    </div>
+  </div>
+
+  <!-- 3: failed on checks -->
+  <div class="msg"><div class="mh"><b>Mira Fenwood</b><span>just now</span></div>
+    <div class="beavers-crafting bcc bad">
+      <div class="bcc-head">
+        <img src="assets/foundry/conical-mushroom-poison-red.webp" alt="">
+        <div class="bcc-t"><div class="n">Tiny Bite</div>
+          <div class="s"><span class="bcc-pips"><i class="ok"></i><i></i><span class="sep"></span><i class="bad"></i><i class="bad"></i></span>1 of 2 checks</div></div>
+        <span class="bcc-chip"><i class="fas fa-xmark"></i>Failed</span>
+      </div>
+      <div class="bcc-why"><i class="fas fa-triangle-exclamation"></i>Too many failed checks</div>
+      <div class="bcc-grp"><b>Used</b><div class="bcc-items">
+        <span class="bcc-it"><img src="assets/foundry/conical-mushroom-poison-red.webp" alt=""><span>3× Tiny Maw</span></span>
+      </div></div>
+    </div>
+  </div>
+
+  <!-- 4: failed, something missing -->
+  <div class="msg"><div class="mh"><b>Klovarek Ukelstein</b><span>just now</span></div>
+    <div class="beavers-crafting bcc bad">
+      <div class="bcc-head">
+        <img src="assets/foundry/scroll-bound-green.webp" alt="">
+        <div class="bcc-t"><div class="n">Chest</div><div class="s">Not crafted</div></div>
+        <span class="bcc-chip"><i class="fas fa-xmark"></i>Failed</span>
+      </div>
+      <div class="bcc-why"><i class="fas fa-triangle-exclamation"></i>Missing: Iron Nails, Carpenter's Tools</div>
+      <div class="bcc-grp"><b>Used</b><div class="bcc-items">
+        <span class="bcc-it kept"><img src="assets/foundry/scroll-bound-red-tan.webp" alt=""><span>4× Plank</span></span>
+        <span class="bcc-it bad"><img src="assets/foundry/gem-faceted-rough-purple.webp" alt=""><span>20× Iron Nails</span><i class="fas fa-xmark"></i></span>
+      </div></div>
+      <div class="bcc-grp"><b>Tools</b><div class="bcc-items">
+        <span class="bcc-it bad"><img src="assets/foundry/potion-flask-corked-green.webp" alt=""><span>Carpenter's Tools</span><i class="fas fa-xmark"></i></span>
+      </div></div>
+    </div>
+  </div>
+</template>
+
+<h2 class="cap">Crafting chat card: the same markup in four chat logs</h2>
+<div class="frame"><small>Foundry dark (your screenshot)</small><div class="log l-dark" data-t="cards"></div></div>
+<div class="frame"><small>Foundry light</small><div class="log l-light" data-t="cards"></div></div>
+<div class="frame"><small>dnd5e chat</small><div class="log l-5e" data-t="cards"></div></div>
+<div class="frame" style="width:240px"><small>strongly coloured, narrow (popout)</small><div class="log l-red" data-t="cards"></div></div>
+
+<script>
+document.querySelectorAll("[data-t]").forEach(el => el.append(document.getElementById(el.dataset.t).content.cloneNode(true)));
+</script>
+</body>
+</html>
