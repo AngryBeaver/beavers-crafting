@@ -188,18 +188,28 @@ export class RecipeCompendium {
     static async evaluateAnyOf(type: DataType, recipe: Recipe, group: string, key: string, items) {
         const component = recipe[type][group][key];
         if (component.type === Settings.ANYOF_SUBTYPE) {
-            const item = await component.getEntity();
-            const anyOf = new AnyOf(item);
-            const components = await anyOf.filter(items);
+            const components = await this.anyOfCandidates(component, items);
             const comps = components.reduce((result, item, index) => {
                 result[index.toString()] = item;
                 return result;
             }, {})
             const used = await this.chooseComponent(comps);
-            comps[used].quantity = component.quantity;
-            recipe._addData(type, comps[used], comps[used].uuid, group);
-            recipe._removeData(type, group, key);
+            this.resolveAnyOf(type, recipe, group, key, comps[used]);
         }
+    }
+
+    /** the items of the pool that match an AnyOf component */
+    static async anyOfCandidates(component: Component, items): Promise<Component[]> {
+        const item = await component.getEntity();
+        return new AnyOf(item).filter(items);
+    }
+
+    /** replace the AnyOf component at group/key with the chosen one, keeping the needed quantity */
+    static resolveAnyOf(type: DataType, recipe: Recipe, group: string, key: string, chosen: Component) {
+        const component = recipe[type][group][key];
+        chosen.quantity = component.quantity;
+        recipe._addData(type, chosen, chosen.uuid, group);
+        recipe._removeData(type, group, key);
     }
 
 

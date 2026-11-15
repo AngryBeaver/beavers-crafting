@@ -9,11 +9,42 @@
 {{/inline}}
 
 {{#*inline "bc-qty"}}
-  <span class="bc-qty">{{#if hasHave}}<b>{{have}}</b> / {{need}}{{else}}{{need}}{{/if}}</span>
+  <span class="bc-qty">{{#if (eq type "output")}}×{{need}}{{else if hasHave}}<b>{{have}}</b> / {{need}}{{else}}<span class="bc-na">–</span> / {{need}}{{/if}}</span>
+{{/inline}}
+
+{{#*inline "bc-undo"}}
+  {{#if changeable}}
+    <button type="button" class="bc-undo" data-type="{{type}}" data-group="{{group}}"
+            data-tooltip="{{localize 'beaversCrafting.crafting-app.chooseAgain'}}">
+      <i class="fas fa-rotate-left"></i>
+    </button>
+  {{/if}}
+{{/inline}}
+
+{{#*inline "bc-anyof"}}
+  {{#if expanded}}
+    <div class="bc-grp bc-anyof">
+      <div class="bc-grp-l">{{localize "beaversCrafting.crafting-app.chooseOne"}}: {{name}}</div>
+      {{#if candidates.length}}
+        <div class="bc-opts">
+          {{#each candidates}}
+            <button type="button" class="bc-opt pickAnyOf {{#if missing}}missing{{/if}}"
+                    data-anyof="{{../type}}|{{../group}}|{{../key}}" data-index="{{index}}">
+              <img src="{{img}}" alt="">
+              <span class="bc-n">{{name}}</span>
+              {{#if hasHave}}<span class="bc-qty"><b>{{have}}</b> / {{../need}}</span>{{/if}}
+            </button>
+          {{/each}}
+        </div>
+      {{else}}
+        <div class="bc-none">{{localize "beaversCrafting.crafting-app.noMatch"}}</div>
+      {{/if}}
+    </div>
+  {{/if}}
 {{/inline}}
 
 {{#*inline "bc-slot"}}
-  <div class="bc-slot {{#if missing}}missing{{/if}} {{#if isAnyOf}}chooseAnyOf{{else if clickable}}open-sheet{{/if}}"
+  <div class="bc-slot {{#if missing}}missing{{/if}} {{#if isAnyOf}}chooseAnyOf bc-pending{{#if expanded}} expanded{{/if}}{{else if clickable}}open-sheet{{/if}}"
        data-id="{{uuid}}" data-type="{{type}}" data-group="{{group}}" data-key="{{key}}"
        {{#if isAnyOf}}data-tooltip="{{localize 'beaversCrafting.crafting-app.anyOfHint'}}"{{/if}}>
     <img src="{{img}}" alt="">
@@ -21,13 +52,15 @@
     {{#if crafted}}<img class="bc-crafted" src="modules/beavers-crafting/icons/tools.svg" alt="crafted" data-tooltip="crafted">{{/if}}
     {{> bc-qty}}
     {{> bc-status}}
+    {{> bc-undo}}
   </div>
+  {{> bc-anyof}}
 {{/inline}}
 
 {{#*inline "bc-groups"}}
   {{#each groups}}
     {{#if isChoice}}
-      <div class="bc-grp">
+      <div class="bc-grp bc-pending">
         <div class="bc-grp-l">{{localize "beaversCrafting.crafting-app.chooseOne"}}</div>
         <div class="bc-opts">
           {{#each options}}
@@ -107,12 +140,15 @@
                 {{> bc-groups groups=(beavers-object "0" this)}}
               {{else}}
                 {{#each options}}
-                  <div class="bc-res {{#if isAnyOf}}chooseAnyOf{{else if clickable}}open-sheet{{/if}}"
-                       data-id="{{uuid}}" data-type="{{type}}" data-group="{{group}}" data-key="{{key}}">
+                  <div class="bc-res {{#if isAnyOf}}chooseAnyOf bc-pending{{#if expanded}} expanded{{/if}}{{else if clickable}}open-sheet{{/if}}"
+                       data-id="{{uuid}}" data-type="{{type}}" data-group="{{group}}" data-key="{{key}}"
+                       {{#if isAnyOf}}data-tooltip="{{localize 'beaversCrafting.crafting-app.anyOfHint'}}"{{/if}}>
                     <span class="bc-q">×{{need}}</span>
+                    {{> bc-undo}}
                     <img src="{{img}}" alt="">
                     <span class="bc-n">{{name}}</span>
                   </div>
+                  {{> bc-anyof}}
                 {{/each}}
               {{/if}}
             {{/each}}
@@ -145,7 +181,12 @@
   </div>
 
   <footer class="bc-ft">
-    {{#if hasMissing}}
+    {{#if hasPending}}
+      <div class="bc-warn pending">
+        <i class="fas fa-hand-pointer"></i>
+        <span>{{localize "beaversCrafting.crafting-app.chooseFirst"}} <b>{{pending}}</b></span>
+      </div>
+    {{else if hasMissing}}
       <div class="bc-warn">
         <i class="fas fa-triangle-exclamation"></i>
         <span>{{localize "beaversCrafting.crafting-app.missing"}} <b>{{missing}}</b></span>
@@ -153,7 +194,7 @@
     {{else}}
       <div class="bc-warn ok"></div>
     {{/if}}
-    <button type="button" class="bc-craft {{#unless hasMissing}}go{{/unless}}">
+    <button type="button" class="bc-craft {{#if ready}}go{{/if}}">
       <i class="fas fa-hammer"></i>
       {{localize "beaversCrafting.crafting-app.button"}}
     </button>

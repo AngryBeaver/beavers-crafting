@@ -117,6 +117,9 @@
       "notConsumed": "not consumed",
       "haveNeed": "have / need",
       "chooseOne": "Choose one",
+      "chooseFirst": "Choose first:",
+      "chooseAgain": "Choose again",
+      "noMatch": "No matching item",
       "missing": "Missing",
       "anyOfHint": "Click or drop an item to choose",
       "summary": {

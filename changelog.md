@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.8.2
+- crafting compendium: open decisions are made inline instead of in a popup
+  - "choose one" and "any of" are highlighted when crafting while still undecided
+  - "any of" lists the matching items inline when clicked, with have / need
+  - a made choice can be undone
+- clearer have / need display
+- remove unused pictures
 ## 4.8.1
 - redesign crafting tab in actor sheets
   - adapts to the colors and fonts of each system's sheet

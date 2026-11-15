@@ -26,6 +26,20 @@ interface SlotView {
     isAnyOf: boolean,
     clickable: boolean,
     crafted: boolean,
+    /** the group was a choice or an AnyOf in the original recipe and can be chosen again */
+    changeable?: boolean,
+    /** AnyOf whose matching items are listed inline */
+    expanded?: boolean,
+    candidates?: CandidateView[],
+}
+
+interface CandidateView {
+    index: number,
+    name: string,
+    img: string,
+    have?: number,
+    hasHave: boolean,
+    missing: boolean,
 }
 
 interface GroupView {
@@ -65,6 +79,10 @@ export class CraftingApp extends Application {
         selected?,
         recipe?: Recipe,
         result?: Result,
+        /** matching items per AnyOf slot, keyed "type|group|key" */
+        anyOfCandidates: Map<string, Component[]>,
+        /** key of the AnyOf slot whose candidates are shown inline */
+        anyOfOpen?: string,
     };
 
     constructor(actor, options: any = {}) {
@@ -78,6 +96,7 @@ export class CraftingApp extends Application {
             collapsed: new Set(),
             instructionOpen: false,
             filterItems: {},
+            anyOfCandidates: new Map(),
         };
         if (this.element.length > 0) {
             this.bringToTop();
@@ -178,6 +197,8 @@ export class CraftingApp extends Application {
     selectRecipe(uuid: string) {
         this.data.selected = uuid;
         this.data.recipe = undefined;
+        this.data.anyOfCandidates = new Map();
+        this.data.anyOfOpen = undefined;
         const recipe = this.data.recipes.find(r => r.uuid === uuid);
         if (recipe) {
             this.data.recipe = Recipe.clone(recipe);
@@ -221,7 +242,13 @@ export class CraftingApp extends Application {
             const isMoney = component.flags?.[Settings.NAMESPACE]?.subtype === "money";
             let status: SlotStatus = undefined;
             let have: number | undefined = undefined;
-            if (results) {
+            const anyOfKey = CraftingApp._anyOfKey(type, group, key);
+            const candidates = isAnyOf ? this.data.anyOfCandidates.get(anyOfKey) : undefined;
+            if (isAnyOf && type !== "output" && candidates) {
+                // the best matching item the actor owns
+                have = candidates.reduce((max, c) => Math.max(max, Number(c.quantity) || 0), 0);
+                status = have >= component.quantity ? "success" : "error";
+            } else if (results) {
                 const componentResult = results.findComponentResult(component);
                 if (componentResult && !isAnyOf) {
                     status = componentResult.hasError() ? "error" : "success";
@@ -245,13 +272,30 @@ export class CraftingApp extends Application {
                 isAnyOf,
                 clickable: clickable && !isAnyOf,
                 crafted: hasCraftedFlag && !!component.flags?.[Settings.NAMESPACE]?.isCrafted,
+                expanded: isAnyOf && this.data.anyOfOpen === anyOfKey,
+                candidates: isAnyOf && this.data.anyOfOpen === anyOfKey ? (candidates || []).map((c, index) => ({
+                    index,
+                    name: c.name,
+                    img: c.img,
+                    // world items (results) have no meaningful quantity
+                    have: type === "output" ? undefined : c.quantity,
+                    hasHave: type !== "output",
+                    missing: type !== "output" && (Number(c.quantity) || 0) < component.quantity,
+                })) : undefined,
             };
         };
+        const original = this.data.recipes.find(r => r.uuid === recipe.uuid);
         const groups = (data, type: DataType, results: ComponentResults | undefined, clickable: boolean): GroupView[] =>
             Object.entries(data || {}).map(([group, components]) => {
                 const options = Object.entries(components as { [key: string]: Component })
                     .map(([key, component]) => slot(component, type, group, key, results, clickable));
-                return {group, isChoice: options.length > 1, options};
+                const isChoice = options.length > 1;
+                const originalGroup = Object.values(original?.[type]?.[group] || {}) as Component[];
+                const wasOpen = originalGroup.length > 1 || originalGroup.some(c => c.type === Settings.ANYOF_SUBTYPE);
+                if (!isChoice && wasOpen && !options[0]?.isAnyOf) {
+                    options.forEach(o => o.changeable = true);
+                }
+                return {group, isChoice, options};
             });
 
         const useAttendants = !!Settings.get(Settings.USE_ATTENDANTS);
@@ -290,6 +334,16 @@ export class CraftingApp extends Application {
                 }
             } else {
                 group.options.filter(o => o.missing).forEach(o => missing.push(describe(o)));
+            }
+        }
+
+        // decisions the user still has to make before crafting
+        const pending: string[] = [];
+        for (const group of [...required, ...input, ...output]) {
+            if (group.isChoice) {
+                pending.push(group.options.map(o => o.name).join(" / "));
+            } else {
+                group.options.filter(o => o.isAnyOf).forEach(o => pending.push(o.name));
             }
         }
 
@@ -343,6 +397,9 @@ export class CraftingApp extends Application {
             instructionOpen: this.data.instructionOpen,
             missing: missing.join(", "),
             hasMissing: missing.length > 0,
+            pending: pending.join(", "),
+            hasPending: pending.length > 0,
+            ready: missing.length === 0 && pending.length === 0,
         };
     }
 
@@ -387,6 +444,7 @@ export class CraftingApp extends Application {
         html.find(".bc-list .bc-rec").on("click", (e) => {
             const id = $(e.currentTarget).data("id");
             this.selectRecipe(id);
+            html.find(".bc-main").removeClass("bc-attn");
             html.find(".bc-list .bc-rec.selected").removeClass("selected");
             $(e.currentTarget).addClass("selected");
             void this.renderRecipeSheet();
@@ -428,6 +486,15 @@ export class CraftingApp extends Application {
             if (this.data.recipe === undefined) {
                 return;
             }
+            // open choices are made inline: point at them instead of asking in a popup
+            const pending = html.find(".bc-pending");
+            if (pending.length > 0) {
+                html.removeClass("bc-attn");
+                void html[0].offsetWidth; // restart the highlight animation
+                html.addClass("bc-attn");
+                pending[0].scrollIntoView({block: "nearest", behavior: "smooth"});
+                return;
+            }
             Crafting.fromRecipe(this.data.actor.id, this.data.recipe)
                 .then(crafting => crafting.craft())
                 .then(() => this.close());
@@ -445,14 +512,63 @@ export class CraftingApp extends Application {
             const group = $(e.currentTarget).data("group") + "";
             const key = $(e.currentTarget).data("key") + "";
             const type = $(e.currentTarget).data("type");
-            if (this.data.recipe != undefined) {
-                const pool = type === "output" ? game["items"].contents : this.data.actor.items;
-                RecipeCompendium.evaluateAnyOf(type, this.data.recipe, group, key, pool)
-                    .then(() => this.renderRecipeSheet());
+            void this._toggleAnyOf(type, group, key);
+        });
+
+        html.find(".pickAnyOf").on("click", e => {
+            const [type, group, key] = ($(e.currentTarget).data("anyof") + "").split("|");
+            const candidate = this.data.anyOfCandidates.get(CraftingApp._anyOfKey(type as DataType, group, key))
+                ?.[Number($(e.currentTarget).data("index"))];
+            if (this.data.recipe === undefined || candidate === undefined || !this.data.recipe[type]?.[group]?.[key]) {
+                return;
             }
+            RecipeCompendium.resolveAnyOf(type as DataType, this.data.recipe, group, key, candidate);
+            this.data.anyOfOpen = undefined;
+            void this.renderRecipeSheet();
+        });
+
+        html.find(".bc-undo").on("click", e => {
+            e.stopPropagation();
+            const group = $(e.currentTarget).data("group") + "";
+            const type = $(e.currentTarget).data("type") as DataType;
+            this._resetGroup(type, group);
+            void this.renderRecipeSheet();
         });
 
         this.addDragDrop(html);
+    }
+
+    static _anyOfKey(type: DataType, group: string, key: string): string {
+        return type + "|" + group + "|" + key;
+    }
+
+    async _toggleAnyOf(type: DataType, group: string, key: string) {
+        const anyOfKey = CraftingApp._anyOfKey(type, group, key);
+        if (this.data.anyOfOpen === anyOfKey) {
+            this.data.anyOfOpen = undefined;
+        } else {
+            const component = this.data.recipe?.[type]?.[group]?.[key];
+            if (!component) {
+                return;
+            }
+            // scan only when the user opens it: results match world items, everything else the actor's items
+            const isOutput = type === "output";
+            const candidates = await RecipeCompendium.anyOfCandidates(component, isOutput ? game["items"].contents : this.data.actor.items);
+            candidates.sort((a, b) => (isOutput ? 0 : (Number(b.quantity) || 0) - (Number(a.quantity) || 0)) || a.name.localeCompare(b.name));
+            this.data.anyOfCandidates.set(anyOfKey, candidates);
+            this.data.anyOfOpen = anyOfKey;
+        }
+        await this.renderRecipeSheet();
+    }
+
+    /** bring back the options of a group as the recipe defines them */
+    _resetGroup(type: DataType, group: string) {
+        const original = this.data.recipes.find(r => r.uuid === this.data.recipe?.uuid);
+        if (this.data.recipe === undefined || original === undefined || !original[type]?.[group]) {
+            return;
+        }
+        this.data.recipe[type][group] = Recipe.clone(original)[type][group];
+        this.data.anyOfOpen = undefined;
     }
 
     _choose(type: DataType, group: string, key: string) {

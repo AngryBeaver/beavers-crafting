@@ -1022,3 +1022,82 @@
         height: 24px;
     }
 }
+
+/* ---------------- open decisions (choose one / any of) ---------------- */
+.beavers-crafting.crafting-app .bc-na {
+    opacity: .6;
+}
+
+.beavers-crafting.crafting-app .bc-slot.expanded,
+.beavers-crafting.crafting-app .bc-res.expanded {
+    border-color: var(--bc-accent);
+    border-style: solid;
+}
+
+.beavers-crafting.crafting-app .bc-anyof {
+    border-color: var(--bc-accent);
+}
+
+.beavers-crafting.crafting-app .bc-anyof .bc-opts {
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.beavers-crafting.crafting-app .bc-none {
+    padding: 4px 6px;
+    font-size: 13px;
+    color: var(--bc-muted);
+}
+
+.beavers-crafting.crafting-app .bc-undo {
+    appearance: none;
+    transition: background-color .15s, color .15s;
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+    background: none;
+    box-shadow: none;
+    color: var(--bc-muted);
+    font-size: 12px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.beavers-crafting.crafting-app .bc-undo:hover {
+    background: var(--bc-sel);
+    color: var(--bc-accent);
+}
+
+.beavers-crafting.crafting-app .bc-undo i {
+    margin: 0;
+}
+
+.beavers-crafting.crafting-app .bc-res .bc-undo {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+}
+
+.beavers-crafting.crafting-app .bc-warn.pending,
+.beavers-crafting.crafting-app .bc-warn.pending b {
+    color: var(--bc-accent);
+}
+
+/* pressing craft with open decisions points at them */
+.beavers-crafting.crafting-app .bc-main.bc-attn .bc-pending {
+    border-style: solid;
+    border-color: var(--bc-accent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--bc-accent) 35%, transparent);
+    animation: bc-attn .6s ease 2;
+}
+
+@keyframes bc-attn {
+    50% { box-shadow: 0 0 0 5px color-mix(in srgb, var(--bc-accent) 15%, transparent); }
+}

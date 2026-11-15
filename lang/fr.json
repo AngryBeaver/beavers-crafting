@@ -117,6 +117,9 @@
       "notConsumed": "non consommé",
       "haveNeed": "possédé / requis",
       "chooseOne": "Choisissez-en un",
+      "chooseFirst": "Choisissez d'abord :",
+      "chooseAgain": "Choisir à nouveau",
+      "noMatch": "Aucun objet correspondant",
       "missing": "Manquant",
       "anyOfHint": "Cliquez ou déposez un objet pour choisir",
       "summary": {
