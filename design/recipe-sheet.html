@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recipe Item Sheet</title>
+<!--
+  Mockup of the redesigned recipe item sheet content.
+  We only own the area beaversSystemInterface.itemSheetReplaceContent gives us: the system keeps its
+  window, header (image, name) and whatever else it draws (the dashed "system" parts below are simulated).
+  So the design is just a column of foldable sections inside that area, no own tabs.
+
+  Same rules as actor tab / chat card: colour + font from the sheet, lines mixed from currentColor.
+  Accent = the amber of the crafting window (#e3a548 on dark, #94490f on light; Foundry's theme-dark / theme-light).
+
+  AND / OR:
+   - every entry of a section is needed (AND); new entries come from the dashed zone at the end
+   - an entry can hold alternatives (OR): drop an item anywhere ON the entry, or use its "or" button
+   - while dragging, every entry shows a large "or" target and the end zone an "and" target
+  Checks: steps run in order (AND), each needs N successes and may offer alternative checks (OR).
+-->
+<link rel="stylesheet" href="assets/foundry/fontawesome/css/all.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Signika:wght@400;600&family=Roboto:wght@400;500;700&family=Roboto+Mono&display=swap">
+<style>
+/* ---------------- page + simulated item sheets (not part of the design) ---------------- */
+body{margin:0;padding:24px;background:#2c4a33 radial-gradient(#4a6b3a,#1d2b1f) fixed;font:14px Signika,sans-serif;color:#eee;
+  display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}
+h2.cap{flex:0 0 100%;margin:0;font:600 15px Signika;color:#dfe8d6}
+.frame{display:flex;flex-direction:column;gap:6px}
+.frame>small{color:#cfd8c6;font-size:12px}
+.win{width:700px;border-radius:6px;overflow:hidden;box-shadow:0 10px 34px #000a;display:flex;flex-direction:column}
+.win .wh{height:30px;display:flex;align-items:center;gap:8px;padding:0 10px;font-size:13px}
+.sys{position:relative;outline:1px dashed #8888;outline-offset:-4px}
+.sys::after{content:"system";position:absolute;right:8px;top:6px;font:600 10px Signika;letter-spacing:.05em;text-transform:uppercase;opacity:.45}
+.win .ih{display:flex;gap:12px;align-items:center;padding:12px 16px}
+.win .ih img{width:56px;height:56px;border-radius:6px}
+.win .ih .t{font-size:22px;font-weight:700}
+.win .ih .k{font-size:12px;opacity:.7}
+.win .body{padding:8px 16px 16px}
+.w-dark{background:#1c1b1a url(assets/foundry/denim075.png);color:#d9d3c7;font-family:Roboto,sans-serif;font-size:13px}
+.w-dark .wh{background:#0b0a13;color:#eee}
+.w-light{background:#f4efe6;color:#4b4a44;font-family:Roboto,sans-serif;font-size:13px}
+.w-light .wh{background:#2a2622;color:#eee}
+.w-core{background:url(assets/foundry/parchment.jpg);color:#191813;font-family:Signika,sans-serif;font-size:14px}
+.w-core .wh{background:#23221d;color:#eee}
+
+/* ================= the design: recipe sheet ================= */
+.brs{
+  --brs-line: color-mix(in srgb, currentColor 18%, transparent);
+  --brs-line-strong: color-mix(in srgb, currentColor 35%, transparent);
+  --brs-muted: color-mix(in srgb, currentColor 65%, transparent);
+  --brs-hover: color-mix(in srgb, currentColor 7%, transparent);
+  --brs-card: color-mix(in srgb, currentColor 4%, transparent);
+  --brs-field: color-mix(in srgb, currentColor 8%, transparent);
+  --brs-acc: #94490f; --brs-acc-fg: #fff8ee;
+  --brs-acc-soft: color-mix(in srgb, var(--brs-acc) 15%, transparent);
+  --brs-pop: #2a2622; --brs-pop-fg: #eee;
+  --brs-ok:#3e8e48; --brs-bad:#b2443b;
+  color:inherit;font:inherit;display:flex;flex-direction:column;gap:10px;container-type:inline-size;
+}
+.theme-dark .brs{--brs-acc:#e3a548;--brs-acc-fg:#1d1408;--brs-pop:#1d1d24}
+.brs *{box-sizing:border-box}
+.brs button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;padding:0;line-height:1}
+.brs i.fas{line-height:1}
+.brs input,.brs textarea{font:inherit;color:inherit}
+
+/* folder line */
+.brs-meta{display:flex;align-items:center;gap:8px;font-size:.88em;color:var(--brs-muted)}
+.brs-meta .brs-in{flex:0 1 260px;height:26px}
+.brs-meta .crumb{display:flex;align-items:center;gap:4px}
+.brs-meta .crumb b{font-weight:600;color:inherit;padding:1px 7px;border-radius:8px;background:var(--brs-field)}
+
+/* foldable section */
+.brs-sec{display:flex;flex-direction:column;gap:6px}
+.brs-sec-h{display:flex;align-items:center;gap:8px;padding:3px 2px 5px;border-bottom:1px solid var(--brs-line-strong);cursor:pointer;user-select:none}
+.brs-sec-h .chev{width:12px;font-size:.75em;color:var(--brs-muted);transition:rotate .15s}
+.brs-sec.folded .chev{rotate:-90deg}
+.brs-sec-h h3{margin:0;font:inherit;font-weight:700;font-size:1.02em;display:flex;align-items:center;gap:7px;border:0}
+.brs-sec-h h3 i{color:var(--brs-acc);width:16px;text-align:center}
+.brs-sec-h .hint{font-size:.8em;color:var(--brs-muted)}
+.brs-sec-h .sum{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:.82em;color:var(--brs-muted);min-width:0}
+.brs-sec-h .sum img{width:18px;height:18px;border-radius:3px}
+.brs-sec-b{display:flex;flex-direction:column;gap:6px}
+.brs-sec.folded .brs-sec-b{display:none}
+.brs-sec:not(.folded) .sum{display:none}
+.brs-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;align-items:start}
+.brs-col{display:flex;flex-direction:column;gap:10px;min-width:0}
+@container (max-width:560px){ .brs-cols{grid-template-columns:1fr} }
+
+/* entry (AND) with alternatives (OR) */
+.brs-ent{position:relative;border:1px solid var(--brs-line);border-radius:6px;background:var(--brs-card);transition:border-color .12s,box-shadow .12s}
+.brs-ent.or{border-left:3px solid var(--brs-acc)}
+.brs-ent-l{display:flex;align-items:center;gap:6px;padding:4px 8px;border-bottom:1px solid var(--brs-line);font-size:.72em;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--brs-acc)}
+.brs-row{display:grid;grid-template-columns:28px minmax(0,1fr) auto 22px;gap:6px;align-items:center;padding:4px 6px}
+.brs-row>img{width:28px;height:28px;border-radius:4px;object-fit:cover;border:1px solid var(--brs-line-strong)}
+.brs-row .n{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.brs-row .n:hover{text-decoration:underline}
+.brs-tag{display:inline-flex;align-items:center;gap:4px;font-size:.72em;font-weight:700;padding:1px 6px;border-radius:8px;margin-left:6px;vertical-align:1px;background:var(--brs-acc-soft);color:var(--brs-acc)}
+.brs-qty{display:flex;align-items:center;height:26px;border-radius:5px;background:var(--brs-field);border:1px solid transparent;overflow:hidden}
+.brs-qty:focus-within{border-color:var(--brs-acc)}
+.brs-qty span{padding:0 0 0 7px;color:var(--brs-muted);font-size:.9em}
+.brs-qty input{width:38px;height:24px;border:0;background:none;text-align:right;padding:0 7px 0 2px;outline:0}
+.brs-ic{width:22px;height:24px;display:grid;place-items:center;border-radius:4px;color:var(--brs-muted) !important}
+.brs-ic:hover{background:var(--brs-hover) !important;color:inherit !important}
+.brs-ic.del{opacity:.35}
+.brs-row:hover .brs-ic.del,.brs-alt:hover .brs-ic.del,.brs-step-h:hover .brs-ic.del,.brs-money:hover .brs-ic.del{opacity:1}
+.brs-ic.del:hover{color:var(--brs-bad) !important}
+.brs-ic.crafted{color:var(--brs-acc) !important}
+.brs-ic.notcrafted{opacity:.45}
+.brs-or{display:flex;align-items:center;gap:8px;margin:0 8px;font-size:.72em;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--brs-acc)}
+.brs-or::before,.brs-or::after{content:"";flex:1;height:1px;background:var(--brs-line)}
+/* "or" drop zone: always visible at the end of every entry */
+.brs-ordrop{display:flex;align-items:stretch;min-height:30px;margin:2px 6px 6px;border:1px dashed var(--brs-line-strong);border-radius:5px;color:var(--brs-muted);font-size:.84em;font-style:italic}
+.brs-ordrop .t{flex:1;display:flex;align-items:center;justify-content:center;gap:6px}
+.brs-ordrop.over,.brs-drop.over{border-style:solid;border-color:var(--brs-acc);background:var(--brs-acc-soft);color:inherit}
+/* money: "| coin" at the right end of a drop zone, like before */
+.brs-coin{flex:none;width:38px;display:grid;place-items:center;border-left:1px solid var(--brs-line-strong) !important;color:var(--brs-muted) !important;font-style:normal}
+.brs-coin:hover{color:var(--brs-acc) !important;background:var(--brs-acc-soft) !important}
+/* crafted flag (setting "separate crafted items"): ingredient must have been crafted */
+.brs-craft{margin-left:7px;font-size:.85em;color:var(--brs-muted) !important;opacity:.4;vertical-align:0}
+.brs-craft:hover{opacity:1}
+.brs-craft.on{opacity:1;color:var(--brs-acc) !important}
+/* clickable add buttons (checks have nothing to drop) */
+.brs-add{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;min-height:30px;border:1px dashed var(--brs-line-strong) !important;border-radius:5px;color:var(--brs-muted) !important;font-size:.86em}
+.brs-add:hover{border-style:solid !important;border-color:var(--brs-acc) !important;color:inherit !important;background:var(--brs-acc-soft) !important}
+.brs-add.big{min-height:36px;font-weight:600}
+
+/* add zone (new AND entry) */
+.brs-drop{display:flex;align-items:stretch;min-height:38px;border:1.5px dashed var(--brs-line-strong);border-radius:6px;color:var(--brs-muted);font-size:.88em;font-style:italic}
+.brs-drop .t{flex:1;display:flex;align-items:center;justify-content:center;gap:6px}
+.brs-hbtn{display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 10px;border-radius:13px;border:1px solid var(--brs-line-strong) !important;font-size:.82em;font-weight:600;color:var(--brs-muted) !important}
+.brs-hbtn:hover{color:inherit !important;border-color:var(--brs-acc) !important;background:var(--brs-acc-soft) !important}
+
+.brs-money{display:grid;grid-template-columns:28px minmax(0,1fr) auto 22px;gap:6px;align-items:center;padding:4px 6px;border:1px solid var(--brs-line);border-radius:6px;background:var(--brs-card)}
+.brs-money>img{width:28px;height:28px;border-radius:4px}
+
+/* icon select */
+.brs-sel{position:relative;min-width:0}
+.brs-sel>button{display:flex;align-items:center;gap:7px;width:100%;height:28px;padding:0 8px 0 4px;border-radius:5px;background:var(--brs-field) !important;border:1px solid transparent !important;text-align:left}
+.brs-sel>button:hover,.brs-sel.open>button{border-color:var(--brs-line-strong) !important}
+.brs-sel>button .ico{width:22px;height:22px;flex:none;display:grid;place-items:center;border-radius:4px;background:var(--brs-acc-soft);color:var(--brs-acc);font-size:.85em}
+.brs-sel>button img{width:22px;height:22px;border-radius:4px;object-fit:cover;flex:none}
+.brs-sel>button .v{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brs-sel>button .car{color:var(--brs-muted);font-size:.8em}
+.brs-sel .pop{display:none;position:absolute;z-index:10;top:calc(100% + 3px);left:0;min-width:100%;width:max-content;max-width:320px;max-height:250px;overflow:auto;padding:4px;border-radius:6px;
+  background:var(--brs-pop);color:var(--brs-pop-fg);box-shadow:0 8px 24px #0008;border:1px solid #fff2}
+.brs-sel.open .pop{display:block}
+.brs-opt{display:flex;align-items:center;gap:9px;width:100%;padding:6px 10px 6px 6px;border-radius:4px;text-align:left;line-height:1.25 !important;white-space:nowrap}
+.brs-opt:hover,.brs-opt.on{background:#ffffff1a !important}
+.brs-opt .ico{width:24px;height:24px;flex:none;display:grid;place-items:center;border-radius:4px;background:#ffffff14}
+.brs-opt img{width:24px;height:24px;border-radius:4px;flex:none}
+.brs-opt .tx{flex:1}
+.brs-opt b{display:block;font-weight:600}
+.brs-opt small{display:block;opacity:.65;font-size:.82em;margin-top:2px}
+.brs-opt .ck{visibility:hidden;margin-left:10px;color:#e3a548 !important}
+.brs-opt.on .ck{visibility:visible}
+.brs-filter{display:flex;align-items:center;gap:6px;margin:0 0 4px;padding:0 8px;height:28px;border-radius:4px;background:#ffffff12}
+.brs-filter input{flex:1;border:0;background:none;outline:0;color:inherit;height:26px}
+
+/* checks */
+.brs-cfg{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;padding:6px 8px;border-radius:6px;background:var(--brs-field);font-size:.88em}
+.brs-cfg label{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.brs-cfg .brs-qty{background:var(--brs-card);height:24px} .brs-cfg .brs-qty input{width:34px;height:22px}
+.brs-switch{width:30px;height:17px;border-radius:9px;background:var(--brs-line-strong);position:relative;flex:none;transition:background .15s}
+.brs-switch::after{content:"";position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:#fff;transition:left .15s}
+.brs-switch.on{background:var(--brs-acc)} .brs-switch.on::after{left:15px}
+.brs-pips{display:flex;gap:3px;align-items:center;margin-left:auto}
+.brs-pips i{width:10px;height:6px;border-radius:2px;border:1px solid var(--brs-ok)}
+.brs-pips i.f{border-color:var(--brs-bad)}
+.brs-pips .sep{width:1px;height:9px;background:var(--brs-line-strong);margin:0 2px}
+.brs-step{border:1px solid var(--brs-line);border-radius:6px;background:var(--brs-card)}
+.brs-then{display:flex;align-items:center;gap:6px;height:20px;margin-left:19px;padding-left:12px;border-left:2px solid var(--brs-line-strong);font-size:.72em;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--brs-muted)}
+.brs-step-h{display:flex;align-items:center;gap:8px;padding:5px 6px 5px 8px;border-bottom:1px solid var(--brs-line)}
+.brs-num{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--brs-acc);color:var(--brs-acc-fg);font-weight:700;font-size:.82em;flex:none}
+.brs-step-h .t{font-weight:600}
+.brs-step-h .need{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:.85em;color:var(--brs-muted)}
+.brs-step-h .need .brs-qty{height:24px} .brs-step-h .need input{width:30px;height:22px}
+.brs-alts{display:flex;flex-direction:column;gap:4px;padding:6px}
+.brs-alt{display:grid;grid-template-columns:minmax(0,180px) minmax(0,1fr) auto 22px;gap:6px;align-items:center}
+.brs-alt.one{grid-template-columns:minmax(0,180px) minmax(0,1fr) 22px}
+.brs-alt .txt{height:28px;border-radius:5px;background:var(--brs-field);border:1px solid transparent;padding:0 8px;outline:0;width:100%}
+.brs-alt .txt:focus{border-color:var(--brs-acc)}
+.brs-dc{display:flex;align-items:center;height:28px;border-radius:5px;background:var(--brs-field)}
+.brs-dc span{padding-left:8px;font-size:.78em;font-weight:700;color:var(--brs-muted)}
+.brs-dc input{width:34px;border:0;background:none;text-align:right;padding:0 7px 0 2px;outline:0;height:26px}
+.brs-alts .brs-or{margin:1px 2px}
+
+/* instruction + macro */
+.brs-in{display:flex;align-items:center;gap:8px;height:30px;padding:0 10px;border-radius:6px;background:var(--brs-field);border:1px solid transparent}
+.brs-in:focus-within{border-color:var(--brs-acc)}
+.brs-in input{flex:1;min-width:0;border:0;background:none;outline:0;height:24px}
+.brs-editor{border:1px solid var(--brs-line);border-radius:6px;overflow:hidden;display:flex;flex-direction:column;min-height:150px;resize:vertical}
+.brs-editor .tb{display:flex;gap:12px;align-items:center;padding:6px 10px;background:var(--brs-field);color:var(--brs-muted);font-size:.9em}
+.brs-editor .ct{padding:10px 12px;line-height:1.5;display:flow-root}
+.brs-editor .ct img{float:left;width:84px;margin:0 12px 4px 0;border-radius:4px}
+.brs-code{display:flex;flex-direction:column;border-radius:6px;overflow:hidden;border:1px solid var(--brs-line-strong)}
+.brs-code .hd{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:6px 10px;background:var(--brs-field);font-size:.82em;color:var(--brs-muted)}
+.brs-code .hd code{font:12px "Roboto Mono",monospace;padding:1px 6px;border-radius:4px;background:var(--brs-acc-soft);color:var(--brs-acc);font-weight:600}
+.brs-code textarea{min-height:120px;border:0;resize:vertical;padding:10px 12px;font:12.5px/1.55 "Roboto Mono",monospace;background:#0000002a;outline:0}
+
+/* read only (players / locked sheet) */
+.brs.ro .brs-ic.del,.brs.ro .brs-ordrop,.brs.ro .brs-ent > .brs-or:nth-last-child(2),.brs.ro .brs-alts > .brs-or:nth-last-child(2),.brs.ro .brs-drop,.brs.ro .brs-add,.brs.ro .brs-then.add,.brs.ro .brs-craft:not(.on),.brs.ro .brs-sel .car,.brs.ro .brs-editor .tb{display:none !important}
+.brs.ro .brs-qty,.brs.ro .brs-dc,.brs.ro .brs-sel>button,.brs.ro .brs-alt .txt,.brs.ro .brs-in{background:none !important;pointer-events:none}
+/* the bin is gone: numbers and DC move to the very end of the line */
+.brs.ro .brs-row,.brs.ro .brs-money{grid-template-columns:28px minmax(0,1fr) auto}
+.brs.ro .brs-alt{grid-template-columns:minmax(0,180px) minmax(0,1fr) auto}
+.brs.ro .brs-alt.one{grid-template-columns:minmax(0,180px) minmax(0,1fr)}
+.brs.ro .brs-qty input,.brs.ro .brs-dc input{padding-right:2px}
+.brs.ro .brs-editor{border:0} .brs.ro .brs-editor .ct{padding:2px 0}
+</style>
+</head>
+<body>
+
+<template id="sheet">
+<div class="brs">
+  <div class="brs-meta">
+    <i class="fas fa-folder-tree"></i>
+    <label class="brs-in" title="Separate subfolders with '.'"><input value="Gear.Wood" placeholder="Folder.Subfolder"></label>
+    <span class="crumb"><b>Gear</b><i class="fas fa-chevron-right" style="font-size:.7em"></i><b>Wood</b></span>
+  </div>
+
+  <!-- instruction -->
+  <section class="brs-sec">
+    <div class="brs-sec-h"><i class="fas fa-chevron-down chev"></i><h3><i class="fas fa-book-open"></i>Instruction</h3>
+      <span class="sum">Saw the planks to equal length, notch the rungs…</span></div>
+    <div class="brs-sec-b">
+      <div class="brs-editor">
+        <div class="tb"><span>Format <i class="fas fa-chevron-down"></i></span><i class="fas fa-table"></i><i class="fas fa-font"></i><i class="fas fa-palette"></i><i class="fas fa-list-ul"></i><i class="fas fa-list-ol"></i><i class="fas fa-image"></i><i class="fas fa-link"></i><i class="fas fa-code"></i><i class="fas fa-floppy-disk" style="margin-left:auto"></i></div>
+        <div class="ct"><img src="assets/foundry/ladder.webp" alt="">Saw the planks to equal length, notch the rungs every foot and bind them with rope. A good ladder holds a dwarf in full armour.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="brs-cols">
+    <div class="brs-col">
+      <!-- required -->
+      <section class="brs-sec">
+        <div class="brs-sec-h"><i class="fas fa-chevron-down chev"></i><h3><i class="fas fa-screwdriver-wrench"></i>Required</h3><span class="hint">kept</span>
+          <span class="sum"><img src="assets/foundry/saw-steel-grey.webp" alt="">1</span></div>
+        <div class="brs-sec-b">
+          <div class="brs-ent or">
+            <div class="brs-ent-l"><i class="fas fa-code-branch"></i>One of</div>
+            <div class="brs-row"><img src="assets/foundry/saw-steel-grey.webp" alt=""><span class="n">Carpenter's Tools</span><label class="brs-qty"><span>×</span><input value="1"></label><button class="brs-ic del" title="Remove"><i class="fas fa-trash"></i></button></div>
+            <div class="brs-or">or</div>
+            <div class="brs-row"><img src="assets/foundry/hammer-cobbler-steel.webp" alt=""><span class="n">Woodcarver's Tools</span><label class="brs-qty"><span>×</span><input value="1"></label><button class="brs-ic del"><i class="fas fa-trash"></i></button></div>
+            <div class="brs-or">or</div>
+            <div class="brs-ordrop"><span class="t">drop an alternative</span></div>
+          </div>
+          <div class="brs-drop"><span class="t">add item</span></div>
+        </div>
+      </section>
+
+      <!-- cost -->
+      <section class="brs-sec">
+        <div class="brs-sec-h"><i class="fas fa-chevron-down chev"></i><h3><i class="fas fa-coins"></i>Cost</h3><span class="hint">consumed</span>
+          <span class="sum">5 sp · 3 items</span></div>
+        <div class="brs-sec-b">
+          <div class="brs-money">
+            <img src="assets/foundry/coins-assorted-mix-copper-silver-gold.webp" alt="">
+            <div class="brs-sel"><button><span class="v">Silver (sp)</span><i class="fas fa-chevron-down car"></i></button></div>
+            <label class="brs-qty"><span>×</span><input value="5"></label>
+            <button class="brs-ic del"><i class="fas fa-trash"></i></button>
+          </div>
+          <div class="brs-ent plank">
+            <div class="brs-row"><img src="assets/foundry/lumber-plank-brown.webp" alt=""><span class="n">Plank<button class="brs-craft on" title="Must be crafted (click: any item)"><i class="fas fa-hammer"></i></button></span><label class="brs-qty"><span>×</span><input value="4"></label><button class="brs-ic del"><i class="fas fa-trash"></i></button></div>
+            <div class="brs-or">or</div>
+            <div class="brs-ordrop"><span class="t">drop an alternative</span><button class="brs-coin" title="Money as alternative"><i class="fas fa-coins"></i></button></div>
+          </div>
+          <div class="brs-ent or">
+            <div class="brs-ent-l"><i class="fas fa-code-branch"></i>One of</div>
+            <div class="brs-row"><img src="assets/foundry/rope-wrapped-brown.webp" alt=""><span class="n">Hempen Rope<button class="brs-craft" title="Any item (click: must be crafted)"><i class="fas fa-hammer"></i></button></span><label class="brs-qty"><span>×</span><input value="2"></label><button class="brs-ic del"><i class="fas fa-trash"></i></button></div>
+            <div class="brs-or">or</div>
+            <div class="brs-row"><img src="assets/foundry/kindling-sticks-brown.webp" alt=""><span class="n">Any wood<span class="brs-tag"><i class="fas fa-filter"></i>any of</span><button class="brs-craft" title="Any item (click: must be crafted)"><i class="fas fa-hammer"></i></button></span><label class="brs-qty"><span>×</span><input value="6"></label><button class="brs-ic del"><i class="fas fa-trash"></i></button></div>
+            <div class="brs-or">or</div>
+            <div class="brs-ordrop"><span class="t">drop an alternative</span><button class="brs-coin" title="Money as alternative"><i class="fas fa-coins"></i></button></div>
+          </div>
+          <div class="brs-drop"><span class="t">add item</span><button class="brs-coin" title="Add money"><i class="fas fa-coins"></i></button></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="brs-col">
+      <!-- results -->
+      <section class="brs-sec">
+        <div class="brs-sec-h"><i class="fas fa-chevron-down chev"></i><h3><i class="fas fa-box-open"></i>Results</h3>
+          <span class="sum"><img src="assets/foundry/ladder.webp" alt="">1× Ladder</span></div>
+        <div class="brs-sec-b">
+          <div class="brs-ent">
+            <div class="brs-row"><img src="assets/foundry/ladder.webp" alt=""><span class="n">Ladder</span><label class="brs-qty"><span>×</span><input value="1"></label><button class="brs-ic del"><i class="fas fa-trash"></i></button></div>
+            <div class="brs-or">or</div>
+            <div class="brs-ordrop"><span class="t">drop an alternative</span><button class="brs-coin" title="Money as alternative"><i class="fas fa-coins"></i></button></div>
+          </div>
+          <div class="brs-ent">
+            <div class="brs-row"><img src="assets/foundry/dice-target.svg" alt="" style="background:#0003;padding:3px"><span class="n">Announce ladder<span class="brs-tag"><i class="fas fa-terminal"></i>macro</span></span><span></span><button class="brs-ic del"><i class="fas fa-trash"></i></button></div>
+          </div>
+          <div class="brs-drop"><span class="t">add item, roll table or macro</span><button class="brs-coin" title="Add money"><i class="fas fa-coins"></i></button></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- checks -->
+  <section class="brs-sec">
+    <div class="brs-sec-h"><i class="fas fa-chevron-down chev"></i><h3><i class="fas fa-dice-d20"></i>Checks</h3>
+      <span class="sum">2 steps · 3 successes · 2 fails allowed</span></div>
+    <div class="brs-sec-b">
+      <div class="brs-cfg">
+        <label title="failed checks before the crafting fails">Fails allowed <span class="brs-qty"><input value="2"></span></label>
+        <label title="consumes cost on failed tests"><span class="brs-switch on"></span>Consume cost on fail</label>
+        <span class="brs-pips" title="3 successes needed · 2 fails allowed"><i></i><i></i><i></i><span class="sep"></span><i class="f"></i><i class="f"></i></span>
+      </div>
+      <div class="brs-steps">
+        <div class="brs-step">
+          <div class="brs-step-h"><span class="brs-num">1</span><span class="t">Step</span>
+            <span class="need">needs <span class="brs-qty"><input value="2"></span> successes</span>
+            <button class="brs-ic del"><i class="fas fa-trash"></i></button></div>
+          <div class="brs-alts">
+            <div class="brs-alt">
+              <div class="brs-sel type"><button><span class="ico"><i class="fas fa-screwdriver-wrench"></i></span><span class="v">Tool Test</span><i class="fas fa-chevron-down car"></i></button>
+                <div class="pop">
+                  <button class="brs-opt"><span class="ico"><i class="fas fa-shoe-prints"></i></span><span class="tx"><b>Increment Step</b><small>No roll, it just succeeds</small></span><i class="fas fa-check ck"></i></button>
+                  <button class="brs-opt"><span class="ico"><i class="fas fa-user-shield"></i></span><span class="tx"><b>GM Request</b><small>The GM decides success or fail</small></span><i class="fas fa-check ck"></i></button>
+                  <button class="brs-opt"><span class="ico"><i class="fas fa-dumbbell"></i></span><span class="tx"><b>Ability Test</b><small>Ability check of the actor</small></span><i class="fas fa-check ck"></i></button>
+                  <button class="brs-opt"><span class="ico"><i class="fas fa-person-running"></i></span><span class="tx"><b>Skill Test</b><small>Skill check of the actor</small></span><i class="fas fa-check ck"></i></button>
+                  <button class="brs-opt on"><span class="ico"><i class="fas fa-screwdriver-wrench"></i></span><span class="tx"><b>Tool Test</b><small>Tool check of the actor</small></span><i class="fas fa-check ck"></i></button>
+                </div></div>
+              <div class="brs-sel tool"><button><img src="assets/foundry/saw-steel-grey.webp" alt=""><span class="v">Carpenter's Tools</span><i class="fas fa-chevron-down car"></i></button>
+                <div class="pop">
+                  <div class="brs-filter"><i class="fas fa-magnifying-glass"></i><input placeholder="filter…"></div>
+                  <button class="brs-opt"><img src="assets/foundry/anvil.webp" alt=""><span class="tx">Smith's Tools</span><i class="fas fa-check ck"></i></button>
+                  <button class="brs-opt on"><img src="assets/foundry/saw-steel-grey.webp" alt=""><span class="tx">Carpenter's Tools</span><i class="fas fa-check ck"></i></button>
+                  <button class="brs-opt"><img src="assets/foundry/hammer-cobbler-steel.webp" alt=""><span class="tx">Cobbler's Tools</span><i class="fas fa-check ck"></i></button>
+                  <button class="brs-opt"><img src="assets/foundry/hammer-and-nail.webp" alt=""><span class="tx">Tinker's Tools</span><i class="fas fa-check ck"></i></button>
+                  <button class="brs-opt"><img src="assets/foundry/potion-flask-corked-green.webp" alt=""><span class="tx">Alchemist's Supplies</span><i class="fas fa-check ck"></i></button>
+                  <button class="brs-opt"><img src="assets/foundry/gem-faceted-rough-purple.webp" alt=""><span class="tx">Jeweler's Tools</span><i class="fas fa-check ck"></i></button>
+                </div></div>
+              <label class="brs-dc"><span>DC</span><input value="12"></label>
+              <button class="brs-ic del"><i class="fas fa-trash"></i></button>
+            </div>
+            <div class="brs-or">or</div>
+            <div class="brs-alt">
+              <div class="brs-sel"><button><span class="ico"><i class="fas fa-person-running"></i></span><span class="v">Skill Test</span><i class="fas fa-chevron-down car"></i></button></div>
+              <div class="brs-sel"><button><span class="v">Athletics</span><i class="fas fa-chevron-down car"></i></button></div>
+              <label class="brs-dc"><span>DC</span><input value="15"></label>
+              <button class="brs-ic del"><i class="fas fa-trash"></i></button>
+            </div>
+            <div class="brs-or">or</div>
+            <button class="brs-add alt"><i class="fas fa-plus"></i>alternative check</button>
+          </div>
+        </div>
+        <div class="brs-then"><i class="fas fa-arrow-down"></i>then</div>
+        <div class="brs-step">
+          <div class="brs-step-h"><span class="brs-num">2</span><span class="t">Step</span>
+            <span class="need">needs <span class="brs-qty"><input value="1"></span> success</span>
+            <button class="brs-ic del"><i class="fas fa-trash"></i></button></div>
+          <div class="brs-alts">
+            <div class="brs-alt one">
+              <div class="brs-sel"><button><span class="ico"><i class="fas fa-shoe-prints"></i></span><span class="v">Increment Step</span><i class="fas fa-chevron-down car"></i></button></div>
+              <input class="txt" value="Assemble the frame" placeholder="Describe the step">
+              <button class="brs-ic del"><i class="fas fa-trash"></i></button>
+            </div>
+            <div class="brs-or">or</div>
+            <button class="brs-add alt"><i class="fas fa-plus"></i>alternative check</button>
+          </div>
+        </div>
+      </div>
+      <div class="brs-then add"><i class="fas fa-arrow-down"></i>then</div>
+      <button class="brs-add big step"><i class="fas fa-plus"></i>Add step</button>
+    </div>
+  </section>
+
+  <!-- macro -->
+  <section class="brs-sec folded">
+    <div class="brs-sec-h"><i class="fas fa-chevron-down chev"></i><h3><i class="fas fa-code"></i>Macro</h3>
+      <span class="sum"><span class="brs-tag" style="margin:0">4 lines</span></span></div>
+    <div class="brs-sec-b">
+      <div class="brs-code">
+        <div class="hd"><i class="fas fa-circle-info"></i>Runs when crafting starts. Available: <code>result</code><code>actor</code><code>recipeData</code></div>
+        <textarea spellcheck="false">// add a bonus success for dwarves
+if (actor.system.details.race === "Dwarf") {
+  result.updateTests(1);
+}</textarea>
+      </div>
+    </div>
+  </section>
+</div>
+</template>
+
+<h2 class="cap">Recipe sheet: only the content area is ours, sections fold, amber accent</h2>
+<div class="frame"><small>dnd5e dark · editable · test type select open</small>
+  <div class="win w-dark theme-dark"><div class="wh sys"><i class="fas fa-scroll"></i>Recipe: Ladder</div>
+    <div class="ih sys"><img src="assets/foundry/scroll-bound-blue-tan.webp" alt=""><div><div class="t">Ladder</div><div class="k">Loot</div></div></div>
+    <div class="body" data-t="sheet" data-open="type"></div></div></div>
+<div class="frame"><small>dnd5e light · an item dragged over Plank's "or" zone · try the coins, "alternative check" and "Add step"</small>
+  <div class="win w-light theme-light"><div class="wh sys"><i class="fas fa-scroll"></i>Recipe: Ladder</div>
+    <div class="ih sys"><img src="assets/foundry/scroll-bound-blue-tan.webp" alt=""><div><div class="t">Ladder</div><div class="k">Loot</div></div></div>
+    <div class="body" data-t="sheet" data-drag="1" data-fold="Instruction,Checks"></div></div></div>
+<div class="frame"><small>dark · tool select open · Instruction folded</small>
+  <div class="win w-dark theme-dark" style="width:560px"><div class="wh sys"><i class="fas fa-scroll"></i>Recipe: Ladder</div>
+    <div class="body" data-t="sheet" data-open="tool" data-fold="Instruction"></div></div></div>
+<div class="frame"><small>core parchment · read only (players)</small>
+  <div class="win w-core theme-light"><div class="wh sys"><i class="fas fa-scroll"></i>Recipe: Ladder</div>
+    <div class="ih sys"><img src="assets/foundry/scroll-bound-blue-tan.webp" alt=""><div><div class="t">Ladder</div><div class="k">Recipe</div></div></div>
+    <div class="body" data-t="sheet" data-ro="1"></div></div></div>
+
+<script>
+document.querySelectorAll("[data-t]").forEach(el => {
+  el.append(document.getElementById(el.dataset.t).content.cloneNode(true));
+  const s = el.querySelector(".brs");
+  if (el.dataset.ro) { s.classList.add("ro"); s.querySelectorAll("input,textarea").forEach(i => i.readOnly = true); }
+  if (el.dataset.drag) s.querySelector(".brs-ent.plank .brs-ordrop").classList.add("over");
+  if (el.dataset.open) s.querySelector(".brs-sel." + el.dataset.open)?.classList.add("open");
+  (el.dataset.fold || "").split(",").filter(Boolean).forEach(name =>
+    [...s.querySelectorAll(".brs-sec")].find(x => x.querySelector("h3").textContent.trim() === name)?.classList.add("folded"));
+});
+document.addEventListener("click", e => {
+  const h = e.target.closest(".brs-sec-h"); if (h) { h.parentElement.classList.toggle("folded"); return; }
+  const coin = e.target.closest(".brs-coin"); if (coin) { addMoney(coin); return; }
+  const alt = e.target.closest(".brs-add.alt"); if (alt) { addAlt(alt); return; }
+  const st = e.target.closest(".brs-add.step"); if (st) { addStep(st); return; }
+  const sw = e.target.closest(".brs-switch"); if (sw) { sw.classList.toggle("on"); return; }
+  const opt = e.target.closest(".brs-opt"); if (opt) { opt.closest(".brs-sel").classList.remove("open"); return; }
+  const sel = e.target.closest(".brs-sel>button");
+  document.querySelectorAll(".brs-sel.open").forEach(x => { if (!sel || x !== sel.parentElement) x.classList.remove("open"); });
+  if (sel && sel.parentElement.querySelector(".pop")) sel.parentElement.classList.toggle("open");
+});
+const el = (cls, html) => Object.assign(document.createElement("div"), {className: cls, innerHTML: html});
+function addAlt(btn) {
+  const alts = btn.closest(".brs-alts");
+  const row = el("brs-alt", '<div class="brs-sel"><button><span class="ico"><i class="fas fa-person-running"></i></span><span class="v">Skill Test</span><i class="fas fa-chevron-down car"></i></button></div>'
+    + '<div class="brs-sel"><button><span class="v">Survival</span><i class="fas fa-chevron-down car"></i></button></div><label class="brs-dc"><span>DC</span><input value="10"></label><button class="brs-ic del"><i class="fas fa-trash"></i></button>');
+  const or = btn.previousElementSibling;
+  alts.insertBefore(el("brs-or", "or"), or); alts.insertBefore(row, or);
+}
+function addStep(btn) {
+  const list = btn.closest(".brs-sec-b").querySelector(".brs-steps");
+  const n = list.querySelectorAll(".brs-step").length + 1;
+  list.append(el("brs-then", '<i class="fas fa-arrow-down"></i>then'));
+  const step = el("brs-step", '<div class="brs-step-h"><span class="brs-num">' + n + '</span><span class="t">Step</span><span class="need">needs <span class="brs-qty"><input value="1"></span> success</span><button class="brs-ic del"><i class="fas fa-trash"></i></button></div>'
+    + '<div class="brs-alts"><div class="brs-alt one"><div class="brs-sel"><button><span class="ico"><i class="fas fa-shoe-prints"></i></span><span class="v">Increment Step</span><i class="fas fa-chevron-down car"></i></button></div><input class="txt" placeholder="Describe the step"><button class="brs-ic del"><i class="fas fa-trash"></i></button></div>'
+    + '<div class="brs-or">or</div><button class="brs-add alt"><i class="fas fa-plus"></i>alternative check</button></div>');
+  list.append(step);
+}
+function addMoney(coin) {
+  const coins = "assets/foundry/coins-assorted-mix-copper-silver-gold.webp";
+  const row = el("brs-row", '<img src="' + coins + '" alt=""><div class="brs-sel"><button><span class="v">Gold (gp)</span><i class="fas fa-chevron-down car"></i></button><div class="pop">'
+    + ["Platinum (pp)", "Gold (gp)", "Electrum (ep)", "Silver (sp)", "Copper (cp)"].map(c => '<button class="brs-opt' + (c === "Gold (gp)" ? " on" : "") + '"><img src="' + coins + '" alt=""><span class="tx">' + c + '</span><i class="fas fa-check ck"></i></button>').join("")
+    + '</div></div><label class="brs-qty"><span>×</span><input value="1"></label><button class="brs-ic del"><i class="fas fa-trash"></i></button>');
+  const zone = coin.closest(".brs-ordrop");
+  if (zone) { // money as alternative inside this entry
+    const ent = zone.closest(".brs-ent"), or = zone.previousElementSibling;
+    ent.insertBefore(el("brs-or", "or"), or); ent.insertBefore(row, or);
+    if (!ent.classList.contains("or")) { ent.classList.add("or"); ent.prepend(el("brs-ent-l", '<i class="fas fa-code-branch"></i>One of')); }
+  } else { // new needed entry
+    const ent = el("brs-ent", ""); ent.append(row);
+    ent.insertAdjacentHTML("beforeend", '<div class="brs-or">or</div><div class="brs-ordrop"><span class="t">drop an alternative</span><button class="brs-coin"><i class="fas fa-coins"></i></button></div>');
+    coin.closest(".brs-drop").before(ent);
+  }
+  row.querySelector(".brs-sel").classList.add("open");
+}
+</script>
+</body>
+</html>

@@ -1,23 +1,216 @@
-<div class="flexcol beavers-recipe-sheet" style="height:100%">
-    <nav class="tabs" data-group="primary" style="flex:0 20px">
-        <a class="item {{#if (eq active "description")}}active{{/if}}" data-tab="description">Description</a>
-        <a class="item {{#if (eq active "main")}}active{{/if}}" data-tab="main">Main</a>
-        <a class="item {{#if (eq active "advanced")}}active{{/if}}" data-tab="advanced">Advanced</a>
-    </nav>
-  <br/>
-    <section>
-        <div style="padding:0px; height:100%" class="tab description {{#if (eq active "description")}}active{{/if}}" data-tab="description" data-group="primary">
-            {{{description}}}
+{{!--
+  Recipe item sheet content (RecipeSheet.ts). Only this area is ours: the system keeps window and header.
+  View model: RecipeSheet._view(). AND = entries of a section / steps, OR = alternatives of an entry / step.
+--}}
+{{#*inline "brs-select"}}
+    <div class="brs-sel {{cls}}" {{#if step}}data-step="{{step}}" data-check="{{check}}"{{/if}}>
+        <input type="hidden" name="{{name}}" value="{{value}}">
+        <button type="button" class="brs-sel-btn" {{#unless @root.editable}}disabled{{/unless}}>
+            {{#if current.icon}}<span class="ico"><i class="fas {{current.icon}}"></i></span>{{/if}}
+            {{#if current.img}}<img src="{{current.img}}" alt="">{{/if}}
+            <span class="v">{{current.label}}</span>
+            <i class="fas fa-chevron-down car"></i>
+        </button>
+        <div class="pop">
+            {{#if filter}}
+                <div class="brs-filter"><i class="fas fa-magnifying-glass"></i><input type="text" placeholder="{{localize "beaversCrafting.recipeSheet.filter"}}"></div>
+            {{/if}}
+            {{#each choices}}
+                <button type="button" class="brs-opt {{#if on}}on{{/if}}" data-value="{{value}}">
+                    {{#if icon}}<span class="ico"><i class="fas {{icon}}"></i></span>{{/if}}
+                    {{#if img}}<img src="{{img}}" alt="">{{/if}}
+                    <span class="tx"><b>{{label}}</b>{{#if hint}}<small>{{hint}}</small>{{/if}}</span>
+                    <i class="fas fa-check ck"></i>
+                </button>
+            {{/each}}
         </div>
-        <div style="padding:0px; height:100%" class="tab main {{#if (eq active "main")}}active{{/if}}" data-tab="main" data-group="primary">
-            {{{main}}}
-        </div>
-        <div style="padding:0px; height:100%" class="tab advanced {{#if (eq active "advanced")}}active{{/if}}" data-tab="advanced" data-group="primary">
-            <div class="flexcol" style="height:100%" >
-                <textarea style="height:100%" placeholder="your code here...&#10;available vars: result, actor, recipeData"
-              {{#if editable}}disabled{{/if}}
-              name="flags.beavers-crafting.recipe.macro">{{recipe.macro}}</textarea>
+    </div>
+{{/inline}}
+
+{{#*inline "brs-entry"}}
+    <div class="brs-ent {{#if canOr}}brs-target{{/if}} {{#if isOr}}or{{/if}}" data-type="{{type}}" data-group="{{group}}">
+        {{#if isOr}}<div class="brs-ent-l"><i class="fas fa-code-branch"></i>{{localize "beaversCrafting.recipeSheet.oneOf"}}</div>{{/if}}
+        {{#each options}}
+            {{#unless @first}}<div class="brs-or">{{localize "beaversCrafting.recipeSheet.or"}}</div>{{/unless}}
+            <div class="brs-row">
+                <img src="{{img}}" alt="">
+                {{#if isMoney}}
+                    {{> brs-select cls="currency" name=(concat "flags.beavers-crafting.recipe." ../type "." ../group "." key ".id") value=currencyId current=currency choices=currencyChoices filter=false}}
+                {{else}}
+                    <span class="n {{#if clickable}}open-sheet{{/if}}" data-uuid="{{uuid}}" title="{{name}}">{{name}}{{#if tag}}<span class="brs-tag"><i class="fas {{tag.icon}}"></i>{{tag.text}}</span>{{/if}}{{#if hasCrafted}}<button type="button" class="brs-craft {{#if crafted}}on{{/if}}" data-type="{{../type}}" data-group="{{../group}}" data-key="{{key}}"
+                        title="{{#if crafted}}{{localize "beaversCrafting.recipeSheet.crafted"}}{{else}}{{localize "beaversCrafting.recipeSheet.notCrafted"}}{{/if}}" {{#unless @root.editable}}disabled{{/unless}}><i class="fas fa-hammer"></i></button>{{/if}}</span>
+                {{/if}}
+                {{#if hasQty}}
+                    <label class="brs-qty"><span>×</span><input type="number" step="any" {{#unless @root.editable}}readonly{{/unless}}
+                        name="flags.beavers-crafting.recipe.{{../type}}.{{../group}}.{{key}}.quantity" value="{{quantity}}"></label>
+                {{else}}<span></span>{{/if}}
+                {{#if @root.editable}}
+                    <button type="button" class="brs-ic del item-delete" data-type="{{../type}}" data-group="{{../group}}" data-key="{{key}}"
+                            title="{{localize "beaversCrafting.recipeSheet.remove"}}"><i class="fas fa-trash"></i></button>
+                {{/if}}
             </div>
+        {{/each}}
+        {{#if (and @root.editable canOr)}}
+            <div class="brs-or">{{localize "beaversCrafting.recipeSheet.or"}}</div>
+            <div class="brs-ordrop">
+                <span class="t">{{localize "beaversCrafting.recipeSheet.dropAlternative"}}</span>
+                {{#if money}}<button type="button" class="brs-coin add-money" data-type="{{type}}" data-group="{{group}}"
+                        title="{{localize "beaversCrafting.recipeSheet.moneyAlternative"}}"><i class="fas fa-coins"></i></button>{{/if}}
+            </div>
+        {{/if}}
+    </div>
+{{/inline}}
+
+{{#*inline "brs-section"}}
+    <section class="brs-sec {{#if folded}}folded{{/if}}" data-sec="{{id}}">
+        <div class="brs-sec-h">
+            <i class="fas fa-chevron-down chev"></i>
+            <h3><i class="fa-regular {{icon}}"></i>{{label}}</h3>
+            {{#if hint}}<span class="hint">{{hint}}</span>{{/if}}
+            <span class="sum">{{summary}}</span>
+        </div>
+        <div class="brs-sec-b">
+            {{> @partial-block}}
         </div>
     </section>
+{{/inline}}
+
+{{#*inline "brs-adds"}}
+    {{#each entries}}{{> brs-entry type=../type money=../money}}{{/each}}
+    {{#if @root.editable}}
+        <div class="brs-drop brs-target" data-type="{{type}}" data-group="">
+            <span class="t">{{dropLabel}}</span>
+            {{#if money}}<button type="button" class="brs-coin add-money" data-type="{{type}}" data-group=""
+                    title="{{localize "beaversCrafting.recipeSheet.money"}}"><i class="fas fa-coins"></i></button>{{/if}}
+        </div>
+    {{/if}}
+{{/inline}}
+
+<div class="beavers-crafting brs beavers-recipe-sheet {{#unless editable}}ro{{/unless}}">
+    <header class="brs-head">
+        <img src="{{img}}" alt="" {{#if editable}}data-action="editImage" data-edit="img" class="editable"{{/if}}>
+        <div class="brs-title">
+            <input type="text" name="name" value="{{name}}" {{#unless editable}}readonly{{/unless}} placeholder="{{localize "Name"}}">
+            <div class="brs-folder">
+                <button type="button" class="brs-folder-show" title="{{localize "beaversCrafting.recipe.folderHint"}}" {{#unless editable}}disabled{{/unless}}>
+                    <i class="fa-regular fa-folder"></i>
+                    {{#if folderParts.length}}
+                        {{#each folderParts}}{{#unless @first}}<i class="fa-regular fa-chevron-right sep"></i>{{/unless}}<span>{{this}}</span>{{/each}}
+                    {{else}}<span class="ph">{{localize "beaversCrafting.recipeSheet.noFolder"}}</span>{{/if}}
+                </button>
+                <input type="text" class="brs-folder-in" name="flags.beavers-crafting.recipe.folder" value="{{folder}}"
+                       placeholder="{{localize "beaversCrafting.recipe.folderPlaceHolder"}}" {{#unless editable}}readonly{{/unless}}>
+            </div>
+        </div>
+        <button type="button" class="brs-hbtn" data-action="systemSheet" title="{{localize "beaversCrafting.recipeSheet.systemSheetHint"}}">
+            <i class="fa-regular fa-up-right-from-square"></i>{{localize "beaversCrafting.recipeSheet.systemSheet"}}</button>
+    </header>
+
+    {{#> brs-section id="instruction" icon="fa-book-open" label=(localize "beaversCrafting.crafting-app.instruction") folded=folded.instruction summary=instructionSummary}}
+        <div class="brs-editor">
+            <prose-mirror {{#unless editable}}disabled{{/unless}} name="flags.beavers-crafting.recipe.instruction" value="{{instruction}}"></prose-mirror>
+        </div>
+    {{/brs-section}}
+
+    <div class="brs-cols">
+        <div class="brs-col">
+            {{#if required}}
+                {{#> brs-section id="required" icon="fa-screwdriver-wrench" label=(localize "beaversCrafting.crafting-app.required") hint=(localize "beaversCrafting.recipeSheet.kept") folded=folded.required summary=required.summary}}
+                    {{> brs-adds entries=required.entries type="required" dropLabel=(localize "beaversCrafting.recipeSheet.addItem")}}
+                {{/brs-section}}
+            {{/if}}
+            {{#> brs-section id="cost" icon="fa-coins" label=(localize "beaversCrafting.crafting-app.cost") hint=(localize "beaversCrafting.recipeSheet.consumed") folded=folded.cost summary=cost.summary}}
+                {{#if cost.currency}}
+                    <div class="brs-money">
+                        <img src="{{cost.currency.img}}" alt="">
+                        {{> brs-select cls="legacy-currency" name="flags.beavers-crafting.recipe.currency.name" value=cost.currency.id current=cost.currency.current choices=cost.currency.choices}}
+                        <label class="brs-qty"><span>×</span><input type="number" step="any" {{#unless editable}}readonly{{/unless}}
+                            name="flags.beavers-crafting.recipe.currency.value" value="{{cost.currency.value}}"></label>
+                        {{#if editable}}<button type="button" class="brs-ic del currency-delete" title="{{localize "beaversCrafting.recipeSheet.remove"}}"><i class="fas fa-trash"></i></button>{{/if}}
+                    </div>
+                {{/if}}
+                {{> brs-adds entries=cost.entries type="input" money=true dropLabel=(localize "beaversCrafting.recipeSheet.addItem")}}
+            {{/brs-section}}
+        </div>
+        <div class="brs-flow" aria-hidden="true"><i class="fa-regular fa-arrow-right"></i></div>
+        <div class="brs-col">
+            {{#> brs-section id="results" icon="fa-box-open" label=(localize "beaversCrafting.recipe.results") folded=folded.results summary=results.summary}}
+                {{> brs-adds entries=results.entries type="output" money=true dropLabel=(localize "beaversCrafting.recipeSheet.addResult")}}
+            {{/brs-section}}
+        </div>
+    </div>
+
+    {{#> brs-section id="checks" icon="fa-dice-d20" label=(localize "beaversCrafting.recipeSheet.checks") folded=folded.checks summary=checks.summary}}
+        {{#if checks.steps.length}}
+            <div class="brs-cfg">
+                <label title="{{localize "beaversCrafting.recipe.beaversTests.failsHint"}}">{{localize "beaversCrafting.recipeSheet.failsAllowed"}}
+                    <span class="brs-qty"><input type="number" step="1" min="0" {{#unless editable}}readonly{{/unless}}
+                        name="flags.beavers-crafting.recipe.beaversTests.fails" value="{{checks.fails}}"></span></label>
+                <label title="{{localize "beaversCrafting.recipe.beaversTests.consumeHint"}}">
+                    <input type="checkbox" class="brs-switch" {{#unless editable}}disabled{{/unless}} {{#if checks.consume}}checked{{/if}}
+                           name="flags.beavers-crafting.recipe.beaversTests.consume">{{localize "beaversCrafting.recipeSheet.consumeOnFail"}}</label>
+                <span class="brs-pips" title="{{checks.summary}}">{{#each checks.pips}}{{#if sep}}<span class="sep"></span>{{else}}<i class="{{cls}}"></i>{{/if}}{{/each}}</span>
+            </div>
+            <div class="brs-steps">
+                {{#each checks.steps}}
+                    {{#unless @first}}<div class="brs-then"><i class="fas fa-arrow-down"></i>{{localize "beaversCrafting.recipeSheet.then"}}</div>{{/unless}}
+                    <div class="brs-step">
+                        <div class="brs-step-h">
+                            <span class="brs-num">{{num}}</span>
+                            <span class="t">{{localize "beaversCrafting.recipeSheet.step"}}</span>
+                            <span class="need" title="{{localize "beaversCrafting.recipe.beaversTests.hitsHint"}}">{{localize "beaversCrafting.recipeSheet.needs"}}
+                                <span class="brs-qty"><input type="number" step="1" min="1" {{#unless @root.editable}}readonly{{/unless}}
+                                    name="flags.beavers-crafting.recipe.beaversTests.ands.{{step}}.hits" value="{{hits}}"></span>
+                                {{successes}}</span>
+                        </div>
+                        <div class="brs-alts">
+                            {{#each alts}}
+                                {{#unless @first}}<div class="brs-or">{{localize "beaversCrafting.recipeSheet.or"}}</div>{{/unless}}
+                                <div class="brs-alt">
+                                    {{> brs-select cls="test-type" step=../step check=check name=(concat prefix ".type") value=type current=typeCurrent choices=typeChoices}}
+                                    <div class="brs-fields">
+                                        {{#each fields}}
+                                            {{#if (eq kind "select")}}
+                                                {{> brs-select cls="test-field" name=name value=value current=current choices=choices filter=filter}}
+                                            {{else if (eq kind "number")}}
+                                                <label class="brs-dc" title="{{note}}"><span>{{label}}</span><input type="number" step="any" {{#unless @root.editable}}readonly{{/unless}}
+                                                    name="{{name}}" value="{{value}}"></label>
+                                            {{else if (eq kind "area")}}
+                                                <textarea class="txt" name="{{name}}" placeholder="{{placeholder}}" title="{{note}}" {{#unless @root.editable}}readonly{{/unless}}>{{value}}</textarea>
+                                            {{else}}
+                                                <input type="text" class="txt" name="{{name}}" value="{{value}}" placeholder="{{placeholder}}" title="{{note}}" {{#unless @root.editable}}readonly{{/unless}}>
+                                            {{/if}}
+                                        {{/each}}
+                                    </div>
+                                    {{#if @root.editable}}
+                                        <button type="button" class="brs-ic del test-delete" data-step="{{../step}}" data-check="{{check}}"
+                                                title="{{localize "beaversCrafting.recipeSheet.remove"}}"><i class="fas fa-trash"></i></button>
+                                    {{/if}}
+                                </div>
+                            {{/each}}
+                            {{#if @root.editable}}
+                                <div class="brs-or">{{localize "beaversCrafting.recipeSheet.or"}}</div>
+                                <button type="button" class="brs-add test-or" data-step="{{step}}"><i class="fas fa-plus"></i>{{localize "beaversCrafting.recipeSheet.alternativeCheck"}}</button>
+                            {{/if}}
+                        </div>
+                    </div>
+                {{/each}}
+            </div>
+        {{/if}}
+        {{#if editable}}
+            {{#if checks.steps.length}}<div class="brs-then"><i class="fas fa-arrow-down"></i>{{localize "beaversCrafting.recipeSheet.then"}}</div>{{/if}}
+            <button type="button" class="brs-add big test-and"><i class="fas fa-plus"></i>{{localize "beaversCrafting.recipeSheet.addStep"}}</button>
+        {{else}}
+            {{#unless checks.steps.length}}<div class="brs-none">{{localize "beaversCrafting.recipeSheet.noChecks"}}</div>{{/unless}}
+        {{/if}}
+    {{/brs-section}}
+
+    {{#> brs-section id="macro" icon="fa-code" label=(localize "beaversCrafting.recipeSheet.macro") folded=folded.macro summary=macroSummary}}
+        <div class="brs-code">
+            <div class="hd"><i class="fa-regular fa-circle-info"></i>{{localize "beaversCrafting.recipeSheet.macroHint"}} <code>result</code><code>actor</code><code>recipeData</code>
+                {{#if (and editable (not macro))}}<button type="button" class="brs-hbtn macro-example"><i class="fa-regular fa-wand-magic-sparkles"></i>{{localize "beaversCrafting.recipeSheet.insertExample"}}</button>{{/if}}</div>
+            <textarea spellcheck="false" name="flags.beavers-crafting.recipe.macro" {{#unless editable}}readonly{{/unless}}
+                      placeholder="{{macroExample}}">{{macro}}</textarea>
+        </div>
+    {{/brs-section}}
 </div>

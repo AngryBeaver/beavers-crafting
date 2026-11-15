@@ -3,7 +3,6 @@ import {sanitizeUuid} from "./helpers/Utility.js";
 import {Result} from "./Result.js";
 import { recipeSkillToTests, recipeTestsToBeaversTests } from "./migration.js";
 import { markReplaced } from "./helpers/Compat.js";
-
 export class Recipe implements RecipeData {
     uuid: string;
     id: string;
@@ -33,13 +32,14 @@ export class Recipe implements RecipeData {
     folder?: string;
     instruction?: string;
 
+    /** our flag marks a recipe, whatever item type the system uses for it */
     static isRecipe(item) {
+        if (foundry.utils.getProperty(item, `flags.${Settings.NAMESPACE}.subtype`) === Settings.RECIPE_SUBTYPE) {
+            return true;
+        }
+        // very old recipes were marked in system.source of the loot type
         // @ts-ignore
-        return (item?.type === beaversSystemInterface.configLootItemType && (
-                item?.system?.source === Settings.RECIPE_SUBTYPE ||
-                foundry.utils.getProperty(item, `flags.${Settings.NAMESPACE}.subtype`) === Settings.RECIPE_SUBTYPE
-            )
-        )
+        return item?.system?.source === Settings.RECIPE_SUBTYPE && item?.type === beaversSystemInterface.configLootItemType;
     }
 
     static fromItem(item): Recipe {
@@ -207,22 +207,18 @@ export class Recipe implements RecipeData {
     }
 
     addTestAnd() {
+        //copies: the defaults must not be changed through the recipe
         if (this.beaversTests == undefined) {
-            this.beaversTests = test
-        }else {
-            const sorted = Object.keys(this.beaversTests.ands).sort();
-            // @ts-ignore
-            const nextId = sorted[sorted.length - 1] - 1 + 2;
-            this.beaversTests.ands[nextId] = testAnd;
+            this.beaversTests = foundry.utils.deepClone(test);
+        } else {
+            this.beaversTests.ands[nextKey(this.beaversTests.ands)] = foundry.utils.deepClone(testAnd);
         }
     }
 
     addTestOr(and) {
         if (this.beaversTests?.ands[and] != undefined) {
-            const sorted = Object.keys(this.beaversTests?.ands[and].ors).sort();
-            // @ts-ignore
-            const nextId = sorted[sorted.length - 1] - 1 + 2;
-            this.beaversTests.ands[and].ors[nextId] = {type:"IncrementStep",data:{}}
+            const ors = this.beaversTests.ands[and].ors;
+            ors[nextKey(ors)] = {type: "IncrementStep", data: {}};
         }
     }
 
@@ -291,6 +287,11 @@ export class Recipe implements RecipeData {
 class DefaultCurrency implements Currency {
     name = "gp"
     value = 5;
+}
+
+/** next free numeric key; keys are strings, so sorting them as text would put "10" before "2" */
+function nextKey(map: object): number {
+    return Math.max(0, ...Object.keys(map || {}).map(Number).filter(n => !isNaN(n))) + 1;
 }
 
 const defaultTest: SerializedTest<any> = {

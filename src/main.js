@@ -1,5 +1,5 @@
 import {CraftingApp} from './apps/CraftingApp.js';
-import {RecipeSheet} from './apps/RecipeSheet.js';
+import {registerRecipeItemSheet} from "./apps/RecipeItemSheet.js";
 import { rerenderItemDirectory, Settings} from './Settings.js';
 import {Crafting} from "./Crafting.js";
 import {RecipeCompendium} from "./apps/RecipeCompendium.js";
@@ -21,6 +21,9 @@ import "./compatibility/tidy5e.js";
 import { hookChatLog } from "./apps/ChatLog.js";
 import { attachContentsToCreatedContainer, runCleanup } from "./ContainerHandler.js";
 import { getTemplate, markDeleted } from "./helpers/Compat.js";
+
+//recipes open our own sheet, whatever item type the system uses for them
+Hooks.once("init", registerRecipeItemSheet);
 
 Hooks.on("beavers-system-interface.init", async function(){
     beaversSystemInterface.addModule(Settings.NAMESPACE);
@@ -154,7 +157,6 @@ Hooks.once("beavers-system-interface.ready", async function(){
   //SubTypeSheet
   Hooks.on(`renderItemSheet`, async (app, html, data) => {
     if (app instanceof Application) {
-      await RecipeSheet.bind(app, html, data, 1);
       AnyOfSheet.bind(app, html, data);
       CraftedItemSheet.bind(app, html, data);
       ContainerSheet.bind(app, html, data);
@@ -162,7 +164,6 @@ Hooks.once("beavers-system-interface.ready", async function(){
   });
 
   Hooks.on(`renderApplicationV2`, async (app, html, data, options) => {
-    await RecipeSheet.bind(app, html, data, 2);
     AnyOfSheet.bind(app, html, data, 2);
     CraftedItemSheet.bind(app, html, data);
     ContainerSheet.bind(app, html, data);

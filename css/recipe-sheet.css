@@ -1,0 +1,1001 @@
+/*
+  Recipe item sheet content (templates/recipe-sheet.hbs, RecipeSheet.ts).
+  Only the content area is ours, the system keeps window and header. So like the actor tab it paints no
+  background: colour and font come from the sheet, lines and tints are mixed from currentColor.
+  Accent = the amber of the crafting window; .dark is set when the sheet's text is light.
+*/
+.beavers-crafting.brs {
+    --brs-line: color-mix(in srgb, currentColor 18%, transparent);
+    --brs-line-strong: color-mix(in srgb, currentColor 35%, transparent);
+    --brs-muted: color-mix(in srgb, currentColor 65%, transparent);
+    --brs-hover: color-mix(in srgb, currentColor 7%, transparent);
+    --brs-card: color-mix(in srgb, currentColor 4%, transparent);
+    --brs-field: color-mix(in srgb, currentColor 8%, transparent);
+    --brs-acc: #94490f;
+    --brs-acc-fg: #fff8ee;
+    --brs-acc-soft: color-mix(in srgb, var(--brs-acc) 15%, transparent);
+    --brs-pop: #2a2622;
+    --brs-pop-fg: #eee;
+    --brs-ok: #3e8e48;
+    --brs-bad: #b2443b;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+    color: inherit;
+    font: inherit;
+    container-type: inline-size;
+}
+.beavers-crafting.brs.dark {
+    --brs-acc: #e3a548;
+    --brs-acc-fg: #1d1408;
+    --brs-pop: #1d1d24;
+}
+.beavers-crafting.brs * {
+    box-sizing: border-box;
+}
+
+/* ---------- resets against core and system styles ---------- */
+.beavers-crafting.brs button {
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: auto;
+    min-height: 0;
+    height: auto;
+    margin: 0;
+    padding: 0;
+    font: inherit;
+    line-height: 1;
+    color: inherit;
+    text-transform: none;
+    letter-spacing: normal;
+    text-shadow: none;
+    background: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    cursor: pointer;
+}
+.beavers-crafting.brs button:disabled {
+    cursor: default;
+}
+.beavers-crafting.brs input[type=text],
+.beavers-crafting.brs input[type=number],
+.beavers-crafting.brs textarea {
+    width: auto;
+    height: auto;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    outline: 0;
+}
+.beavers-crafting.brs input[type=number] {
+    -moz-appearance: textfield;
+}
+.beavers-crafting.brs input::-webkit-inner-spin-button,
+.beavers-crafting.brs input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.beavers-crafting.brs img {
+    flex: none;
+    max-width: none;
+    margin: 0;
+    border: 0;
+    object-fit: cover;
+}
+.beavers-crafting.brs i[class*="fa-"] {
+    line-height: 1;
+    margin: 0;
+    width: auto;
+    color: inherit;
+}
+.beavers-crafting.brs h3 {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font: inherit;
+    color: inherit;
+    text-transform: none;
+}
+
+/* ---------- folder line ---------- */
+.beavers-crafting.brs .brs-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .88em;
+    color: var(--brs-muted);
+}
+.beavers-crafting.brs .brs-in {
+    display: flex;
+    align-items: center;
+    flex: 0 1 260px;
+    height: 26px;
+    padding: 0 10px;
+    border-radius: 6px;
+    background: var(--brs-field);
+    border: 1px solid transparent;
+    color: var(--brs-text, inherit);
+}
+.beavers-crafting.brs .brs-in:focus-within {
+    border-color: var(--brs-acc);
+}
+.beavers-crafting.brs .brs-in input {
+    flex: 1;
+    min-width: 0;
+    height: 24px;
+}
+.beavers-crafting.brs .crumb {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+}
+.beavers-crafting.brs .crumb i {
+    font-size: .7em;
+}
+.beavers-crafting.brs .crumb b {
+    font-weight: 600;
+    padding: 1px 7px;
+    border-radius: 8px;
+    background: var(--brs-field);
+    white-space: nowrap;
+}
+
+/* ---------- foldable sections ---------- */
+.beavers-crafting.brs .brs-sec {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+.beavers-crafting.brs .brs-sec-h {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 2px 5px;
+    border-bottom: 1px solid var(--brs-line-strong);
+    cursor: pointer;
+    user-select: none;
+}
+.beavers-crafting.brs .brs-sec-h .chev {
+    width: 12px;
+    font-size: .75em;
+    color: var(--brs-muted);
+    transition: rotate .15s;
+}
+.beavers-crafting.brs .brs-sec.folded .chev {
+    rotate: -90deg;
+}
+.beavers-crafting.brs .brs-sec-h h3 {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-weight: 700;
+    font-size: 1.02em;
+}
+.beavers-crafting.brs .brs-sec-h h3 i {
+    width: 16px;
+    text-align: center;
+    color: var(--brs-acc);
+}
+.beavers-crafting.brs .brs-sec-h .hint {
+    font-size: .8em;
+    color: var(--brs-muted);
+}
+.beavers-crafting.brs .brs-sec-h .sum {
+    margin-left: auto;
+    min-width: 0;
+    font-size: .82em;
+    color: var(--brs-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.beavers-crafting.brs .brs-sec:not(.folded) .sum {
+    display: none;
+}
+.beavers-crafting.brs .brs-sec-b {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.beavers-crafting.brs .brs-sec.folded .brs-sec-b {
+    display: none;
+}
+.beavers-crafting.brs .brs-cols {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 22px minmax(0, 1fr);
+    gap: 10px 6px;
+    align-items: start;
+}
+/* arrow from what goes in to what comes out, like in the crafting window */
+.beavers-crafting.brs .brs-flow {
+    align-self: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--brs-acc);
+    font-size: 20px;
+}
+.beavers-crafting.brs .brs-col {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+}
+@container (max-width: 560px) {
+    .beavers-crafting.brs .brs-cols {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .beavers-crafting.brs .brs-flow {
+        height: 22px;
+        rotate: 90deg;
+    }
+}
+
+/* ---------- entries (AND) with alternatives (OR) ---------- */
+.beavers-crafting.brs .brs-ent,
+.beavers-crafting.brs .brs-money {
+    border: 1px solid var(--brs-line);
+    border-radius: 6px;
+    background: var(--brs-card);
+}
+.beavers-crafting.brs .brs-ent.or {
+    border-left: 3px solid var(--brs-acc);
+}
+.beavers-crafting.brs .brs-ent-l {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border-bottom: 1px solid var(--brs-line);
+    font-size: .72em;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--brs-acc);
+}
+.beavers-crafting.brs .brs-row,
+.beavers-crafting.brs .brs-money {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr) auto 22px;
+    gap: 6px;
+    align-items: center;
+    padding: 4px 6px;
+}
+.beavers-crafting.brs .brs-row > img,
+.beavers-crafting.brs .brs-money > img {
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    border: 1px solid var(--brs-line-strong);
+}
+.beavers-crafting.brs .brs-row .n {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.beavers-crafting.brs .brs-row .n.open-sheet {
+    cursor: pointer;
+}
+.beavers-crafting.brs .brs-row .n.open-sheet:hover {
+    text-decoration: underline;
+}
+.beavers-crafting.brs .brs-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 6px;
+    padding: 1px 6px;
+    border-radius: 8px;
+    font-size: .72em;
+    font-weight: 700;
+    vertical-align: 1px;
+    background: var(--brs-acc-soft);
+    color: var(--brs-acc);
+}
+.beavers-crafting.brs .brs-craft {
+    display: inline;
+    margin-left: 7px;
+    font-size: .85em;
+    vertical-align: 0;
+    color: var(--brs-muted);
+    opacity: .4;
+}
+.beavers-crafting.brs .brs-craft:hover {
+    opacity: 1;
+}
+.beavers-crafting.brs .brs-craft.on {
+    opacity: 1;
+    color: var(--brs-acc);
+}
+.beavers-crafting.brs .brs-qty {
+    display: flex;
+    align-items: center;
+    height: 26px;
+    border-radius: 5px;
+    background: var(--brs-field);
+    border: 1px solid transparent;
+    overflow: hidden;
+}
+.beavers-crafting.brs .brs-qty:focus-within {
+    border-color: var(--brs-acc);
+}
+.beavers-crafting.brs .brs-qty span {
+    padding-left: 7px;
+    font-size: .9em;
+    color: var(--brs-muted);
+}
+.beavers-crafting.brs .brs-qty input {
+    width: 40px;
+    height: 24px;
+    padding: 0 7px 0 2px;
+    text-align: right;
+}
+.beavers-crafting.brs .brs-ic {
+    width: 22px;
+    height: 24px;
+    border-radius: 4px;
+    color: var(--brs-muted);
+}
+.beavers-crafting.brs .brs-ic:hover {
+    background: var(--brs-hover);
+    color: inherit;
+}
+.beavers-crafting.brs .brs-ic.del {
+    opacity: .35;
+}
+.beavers-crafting.brs :is(.brs-row, .brs-alt, .brs-money):hover .brs-ic.del {
+    opacity: 1;
+}
+.beavers-crafting.brs .brs-ic.del:hover {
+    color: var(--brs-bad);
+}
+.beavers-crafting.brs .brs-or {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 8px;
+    font-size: .72em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--brs-acc);
+}
+.beavers-crafting.brs .brs-or::before,
+.beavers-crafting.brs .brs-or::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--brs-line);
+}
+
+/* drop zones: "or" at the end of each entry, a new entry at the end of a section; "| coin" adds money */
+.beavers-crafting.brs .brs-ordrop,
+.beavers-crafting.brs .brs-drop {
+    display: flex;
+    align-items: stretch;
+    border: 1px dashed var(--brs-line-strong);
+    border-radius: 5px;
+    color: var(--brs-muted);
+    font-size: .84em;
+    font-style: italic;
+}
+.beavers-crafting.brs .brs-ordrop {
+    min-height: 30px;
+    margin: 2px 6px 6px;
+}
+.beavers-crafting.brs .brs-drop {
+    min-height: 38px;
+    border-width: 1.5px;
+    border-radius: 6px;
+    font-size: .88em;
+}
+.beavers-crafting.brs :is(.brs-ordrop, .brs-drop) .t {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.beavers-crafting.brs :is(.brs-ordrop, .brs-drop).over {
+    border-style: solid;
+    border-color: var(--brs-acc);
+    background: var(--brs-acc-soft);
+    color: inherit;
+}
+.beavers-crafting.brs .brs-coin {
+    flex: none;
+    width: 38px;
+    border-left: 1px solid var(--brs-line-strong);
+    font-style: normal;
+    color: var(--brs-muted);
+}
+.beavers-crafting.brs .brs-coin:hover {
+    color: var(--brs-acc);
+    background: var(--brs-acc-soft);
+}
+
+/* ---------- icon select ---------- */
+.beavers-crafting.brs .brs-sel {
+    position: relative;
+    min-width: 0;
+}
+.beavers-crafting.brs .brs-sel-btn {
+    justify-content: flex-start;
+    gap: 7px;
+    width: 100%;
+    height: 28px;
+    padding: 0 8px 0 4px;
+    border-radius: 5px;
+    border: 1px solid transparent;
+    background: var(--brs-field);
+    text-align: left;
+}
+.beavers-crafting.brs .brs-sel-btn:hover:not(:disabled),
+.beavers-crafting.brs .brs-sel.open .brs-sel-btn {
+    border-color: var(--brs-line-strong);
+}
+.beavers-crafting.brs .brs-sel-btn .ico,
+.beavers-crafting.brs .brs-opt .ico {
+    width: 22px;
+    height: 22px;
+    flex: none;
+    display: grid;
+    place-items: center;
+    border-radius: 4px;
+    font-size: .85em;
+}
+.beavers-crafting.brs .brs-sel-btn .ico {
+    background: var(--brs-acc-soft);
+    color: var(--brs-acc);
+}
+.beavers-crafting.brs .brs-sel-btn img {
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+}
+.beavers-crafting.brs .brs-sel-btn .v {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.beavers-crafting.brs .brs-sel-btn .car {
+    font-size: .8em;
+    color: var(--brs-muted);
+}
+.beavers-crafting.brs .pop {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    width: max-content;
+    max-width: 320px;
+    max-height: 250px;
+    overflow: auto;
+    padding: 4px;
+    border-radius: 6px;
+    border: 1px solid #fff2;
+    background: var(--brs-pop);
+    color: var(--brs-pop-fg);
+    box-shadow: 0 8px 24px #0008;
+    font-style: normal;
+}
+.beavers-crafting.brs .brs-sel.open .pop {
+    display: block;
+}
+.beavers-crafting.brs .brs-opt {
+    justify-content: flex-start;
+    gap: 9px;
+    width: 100%;
+    padding: 6px 10px 6px 6px;
+    border-radius: 4px;
+    line-height: 1.25;
+    text-align: left;
+    white-space: nowrap;
+}
+.beavers-crafting.brs .brs-opt:hover,
+.beavers-crafting.brs .brs-opt.on {
+    background: #ffffff1a;
+}
+.beavers-crafting.brs .brs-opt .ico {
+    width: 24px;
+    height: 24px;
+    background: #ffffff14;
+}
+.beavers-crafting.brs .brs-opt img {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+}
+.beavers-crafting.brs .brs-opt .tx {
+    flex: 1;
+}
+.beavers-crafting.brs .brs-opt b {
+    display: block;
+    font-weight: 600;
+}
+.beavers-crafting.brs .brs-opt small {
+    display: block;
+    margin-top: 2px;
+    font-size: .82em;
+    opacity: .65;
+}
+.beavers-crafting.brs .brs-opt .ck {
+    visibility: hidden;
+    margin-left: 10px;
+    color: #e3a548;
+}
+.beavers-crafting.brs .brs-opt.on .ck {
+    visibility: visible;
+}
+.beavers-crafting.brs .brs-filter {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    margin-bottom: 4px;
+    padding: 0 8px;
+    border-radius: 4px;
+    background: #ffffff12;
+}
+.beavers-crafting.brs .brs-filter input {
+    flex: 1;
+    height: 26px;
+    color: inherit;
+}
+
+/* ---------- checks ---------- */
+.beavers-crafting.brs .brs-cfg {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 14px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    background: var(--brs-field);
+    font-size: .88em;
+}
+.beavers-crafting.brs .brs-cfg label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+.beavers-crafting.brs .brs-cfg .brs-qty,
+.beavers-crafting.brs .brs-step-h .brs-qty {
+    height: 24px;
+    background: var(--brs-card);
+}
+.beavers-crafting.brs .brs-cfg .brs-qty input,
+.beavers-crafting.brs .brs-step-h .brs-qty input {
+    width: 32px;
+    height: 22px;
+}
+.beavers-crafting.brs input.brs-switch {
+    appearance: none;
+    position: relative;
+    flex: none;
+    width: 30px;
+    height: 17px;
+    margin: 0;
+    border: 0;
+    border-radius: 9px;
+    background: var(--brs-line-strong);
+    cursor: pointer;
+    transition: background .15s;
+}
+.beavers-crafting.brs input.brs-switch::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: #fff;
+    transition: left .15s;
+}
+.beavers-crafting.brs input.brs-switch::before {
+    display: none;
+}
+.beavers-crafting.brs input.brs-switch:checked {
+    background: var(--brs-acc);
+}
+.beavers-crafting.brs input.brs-switch:checked::after {
+    left: 15px;
+}
+.beavers-crafting.brs .brs-pips {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    margin-left: auto;
+}
+.beavers-crafting.brs .brs-pips i {
+    width: 10px;
+    height: 6px;
+    border-radius: 2px;
+    border: 1px solid var(--brs-ok);
+}
+.beavers-crafting.brs .brs-pips i.bad {
+    border-color: var(--brs-bad);
+}
+.beavers-crafting.brs .brs-pips .sep {
+    width: 1px;
+    height: 9px;
+    margin: 0 2px;
+    background: var(--brs-line-strong);
+}
+.beavers-crafting.brs .brs-step {
+    border: 1px solid var(--brs-line);
+    border-radius: 6px;
+    background: var(--brs-card);
+}
+.beavers-crafting.brs .brs-then {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 20px;
+    margin-left: 19px;
+    padding-left: 12px;
+    border-left: 2px solid var(--brs-line-strong);
+    font-size: .72em;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--brs-muted);
+}
+.beavers-crafting.brs .brs-step-h {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 6px 5px 8px;
+    border-bottom: 1px solid var(--brs-line);
+}
+.beavers-crafting.brs .brs-num {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--brs-acc);
+    color: var(--brs-acc-fg);
+    font-weight: 700;
+    font-size: .82em;
+}
+.beavers-crafting.brs .brs-step-h .t {
+    font-weight: 600;
+}
+.beavers-crafting.brs .brs-step-h .need {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+    font-size: .85em;
+    color: var(--brs-muted);
+}
+.beavers-crafting.brs .brs-alts {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 6px;
+}
+.beavers-crafting.brs .brs-alts .brs-or {
+    margin: 1px 2px;
+}
+.beavers-crafting.brs .brs-alt {
+    display: grid;
+    grid-template-columns: minmax(0, 180px) minmax(0, 1fr) 22px;
+    gap: 6px;
+    align-items: center;
+}
+.beavers-crafting.brs .brs-fields {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+.beavers-crafting.brs .brs-fields > .brs-sel,
+.beavers-crafting.brs .brs-fields > .txt {
+    flex: 1;
+    min-width: 0;
+}
+.beavers-crafting.brs .brs-fields .txt {
+    height: 28px;
+    padding: 0 8px;
+    border-radius: 5px;
+    border: 1px solid transparent;
+    background: var(--brs-field);
+}
+.beavers-crafting.brs .brs-fields textarea.txt {
+    height: 54px;
+    padding: 4px 8px;
+    resize: vertical;
+}
+.beavers-crafting.brs .brs-fields .txt:focus {
+    border-color: var(--brs-acc);
+}
+.beavers-crafting.brs .brs-dc {
+    flex: none;
+    display: flex;
+    align-items: center;
+    height: 28px;
+    border-radius: 5px;
+    border: 1px solid transparent;
+    background: var(--brs-field);
+}
+.beavers-crafting.brs .brs-dc:focus-within {
+    border-color: var(--brs-acc);
+}
+.beavers-crafting.brs .brs-dc span {
+    padding-left: 8px;
+    font-size: .78em;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--brs-muted);
+}
+.beavers-crafting.brs .brs-dc input {
+    width: 38px;
+    height: 26px;
+    padding: 0 7px 0 2px;
+    text-align: right;
+}
+.beavers-crafting.brs .brs-add {
+    width: 100%;
+    min-height: 30px;
+    gap: 7px;
+    border: 1px dashed var(--brs-line-strong);
+    border-radius: 5px;
+    font-size: .86em;
+    color: var(--brs-muted);
+}
+.beavers-crafting.brs .brs-add:hover {
+    border-style: solid;
+    border-color: var(--brs-acc);
+    background: var(--brs-acc-soft);
+    color: inherit;
+}
+.beavers-crafting.brs .brs-add.big {
+    min-height: 36px;
+    font-weight: 600;
+}
+.beavers-crafting.brs .brs-none {
+    padding: 4px 2px;
+    color: var(--brs-muted);
+    font-style: italic;
+}
+
+/* ---------- instruction and macro ---------- */
+.beavers-crafting.brs .brs-editor {
+    display: flex;
+    flex-direction: column;
+    min-height: 180px;
+    border: 1px solid var(--brs-line);
+    border-radius: 6px;
+    overflow: hidden;
+}
+.beavers-crafting.brs .brs-editor > :is(prose-mirror, .editor) {
+    flex: 1;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+}
+.beavers-crafting.brs .brs-editor .editor-content img {
+    max-width: 100%;
+    height: auto;
+}
+.beavers-crafting.brs .brs-code {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--brs-line-strong);
+    border-radius: 6px;
+    overflow: hidden;
+}
+.beavers-crafting.brs .brs-code .hd .brs-hbtn {
+    margin-left: auto;
+    height: 24px;
+}
+.beavers-crafting.brs .brs-code textarea::placeholder {
+    opacity: .45;
+}
+.beavers-crafting.brs .brs-code .hd {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    background: var(--brs-field);
+    font-size: .82em;
+    color: var(--brs-muted);
+}
+.beavers-crafting.brs .brs-code code {
+    padding: 1px 6px;
+    border: 0;
+    border-radius: 4px;
+    background: var(--brs-acc-soft);
+    color: var(--brs-acc);
+    font: 600 12px/1.4 monospace;
+}
+.beavers-crafting.brs .brs-code textarea {
+    min-height: 140px;
+    padding: 10px 12px;
+    resize: vertical;
+    background: #0000002a;
+    font: 12.5px/1.55 monospace;
+    tab-size: 2;
+}
+
+/* ---------- read only (players, locked sheets) ---------- */
+.beavers-crafting.brs.ro :is(.brs-qty, .brs-dc, .brs-sel-btn, .brs-fields .txt, .brs-in) {
+    background: none;
+    border-color: transparent;
+}
+.beavers-crafting.brs.ro .brs-sel-btn .car {
+    display: none;
+}
+.beavers-crafting.brs.ro .brs-row,
+.beavers-crafting.brs.ro .brs-money {
+    grid-template-columns: 28px minmax(0, 1fr) auto;
+}
+.beavers-crafting.brs.ro .brs-alt {
+    grid-template-columns: minmax(0, 180px) minmax(0, 1fr);
+}
+.beavers-crafting.brs.ro :is(.brs-qty, .brs-dc) input {
+    padding-right: 2px;
+}
+.beavers-crafting.brs.ro .brs-craft:not(.on) {
+    display: none;
+}
+.beavers-crafting.brs.ro .brs-code textarea {
+    resize: none;
+}
+
+/* ---------- own sheet window (RecipeItemSheet) ---------- */
+.beavers-crafting.recipe-item-sheet .window-content {
+    display: block;
+    padding: 12px 15px;
+    overflow-y: auto;
+}
+.beavers-crafting.brs .brs-head {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--brs-line-strong);
+}
+.beavers-crafting.brs .brs-head > img {
+    width: 56px;
+    height: 56px;
+    border-radius: 6px;
+    border: 1px solid var(--brs-line-strong);
+}
+.beavers-crafting.brs .brs-head > img.editable {
+    cursor: pointer;
+}
+.beavers-crafting.brs .brs-head > img.editable:hover {
+    border-color: var(--brs-acc);
+}
+.beavers-crafting.brs .brs-title {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+.beavers-crafting.brs .brs-title input {
+    width: 100%;
+    height: 34px;
+    padding: 0 6px;
+    margin-left: -6px;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    font-size: 1.6em;
+    font-weight: 700;
+}
+.beavers-crafting.brs:not(.ro) .brs-title input:hover {
+    border-color: var(--brs-line);
+}
+.beavers-crafting.brs .brs-title input:focus {
+    border-color: var(--brs-acc);
+}
+/* folder: a path, the text field only while editing */
+.beavers-crafting.brs .brs-folder {
+    display: flex;
+    min-width: 0;
+    height: 24px;
+}
+.beavers-crafting.brs .brs-folder-show {
+    justify-content: flex-start;
+    gap: 6px;
+    min-width: 0;
+    max-width: 100%;
+    padding: 0 6px;
+    margin-left: -6px;
+    border-radius: 5px;
+    font-size: .88em;
+    color: var(--brs-muted);
+}
+.beavers-crafting.brs .brs-folder-show:not(:disabled):hover {
+    background: var(--brs-hover);
+    color: inherit;
+}
+.beavers-crafting.brs .brs-folder-show span {
+    white-space: nowrap;
+}
+.beavers-crafting.brs .brs-folder-show .sep {
+    font-size: .7em;
+    opacity: .7;
+}
+.beavers-crafting.brs .brs-folder-show .ph {
+    font-style: italic;
+}
+.beavers-crafting.brs.ro .brs-folder-show .ph {
+    display: none;
+}
+.beavers-crafting.brs .brs-folder-in {
+    display: none;
+}
+.beavers-crafting.brs .brs-folder.editing .brs-folder-show {
+    display: none;
+}
+.beavers-crafting.brs .brs-folder.editing .brs-folder-in {
+    display: block;
+    width: 280px;
+    max-width: 100%;
+    height: 24px;
+    padding: 0 8px;
+    border-radius: 5px;
+    border: 1px solid var(--brs-acc);
+    background: var(--brs-field);
+    font-size: .88em;
+}
+.beavers-crafting.brs .brs-hbtn {
+    height: 28px;
+    padding: 0 11px;
+    gap: 6px;
+    border: 1px solid var(--brs-line-strong);
+    border-radius: 14px;
+    font-size: .84em;
+    font-weight: 600;
+    color: var(--brs-muted);
+    white-space: nowrap;
+}
+.beavers-crafting.brs .brs-hbtn:hover {
+    border-color: var(--brs-acc);
+    background: var(--brs-acc-soft);
+    color: inherit;
+}
+
+/* an open select list is moved to <body> (RecipeSheet.handleSelects) */
+.beavers-crafting.brs.brs-portal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    z-index: 10000;
+    container-type: normal;
+    font-family: var(--font-body, Signika, sans-serif);
+    font-size: 13px;
+}
+.beavers-crafting.brs.brs-portal .pop {
+    display: block;
+}
+
+/* all icons of the sheet, the editor toolbar too, in the regular instead of the bold (solid) weight */
+.beavers-crafting.brs i[class*="fa-"],
+.beavers-crafting.brs i[class*="fa-"]::before {
+    --fa-style: 400;
+}

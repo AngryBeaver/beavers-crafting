@@ -3,173 +3,255 @@ import { Settings } from "../Settings.js";
 import { getDataFrom } from "../helpers/Utility.js";
 import { AnyOf } from "../AnyOf.js";
 import { createDragDrop, markReplaced, renderTemplate } from "../helpers/Compat.js";
+import { MAX_PIPS } from "../helpers/Progress.js";
+import { CraftingApp } from "./CraftingApp.js";
 
-const recipeSheets: { [key: string]: RecipeSheet } = {};
+const COINS = "icons/commodities/currency/coins-assorted-mix-copper-silver-gold.webp";
+/** icons of the known test types, others get a d20 */
+const TEST_ICONS = {
+  IncrementStep: "fa-shoe-prints",
+  GmRequest: "fa-user-shield",
+  AbilityTest: "fa-dumbbell",
+  SkillTest: "fa-person-running",
+  ToolTest: "fa-screwdriver-wrench",
+};
+/** folded sections per recipe item, survives re-rendering */
+const foldedSections = new Map<string, Set<string>>();
+/** shown in an empty macro and inserted on request; works in every system */
+const MACRO_EXAMPLE = `// runs when the crafting starts
+// result: the crafting so far · actor: who crafts · recipeData: this recipe
+ui.notifications.info(\`\${actor.name} starts crafting \${recipeData.name}\`);
 
+// throwing an error stops the crafting, it counts as failed
+if (!actor.isOwner) {
+  throw new Error("only the owner of the actor may craft this");
+}`;
+
+/**
+ * Content of the recipe sheet (RecipeItemSheet): builds the view, wires the events, saves the recipe.
+ * The recipe is kept here between renders, so a change can be shown before it is saved.
+ */
 export class RecipeSheet {
   app;
   item;
   recipe: Recipe;
   recipeElement?;
-  sheet: {
-    active: string
-  };
-
-  static async bind(app, html, data, version) {
-    if (Recipe.isRecipe(app.item)) {
-      app.recipeSheet = this;
-      app.version = version;
-      if (!recipeSheets[app.id]) {
-        recipeSheets[app.id] = new RecipeSheet(app);
-      }
-      recipeSheets[app.id].init(html);
-      if (!app.initialized) {
-        let width = 700;
-        let height: any = 500;
-        if (app.options.position) {//applicationV2
-          if (app.options.position.height != "auto") {
-            app.options.position.height = height;
-          } else {
-            height = "auto";
-          }
-          app.options.position.width = width;
-        } else {
-          app.options.height = height;
-          app.options.width = width;
-        }
-        app.setPosition({ height: height, width: width });
-      }
-      app.initialized = true;
-
-      app._onResize = (e) => {
-        if (app.options.position) {//applicationV2
-          app.options.position.height = app.position.height;
-          app.options.position.width = app.position.width;
-        } else {//applicationV1
-          app.options.height = app.position.height;
-          app.options.width = app.position.width;
-        }
-      };
-      if (app.options?.window?.resizable !== undefined) {
-        if (app.options.window.resizable !== true) {
-          app.options.window.resizable = true;
-          await app.close({ animate: false }).catch(() => {
-          });
-          await app.render(true);
-        }
-      }
-    }
-  }
 
   constructor(app) {
     this.app = app;
-    this.item = app.item;
-    this.sheet = {
-      active: "main",
-    };
+    this.item = app.document;
   }
 
-  get editable() {
-    return this.app.options.editable ||
-      (this.app.isEditable && (this.app._mode == undefined || this.app._mode == 2)); //V2 or DNDv5 ? //apparently it can change in V2
+  get editable(): boolean {
+    return !!this.app.isEditable;
   }
 
-  init(html) {
-    if (html[0].localName !== "div") {
-      html = $(html[0].parentElement.parentElement);
-    }
-    let exists = html.find(".beavers-recipe-sheet");
-    if (exists.length != 0) {
-      if (this.app.version === 1) {
-        return; //do not repaint
-      } else {
-        exists.remove(); // repaint everything
-      }
-    }
-    this.recipeElement = $("<div class=\"beavers-crafting\" style=\"height:100%;width:100%;padding:15px;\"></div>");
-    if (!this.app.form) {
-      this.recipeElement = $("<form class=\"beavers-crafting\" style=\"height:100%;width:100%;padding:15px;\"></form>");
-    }
-    beaversSystemInterface.itemSheetReplaceContent(this.app, html, this.recipeElement);
-    this.recipe = Recipe.fromItem(this.item);
-    this.render().then(i => this.addDragDrop());
-  }
-
-  addDragDrop() {
-    if (this.editable) {
-      var recipeSheetDragDrop = this.app._dragDrop?.filter(d => d.name == "recipeSheet")[0];
-      if (recipeSheetDragDrop && this.app.version === 1) {
-        recipeSheetDragDrop.bind(this.recipeElement[0]);
-        return;
-      }
-      const dragDrop = createDragDrop({
-        dropSelector: ".drop-area",
-        permissions: {
-          dragstart: () => true,
-          drop: () => true,
-        },
-        callbacks: {
-          dragstart: this.app._onDragStart?.bind(this.app),
-          dragover: this.app._onDragOver?.bind(this.app),
-          drop: this._onDrop.bind(this),
-        },
-      });
-      dragDrop["name"] = "recipeSheet";
-      this.app?._dragDrop?.push(dragDrop);
-      dragDrop.bind(this.recipeElement[0]);
-    }
-  }
-
+  /** re-render the sheet from the recipe as it is in memory */
   async render() {
-    let main = await renderTemplate("modules/beavers-crafting/templates/recipe-main.hbs",
-      {
-        recipe: this.recipe,
-        currencies: beaversSystemInterface.configCurrencies,
-        editable: this.editable,
-        displayResults: Settings.get(Settings.DISPLAY_RESULTS),
-        displayIngredients: Settings.get(Settings.DISPLAY_RESULTS),
-        useAttendants: Settings.get(Settings.USE_ATTENDANTS),
-        canRollAbility: beaversSystemInterface.configCanRollAbility,
-        hasCraftedFlag: Settings.get(Settings.SEPARATE_CRAFTED_ITEMS) !== "none",
-      });
-    let description = "";
-    if (game["version"].split(".")[0] >= 12) {
-      description = await renderTemplate("modules/beavers-crafting/templates/recipe-descriptionV12.hbs",
-        {
-          recipe: this.recipe,
-          editable: this.editable,
-        });
-    } else {
-      description = await renderTemplate("modules/beavers-crafting/templates/recipe-description.hbs",
-        {
-          recipe: this.recipe,
-          editable: this.editable,
-        });
+    await this.app.render({keepRecipe: true});
+  }
+
+  async renderHTML(options): Promise<string> {
+    if (!options?.keepRecipe || !this.recipe) {
+      this.recipe = Recipe.fromItem(this.item);
     }
-    let template = await renderTemplate("modules/beavers-crafting/templates/recipe-sheet.hbs", {
-      main: main,
-      description: description,
-      active: this.sheet.active,
-      advanced: "test",
-      recipe: this.recipe,
-    });
-    this.recipeElement.find(".beavers-recipe-sheet").remove();
-    this.recipeElement.append(template);
-    if (this.app.scrollToPosition) {
-      this.recipeElement.scrollTop(this.app.scrollToPosition);
-    }
+    return renderTemplate("modules/beavers-crafting/templates/recipe-sheet.hbs", this._view());
+  }
+
+  /** the html is in place: wire it up */
+  attach(content: HTMLElement) {
+    this.recipeElement = $(content);
+    this.recipeElement.find(".brs").toggleClass("dark", this._isDark());
     this.handleEvents();
+    if (this.editable) {
+      createDragDrop({
+        dropSelector: ".brs-target",
+        permissions: {drop: () => this.editable},
+        callbacks: {drop: this._onDrop.bind(this)},
+      }).bind(content);
+    }
+  }
+
+  /** Foundry puts theme-dark / theme-light on the window; without one it follows the page */
+  _isDark(): boolean {
+    const classes = this.app.element?.classList;
+    if (classes?.contains("theme-dark")) return true;
+    if (classes?.contains("theme-light")) return false;
+    return document.body.classList.contains("theme-dark");
+  }
+
+  get folded(): Set<string> {
+    let set = foldedSections.get(this.item.uuid);
+    if (!set) {
+      //start with empty instruction / macro folded
+      set = new Set();
+      if (!this.recipe.instruction) set.add("instruction");
+      if (!this.recipe.macro) set.add("macro");
+      foldedSections.set(this.item.uuid, set);
+    }
+    return set;
+  }
+
+  _view() {
+    const recipe = this.recipe;
+    const t = (key: string) => game["i18n"].localize("beaversCrafting.recipeSheet." + key);
+    const f = (key: string, data: object) => game["i18n"].format("beaversCrafting.recipeSheet." + key, data);
+    const hasCraftedFlag = Settings.get(Settings.SEPARATE_CRAFTED_ITEMS) !== "none";
+    const currencies = (beaversSystemInterface.configCurrencies || []) as any[];
+    const currencyView = (id: string) => {
+      const c = currencies.find(c => c.id === id);
+      return {label: c?.label || id || "", img: c?.component?.img || COINS};
+    };
+    const currencyChoices = (id: string) => currencies.map(c => ({
+      value: c.id, label: c.label, img: c.component?.img || COINS, on: c.id === id,
+    }));
+
+    const entries = (type: "required" | "input" | "output") => {
+      const clickable = Settings.get(type === "output" ? Settings.DISPLAY_RESULTS : Settings.DISPLAY_INGREDIENTS);
+      return Object.entries(recipe[type] || {}).map(([group, components]) => {
+        const options = Object.entries(components as { [key: string]: Component }).map(([key, component]) => {
+          const isMoney = component.flags?.[Settings.NAMESPACE]?.subtype === "money";
+          const tag = component.type === Settings.ANYOF_SUBTYPE ? {icon: "fa-filter", text: t("tag.anyOf")}
+            : component.type === "Macro" ? {icon: "fa-terminal", text: t("tag.macro")}
+            : component.type === "RollTable" ? {icon: "fa-table-list", text: t("tag.table")}
+            : undefined;
+          return {
+            key,
+            name: component.name,
+            img: isMoney ? currencyView(component.id).img || component.img : component.img,
+            uuid: component.uuid,
+            quantity: component.quantity,
+            hasQty: component.type !== "Macro",
+            isMoney,
+            currencyId: component.id,
+            currency: isMoney ? {label: currencyView(component.id).label} : undefined,
+            currencyChoices: isMoney ? currencyChoices(component.id) : undefined,
+            tag,
+            hasCrafted: hasCraftedFlag && type !== "output" && !isMoney,
+            crafted: !!component.flags?.[Settings.NAMESPACE]?.isCrafted,
+            clickable: clickable && !isMoney && !!component.uuid,
+          };
+        });
+        //macros run as they are, there is nothing to choose between
+        return {group, isOr: options.length > 1, canOr: !options.some(o => o.tag?.icon === "fa-terminal"), options};
+      });
+    };
+    const itemSummary = (list: ReturnType<typeof entries>, extra: string[] = []) => {
+      const parts = [...extra];
+      if (list.length === 1 && list[0].options.length === 1) {
+        const o = list[0].options[0];
+        parts.push(o.hasQty ? `${o.quantity}× ${o.isMoney ? o.currency?.label : o.name}` : o.name);
+      } else if (list.length > 0) {
+        parts.push(f("summary.items", {count: list.length}));
+      }
+      return parts.join(" · ");
+    };
+
+    const required = Settings.get(Settings.USE_ATTENDANTS) ? entries("required") : undefined;
+    const input = entries("input");
+    const output = entries("output");
+    const legacy = recipe.currency;
+    const cost = {
+      entries: input,
+      currency: legacy ? {
+        id: legacy.name,
+        value: legacy.value,
+        img: currencyView(legacy.name).img,
+        current: {label: currencyView(legacy.name).label},
+        choices: currencyChoices(legacy.name),
+      } : undefined,
+      summary: itemSummary(input, legacy ? [`${legacy.value} ${currencyView(legacy.name).label}`] : []),
+    };
+
+    // checks: steps (AND) with alternative checks (OR); the fields come from the test classes of the system
+    const testClasses = beaversSystemInterface.testClasses;
+    const tests = recipe.beaversTests;
+    //steps without checks are left overs, they are dropped on the next save
+    const steps = Object.entries(tests?.ands || {}).filter(([, step]) => step?.ors).map(([and, step], index) => {
+      const hits = Number(step.hits) || 0;
+      const alts = Object.entries(step.ors || {}).map(([or, test]) => {
+        const prefix = `flags.beavers-crafting.recipe.beaversTests.ands.${and}.ors.${or}`;
+        const testClass = testClasses[test.type];
+        const typeChoices = Object.entries(testClasses).map(([type, clazz]: [string, any]) => ({
+          value: type,
+          label: clazz.informationField?.label || type,
+          hint: clazz.informationField?.note || "",
+          icon: TEST_ICONS[type] || "fa-dice-d20",
+          on: type === test.type,
+        }));
+        const fields = Object.entries(testClass?.customizationFields || {})
+          .filter(([, field]: [string, any]) => field.type !== "info" && field.type !== "button")
+          .map(([key, field]: [string, any]) => {
+            const value = test.data?.[key] ?? field.defaultValue ?? "";
+            const view: any = {
+              name: `${prefix}.data.${key}`,
+              value,
+              label: field.label,
+              note: field.note,
+              placeholder: field.defaultValue ?? field.label ?? "",
+            };
+            if (field.type === "selection") {
+              const choices = Object.entries(field.choices || {}).map(([id, choice]: [string, any]) => ({
+                value: id, label: choice.text, img: choice.img, on: id === value,
+              }));
+              const chosen = choices.find(c => c.on);
+              return {...view, kind: "select", choices, filter: choices.length > 8,
+                current: {label: chosen?.label || "", img: chosen?.img}};
+            }
+            return {...view, kind: field.type === "number" ? "number" : field.type === "area" ? "area" : "text"};
+          });
+        return {
+          check: or, prefix, type: test.type, typeChoices, fields,
+          typeCurrent: {label: testClass?.informationField?.label || test.type || t("chooseCheck"), icon: TEST_ICONS[test.type] || "fa-dice-d20"},
+        };
+      });
+      return {step: and, num: index + 1, hits, successes: t(hits === 1 ? "success" : "successes"), alts};
+    });
+    const maxHits = steps.reduce((sum, s) => sum + s.hits, 0);
+    const fails = Number(tests?.fails) || 0;
+    const checks = {
+      steps,
+      fails,
+      consume: !!tests?.consume,
+      // preview of what is needed: empty green ones per success, empty red ones per allowed fail
+      pips: maxHits + fails <= MAX_PIPS
+        ? [...Array(maxHits).fill({cls: ""}), ...(fails ? [{sep: true}] : []), ...Array(fails).fill({cls: "bad"})]
+        : [],
+      summary: steps.length ? f("summary.checks", {steps: steps.length, hits: maxHits, fails}) : t("noChecks"),
+    };
+
+    const folded = Object.fromEntries([...this.folded].map(id => [id, true]));
+    const macroLines = recipe.macro ? recipe.macro.split("\n").length : 0;
+    return {
+      editable: this.editable,
+      name: this.item.name,
+      img: this.item.img,
+      typeLabel: game["i18n"].localize(CONFIG.Item.typeLabels?.[this.item.type] || this.item.type),
+      folder: recipe.folder || "",
+      folderParts: (recipe.folder || "").split(".").filter(p => p !== ""),
+      instruction: recipe.instruction || "",
+      instructionSummary: CraftingApp._plainText(recipe.instruction, 80),
+      macro: recipe.macro || "",
+      macroExample: MACRO_EXAMPLE,
+      macroSummary: macroLines ? f("summary.lines", {count: macroLines}) : "",
+      folded,
+      required: required ? {entries: required, summary: itemSummary(required)} : undefined,
+      cost,
+      results: {entries: output, summary: itemSummary(output)},
+      checks,
+    };
   }
 
   handleEvents() {
     if (game["version"].split(".")[0] < 12) {
       this.app._activateEditor?.(this.recipeElement.find(".editor-content")[0]);
     }
-    this.recipeElement.find(".tabs a").click(e => {
-      this.sheet.active = $(e.currentTarget).data("tab");
-      this.render();
+    this.recipeElement.find(".brs-sec-h").on("click", e => {
+      const section = $(e.currentTarget).closest(".brs-sec");
+      section.toggleClass("folded");
+      if (section.hasClass("folded")) this.folded.add(section.data("sec")); else this.folded.delete(section.data("sec"));
     });
-
+    this.handleSelects();
     this.handleMainEvents();
   }
 
@@ -180,11 +262,9 @@ export class RecipeSheet {
   async update() {
     const update = { flags: {} };
     const formData = this.getFormData();
-    // add macro before setting it via serialization to null
-    if (!this.app.form) {
-      for (const [key, value] of Object.entries(formData)) {
-        let recipeKey = key.replace("flags.beavers-crafting.recipe.", "");
-        foundry.utils.setProperty(this.recipe, recipeKey, value);
+    for (const [key, value] of Object.entries(formData)) {
+      if (key.startsWith(`flags.${Settings.NAMESPACE}.recipe.`)) {
+        foundry.utils.setProperty(this.recipe, key.replace(`flags.${Settings.NAMESPACE}.recipe.`, ""), value);
       }
     }
     const recipeData = this.recipe.serialize();
@@ -203,31 +283,29 @@ export class RecipeSheet {
         }
       }
     }
+    const merged = foundry.utils.mergeObject(recipeData, recipeFormData, {inplace: false}) as any;
+    //steps without checks (left overs) would break crafting
+    for (const [key, step] of Object.entries(merged.beaversTests?.ands || {})) {
+      if (!(step as any)?.ors || Object.keys((step as any).ors).length === 0) delete merged.beaversTests.ands[key];
+    }
+    if (merged.beaversTests && Object.keys(merged.beaversTests.ands || {}).length === 0) delete merged.beaversTests;
     //replace instead of merge so removed parts do not survive
-    update.flags[Settings.NAMESPACE] = markReplaced({}, "recipe",
-      foundry.utils.mergeObject(recipeData, recipeFormData, {inplace: false}));
-    if (!this.app.form) {
-      // @ts-ignore
-      for (const [key, value] of Object.entries(formData)) {
-        if(!key.startsWith(`flags.${Settings.NAMESPACE}.recipe`)) {
-          foundry.utils.setProperty(update, key, value);
-        }
+    update.flags[Settings.NAMESPACE] = markReplaced({}, "recipe", merged);
+    // name and other fields of the item itself
+    for (const [key, value] of Object.entries(formData)) {
+      if (!key.startsWith(`flags.${Settings.NAMESPACE}.recipe`)) {
+        foundry.utils.setProperty(update, key, value);
       }
     }
+    //the sheet re-renders by itself when the item changed
     await this.item.update(update);
-    this.recipe = Recipe.fromItem(this.item);
-
-    if (this.recipeElement) {
-      this.app.scrollToPosition = this.recipeElement.scrollTop();
-    }
-    await this.render();
   }
 
   getFormData() {
     let data = {};
     // @ts-ignore
     const elements = this.recipeElement[0].querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(
-      "input, select, textarea",
+      "input, select, textarea, prose-mirror",
     );
     for (let el of elements) {
       let element = el as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
@@ -244,6 +322,8 @@ export class RecipeSheet {
           const select = element as HTMLSelectElement;
           data[element.name] = Array.from(select.selectedOptions)
             .map(option => option.value);
+        } else if (element.localName === "prose-mirror") {
+          data[element.name] = (element as any).value ?? "";
         } else if (element.type === "textarea") {
           data[element.name] = element.value;
         } else {
@@ -254,151 +334,183 @@ export class RecipeSheet {
     return data;
   }
 
-  handleMainEvents() {
-    this.recipeElement.find(".beavers-fontsize-svg-img").click(e => {
-      const group = e.target.dataset.group;
-      const type = e.target.dataset.type;
-      const key = e.target.dataset.key;
-      const name = `${type}.${group}.${key}.flags.${Settings.NAMESPACE}.isCrafted`;
-      const value = foundry.utils.getProperty(this.recipe, name);
-      if (value) {
-        foundry.utils.setProperty(this.recipe, name, null);
-      } else {
-        foundry.utils.setProperty(this.recipe, name, true);
-      }
-      this.update();
-    });
+  /** the icon selects: a button with a popup list, the value lives in a hidden input */
+  closeSelects = () => {};
 
-    this.recipeElement.find(".ingredients .item-delete").click(e => {
-      this.recipe.removeInput(e.target.dataset.group, e.target.dataset.id);
-      this.update();
+  handleSelects() {
+    // the open list lives in <body>: inside the sheet it would be cut off by the scrolling area,
+    // and the sheet's container query makes "position: fixed" relative to the sheet instead of the screen
+    const closeAll = () => {
+      $("body > .brs-portal").each((i, portal) => {
+        const pop = $(portal).children(".pop");
+        const select = pop.data("brsSelect");
+        if (select?.length && document.contains(select[0])) select.append(pop);
+        select?.removeClass("open");
+        $(portal).remove();
+      });
+    };
+    this.recipeElement.find(".brs-sel-btn").on("click", e => {
+      e.preventDefault();
+      const select = $(e.currentTarget).closest(".brs-sel");
+      const wasOpen = select.hasClass("open");
+      closeAll();
+      if (wasOpen || !this.editable) return;
+      const rect = e.currentTarget.getBoundingClientRect();
+      const dark = this.recipeElement.find(".brs").hasClass("dark") ? " dark" : "";
+      const portal = $(`<div class="beavers-crafting brs brs-portal${dark}"></div>`).appendTo(document.body);
+      const pop = select.find(".pop").data("brsSelect", select).appendTo(portal);
+      const below = window.innerHeight - rect.bottom;
+      pop.css({left: rect.left, minWidth: rect.width, top: "", bottom: ""});
+      if (below < 260 && rect.top > below) pop.css({bottom: window.innerHeight - rect.top + 3});
+      else pop.css({top: rect.bottom + 3});
+      select.addClass("open");
+      pop.find(".brs-opt").show();
+      pop.find(".brs-filter input").val("").trigger("focus");
     });
-    this.recipeElement.find(".results .item-delete").click(e => {
-      this.recipe.removeOutput(e.target.dataset.group, e.target.dataset.id);
-      this.update();
+    this.recipeElement.find(".brs-filter input").on("input", e => {
+      const text = ($(e.currentTarget).val() as string).toLowerCase();
+      $(e.currentTarget).closest(".pop").find(".brs-opt").each((i, opt) => {
+        $(opt).toggle($(opt).text().toLowerCase().includes(text));
+      });
     });
-    this.recipeElement.find(".attendants .item-delete").click(e => {
-      this.recipe.removeRequired(e.target.dataset.group, e.target.dataset.id);
-      this.update();
-    });
-    this.recipeElement.find(".currencies .item-delete").click(async e => {
-      this.recipe.removeCurrency();
-      await this.render();
-      this.update();
-    });
-    this.recipeElement.find(".cost .header .item-add").click(e => {
-      this.recipe.addCurrency();
-      this.update();
-    });
-    this.recipeElement.find(".tests .testAnd .item-add").click(e => {
-      this.recipe.addTestAnd();
-      this.update();
-    });
-    this.recipeElement.find(".tests .testOr .item-add").click(async e => {
-      const and = $(e.currentTarget).data("and");
-      this.recipe.addTestOr(and);
-      //first rerender so we get rid of the old data in form.
-      await this.render();
-      this.update();
-    });
-    this.recipeElement.find(".tests .item-delete").click(async e => {
-      const and = $(e.currentTarget).data("and");
-      const or = $(e.currentTarget).data("or");
-      this.recipe.removeTestOr(and, or);
-      //first rerender so we get rid of the old data in form.
-      await this.render();
-      this.update();
-    });
-
-    this.recipeElement.find(".beavers-test-selection select").on("change", async e => {
-      const name = e.target.name;
-      const { ands: and, ors: or } = name.split(".").reduce((result, item, index, array) =>
-        (item === "ands" || item === "ors") ? { ...result, [item]: array[index + 1] } : result, {});
-      const type = $(e.target).val() as string;
-      if (this.recipe.beaversTests?.ands[and]?.ors[or]) {
-        this.recipe.beaversTests.ands[and].ors[or].type = type;
-        this.recipe.beaversTests.ands[and].ors[or].data = {};
-      }
-      //first rerender so we get rid of the old data in form.
-      await this.render();
-      await this.update();
-    });
-    //fix some systems e.g. a5e does not update for selects
-    this.recipeElement.find(".beavers-test select:not(.beavers-test .beavers-test-selection select)").on("change", async e => {
-      e;
-      //fix also dnd5e v5
-      const name = e.target.name;
-      const value = $(e.target).val() as string;
-      const cleanedString = name.replace("flags.beavers-crafting.recipe.", "");
-      foundry.utils.setProperty(this.recipe, cleanedString, value);
-      await this.update();
-    });
-    this.recipeElement.find("input, .currencies select, .advanced textarea").on("change", async e => {
-      e;
-      await this.update();
-    });
-
-    this.recipeElement.find(".results .beavers-component .clickable").on("click", e => {
-      const uuid = $(e.currentTarget).data("id");
-      if (Settings.get(Settings.DISPLAY_RESULTS)) {
-        beaversSystemInterface.uuidToDocument(uuid).then(i => i.sheet.render(true));
-      }
-    });
-    this.recipeElement.find(".ingredients .beavers-component .clickable").on("click", e => {
-      const uuid = $(e.currentTarget).data("id");
-      if (Settings.get(Settings.DISPLAY_INGREDIENTS)) {
-        beaversSystemInterface.uuidToDocument(uuid).then(i => i.sheet.render(true));
-      }
-    });
-    this.recipeElement.find(".attendants .beavers-component .clickable").on("click", e => {
-      const uuid = $(e.currentTarget).data("id");
-      if (Settings.get(Settings.DISPLAY_INGREDIENTS)) {
-        beaversSystemInterface.uuidToDocument(uuid).then(i => i.sheet.render(true));
-      }
-    });
-    this.recipeElement.find(".drop-area .item-add").click(e => {
-      this._onAddMoney(e);
-    });
-    this.recipeElement.find(".currency-selector").on("change", async e => {
-      const name = e.target.name;
-      const newCurrencyId = $(e.target).val() as string;
-      const currencies = beaversSystemInterface.configCurrencies;
-      const newCurrency = currencies.find(c => c.id === newCurrencyId);
-
-      if (newCurrency) {
-        // Update the component with the new currency data
-        const cleanedString = name.replace("flags.beavers-crafting.recipe.", "").replace(".id", "");
-        const component = foundry.utils.getProperty(this.recipe, cleanedString);
-
-        if (component) {
-          component.id = newCurrency.id;
-          component.name = newCurrency.label;
-          component.img = newCurrency.component?.img || component.img;
+    this.recipeElement.find(".brs-opt").on("click", async e => {
+      e.preventDefault();
+      const select = $(e.currentTarget).closest(".pop").data("brsSelect") as JQuery;
+      const value = $(e.currentTarget).attr("data-value") as string;
+      closeAll();
+      if (!select) return;
+      const input = select.find("input[type=hidden]");
+      if (input.val() === value) return;
+      input.val(value);
+      if (select.hasClass("test-type")) {
+        const and = select.attr("data-step") as string, or = select.attr("data-check") as string;
+        if (this.recipe.beaversTests?.ands[and]?.ors[or]) {
+          this.recipe.beaversTests.ands[and].ors[or].type = value;
+          this.recipe.beaversTests.ands[and].ors[or].data = {};
         }
+        //first rerender so we get rid of the old data in form.
+        await this.render();
+      } else if (select.hasClass("currency")) {
+        this._setCurrency(input.attr("name") as string, value);
       }
-
       await this.update();
     });
-
+    $(document).off("mousedown.brs").on("mousedown.brs", e => {
+      if (!$(e.target).closest(".brs-sel, .brs-portal").length) closeAll();
+    });
+    this.recipeElement.off("scroll.brs").on("scroll.brs", closeAll);
+    this.closeSelects = closeAll;
   }
 
-  async _onAddMoney(e) {
-    const dropArea = $(e.target).parents(".drop-area");
-    const group = dropArea.data("id");
-    const isInput = dropArea.parents(".ingredients").length !== 0;
-    const isOutput = dropArea.parents(".results").length !== 0;
-    const isRequired = dropArea.parents(".attendants").length !== 0;
+  /** a money component got another currency: keep name and image in line */
+  _setCurrency(name: string, currencyId: string) {
+    const currency = (beaversSystemInterface.configCurrencies || []).find(c => c.id === currencyId);
+    const path = name.replace("flags.beavers-crafting.recipe.", "").replace(/\.id$/, "");
+    const component = foundry.utils.getProperty(this.recipe, path);
+    if (currency && component) {
+      component.id = currency.id;
+      component.name = currency.label;
+      component.img = currency.component?.img || component.img;
+    }
+  }
 
+  handleMainEvents() {
+    if (!this.editable) {
+      this.recipeElement.find(".open-sheet").on("click", e => this._openSheet(e));
+      return;
+    }
+    this.recipeElement.find(".open-sheet").on("click", e => this._openSheet(e));
+    // folder: shown as a path, the text field only while it is edited
+    this.recipeElement.find(".brs-folder-show").on("click", e => {
+      const folder = $(e.currentTarget).closest(".brs-folder").addClass("editing");
+      folder.find(".brs-folder-in").trigger("focus").trigger("select");
+    });
+    this.recipeElement.find(".brs-folder-in")
+      .on("blur", e => { $(e.currentTarget).closest(".brs-folder").removeClass("editing"); })
+      .on("keydown", e => {
+        if (e.key === "Escape") {
+          $(e.currentTarget).val($(e.currentTarget).prop("defaultValue")).trigger("blur");
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      });
+    this.recipeElement.find(".macro-example").on("click", () => {
+      this.recipe.macro = MACRO_EXAMPLE;
+      this.recipeElement.find("textarea[name='flags.beavers-crafting.recipe.macro']").val(MACRO_EXAMPLE);
+      void this.update();
+    });
+    this.recipeElement.find(".brs-craft").on("click", e => {
+      e.stopPropagation();
+      const {type, group, key} = e.currentTarget.dataset;
+      const name = `${type}.${group}.${key}.flags.${Settings.NAMESPACE}.isCrafted`;
+      foundry.utils.setProperty(this.recipe, name, foundry.utils.getProperty(this.recipe, name) ? null : true);
+      void this.update();
+    });
+    this.recipeElement.find(".item-delete").on("click", async e => {
+      const {type, group, key} = e.currentTarget.dataset;
+      this.recipe._removeData(type as DataType, group, key);
+      await this.render();
+      void this.update();
+    });
+    this.recipeElement.find(".currency-delete").on("click", async () => {
+      this.recipe.removeCurrency();
+      await this.render();
+      void this.update();
+    });
+    this.recipeElement.find(".add-money").on("click", e => {
+      const {type, group} = e.currentTarget.dataset;
+      this._onAddMoney(type as DataType, group || "");
+    });
+    this.recipeElement.find(".test-and").on("click", () => {
+      this.recipe.addTestAnd();
+      void this.update();
+    });
+    this.recipeElement.find(".test-or").on("click", async e => {
+      this.recipe.addTestOr($(e.currentTarget).attr("data-step"));
+      //first rerender so we get rid of the old data in form.
+      await this.render();
+      void this.update();
+    });
+    this.recipeElement.find(".test-delete").on("click", async e => {
+      this.recipe.removeTestOr($(e.currentTarget).attr("data-step"), $(e.currentTarget).attr("data-check"));
+      await this.render();
+      void this.update();
+    });
+    this.recipeElement.find("input:not([type=hidden]):not(.brs-filter input), textarea, prose-mirror").on("change", () => {
+      void this.update();
+    });
+    // highlight the drop target under the pointer
+    this.recipeElement.find(".brs-target")
+      .on("dragover", e => {
+        const target = $(e.currentTarget);
+        const zone = target.hasClass("brs-ent") ? target.find(".brs-ordrop") : target;
+        this.recipeElement.find(".over").not(zone).removeClass("over");
+        zone.addClass("over");
+        e.stopPropagation();
+      })
+      .on("dragleave drop", e => {
+        if (e.type === "drop" || !e.currentTarget.contains(e.relatedTarget as Node)) {
+          $(e.currentTarget).find(".over").addBack(".over").removeClass("over");
+        }
+      });
+  }
+
+  _openSheet(e) {
+    const uuid = $(e.currentTarget).data("uuid");
+    if (uuid) {
+      beaversSystemInterface.uuidToDocument(uuid).then(i => i?.sheet?.render(true));
+    }
+  }
+
+  _onAddMoney(type: DataType, group: string) {
     const currencies = beaversSystemInterface.configCurrencies;
     if (!currencies || currencies.length === 0) return;
-
-    // Always use the first currency - no dialog
+    // starts with the first currency, it can be changed in the line
     const currency = currencies[0];
-
     const component = beaversSystemInterface.componentCreate({
       id: currency.id,
       name: currency.label,
-      img: "icons/commodities/currency/coins-assorted-mix-copper-silver-gold.webp",
+      img: currency.component?.img || COINS,
       type: "item",
       quantity: 1,
       flags: {
@@ -407,31 +519,24 @@ export class RecipeSheet {
         }
       }
     });
-
-    if (isInput) {
-      this.recipe.addInput(component, component.id, group);
-    } else if (isOutput) {
-      this.recipe.addOutput(component, component.id, group);
-    } else if (isRequired) {
-      this.recipe.addRequired(component, component.id, group);
-    }
+    this.recipe._addData(type, component, component.id, group);
     void this.update();
   }
 
   async _onDropMain(e) {
-    const isDrop = $(e.target).hasClass("drop-area");
-    const isInput = $(e.target).parents(".ingredients").length !== 0;
-    const isOutput = $(e.target).parents(".results").length !== 0;
-    const isRequired = $(e.target).parents(".attendants").length !== 0;
-    if (!isDrop && !isInput && !isOutput && !isRequired) {
+    const target = $(e.target).closest(".brs-target");
+    if (!target.length) {
       return;
     }
+    const type = target.data("type") as DataType;
+    //dropped on an entry: alternative of that entry, on the end zone: new entry
+    const group = target.data("group") === undefined ? "" : target.data("group") + "";
     const data = getDataFrom(e);
     if (!data) return;
 
-    // Allow dropping Macros into the output section as components (multiple supported)
-    if (isOutput && data.type === "Macro" && data.uuid) {
-      const macroDoc:any = await fromUuid(data.uuid);
+    // Macros can be results
+    if (type === "output" && data.type === "Macro" && data.uuid) {
+      const macroDoc: any = await fromUuid(data.uuid);
       if (macroDoc) {
         const component: any = {
           type: "Macro",
@@ -440,47 +545,24 @@ export class RecipeSheet {
           img: macroDoc?.img || macroDoc?.icon || "icons/svg/dice-target.svg",
           quantity: 1,
         };
-        const keyid = data.uuid;
-        this.recipe.addOutput(component, keyid, $(e.target).data("id"));
-        this.update();
+        this.recipe.addOutput(component, data.uuid, group);
+        void this.update();
       }
       return;
     }
 
-    if (
-      (data.type === "Item") ||
-      (isOutput && data.type === "RollTable")
-    ) {
+    if (data.type === "Item" || (type === "output" && data.type === "RollTable")) {
       const entity = await fromUuid(data.uuid);
       if (entity) {
-        const isAnyOf = AnyOf.isAnyOf(entity);
         const component = beaversSystemInterface.componentFromEntity(entity);
         component.type = data.type;
-        if (isInput) {
-          let keyid = data.uuid;
-          if (isAnyOf) {
-            component.type = Settings.ANYOF_SUBTYPE;
-            keyid = foundry.utils.randomID();
-          }
-          this.recipe.addInput(component, keyid, $(e.target).data("id"));
+        let keyid = data.uuid;
+        if (AnyOf.isAnyOf(entity)) {
+          component.type = Settings.ANYOF_SUBTYPE;
+          keyid = foundry.utils.randomID();
         }
-        if (isOutput) {
-          let keyid = data.uuid;
-          if (isAnyOf) {
-            component.type = Settings.ANYOF_SUBTYPE;
-            keyid = foundry.utils.randomID();
-          }
-          this.recipe.addOutput(component, keyid, $(e.target).data("id"));
-        }
-        if (isRequired) {
-          let keyid = data.uuid;
-          if (isAnyOf) {
-            component.type = Settings.ANYOF_SUBTYPE;
-            keyid = foundry.utils.randomID();
-          }
-          this.recipe.addRequired(component, keyid, $(e.target).data("id"));
-        }
-        this.update();
+        this.recipe._addData(type, component, keyid, group);
+        void this.update();
       }
     }
   }

@@ -1,5 +1,24 @@
 # Changelog
 
+## 4.8.4
+- redesign recipe sheet
+  - recipes open their own sheet, independent of the system's item sheet
+  - recipes are recognized by their flag, whatever item type the system uses
+  - "System sheet" button opens the system's sheet for price, weight, description …
+  - another sheet can still be chosen per item in Foundry's sheet configuration
+  - follows Foundry's dark and light mode
+  - header with image, name and folder; the folder is edited in place
+  - foldable sections instead of tabs: instruction, required, cost, results, checks, macro
+    - empty instruction and macro start folded
+  - arrow from cost to results, like in the crafting window
+  - "one of" alternatives are shown explicitly, every entry has its own "or" drop zone
+  - money can be added in every drop zone and its currency changed in the line
+  - "crafted" flag as a hammer next to the item name
+  - checks as numbered steps with alternative checks, test type select with icons
+  - example for the macro that works in every system
+  - read only view for players
+- fix: adding steps or alternative checks could pick a wrong id (e.g. after 9 steps)
+
 ## 4.8.3
 - redesign crafting chat message
   - adapts to dark / light mode and the system's chat style
