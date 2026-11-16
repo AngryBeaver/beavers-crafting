@@ -3,363 +3,295 @@
 ![Foundry System](https://img.shields.io/endpoint?url=https%3A%2F%2Ffoundryshields.com%2Fsystem%3FnameType%3Draw%26showVersion%3D1%26style%3Dflat%26url%3Dhttps%3A%2F%2Fraw.githubusercontent.com%2FAngryBeaver%2Fbeavers-crafting%2Fmain%2Fmodule.json)
 ![Download Count](https://img.shields.io/github/downloads/AngryBeaver/beavers-crafting/total)
 
-This module is for:
-- Crafting, brewing, harvesting, mining, fabricating, gathering
-- Character advancement, tech tree, skill tree, ability tree
-- Downtime activities, factions / organisation reputation, quest logs, Skill Training
-  
-by:
-- optionally granting specific or random items on success
-- optionally consuming ingredients and money
-- optionally requiring features, tools, classes, backgrounds
-- optionally tracking your progress by optionally testing (skills, tools, abilities) or just advancing it.
+Recipes for everything your characters can work on over time:
+- crafting, brewing, harvesting, mining, fabricating, gathering
+- character advancement, tech trees, skill trees, ability trees
+- downtime activities, faction or organisation reputation, quest logs, skill training
 
-in possibly all Systems: ([List of adaption layers](https://github.com/AngryBeaver/beavers-system-interface/wiki/BSA-x-links))
+A recipe can
+- require items, features, tools, classes or backgrounds
+- consume ingredients and money
+- ask for checks (skills, tools, abilities) or simply advance step by step
+- grant specific or random items, containers or run macros on success
+
+It works in possibly every system through the [Beaver's System Interface](https://github.com/AngryBeaver/beavers-system-interface) ([list of adaption layers](https://github.com/AngryBeaver/beavers-system-interface/wiki/BSA-x-links)).
+
+**New to the module?** Start with the [ready-made recipes](#ready-made-recipes): with dnd5e you get a recipe for every tool of the D&D 2024 rules out of the box.
 
 ## Features
 ### Crafting
 ![potionCrafting.png](pictures/potionCrafting.png)
 
-[full Length Video](https://www.youtube.com/watch?v=t3YGk8uFK0w)
+[Full length video](https://www.youtube.com/watch?v=t3YGk8uFK0w)
 ### Character advancement
 ![img.png](pictures/advancement.png)
-### DownTimeActivities
+### Downtime activities
 ![downtime.png](pictures/downtime.png)
-
 ### Containers
 ![container.png](pictures/container.png)
 
-- Custom container item subtype for systems that do not provide a native container type (non-dnd5e systems).
-- For dnd5e, use the native system container type; Beaver's Crafting integrates with it.
-- Recipes can now produce containers as results (both the custom subtype and dnd5e native containers are supported).
-- Dropping a Beaver's Crafting container onto an actor automatically copies its predefined contents to the actor and assigns them to the newly created container.
-- The custom container sheet and features are currently experimental.
+- Recipes can produce containers, including their contents.
+- dnd5e: the system's own container type is used.
+- Other systems: Beaver's Crafting brings its own container item (experimental).
+- Dropping a Beaver's Crafting container onto an actor copies its predefined contents to the actor and puts them into the new container.
 
-## TOC
+## Contents
 <!-- TOC -->
-* [Beaver's Crafting Module](#beavers-crafting-module)
-  * [Features](#features)
-    * [Crafting](#crafting)
-    * [Character advancement](#character-advancement)
-    * [DownTimeActivities](#downtimeactivities)
-    * [Containers](#containers)
-  * [TOC](#toc)
-  * [HowTo](#howto)
-    * [Create Recipes](#create-recipes)
-    * [Configure Recipe](#configure-recipe)
-      * [requires:](#requires-)
-      * [costs:](#costs-)
-      * [tests:](#tests-)
-        * [TestSection](#testsection)
-      * [results:](#results-)
-      * [instruction:](#instruction-)
-      * [folder:](#folder-)
-      * [macro:](#macro-)
-    * [Executing Recipes](#executing-recipes)
-      * [add](#add)
-        * [Recipe Compendium](#recipe-compendium)
-          * [or Condition](#or-condition)
-      * [list](#list)
-      * [advancement](#advancement)
-        * [result](#result)
-  * [AnyOf](#anyof)
-    * [Example](#example)
-      * [ItemTags](#itemtags)
-    * [test](#test)
-    * [customize Recipes](#customize-recipes)
-      * [Drag And Drop](#drag-and-drop)
-      * [Select available](#select-available)
-      * [reset](#reset)
-  * [Examples](#examples)
-    * [Ingredients](#ingredients)
-    * [Recipes](#recipes)
-  * [Settings](#settings)
-    * [Create Beaver's Item Button](#create-beavers-item-button)
-    * [3.3.x isCrafted flag](#33x-iscrafted-flag)
-  * [Notes](#notes)
-    * [Currency reorder](#currency-reorder)
-    * [Items reorder](#items-reorder)
-    * [ItemReference](#itemreference)
-  * [Troubleshooting](#troubleshooting)
-    * [Dont show "RECIPE" in item menu](#dont-show--recipe--in-item-menu)
-      * [Problem:](#problem-)
-      * [Solution:](#solution-)
-      * [Explanation:](#explanation-)
-  * [Credits](#credits)
+* [Ready-made recipes](#ready-made-recipes)
+  * [Tool Recipes (dnd5e)](#tool-recipes-dnd5e)
+  * [Ingredients (dnd5e)](#ingredients-dnd5e)
+* [Create a recipe](#create-a-recipe)
+* [The recipe sheet](#the-recipe-sheet)
+  * [Instruction](#instruction)
+  * [Required](#required)
+  * [Cost](#cost)
+  * [Results](#results)
+  * [Checks](#checks)
+  * [Macro](#macro)
+* [Crafting](#crafting-1)
+  * [Choose a recipe](#choose-a-recipe)
+  * [Progress](#progress)
+  * [Result](#result)
+* [AnyOf](#anyof)
+* [Hooks](#hooks)
+* [Settings](#settings)
+* [Good to know](#good-to-know)
+* [Troubleshooting](#troubleshooting)
+* [Credits](#credits)
 <!-- TOC -->
 
-## HowTo
-### Create Recipes
-![img.png](pictures/newItem.png)
+## Ready-made recipes
+The easiest way to get started is to import existing recipes.
 
-For this to work you must go to your settings and enter the name of the create Item Dialog.
-Default is "Create New Item" obviously you need to adapt if you have a different language.
+### Tool Recipes (dnd5e)
+This module includes the compendium **D&D 2024 Tool Recipes**: one recipe for every tool that can craft something by the D&D 2024 rules, e.g. "Smith's Tools Recipes".
+1. Import the recipes into your world (they go into the folder "Tools").
+2. Give the players permission to see them.
 
-### Configure Recipe
-![configure.png](pictures/configure.png)
-#### requires:
-you may add required items to your recipe via drag and drop. 
-Required items are not consumed and could be anything from classes to backgrounds.
-#### costs: 
-You may add costs to your recipe named ingredients. This can either be currency or items
-You may add items via drag and drop.
-#### tests: 
-you may add steps or tests that are needed in the process.
-When adding tests you can define that your progress can fail on certain amount of failed tests.
-You can configure that costs are consumed or returned when you fail your progress.
+When crafting, the player chooses what to make from everything the tool can craft.
+- Proficiency with the tool is needed.
+- The raw materials cost half the price of the chosen item.
+- The items come from the Player's Handbook when that module is active, otherwise from the free dnd5e equipment (SRD 5.2).
 
-Tests consisting of one or more TestSections.
-##### TestSection
-
-In ech TestSection you need to hit a given amount of successes specified by "hits" in the TestSection default is 1.
-
-Each TestSection consist of one or more TestOption you can add as choice .
-There are up to 4 types of TestOptions.
-- skill check
-- ability check (not sure how to model this in pf2e (help wanted! bsa-pf2e module))
-- tool check (not sure how to model this in pf2e (help wanted! bsa-pf2e module))
-- fixed hit
-  - just progress without any check.
-
-You can add multiple times the same type of TestOption for example to choose from diffrent skills.
-Your Recipe can fail if you reach the specified "fails" default is 1. If you set the fails to 0 your recipe can never fail.
-You can also specify if your costs will get consumed when your recipe fails.
-e.g.
-![img.png](pictures/skillchallenge.png)
-
-meaning:
-- you need 3 success in:insight skill dc 8 or forgery kit dc 8
-- and thereafter 2 success in history
-- before you have 3 fails overall.
-
-#### results:
-You may add Items, Containers, RollTables, or Macros via drag and drop as results of your process.
-- Containers are supported in two forms:
-  - Beaver's Crafting custom container subtype (for systems without native containers)
-  - Native dnd5e containers (when using the dnd5e system)
-- Macros dropped into the result section will be executed upon successful crafting.
-  They receive the same parameters as the recipe macro. See [OutputMacro](https://github.com/AngryBeaver/beavers-crafting/blob/main/macros.md#output-macros)
-You will receive the result at the end of the progress if your progress was successful.
-If you add a RollTable you will get quantity amount of rolls on that table, not one roll quantity of times.
-#### instruction:
-![description.png](pictures/description.png)
-
-You may add flavour text to your "recipe".
-Make sure to hit the save button.
-#### folder:
-You may add a folder structure to group your progresses on your actor tab.
-#### macro:
-Advanced user may use the optional recipe macro that gets executed during the crafting process.
-see [RecipeMacro](https://github.com/AngryBeaver/beavers-crafting/blob/main/macros.md)
-
-### Executing Recipes
-On your actor-sheet you will find a new tab.
-#### add
-Initially your sheet will be blank except for the add button.
-you can add a new crafting process by clicking on +Add,  which will open the [Recipe Compendium](#recipe-compendium).
-##### Recipe Compendium
-![img.png](pictures/crafting.png)
-
-- list all recipes that you have permission to see for all items in your world (not compendium)
-  - filter available: only those that you have at least one ingredient of any quantity of.
-  - filter useable: only those that you have all ingredients in required quantity of.
-  - filter own : only those that you personally have in your inventory
-  - filter by item: only those recipes that uses all items in the filter regardless of quantity.
-- you can display details for a Recipe:
-  - it will display you an uneditable recipe and shows you which ingredients are missing.
-- you can hit the start button to start a process.
-  - a process will ask for the given skill if any and returns with a result
-
-###### or Condition
-![img.png](pictures/simpleOr.png)
-Some recipe can have "or conditions" for required, cost and result items.
-You can choose one of those or conditions in the RecipeCompendium.
-
-#### list
-![img.png](pictures/craftingTab.png)
-
-It lists all your progress with the various recipes you are currently interacting with.
-
-You can show details to each progress by clicking on the progress-name.
-
-#### advancement
-if your recipe has a test/progress involved you can advance it on this tab.
-
-Your process will start by locking the resources needed.
-you can advance or test your progress by clicking on the progress column:
-
-![advance.png](pictures/advance.png)
-
-when your progress ends by reaching 100% success you will be rewarded with the results of the recipe.
-or nothing when you fail.
-##### result
-
-![img.png](pictures/result.png)
-
-You will see a chat message with your result
-
-Items updated or created in a successfull crafting process are flagged:
-````
-flags.beavers-crafting.isCrafted = true
-````
-
-## AnyOf
-AnyOf is an Item that is intended to be used as ingredient to create recipes that do not need a specific ingredient but any ingredient of... e.g. specific type.
-
-Therefor AnyOf Item has an input field to write a macro code that gets executed when a recipe is checked for its ingredients.
-The macro has "item" as input and should return boolean as output. The macro will test if the given item meets the conditions of the AnyOf Ingredient.
-
-### Example
-To understand the intension of this feature you can use this as examples:
-
-````return item.name.startsWith("Test")```` any item that has a name that starts with "Test"
-
-````return item.type === "weapon" ```` any item of type weapon (if weapon is a type in your system)
-The attributes of item depend on your system. To find out what attributes your item has you can test with
-````console.log(item); return false ````. When you hit f12 the item document structure should be copied to your logs when ever you test this anyOf.
-
-#### ItemTags
-For people with 0 code experience to better filter the item AnyOf we point out the [ItemTags](https://foundryvtt.com/packages/item-tags) a simple and easy module to use and integrates perfectly with this feature all you have to do is insert the following macro:
-`return ItemTags.Check(item, ['tag1','tag2'])`
-and modify the tag array as you want ['metal','sword'] or ['metal','bow'] etc., major details about this module are on this [API](https://modules.zoty.dev/itemTags/apiReference.html)
-this allows you to "draconianly" filter your components with little and definitely more dynamic effort.
-
-### test
-You can test your AnyOf Conditions by dropping an item in the dropArea and hit the "test item" button.
-
-### customize Recipes
-When you use a recipe with AnyOf you can customize it and by doing so define what specific ingredients you finally want to use for this recipe.
-
-#### Drag And Drop
-
-![img.png](pictures/anyOfDrop1.png)
-![img.png](pictures/anyOfDrop2.png)
-
-drag and drop an ingredient (e.g. from your inventar) to "anyOf" ingredient within your recipeCompendium.
-#### Select available
-![selection.png](pictures/selection.png)
-clicking the AnyOf will popup a multiple choice dialog of available matching items you can choose from.
-
-It will automatically check if that new ingredient is available in that quantity. 
-
-none customized AnyOf ingredients will popup a multiple choice dialog of available matching items before starting
-#### reset
-when you reselect the recipe it will remove your customization and start over with unconfigured anyOf Items again.
-
-## Hooks
-### beavers-crafting.start
-This is fired for all crafting processes directly 
-after all components are selected and before anything is actually processed.
-````
-Hooks.on("beavers-crafting.start", (recipe) => {
-  console.log(recipe);  
-});
-````
-Parameters
-- Recipe as reference: You can change the crafting process by manipulating the recipe parameter.
-
-## Examples
-The easiest way to get started with this module is with some examples.
-
-### Ingredients
-This module provides an example ingredient compendium for dnd5e. that can be used with your recipes.
+### Ingredients (dnd5e)
+The compendium "ingredients" of this module has example ingredients you can use in your own recipes.
 
 ![img.png](pictures/ingredients.png)
 
-### Recipes
-You can find some example recipes for potions (dnd5e) in the companion module beavers-potions
-- Install companion module [Beavers-potions](https://github.com/AngryBeaver/beavers-potions)
-- import the recipes into your world 
-- grant permission to the users you want to have access to it.
+## Create a recipe
+![img.png](pictures/newItem.png)
 
-![img.png](pictures/recipes.png)
+Create a new item and choose "Recipe" (or "AnyOf") as its type.
 
-Every Character will now have access to 50+ recipes to brew potions.
+If the type is missing, enable the [Create Beaver's Item Button](#create-beavers-item-button) or see [Troubleshooting](#troubleshooting).
+
+Recipes are recognized by the module, whatever item type your system uses for them, and always open in the recipe sheet.
+The button **System sheet** in its header opens your system's own item sheet, e.g. for price, weight or description.
+
+## The recipe sheet
+![configure.png](pictures/configure.png)
+
+The header shows the image, the name and the folder of the recipe.
+The folder groups the recipes in the crafting window and on the actor tab; click it to change it, e.g. `Smithing/Weapons`.
+
+The sheet follows Foundry's light and dark mode. Every section can be folded; players without edit rights see a read-only version.
+
+### Instruction
+Flavour text or instructions for the players, e.g. how long the work takes.
+
+![description.png](pictures/description.png)
+
+### Required
+Items that must be present but are not used up: tools, features, classes, backgrounds …
+
+### Cost
+Ingredients and money that are used up.
+
+### Results
+What the crafting gives on success: items, containers, roll tables or macros.
+- A roll table with quantity 3 is rolled three times.
+- A macro as result runs on success; it gets the same parameters as the recipe macro, see [Output macros](macros.md#output-macros).
+- The hammer next to an item marks it as "crafted", see [isCrafted flag](#iscrafted-flag).
+
+For Required, Cost and Results:
+- Drag and drop items (from a compendium, see [Good to know](#good-to-know)) into the section.
+- Every line is needed (and). Drop an item on the **or** zone below a line to add an alternative: the player then picks **one of** them.
+- Click **| coin** at the end of a drop zone to add money; choose the currency in the line.
+
+![img.png](pictures/simpleOr.png)
+
+### Checks
+Optional checks the crafting needs, as numbered steps that are done one after another.
+- **+ Add step** adds a step; **+ alternative check** adds a check the player can choose instead.
+- A step needs a number of successes before the next step starts.
+- Check types: skill, ability, tool, or a fixed success without rolling (just progress over time). What is available depends on your system.
+- **Fails allowed**: the crafting fails when this many checks fail; 0 means it can never fail.
+- **Consume on fail**: whether the cost is lost when the crafting fails.
+
+![img.png](pictures/skillchallenge.png)
+
+This example means:
+- 3 successes in Insight DC 8 or Forgery Kit DC 8,
+- then 2 successes in History,
+- before 3 fails overall.
+
+### Macro
+For advanced users: JavaScript that runs during the crafting, with `result`, `actor` and `recipeData` available.
+
+Plain code runs when the crafting starts. Or write one object with a function per moment, every function is optional:
+```js
+{
+  start() {},                           // the crafting starts
+  inputChosen(component, preview) {},   // a cost is chosen, before anything is checked or paid
+  resultChosen(component, preview) {},  // a result is chosen, before anything is checked or paid
+  finish(success) {}                    // the crafting ends, before the results are given
+}
+```
+`inputChosen` and `resultChosen` can change quantities and money; the crafting window shows these changes as a preview (`preview` is `true` there).
+Throwing an error stops the crafting, it counts as failed.
+
+The sheet has an example to insert; more in [Macros](macros.md).
+
+Example: the cost is half the price of the chosen result (dnd5e)
+```js
+{
+  async resultChosen(component, preview) {
+    const item = await fromUuid(component.uuid);
+    const price = item?.system.price;
+    if (!price?.value) return;
+    // half the price in copper, rounded up
+    const perGold = CONFIG.DND5E.currencies[price.denomination]?.conversion || 1;
+    recipeData.currency = {name: "cp", value: Math.ceil(price.value * 100 / perGold / 2)};
+  }
+}
+```
+
+## Crafting
+Players find a new tab on their actor sheet.
+
+![img.png](pictures/craftingTab.png)
+
+### Choose a recipe
+Click **Craft…** to open the crafting window.
+
+![img.png](pictures/crafting.png)
+
+- It lists every recipe in your world that you may see (not those in compendiums).
+- Filters:
+  - **available**: you have at least one of the ingredients
+  - **usable**: you have all ingredients in the needed quantity
+  - **own**: the recipe is in your inventory
+  - **by item**: drop items to see only recipes using all of them
+- The recipe shows what you have and what is missing.
+- Where a recipe offers a choice ("one of", AnyOf), make it in the window; it can be undone.
+- **Start** begins the crafting.
+
+### Progress
+The tab lists everything you are working on, grouped by folder; click a name for details.
+
+If the recipe has checks, the needed resources are locked and you advance by clicking the progress:
+
+![advance.png](pictures/advance.png)
+
+At 100% you get the results. If the crafting fails, you get nothing.
+
+### Result
+A chat message shows the result.
+
+![img.png](pictures/result.png)
+
+Items created or updated by a successful crafting are flagged with `flags.beavers-crafting.isCrafted = true`.
+
+## AnyOf
+An AnyOf is an ingredient that stands for "any item that …", e.g. any weapon or any herb.
+Its macro gets an `item` and returns `true` when the item matches.
+
+```js
+return item.name.startsWith("Test")   // any item whose name starts with "Test"
+return item.type === "weapon"         // any weapon (if your system has this type)
+```
+The attributes of an item depend on your system. To look at them, use `console.log(item); return false` and open the console (F12).
+
+Test your AnyOf by dropping an item on its drop area and clicking "test item".
+
+**Without code:** with the module [Item Tags](https://foundryvtt.com/packages/item-tags) you can filter by tags:
+`return ItemTags.Check(item, ['metal','sword'])` ([API](https://modules.zoty.dev/itemTags/apiReference.html)).
+
+**When crafting**, choose which item is used for the AnyOf:
+- click it to pick from your matching items,
+
+  ![selection.png](pictures/selection.png)
+- or drag an item from your inventory onto it.
+
+  ![img.png](pictures/anyOfDrop1.png)
+  ![img.png](pictures/anyOfDrop2.png)
+
+An AnyOf that is not chosen yet asks before the crafting starts. Selecting the recipe again starts over.
+
+## Hooks
+### beavers-crafting.start
+Fires for every crafting after all components are chosen and before anything is processed.
+The recipe can be changed here to change the crafting.
+```js
+Hooks.on("beavers-crafting.start", (recipe) => {
+  console.log(recipe);
+});
+```
 
 ## Settings
 ### Create Beaver's Item Button
-In Foundry VTT v12+, you can enable a button in the Item Directory to quickly create Beaver's Crafting items (Recipes and AnyOf).
+Adds a button to the Item Directory to create Beaver's Crafting items (Recipe, AnyOf) directly (Foundry v12+).
+Enable **Add Beaver's Item Button** in the module settings.
 
 ![createItemButton.png](pictures/createItemButton.png)
 
-To enable this, go to the module's **Setup** configuration and check the **Add Beaver's Item Button** setting.
+### isCrafted flag
+Tells crafted items apart from bought or found ones, e.g. a recipe that only accepts crafted daggers. Disabled by default.
+- **Full**: a crafted item never counts as a normal one; recipes need to say explicitly that they accept crafted items.
+- **Partial**: recipes can require crafted items, and all other recipes accept crafted items as well. Non-crafted items are used first.
 
-### 3.3.x isCrafted flag
-This module now tracks a isCrafted flag on items.
-It will only be usefull if you want a crafting system that needs to differentiate between crafted and non crafted items.
-E.g. you want to create recipes that will only work with crafted daggers not bought daggers.
-Per default this setting is disabled. You can enable it in the settings to either full mode or partial mode.
-- In full mode a crafted item is never a normal item. e.g. you need to explicitly make recipes that works with crafted and non crafted items.
-- In partial mode you can create recipes that needs crafted items only but all recipes without crafted items would also accept crafted items.
-  You will use non crafted items before crafted ones.
-
-
-When this feature is enabled crafted items will be marked with an icon.
+Crafted items are marked with an icon.
 
 ![img.png](pictures/craftedIcon.png)
 
 ### Draggable chat result
-With this setting the results within your chat messages are draggable.
-You then can copy the item over to another character.
+Results in the chat message can be dragged to another character.
+- Only one item is copied each time.
+- This creates items beyond what the recipe gave.
+- Only items can be dragged.
+- Copied items are not flagged as crafted.
 
-### Limitations
-- you copy always only one instance
-- this will create new items beyond what the recipe original output !
-- this only works for items !
-- the item copied in this way are not flagged as "isCrafted" !
+### Currency exchange
+Money is exchanged automatically (e.g. a gold coin is changed to pay 5 silver).
+Turn it off to require the exact coins.
 
-
-## Notes
-### Currency reorder
-When adding costs to your recipe your currency will get exchanged to highest values.
-You can however turn off currencyExchange then you need to have the exact currency values.
-### Items reorder
-Actor Items will get merged to stacks in the crafting process. 
-(only those that match ingredients or results)
-### ItemReference
-The recipes do not store an item but a reference to the item. You can manipulate your items afterward the recipe always refers to the actual item.
-
-When you create recipes be carefully from where you pull your results/costs/requires items. 
-- Do not pull items from actors !
-- You might pull items form your imported world items, if you do your recipe will work perfectly within your world. 
-- You should pull items from compendium ! This way your recipe can be exported/imported to other worlds as long as those worlds have the same compendiums._
-
+## Good to know
+- **Recipes store references, not copies.** If you change an item later, the recipe uses the changed item.
+- **Where you take the items from matters:**
+  - Never take them from an actor.
+  - Items of your world work, but only in that world.
+  - Items from a compendium work in every world that has the same compendium, so recipes can be exported and imported.
+- **Stacks:** items on the actor that match ingredients or results are merged into stacks while crafting.
 
 ## Troubleshooting
-### Dont show "RECIPE" in item menu
-#### Problem: 
-When creating new Items the drop down menu does not have Recipe or AnyOf.
-#### Explanation:
-The module need to detect the window that creates new Items. For this it uses internally the title of that window. 
-If you have the default language the title is most likely "Create New Item".
+### "Recipe" is missing when creating an item
+The module adds Recipe and AnyOf to the item creation window. It finds that window by its title, which is "Create New Item" in English.
 
-![img.png](pictures/newItem.png).
-#### Solution:
-Enter the title of your item creation window in the module setup.
+![img.png](pictures/newItem.png)
 
-![image](https://github.com/AngryBeaver/beavers-crafting/assets/10677192/2161e666-7e5f-4398-bb4c-aa7ecaf62de5)
+**Solutions, from the easiest:**
+1. Enable the [Create Beaver's Item Button](#create-beavers-item-button) (Foundry v12+), which does not need the window at all.
+2. Enter the title of your item creation window (in your language) in the module settings.
 
-As of dnd5 v3.x it seems some systems can manipulate the window title to appear different to capture the right window use:
+   ![image](https://github.com/AngryBeaver/beavers-crafting/assets/10677192/2161e666-7e5f-4398-bb4c-aa7ecaf62de5)
+3. If your system changes the title, enable capturing in the settings:
 
-![img.png](pictures/capture-settings.png)
+   ![img.png](pictures/capture-settings.png)
 
-this will add a bullseye to the header:
+   A bullseye ![img.png](icons/bullseye.png) appears in window headers. Click it in the item creation window; the module remembers that window from then on.
 
-![img.png](icons/bullseye.png)
-
-click it this will configure this windows as your Item creation window and will add the new subtypes whenever you reopen it.
-
-**Alternative (v12+):**
-If the above methods fail or if you prefer a more direct approach, you can enable the [Create Beaver's Item Button](#create-beavers-item-button) in the module's setup. This adds a dedicated button to the Item Directory that skips the need for window detection.
-
-
-#### Advanced Explanation:
-It is not possible to add a new item subtype into all supported systems, even with this [addition](https://foundryvtt.com/article/module-sub-types/) since v11. So beavers-crafting fake it by listening to an event that opens windows and when the window is
-the Item Creation Window it adds item types to the drop down list. Yes that is evil and has high risks to break at somepoint but as said there is no other possiblity.
-To filter the right window the module uses the title of the window as there is no real good identification.
-
-
+**Why so complicated?** Foundry has no way for a module to add an item type to every system (not even the [module sub-types](https://foundryvtt.com/article/module-sub-types/) since v11), so the module adds the entries to the window when it opens.
 
 ## Credits
-translated to Brazilian Portuguese by [Andersants](https://github.com/Andersants)
-translated to French by [Michel](https://github.com/jehan-michel)
+- Brazilian Portuguese translation by [Andersants](https://github.com/Andersants)
+- French translation by [Michel](https://github.com/jehan-michel)

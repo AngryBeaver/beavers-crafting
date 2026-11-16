@@ -3,6 +3,8 @@ import {sanitizeUuid} from "./helpers/Utility.js";
 import {Result} from "./Result.js";
 import { recipeSkillToTests, recipeTestsToBeaversTests } from "./migration.js";
 import { markReplaced } from "./helpers/Compat.js";
+import { isHandlerMacro, MacroPhase, runMacroHandler } from "./helpers/RecipeMacro.js";
+
 export class Recipe implements RecipeData {
     uuid: string;
     id: string;
@@ -93,7 +95,8 @@ export class Recipe implements RecipeData {
         this.output = migrate(data.results || {}) || deserializeComponents(data.output || {});
         this.tests = data.tests;
         this.beaversTests = data.beaversTests;
-        this.currency = data.currency;
+        //own copy: a crafting may change it (macros) without touching the recipe it came from
+        this.currency = data.currency ? {...data.currency} : undefined;
         this.tool = data.tool;
         this.macro = data.macro || "";
         this.folder = data.folder;
@@ -249,12 +252,29 @@ export class Recipe implements RecipeData {
         delete this.tool;
     }
 
+    /** a handler of the new macro form (see helpers/RecipeMacro.ts); recipeData is this recipe */
+    async runMacro(phase: MacroPhase, result: Result, actor, ...args): Promise<MacroResult<Result>> {
+        const macroResult: MacroResult<Result> = {
+            value: result
+        }
+        try {
+            await runMacroHandler(this.macro, phase, {result, actor, recipeData: this}, ...args);
+        } catch (err) {
+            console.error(`Beavers Crafting | recipe macro ${phase}:`, err);
+            macroResult.error = err;
+        }
+        return macroResult;
+    }
+
     async executeMacro(recipeData: RecipeData, result: Result, actor): Promise<MacroResult<Result>> {
         const macroResult: MacroResult<Result> = {
             value: result
         }
         if (this.macro === undefined || this.macro === "") {
             return macroResult;
+        }
+        if (isHandlerMacro(this.macro)) {
+            return this.runMacro("start", result, actor);
         }
 
         const AsyncFunction = (async function () { }).constructor;

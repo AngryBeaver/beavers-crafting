@@ -18,13 +18,26 @@ const TEST_ICONS = {
 /** folded sections per recipe item, survives re-rendering */
 const foldedSections = new Map<string, Set<string>>();
 /** shown in an empty macro and inserted on request; works in every system */
-const MACRO_EXAMPLE = `// runs when the crafting starts
-// result: the crafting so far · actor: who crafts · recipeData: this recipe
-ui.notifications.info(\`\${actor.name} starts crafting \${recipeData.name}\`);
-
-// throwing an error stops the crafting, it counts as failed
-if (!actor.isOwner) {
-  throw new Error("only the owner of the actor may craft this");
+const MACRO_EXAMPLE = `// one function per moment, each is optional
+// available everywhere: result (the crafting so far), actor (who crafts), recipeData (this recipe)
+// an error stops the crafting, it counts as failed
+// (the old form, plain code without { }, still runs at the start)
+{
+  start() {
+    ui.notifications.info(\`\${actor.name} starts crafting \${recipeData.name}\`);
+  },
+  // every cost once it is chosen: change its quantity before anything is paid
+  inputChosen(component, preview) {
+    // component.quantity = Math.ceil(component.quantity / 2);
+  },
+  // every result once it is chosen; preview: only shown in the crafting window
+  resultChosen(component, preview) {
+    if (!preview) console.log(\`\${actor.name} will get \${component.quantity}x \${component.name}\`);
+  },
+  // at the end, before the results are given
+  finish(success) {
+    if (success) ui.notifications.info(\`\${recipeData.name} is done\`);
+  }
 }`;
 
 /**

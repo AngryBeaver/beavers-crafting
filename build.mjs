@@ -8,6 +8,7 @@ import fs from "fs";
 import fsp from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
+import { compilePack } from "@foundryvtt/foundryvtt-cli";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 let PACKAGE = JSON.parse(fs.readFileSync(path.join(__dirname, "package.json"), "utf8"));
@@ -16,6 +17,8 @@ const DIST = path.join(__dirname, "dist");
 const BUNDLE_DIR = path.join(__dirname, "package");
 const ASSET_DIRS = ["css", "lang", "icons", "templates", "packs"];
 const BUNDLE_JS_PATH = "src/main.js";
+// every folder in packs-src is compiled into a LevelDB pack of the same name in packs/
+const PACK_SOURCES = path.join(__dirname, "packs-src");
 
 const devDist = () => path.join(PACKAGE.devDir, PACKAGE.name);
 
@@ -82,22 +85,51 @@ async function copyAssets(root) {
   console.log(`[assets] -> ${root}`);
 }
 
+/** compiles packs-src/<name>/*.json into <root>/packs/<name> */
+async function compilePacks(root) {
+  if (!fs.existsSync(PACK_SOURCES)) return;
+  for (const entry of await fsp.readdir(PACK_SOURCES, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    const dest = path.join(root, "packs", entry.name);
+    try {
+      await fsp.rm(dest, { recursive: true, force: true });
+      await compilePack(path.join(PACK_SOURCES, entry.name), dest);
+      console.log(`[pack] ${entry.name} -> ${dest}`);
+    } catch (err) {
+      // a running Foundry keeps the pack of an open world locked
+      console.warn(`[pack] ${entry.name} not updated, it is in use (close the world): ${err.message}`);
+    }
+  }
+}
+
+/** removes the folder; parts a running Foundry keeps locked (open packs) stay */
+async function clearDir(dir) {
+  if (!fs.existsSync(dir)) return;
+  for (const entry of await fsp.readdir(dir)) {
+    await fsp.rm(path.join(dir, entry), { recursive: true, force: true })
+      .catch((err) => console.warn(`[clean] kept ${path.join(dir, entry)}: ${err.code}`));
+  }
+  console.log(`[clean] ${dir}`);
+}
+
 const rimraf = async (dir) => {
   await fsp.rm(dir, { recursive: true, force: true });
   console.log(`[clean] ${dir}`);
 };
 
 async function buildAll(root) {
-  await rimraf(root);
+  await clearDir(root);
   await esbuild.build(esbuildOptions(root));
   await Promise.all([buildManifest(root), copyAssets(root)]);
+  await compilePacks(root);
 }
 
 async function watchAll(root) {
-  await rimraf(root);
+  await clearDir(root);
   const ctx = await esbuild.context(esbuildOptions(root));
   await ctx.watch();
   await Promise.all([buildManifest(root), copyAssets(root)]);
+  await compilePacks(root);
   let timer;
   const onChange = (_evt, file) => {
     clearTimeout(timer);

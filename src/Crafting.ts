@@ -88,6 +88,7 @@ export class Crafting implements CraftingData {
 
   async startCrafting() {
     await this.evaluatePossibilities();
+    await this.executeChosenMacros();
     Hooks.call(Settings.NAMESPACE + ".start", this.recipe);
     await this.checkRequired();
     RecipeCompendium.validateRecipeToItemList(RecipeCompendium._filterData(this.recipe.input, component => true), this.actor.items, this.result);
@@ -107,6 +108,8 @@ export class Crafting implements CraftingData {
   }
 
   async endCrafting() {
+    // macro "finish": before the results are given, so it can still change them
+    this._macroError(await this.recipe.runMacro("finish", this.result, this.actor, !this.result.hasError()));
     if (!this.result.hasError()) {
       await this.executeOutputMacros();
     }
@@ -171,6 +174,8 @@ export class Crafting implements CraftingData {
   }
 
   async payCurrency() {
+    // a failed recipe macro ends the crafting without processing anything, so nothing may be paid
+    if (this.result._hasException) return;
     await this.result.payCurrency();
   }
 
@@ -182,13 +187,55 @@ export class Crafting implements CraftingData {
   }
 
   async executeMacro() {
-    const macroResult = await this.recipe.executeMacro(this.recipe, this.result, this.actor);
+    this._macroError(await this.recipe.executeMacro(this.recipe, this.result, this.actor));
+  }
+
+  /** an error in the recipe macro stops the crafting: it counts as failed */
+  _macroError(macroResult: MacroResult<Result>) {
     if (macroResult.error !== undefined) {
       // @ts-ignore
       ui.notifications.error("Beavers Crafting | recipe Error see logs");
       console.error("Beavers Crafting | recipe Error:", macroResult.error);
       this.result._hasException = true;
     }
+  }
+
+  /**
+   * macro "inputChosen" / "resultChosen": once per cost and per result, after the choices are made
+   * and before anything is checked or paid, so quantities and prices can still be changed.
+   */
+  async executeChosenMacros() {
+    const error = await Crafting.runChosenMacros(this.recipe, this.result, this.actor, false);
+    if (error) {
+      this._macroError({value: this.result, error});
+      return;
+    }
+    // the cost currency was copied into the result when the crafting was created
+    if (this.recipe.currency) {
+      this.result.setRecipeCurrency(this.recipe.currency);
+    }
+  }
+
+  /**
+   * preview (crafting window): only entries that are decided are passed, open choices are skipped.
+   * @returns the error of the first failing handler
+   */
+  static async runChosenMacros(recipe: Recipe, result: Result, actor, preview: boolean): Promise<any> {
+    for (const [type, phase] of [["input", "inputChosen"], ["output", "resultChosen"]] as const) {
+      for (const group of Object.values(recipe[type] || {})) {
+        const components = Object.values(group as { [key: string]: Component });
+        if (preview && (components.length !== 1 || components[0].type === Settings.ANYOF_SUBTYPE)) {
+          continue;
+        }
+        for (const component of components) {
+          const macroResult = await recipe.runMacro(phase, result, actor, component, preview);
+          if (macroResult.error !== undefined) {
+            return macroResult.error;
+          }
+        }
+      }
+    }
+    return undefined;
   }
 
   async executeOutputMacros() {

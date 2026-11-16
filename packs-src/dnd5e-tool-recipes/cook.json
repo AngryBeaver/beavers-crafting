@@ -1,0 +1,49 @@
+{
+  "_id": "bcr24cook0000000",
+  "_key": "!items!bcr24cook0000000",
+  "name": "Cook's Utensils Recipes",
+  "type": "loot",
+  "img": "icons/tools/laboratory/bowl-mixing.webp",
+  "system": {
+    "description": {
+      "value": "<p>Crafting with <strong>Cook's Utensils</strong> by the D&amp;D 2024 rules.</p>\n<ul>\n<li>You need proficiency with Cook's Utensils.</li>\n<li>Choose what to craft; the raw materials cost half of its price.</li>\n<li>The work takes one day of 8 hours per 10 GP of the item's price (at least one day). Several proficient crafters share the days.</li>\n</ul>"
+    }
+  },
+  "flags": {
+    "beavers-crafting": {
+      "subtype": "Recipe",
+      "recipe": {
+        "required": {
+          "1": {
+            "Compendium-dnd5e-equipment24-Item-phbtulCooksUtens": {
+              "id": "phbtulCooksUtens",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbtulCooksUtens",
+              "img": "icons/tools/laboratory/bowl-mixing.webp",
+              "name": "Cook's Utensils",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "tool"
+            }
+          }
+        },
+        "input": {},
+        "output": {
+          "1": {
+            "Compendium-dnd5e-equipment24-Item-phbagRations0000": {
+              "id": "phbagRations0000",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbagRations0000",
+              "img": "icons/consumables/food/berries-ration-round-red.webp",
+              "name": "Rations",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "consumable"
+            }
+          }
+        },
+        "macro": "// D&D 2024 crafting (Player's Handbook, SRD 5.2)\n// - proficiency with the tool is needed\n// - the raw materials cost half the price of the chosen item\n// - the items come from the Player's Handbook when it is active, otherwise from the free dnd5e equipment\n{\n  async resultChosen(component, preview) {\n    if (game.modules.get(\"dnd-players-handbook\")?.active) {\n      component.uuid = component.uuid.replace(\"Compendium.dnd5e.equipment24.Item.\", \"Compendium.dnd-players-handbook.equipment.Item.\");\n    }\n    const tool = \"cook\";\n    const proficient = actor.system.tools?.[tool]?.value > 0\n      || actor.items.some(i => i.type === \"tool\" && i.system.type?.baseItem === tool && i.system.prof?.multiplier > 0);\n    if (!preview && !proficient) {\n      ui.notifications.warn(`${actor.name} is not proficient with Cook's Utensils`);\n      throw new Error(`${actor.name} is not proficient with Cook's Utensils`);\n    }\n    const item = await fromUuid(component.uuid);\n    const price = item?.system.price;\n    if (!price?.value) return;\n    // in copper, halved and rounded up, then in the largest coin that fits exactly\n    const perGold = CONFIG.DND5E.currencies[price.denomination]?.conversion || 1;\n    const copper = Math.ceil(price.value * 100 / perGold / 2);\n    const coin = copper % 100 === 0 ? \"gp\" : copper % 10 === 0 ? \"sp\" : \"cp\";\n    recipeData.currency = {name: coin, value: copper / {gp: 100, sp: 10, cp: 1}[coin]};\n  }\n}",
+        "folder": "Tools",
+        "instruction": "<p>Crafting with <strong>Cook's Utensils</strong> by the D&amp;D 2024 rules.</p>\n<ul>\n<li>You need proficiency with Cook's Utensils.</li>\n<li>Choose what to craft; the raw materials cost half of its price.</li>\n<li>The work takes one day of 8 hours per 10 GP of the item's price (at least one day). Several proficient crafters share the days.</li>\n</ul>"
+      }
+    }
+  }
+}

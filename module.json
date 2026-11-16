@@ -38,6 +38,17 @@
       "system": "dnd5e",
       "type": "Item",
       "private": false
+    },
+    {
+      "label": "D&D 2024 Tool Recipes",
+      "name": "dnd5e-tool-recipes",
+      "path": "packs/dnd5e-tool-recipes",
+      "system": "dnd5e",
+      "type": "Item",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
     }
   ],
   "url": "https://github.com/AngryBeaver/beavers-crafting",

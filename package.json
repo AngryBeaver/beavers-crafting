@@ -15,6 +15,7 @@
     "devbuild": "node build.mjs dev",
     "devwatch": "node build.mjs devwatch",
     "release": "node build.mjs zip",
+    "recipes:dnd5e": "node tools/dnd5e-tool-recipes.mjs",
     "tag": "git tag -d ${npm_package_name}_${npm_package_version} 2>/dev/null ; git tag ${npm_package_name}_${npm_package_version} && git push -f origin ${npm_package_name}_${npm_package_version}",
     "format": "prettier --write \"src/**/*.{ts,js}\"",
     "format:check": "prettier --check \"src/**/*.{ts,js}\""
@@ -28,6 +29,7 @@
   },
   "devDependencies": {
     "@ethaks/fvtt-quench": "^0.6.0",
+    "@foundryvtt/foundryvtt-cli": "^1.1.0",
     "@league-of-foundry-developers/foundry-vtt-types": "^0.8.8-9",
     "@types/node": "^22.0.0",
     "archiver": "^7.0.1",

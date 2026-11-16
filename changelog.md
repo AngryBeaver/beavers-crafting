@@ -1,5 +1,19 @@
 # Changelog
 
+## 4.9.0
+- recipe macro can run at different moments
+  - write one object with a function per moment: `start`, `inputChosen(component, preview)`, `resultChosen(component, preview)`, `finish(success)`
+  - `inputChosen` / `resultChosen` run for every chosen cost and result before anything is checked or paid, so quantities and money can still be changed (e.g. half the price of the chosen result)
+  - the crafting window shows these changes as a preview
+  - the old form (plain code) keeps running when the crafting starts
+  - the example in the recipe sheet shows the new form
+- new compendium "D&D 2024 Tool Recipes" (dnd5e only)
+  - one recipe per tool with everything the tool can craft by the 2024 rules, choose the item when crafting
+  - the raw materials cost half the price of the chosen item (recipe macro)
+  - proficiency with the tool is needed
+  - uses the items of the Player's Handbook when it is active, otherwise the free dnd5e equipment (SRD 5.2)
+- fix: money was paid but not given back when a recipe macro failed
+
 ## 4.8.4
 - redesign recipe sheet
   - recipes open their own sheet, independent of the system's item sheet

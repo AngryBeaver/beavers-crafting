@@ -1,0 +1,418 @@
+{
+  "_id": "bcr24smith000000",
+  "_key": "!items!bcr24smith000000",
+  "name": "Smith's Tools Recipes",
+  "type": "loot",
+  "img": "icons/skills/trades/smithing-tongs-metal-red.webp",
+  "system": {
+    "description": {
+      "value": "<p>Crafting with <strong>Smith's Tools</strong> by the D&amp;D 2024 rules.</p>\n<ul>\n<li>You need proficiency with Smith's Tools.</li>\n<li>Choose what to craft; the raw materials cost half of its price.</li>\n<li>The work takes one day of 8 hours per 10 GP of the item's price (at least one day). Several proficient crafters share the days.</li>\n</ul>"
+    }
+  },
+  "flags": {
+    "beavers-crafting": {
+      "subtype": "Recipe",
+      "recipe": {
+        "required": {
+          "1": {
+            "Compendium-dnd5e-equipment24-Item-phbtulSmithsTool": {
+              "id": "phbtulSmithsTool",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbtulSmithsTool",
+              "img": "icons/skills/trades/smithing-tongs-metal-red.webp",
+              "name": "Smith's Tools",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "tool"
+            }
+          }
+        },
+        "input": {},
+        "output": {
+          "1": {
+            "Compendium-dnd5e-equipment24-Item-phbagBallBearing": {
+              "id": "phbagBallBearing",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbagBallBearing",
+              "img": "icons/weapons/ammunition/shot-round-brown.webp",
+              "name": "Ball Bearings",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "consumable"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbwepBattleaxe0": {
+              "id": "phbwepBattleaxe0",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbwepBattleaxe0",
+              "img": "icons/weapons/axes/axe-battle-black.webp",
+              "name": "Battleaxe",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "weapon"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbarmBreastplat": {
+              "id": "phbarmBreastplat",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbarmBreastplat",
+              "img": "icons/equipment/chest/breastplate-collared-steel-grey.webp",
+              "name": "Breastplate",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "equipment"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbagBucket00000": {
+              "id": "phbagBucket00000",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbagBucket00000",
+              "img": "icons/containers/misc/bucket-steel.webp",
+              "name": "Bucket",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "container"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbamoBulletsFir": {
+              "id": "phbamoBulletsFir",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbamoBulletsFir",
+              "img": "icons/containers/ammunition/bullets-belt.webp",
+              "name": "Bullets, Firearm",
+              "type": "Item",
+              "quantity": 10,
+              "itemType": "consumable"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbamoBulletsSli": {
+              "id": "phbamoBulletsSli",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbamoBulletsSli",
+              "img": "icons/weapons/ammunition/shot-round-blue.webp",
+              "name": "Bullets, Sling",
+              "type": "Item",
+              "quantity": 20,
+              "itemType": "consumable"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbagCaltrops000": {
+              "id": "phbagCaltrops000",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbagCaltrops000",
+              "img": "icons/weapons/thrown/bomb-spiked-purple.webp",
+              "name": "Caltrops",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "consumable"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbagChain000000": {
+              "id": "phbagChain000000",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbagChain000000",
+              "img": "icons/tools/fasteners/chain-steel-grey.webp",
+              "name": "Chain",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "consumable"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbarmChainMail0": {
+              "id": "phbarmChainMail0",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbarmChainMail0",
+              "img": "icons/equipment/chest/breastplate-metal-scaled-grey.webp",
+              "name": "Chain Mail",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "equipment"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbarmChainShirt": {
+              "id": "phbarmChainShirt",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbarmChainShirt",
+              "img": "icons/equipment/chest/breastplate-scale-grey.webp",
+              "name": "Chain Shirt",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "equipment"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbagCrowbar0000": {
+              "id": "phbagCrowbar0000",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbagCrowbar0000",
+              "img": "icons/tools/hand/pickaxe-steel-white.webp",
+              "name": "Crowbar",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "loot"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbwepDagger0000": {
+              "id": "phbwepDagger0000",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbwepDagger0000",
+              "img": "icons/weapons/daggers/dagger-straight-blue.webp",
+              "name": "Dagger",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "weapon"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbwepFlail00000": {
+              "id": "phbwepFlail00000",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbwepFlail00000",
+              "img": "icons/weapons/maces/flail-ball-grey.webp",
+              "name": "Flail",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "weapon"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbwepGlaive0000": {
+              "id": "phbwepGlaive0000",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbwepGlaive0000",
+              "img": "icons/weapons/polearms/glaive-simple.webp",
+              "name": "Glaive",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "weapon"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbagGrapplingHo": {
+              "id": "phbagGrapplingHo",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbagGrapplingHo",
+              "img": "icons/tools/fishing/hook-multi-steel-brown.webp",
+              "name": "Grappling Hook",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "equipment"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbwepGreataxe00": {
+              "id": "phbwepGreataxe00",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbwepGreataxe00",
+              "img": "icons/weapons/axes/axe-double-black.webp",
+              "name": "Greataxe",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "weapon"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbwepGreatsword": {
+              "id": "phbwepGreatsword",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbwepGreatsword",
+              "img": "icons/weapons/swords/greatsword-crossguard-steel.webp",
+              "name": "Greatsword",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "weapon"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbwepHalberd000": {
+              "id": "phbwepHalberd000",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbwepHalberd000",
+              "img": "icons/weapons/polearms/halberd-engraved-black.webp",
+              "name": "Halberd",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "weapon"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbarmHalfPlateA": {
+              "id": "phbarmHalfPlateA",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbarmHalfPlateA",
+              "img": "icons/equipment/chest/breastplate-cuirass-steel-grey.webp",
+              "name": "Half Plate Armor",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "equipment"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbwepHandaxe000": {
+              "id": "phbwepHandaxe000",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbwepHandaxe000",
+              "img": "icons/weapons/axes/axe-broad-black.webp",
+              "name": "Handaxe",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "weapon"
+            },
+            "Compendium-dnd5e-items-Item-M8xM8BLK4tpUayEE": {
+              "id": "M8xM8BLK4tpUayEE",
+              "uuid": "Compendium.dnd5e.items.Item.M8xM8BLK4tpUayEE",
+              "img": "icons/tools/laboratory/cauldron-filled-gold.webp",
+              "name": "Iron Pot",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "container"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbwepJavelin000": {
+              "id": "phbwepJavelin000",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbwepJavelin000",
+              "img": "icons/weapons/polearms/javelin-flared.webp",
+              "name": "Javelin",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "weapon"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbwepLance00000": {
+              "id": "phbwepLance00000",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbwepLance00000",
+              "img": "icons/weapons/polearms/spear-simple-engraved.webp",
+              "name": "Lance",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "weapon"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbwepLightHamme": {
+              "id": "phbwepLightHamme",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbwepLightHamme",
+              "img": "icons/weapons/hammers/shorthammer-double-stone-engraved.webp",
+              "name": "Light Hammer",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "weapon"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbwepLongsword0": {
+              "id": "phbwepLongsword0",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbwepLongsword0",
+              "img": "icons/weapons/swords/greatsword-guard.webp",
+              "name": "Longsword",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "weapon"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbwepMace000000": {
+              "id": "phbwepMace000000",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbwepMace000000",
+              "img": "icons/weapons/maces/mace-flanged-steel.webp",
+              "name": "Mace",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "weapon"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbwepMaul000000": {
+              "id": "phbwepMaul000000",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbwepMaul000000",
+              "img": "icons/weapons/hammers/hammer-double-stone-worn.webp",
+              "name": "Maul",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "weapon"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbwepMorningsta": {
+              "id": "phbwepMorningsta",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbwepMorningsta",
+              "img": "icons/weapons/maces/mace-cube-spiked-steel.webp",
+              "name": "Morningstar",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "weapon"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbwepPike000000": {
+              "id": "phbwepPike000000",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbwepPike000000",
+              "img": "icons/weapons/polearms/spear-hooked-spike.webp",
+              "name": "Pike",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "weapon"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbarmPlateArmor": {
+              "id": "phbarmPlateArmor",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbarmPlateArmor",
+              "img": "icons/equipment/chest/breastplate-collared-steel.webp",
+              "name": "Plate Armor",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "equipment"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbwepRapier0000": {
+              "id": "phbwepRapier0000",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbwepRapier0000",
+              "img": "icons/weapons/swords/sword-guard-bronze.webp",
+              "name": "Rapier",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "weapon"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbarmRingMail00": {
+              "id": "phbarmRingMail00",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbarmRingMail00",
+              "img": "icons/equipment/chest/breastplate-banded-simple-leather-brown.webp",
+              "name": "Ring Mail",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "equipment"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbarmScaleMail0": {
+              "id": "phbarmScaleMail0",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbarmScaleMail0",
+              "img": "icons/equipment/chest/breastplate-banded-steel.webp",
+              "name": "Scale Mail",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "equipment"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbwepScimitar00": {
+              "id": "phbwepScimitar00",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbwepScimitar00",
+              "img": "icons/weapons/swords/scimitar-worn-blue.webp",
+              "name": "Scimitar",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "weapon"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbwepShortsword": {
+              "id": "phbwepShortsword",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbwepShortsword",
+              "img": "icons/weapons/swords/sword-guard-worn-purple.webp",
+              "name": "Shortsword",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "weapon"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbwepSickle0000": {
+              "id": "phbwepSickle0000",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbwepSickle0000",
+              "img": "icons/weapons/sickles/sickle-curved.webp",
+              "name": "Sickle",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "weapon"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbwepSpear00000": {
+              "id": "phbwepSpear00000",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbwepSpear00000",
+              "img": "icons/weapons/polearms/spear-flared-green.webp",
+              "name": "Spear",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "weapon"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbagSpikesIron0": {
+              "id": "phbagSpikesIron0",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbagSpikesIron0",
+              "img": "icons/tools/fasteners/nails-steel-brown.webp",
+              "name": "Spikes, Iron",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "loot"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbarmSplintArmo": {
+              "id": "phbarmSplintArmo",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbarmSplintArmo",
+              "img": "icons/equipment/chest/breastplate-layered-steel.webp",
+              "name": "Splint Armor",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "equipment"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbwepTrident000": {
+              "id": "phbwepTrident000",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbwepTrident000",
+              "img": "icons/weapons/polearms/trident-silver-blue.webp",
+              "name": "Trident",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "weapon"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbwepWarPick000": {
+              "id": "phbwepWarPick000",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbwepWarPick000",
+              "img": "icons/weapons/axes/pickaxe-iron-green.webp",
+              "name": "War Pick",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "weapon"
+            },
+            "Compendium-dnd5e-equipment24-Item-phbwepWarhammer0": {
+              "id": "phbwepWarhammer0",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbwepWarhammer0",
+              "img": "icons/weapons/hammers/hammer-drilling-spiked.webp",
+              "name": "Warhammer",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "weapon"
+            }
+          }
+        },
+        "macro": "// D&D 2024 crafting (Player's Handbook, SRD 5.2)\n// - proficiency with the tool is needed\n// - the raw materials cost half the price of the chosen item\n// - the items come from the Player's Handbook when it is active, otherwise from the free dnd5e equipment\n{\n  async resultChosen(component, preview) {\n    if (game.modules.get(\"dnd-players-handbook\")?.active) {\n      component.uuid = component.uuid.replace(\"Compendium.dnd5e.equipment24.Item.\", \"Compendium.dnd-players-handbook.equipment.Item.\");\n    }\n    const tool = \"smith\";\n    const proficient = actor.system.tools?.[tool]?.value > 0\n      || actor.items.some(i => i.type === \"tool\" && i.system.type?.baseItem === tool && i.system.prof?.multiplier > 0);\n    if (!preview && !proficient) {\n      ui.notifications.warn(`${actor.name} is not proficient with Smith's Tools`);\n      throw new Error(`${actor.name} is not proficient with Smith's Tools`);\n    }\n    const item = await fromUuid(component.uuid);\n    const price = item?.system.price;\n    if (!price?.value) return;\n    // in copper, halved and rounded up, then in the largest coin that fits exactly\n    const perGold = CONFIG.DND5E.currencies[price.denomination]?.conversion || 1;\n    const copper = Math.ceil(price.value * 100 / perGold / 2);\n    const coin = copper % 100 === 0 ? \"gp\" : copper % 10 === 0 ? \"sp\" : \"cp\";\n    recipeData.currency = {name: coin, value: copper / {gp: 100, sp: 10, cp: 1}[coin]};\n  }\n}",
+        "folder": "Tools",
+        "instruction": "<p>Crafting with <strong>Smith's Tools</strong> by the D&amp;D 2024 rules.</p>\n<ul>\n<li>You need proficiency with Smith's Tools.</li>\n<li>Choose what to craft; the raw materials cost half of its price.</li>\n<li>The work takes one day of 8 hours per 10 GP of the item's price (at least one day). Several proficient crafters share the days.</li>\n</ul>"
+      }
+    }
+  }
+}

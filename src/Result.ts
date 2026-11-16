@@ -175,6 +175,16 @@ export class Result implements ResultApi, ResultData {
         this._tests.maxHits=maxHits;
         this._tests.maxFails=maxFails;
     }
+    /** the recipe's cost money changed (macro): replace it, the combined sum included */
+    setRecipeCurrency(currency: Currency) {
+        if (this._currencyResult) {
+            this._addCurrencie({name: this._currencyResult.name, value: this._currencyResult.value});
+        }
+        this._recipe = {...this._recipe, currency: {...currency}};
+        this._currencyResult = new CurrencyResult(currency);
+        this._addCurrencie({name: currency.name, value: currency.value * -1});
+    }
+
     _addCurrencie(currency:Currency){
         this._currencyCombined[currency.name] = (this._currencyCombined[currency.name] || 0 )+ currency.value
     }

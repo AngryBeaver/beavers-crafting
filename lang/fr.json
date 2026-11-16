@@ -79,7 +79,7 @@
       "addStep": "Ajouter une étape",
       "noChecks": "Aucun test",
       "macro": "Macro",
-      "macroHint": "S'exécute au début de la fabrication. Disponible :",
+      "macroHint": "Du code simple s'exécute au début de la fabrication, ou une fonction par moment (voir l'exemple). Disponible :",
       "tag": {
         "anyOf": "au choix",
         "macro": "macro",

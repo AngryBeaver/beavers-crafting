@@ -79,7 +79,7 @@
       "addStep": "Adicionar etapa",
       "noChecks": "Sem testes",
       "macro": "Macro",
-      "macroHint": "Executa quando a fabricação começa. Disponível:",
+      "macroHint": "Código simples executa quando a fabricação começa, ou uma função por momento (veja o exemplo). Disponível:",
       "tag": {
         "anyOf": "qualquer",
         "macro": "macro",

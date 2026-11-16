@@ -8,6 +8,7 @@ import {ComponentResults, Result} from "../Result.js";
 import {TestHandler} from "../TestHandler.js";
 import { sortByFolder } from "../helpers/Folder.js";
 import { createDragDrop, renderTemplate } from "../helpers/Compat.js";
+import { isHandlerMacro } from "../helpers/RecipeMacro.js";
 
 type SlotStatus = "success" | "error" | "unknown" | undefined;
 
@@ -214,8 +215,14 @@ export class CraftingApp extends Application {
             main.empty();
             return;
         }
-        const recipe = this.data.recipe;
         const renderId = ++this._sheetRenderId;
+        let recipe = this.data.recipe;
+        if (isHandlerMacro(recipe.macro)) {
+            // macro "inputChosen" / "resultChosen" may change costs: show them on a copy, the recipe itself stays as it is
+            recipe = Recipe.clone(recipe);
+            const error = await Crafting.runChosenMacros(recipe, Result.from(recipe, this.data.actor), this.data.actor, true);
+            if (error) console.warn("Beavers Crafting | recipe macro (preview):", error);
+        }
         const crafting = await Crafting.fromRecipe(this.data.actor.id, recipe);
         await crafting.checkCurrency();
         RecipeCompendium.validateRecipeToItemList(RecipeCompendium._filterData(recipe.input, (c) => c.type === "Item"), this.data.actor.items, crafting.result);

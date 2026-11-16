@@ -79,7 +79,7 @@
       "addStep": "Add step",
       "noChecks": "No checks",
       "macro": "Macro",
-      "macroHint": "Runs when crafting starts. Available:",
+      "macroHint": "Plain code runs when crafting starts, or one function per moment (see example). Available:",
       "tag": {
         "anyOf": "any of",
         "macro": "macro",
