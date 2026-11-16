@@ -105,6 +105,7 @@ function macro(tool) {
   return `// D&D 2024 crafting (Player's Handbook, SRD 5.2)
 // - proficiency with the tool is needed
 // - the raw materials cost half the price of the chosen item
+// - one step per day of work: a day (8 hours) per 10 GP of the price
 // - the items come from the Player's Handbook when it is active, otherwise from the free dnd5e equipment
 {
   async resultChosen(component, preview) {
@@ -126,6 +127,8 @@ function macro(tool) {
     const copper = Math.ceil(price.value * 100 / perGold / 2);
     const coin = copper % 100 === 0 ? "gp" : copper % 10 === 0 ? "sp" : "cp";
     recipeData.currency = {name: coin, value: copper / {gp: 100, sp: 10, cp: 1}[coin]};
+    const step = recipeData.beaversTests?.ands?.[1];
+    if (step) step.hits = Math.max(1, Math.ceil(copper * 2 / 1000));
   }
 }`;
 }
@@ -174,6 +177,12 @@ for (const tool of Object.values(packs.equipment24).filter(i => i.type === "tool
           required: { 1: { [required.key]: required.data } },
           input: {},
           output: { 1: output },
+          // the days of work, set by the macro for the chosen item
+          beaversTests: {
+            fails: 0,
+            consume: true,
+            ands: { 1: { hits: 1, ors: { 1: { type: "IncrementStep", data: { name: "Craft" } } } } },
+          },
           macro: macro(tool),
           folder: FOLDER,
           instruction: instruction(tool, skipped),

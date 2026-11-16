@@ -71,6 +71,7 @@ This module includes the compendium **D&D 2024 Tool Recipes**: one recipe for ev
 When crafting, the player chooses what to make from everything the tool can craft.
 - Proficiency with the tool is needed.
 - The raw materials cost half the price of the chosen item.
+- The work is a "Craft" step, advanced once per day of work: one day per 10 GP of the item's price (at least one).
 - The items come from the Player's Handbook when that module is active, otherwise from the free dnd5e equipment (SRD 5.2).
 
 ### Ingredients (dnd5e)

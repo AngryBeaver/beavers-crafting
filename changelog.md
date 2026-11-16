@@ -10,6 +10,7 @@
 - new compendium "D&D 2024 Tool Recipes" (dnd5e only)
   - one recipe per tool with everything the tool can craft by the 2024 rules, choose the item when crafting
   - the raw materials cost half the price of the chosen item (recipe macro)
+  - one "Craft" step per day of work: a day per 10 GP of the item's price, it cannot fail
   - proficiency with the tool is needed
   - uses the items of the Player's Handbook when it is active, otherwise the free dnd5e equipment (SRD 5.2)
 - fix: money was paid but not given back when a recipe macro failed
