@@ -280,6 +280,7 @@ Turn it off to require the exact coins.
 - **Stacks:** items on the actor that match ingredients or results are merged into stacks while crafting.
 
 ## Troubleshooting
+
 ### "Recipe" is missing when creating an item
 The module adds Recipe and AnyOf to the item creation window. It finds that window by its title, which is "Create New Item" in English.
 
