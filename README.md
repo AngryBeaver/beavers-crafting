@@ -22,9 +22,14 @@ It works in possibly every system through the [Beaver's System Interface](https:
 ### Crafting
 ![potionCrafting.png](pictures/potionCrafting.png)
 
-[Full length video](https://www.youtube.com/watch?v=t3YGk8uFK0w)
-### Character advancement
-![img.png](pictures/advancement.png)
+**Create a recipe**
+
+https://github.com/user-attachments/assets/f5e02b8f-ef72-4c76-a622-9aabf0788f51
+
+**Craft it**
+
+https://github.com/user-attachments/assets/6da63c89-439c-4681-9d1c-798b2250eaf1
+
 ### Downtime activities
 ![downtime.png](pictures/downtime.png)
 ### Containers

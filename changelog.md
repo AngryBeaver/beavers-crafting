@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.9.1
+- fix: the check type list of the recipe sheet showed untranslated texts
+- README: videos showing how to create a recipe and how to craft it
+
 ## 4.9.0
 - recipe macro can run at different moments
   - write one object with a function per moment: `start`, `inputChosen(component, preview)`, `resultChosen(component, preview)`, `finish(success)`

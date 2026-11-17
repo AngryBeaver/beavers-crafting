@@ -17,6 +17,11 @@ const TEST_ICONS = {
 };
 /** folded sections per recipe item, survives re-rendering */
 const foldedSections = new Map<string, Set<string>>();
+/** a text of a test class; a missing translation comes back as its key ("module.tests.x.info.note"), it is left out */
+function translated(text?: string): string {
+  return text && !/^[\w-]+(\.[\w-]+){2,}$/.test(text) ? text : "";
+}
+
 /** shown in an empty macro and inserted on request; works in every system */
 const MACRO_EXAMPLE = `// one function per moment, each is optional
 // available everywhere: result (the crafting so far), actor (who crafts), recipeData (this recipe)
@@ -188,7 +193,7 @@ export class RecipeSheet {
         const typeChoices = Object.entries(testClasses).map(([type, clazz]: [string, any]) => ({
           value: type,
           label: clazz.informationField?.label || type,
-          hint: clazz.informationField?.note || "",
+          hint: translated(clazz.informationField?.note),
           icon: TEST_ICONS[type] || "fa-dice-d20",
           on: type === test.type,
         }));
