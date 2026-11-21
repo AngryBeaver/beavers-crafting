@@ -1,0 +1,21 @@
+{
+  "_id": "bcr24profweaver0",
+  "_key": "!items!bcr24profweaver0",
+  "name": "Proficient with Weaver's Tools",
+  "type": "loot",
+  "folder": "bcr24folderRequi",
+  "img": "icons/equipment/back/cloak-hooded-pink.webp",
+  "system": {
+    "description": {
+      "value": "<p>Requirement: the actor is proficient with Weaver's Tools.</p>"
+    }
+  },
+  "flags": {
+    "beavers-crafting": {
+      "subtype": "Script",
+      "script": {
+        "macro": "{\n  check() {\n    const tool = \"weaver\";\n    return actor.system.tools?.[tool]?.value >= 1 || \"not proficient with Weaver's Tools\";\n  }\n}"
+      }
+    }
+  }
+}

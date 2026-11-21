@@ -2,6 +2,7 @@ import { Recipe } from "../Recipe.js";
 import { Settings } from "../Settings.js";
 import { getDataFrom } from "../helpers/Utility.js";
 import { AnyOf } from "../AnyOf.js";
+import { Script } from "../Script.js";
 import { createDragDrop, markReplaced, renderTemplate } from "../helpers/Compat.js";
 import { MAX_PIPS } from "../helpers/Progress.js";
 import { CraftingApp } from "./CraftingApp.js";
@@ -131,6 +132,7 @@ export class RecipeSheet {
           const isMoney = component.flags?.[Settings.NAMESPACE]?.subtype === "money";
           const tag = component.type === Settings.ANYOF_SUBTYPE ? {icon: "fa-filter", text: t("tag.anyOf")}
             : component.type === "Macro" ? {icon: "fa-terminal", text: t("tag.macro")}
+            : component.type === Settings.SCRIPT_SUBTYPE ? {icon: "fa-code", text: t("tag.script")}
             : component.type === "RollTable" ? {icon: "fa-table-list", text: t("tag.table")}
             : undefined;
           return {
@@ -139,13 +141,13 @@ export class RecipeSheet {
             img: isMoney ? currencyView(component.id).img || component.img : component.img,
             uuid: component.uuid,
             quantity: component.quantity,
-            hasQty: component.type !== "Macro",
+            hasQty: component.type !== "Macro" && component.type !== Settings.SCRIPT_SUBTYPE,
             isMoney,
             currencyId: component.id,
             currency: isMoney ? {label: currencyView(component.id).label} : undefined,
             currencyChoices: isMoney ? currencyChoices(component.id) : undefined,
             tag,
-            hasCrafted: hasCraftedFlag && type !== "output" && !isMoney,
+            hasCrafted: hasCraftedFlag && type !== "output" && !isMoney && component.type !== Settings.SCRIPT_SUBTYPE,
             crafted: !!component.flags?.[Settings.NAMESPACE]?.isCrafted,
             hasNoStack: type === "output" && component.type === "Item" && !isMoney,
             noStack: !!component.flags?.[Settings.NAMESPACE]?.noStack,
@@ -580,6 +582,21 @@ export class RecipeSheet {
 
     if (data.type === "Item" || (type === "output" && data.type === "RollTable")) {
       const entity = await fromUuid(data.uuid);
+      if (entity && Script.isScript(entity)) {
+        // a Script is a requirement: only in "required" and only with a check
+        if (type !== "required") {
+          ui.notifications?.warn(game["i18n"].localize("beaversCrafting.script.onlyRequired"));
+        } else if (!await new Script(entity).hasCheck()) {
+          ui.notifications?.warn(game["i18n"].localize("beaversCrafting.script.noCheckDrop"));
+        } else {
+          const component = beaversSystemInterface.componentFromEntity(entity);
+          component.type = Settings.SCRIPT_SUBTYPE;
+          component.quantity = 1;
+          this.recipe._addData(type, component, data.uuid, group);
+          void this.update();
+        }
+        return;
+      }
       if (entity) {
         const component = beaversSystemInterface.componentFromEntity(entity);
         component.type = data.type;

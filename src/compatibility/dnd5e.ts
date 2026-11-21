@@ -28,6 +28,35 @@ function registerSettings() {
 }
 
 /**
+ * dnd5e 3+ shows the item types of the create dialog as cards: adds the beaver's item types.
+ * @returns false when it is not dnd5e 3+, then the dialog of the other systems is used
+ */
+export function dnd5eCreateItemDialog(app, html): boolean {
+    if (game["system"].id !== "dnd5e" || Number(game["dnd5e"]?.version?.split(".")[0]) < 3) {
+        return false;
+    }
+    const itemType = beaversSystemInterface.configLootItemType;
+    const card = (img: string, name: string, subType: string) => `<li>
+            <label>
+                <img src="${img}" alt="${name}">
+                <span>${name}</span>
+                <input type="radio" data-subType="${subType}" name="type" value="${itemType}">
+            </label>
+        </li>`;
+    // no beaver's container: dnd5e has its own containers
+    html.find("ol.card").append(
+        card("icons/sundries/scrolls/scroll-worn-tan.webp", "Recipe", "recipe")
+        + card("modules/beavers-crafting/icons/anyOf.png", "AnyOf", "anyOf")
+        + card("icons/magic/symbols/cog-glowing-green.webp", "Script", "script")
+        + `<input class="subtype" name="flags.beavers-crafting.subtype" style="display:none" value="">`);
+    html.find("input[type=radio]").on("click", function () {
+        html.find("input.subtype").val($(this).data("subtype"));
+    });
+    app.setPosition({height: "auto"});
+    return true;
+}
+
+/**
  * Items with the flag "fastCrafted" (Crafter feat, Fast Crafting) fall apart
  * when the actor finishes the next long rest.
  */

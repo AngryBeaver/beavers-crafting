@@ -1,6 +1,7 @@
 import {Recipe} from "../Recipe.js";
 import {Settings} from "../Settings.js";
 import {AnyOf} from "../AnyOf.js";
+import {Script} from "../Script.js";
 import {Result} from "../Result.js";
 import {Container} from "../Container.js";
 import { getActorContentPool } from "../ContainerHandler.js";
@@ -156,12 +157,31 @@ export class RecipeCompendium {
         if (Settings.get(Settings.USE_ATTENDANTS)) {
             const listOfRequiredWithoutAnyOf = this._filterData(recipe.required, component => component.type !== Settings.ANYOF_SUBTYPE);
             for (const component of listOfRequiredWithoutAnyOf) {
-                result.updateComponent("required", component);
+                if (component.type === Settings.SCRIPT_SUBTYPE) {
+                    const {ok, reason} = await this.checkScript(component, result._actor, recipe);
+                    result.setScriptResult(component, ok, reason);
+                } else {
+                    result.updateComponent("required", component);
+                }
             }
         }
         return result;
     }
 
+
+    static async checkScript(component: Component, actor, recipe: Recipe): Promise<{ ok: boolean, reason?: string }> {
+        let entity;
+        try {
+            entity = await component.getEntity();
+        } catch (e) {
+            entity = undefined;
+        }
+        if (!entity || !Script.isScript(entity)) {
+            // @ts-ignore
+            return {ok: false, reason: game.i18n.format("beaversCrafting.script.missing", {name: component.name})};
+        }
+        return new Script(entity).check(actor, recipe);
+    }
 
     static async evaluateOption(type: DataType, recipe: Recipe, group: string): Promise<string> {
         const data = recipe[type][group];

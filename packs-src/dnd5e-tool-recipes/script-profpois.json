@@ -1,0 +1,21 @@
+{
+  "_id": "bcr24profpois000",
+  "_key": "!items!bcr24profpois000",
+  "name": "Proficient with Poisoner's Kit",
+  "type": "loot",
+  "folder": "bcr24folderRequi",
+  "img": "icons/containers/bags/pouch-gold-green.webp",
+  "system": {
+    "description": {
+      "value": "<p>Requirement: the actor is proficient with Poisoner's Kit.</p>"
+    }
+  },
+  "flags": {
+    "beavers-crafting": {
+      "subtype": "Script",
+      "script": {
+        "macro": "{\n  check() {\n    const tool = \"pois\";\n    return actor.system.tools?.[tool]?.value >= 1 || \"not proficient with Poisoner's Kit\";\n  }\n}"
+      }
+    }
+  }
+}

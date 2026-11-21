@@ -1,0 +1,21 @@
+{
+  "_id": "bcr24profmason00",
+  "_key": "!items!bcr24profmason00",
+  "name": "Proficient with Mason's Tools",
+  "type": "loot",
+  "folder": "bcr24folderRequi",
+  "img": "icons/tools/hand/hammer-and-nail.webp",
+  "system": {
+    "description": {
+      "value": "<p>Requirement: the actor is proficient with Mason's Tools.</p>"
+    }
+  },
+  "flags": {
+    "beavers-crafting": {
+      "subtype": "Script",
+      "script": {
+        "macro": "{\n  check() {\n    const tool = \"mason\";\n    return actor.system.tools?.[tool]?.value >= 1 || \"not proficient with Mason's Tools\";\n  }\n}"
+      }
+    }
+  }
+}

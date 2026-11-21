@@ -166,6 +166,9 @@ result.updateComponent("consumed",ingredient1,
 });
 ````
 ### Additional Recipe Requirements
+Since 4.11.0 a **Script** item is the easier way (see "Script requirements" below):
+it is checked before crafting, so the recipe list already shows it as not craftable.
+
 with this code you can have additional requirements not covered by items, here we check for required level 8
 ````javascript
 const requiredLevel = 8;
@@ -259,3 +262,23 @@ if (inputKey) {
 }
 ```
 
+
+## Script requirements
+A **Script** is an item (like AnyOf) with a small script. Create it with the item type "Script" and drop it into "Required" of a recipe.
+It can only be put into "Required", and only when it has a `check`.
+
+```javascript
+{
+  check() {
+    if (actor.items.some(i => i.name === "Forge")) return true;
+    return "needs a Forge";
+  }
+}
+```
+- available: `actor` (who crafts) and `recipe` (the recipe)
+- `true`: the requirement is met
+- `false`: not met, the name of the script is shown as the reason
+- a text: not met, the text is shown as the reason; an error counts as not met as well
+- it runs whenever the recipe is evaluated (recipe list, crafting window, start), so it must only check, never change anything
+- like required items it is only checked when the setting "Recipes use required Items" is on
+- drop an actor on the script's sheet to test it

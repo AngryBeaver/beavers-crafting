@@ -1,0 +1,21 @@
+{
+  "_id": "bcr24profbrewer0",
+  "_key": "!items!bcr24profbrewer0",
+  "name": "Proficient with Brewer's Supplies",
+  "type": "loot",
+  "folder": "bcr24folderRequi",
+  "img": "icons/consumables/plants/herb-marjoram-basil-oregano-leaf-bunch-green.webp",
+  "system": {
+    "description": {
+      "value": "<p>Requirement: the actor is proficient with Brewer's Supplies.</p>"
+    }
+  },
+  "flags": {
+    "beavers-crafting": {
+      "subtype": "Script",
+      "script": {
+        "macro": "{\n  check() {\n    const tool = \"brewer\";\n    return actor.system.tools?.[tool]?.value >= 1 || \"not proficient with Brewer's Supplies\";\n  }\n}"
+      }
+    }
+  }
+}

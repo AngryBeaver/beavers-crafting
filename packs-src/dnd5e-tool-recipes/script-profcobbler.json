@@ -1,0 +1,21 @@
+{
+  "_id": "bcr24profcobbler",
+  "_key": "!items!bcr24profcobbler",
+  "name": "Proficient with Cobbler's Tools",
+  "type": "loot",
+  "folder": "bcr24folderRequi",
+  "img": "icons/tools/hand/awl-steel-tan.webp",
+  "system": {
+    "description": {
+      "value": "<p>Requirement: the actor is proficient with Cobbler's Tools.</p>"
+    }
+  },
+  "flags": {
+    "beavers-crafting": {
+      "subtype": "Script",
+      "script": {
+        "macro": "{\n  check() {\n    const tool = \"cobbler\";\n    return actor.system.tools?.[tool]?.value >= 1 || \"not proficient with Cobbler's Tools\";\n  }\n}"
+      }
+    }
+  }
+}

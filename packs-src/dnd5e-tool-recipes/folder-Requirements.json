@@ -1,0 +1,12 @@
+{
+  "_id": "bcr24folderRequi",
+  "_key": "!folders!bcr24folderRequi",
+  "name": "Requirements",
+  "type": "Item",
+  "folder": null,
+  "sorting": "a",
+  "sort": 300000,
+  "color": null,
+  "description": "",
+  "flags": {}
+}

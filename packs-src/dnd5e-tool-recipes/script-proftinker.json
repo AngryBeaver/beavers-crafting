@@ -1,0 +1,21 @@
+{
+  "_id": "bcr24proftinker0",
+  "_key": "!items!bcr24proftinker0",
+  "name": "Proficient with Tinker's Tools",
+  "type": "loot",
+  "folder": "bcr24folderRequi",
+  "img": "icons/commodities/cloth/thread-spindle-white-needle.webp",
+  "system": {
+    "description": {
+      "value": "<p>Requirement: the actor is proficient with Tinker's Tools.</p>"
+    }
+  },
+  "flags": {
+    "beavers-crafting": {
+      "subtype": "Script",
+      "script": {
+        "macro": "{\n  check() {\n    const tool = \"tinker\";\n    return actor.system.tools?.[tool]?.value >= 1 || \"not proficient with Tinker's Tools\";\n  }\n}"
+      }
+    }
+  }
+}

@@ -1,5 +1,19 @@
 # Changelog
 
+## 4.11.0
+- new item type "Script": a small script as an item, like AnyOf (icon: green cog)
+  - for now a requirement: `check()` returns true when it is met, otherwise false or a text with the reason
+  - can only be dropped into "Required", and only when it has a `check()`
+  - checked before anything is chosen: the recipe list, the filters and the crafting window show it as not met, start is blocked
+  - the reason is shown in the crafting window; drop an actor on the script's sheet to test it
+  - like required items it is only checked when "Recipes use required Items" is on
+  - see macros.md "Script requirements"
+- D&D 2024 Tool Recipes: requirements as Script items in the folder "Requirements"
+  - one "Proficient with <tool>" per tool, with the tool's icon
+  - every recipe requires the tool itself and "Proficient with <tool>"; Fast Crafting also the Crafter feat (Player's Handbook feat as required item)
+  - a missing proficiency or feat now shows in the recipe list, not only when crafting starts
+- dnd5e: the item types of the create dialog moved into the dnd5e file
+
 ## 4.10.0
 - new: results can be marked "no stack" in the recipe sheet (layer icon next to the result)
   - the produced item is always added as its own item, never merged with items of the same name

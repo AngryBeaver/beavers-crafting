@@ -1,0 +1,21 @@
+{
+  "_id": "bcr24profcook000",
+  "_key": "!items!bcr24profcook000",
+  "name": "Proficient with Cook's Utensils",
+  "type": "loot",
+  "folder": "bcr24folderRequi",
+  "img": "icons/tools/laboratory/bowl-mixing.webp",
+  "system": {
+    "description": {
+      "value": "<p>Requirement: the actor is proficient with Cook's Utensils.</p>"
+    }
+  },
+  "flags": {
+    "beavers-crafting": {
+      "subtype": "Script",
+      "script": {
+        "macro": "{\n  check() {\n    const tool = \"cook\";\n    return actor.system.tools?.[tool]?.value >= 1 || \"not proficient with Cook's Utensils\";\n  }\n}"
+      }
+    }
+  }
+}

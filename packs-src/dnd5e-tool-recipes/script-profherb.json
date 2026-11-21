@@ -1,0 +1,21 @@
+{
+  "_id": "bcr24profherb000",
+  "_key": "!items!bcr24profherb000",
+  "name": "Proficient with Herbalism Kit",
+  "type": "loot",
+  "folder": "bcr24folderRequi",
+  "img": "icons/containers/bags/pouch-leather-green.webp",
+  "system": {
+    "description": {
+      "value": "<p>Requirement: the actor is proficient with Herbalism Kit.</p>"
+    }
+  },
+  "flags": {
+    "beavers-crafting": {
+      "subtype": "Script",
+      "script": {
+        "macro": "{\n  check() {\n    const tool = \"herb\";\n    return actor.system.tools?.[tool]?.value >= 1 || \"not proficient with Herbalism Kit\";\n  }\n}"
+      }
+    }
+  }
+}

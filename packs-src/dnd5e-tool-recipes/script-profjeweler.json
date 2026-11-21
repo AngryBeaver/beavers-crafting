@@ -1,0 +1,21 @@
+{
+  "_id": "bcr24profjeweler",
+  "_key": "!items!bcr24profjeweler",
+  "name": "Proficient with Jeweler's Tools",
+  "type": "loot",
+  "folder": "bcr24folderRequi",
+  "img": "icons/commodities/gems/gem-rough-rose-teal.webp",
+  "system": {
+    "description": {
+      "value": "<p>Requirement: the actor is proficient with Jeweler's Tools.</p>"
+    }
+  },
+  "flags": {
+    "beavers-crafting": {
+      "subtype": "Script",
+      "script": {
+        "macro": "{\n  check() {\n    const tool = \"jeweler\";\n    return actor.system.tools?.[tool]?.value >= 1 || \"not proficient with Jeweler's Tools\";\n  }\n}"
+      }
+    }
+  }
+}

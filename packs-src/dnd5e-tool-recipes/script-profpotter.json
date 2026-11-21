@@ -1,0 +1,21 @@
+{
+  "_id": "bcr24profpotter0",
+  "_key": "!items!bcr24profpotter0",
+  "name": "Proficient with Potter's Tools",
+  "type": "loot",
+  "folder": "bcr24folderRequi",
+  "img": "icons/containers/kitchenware/vase-bottle-brown.webp",
+  "system": {
+    "description": {
+      "value": "<p>Requirement: the actor is proficient with Potter's Tools.</p>"
+    }
+  },
+  "flags": {
+    "beavers-crafting": {
+      "subtype": "Script",
+      "script": {
+        "macro": "{\n  check() {\n    const tool = \"potter\";\n    return actor.system.tools?.[tool]?.value >= 1 || \"not proficient with Potter's Tools\";\n  }\n}"
+      }
+    }
+  }
+}

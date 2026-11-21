@@ -11,6 +11,7 @@ export class Settings {
     static MODULE_CONFIG_BUTTON = "moduleConfigButton";
     static RECIPE_SUBTYPE = "Recipe";
     static ANYOF_SUBTYPE = "AnyOf";
+    static SCRIPT_SUBTYPE = "Script";
     static MAJOR_VERSION = "majorVersion";
     static CRAFTING_APP_WIDTH = "craftingAppWidth";
     static CRAFTING_APP_HEIGHT = "craftingAppHeight";

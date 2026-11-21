@@ -1,0 +1,21 @@
+{
+  "_id": "bcr24profglassbl",
+  "_key": "!items!bcr24profglassbl",
+  "name": "Proficient with Glassblower's Tools",
+  "type": "loot",
+  "folder": "bcr24folderRequi",
+  "img": "icons/commodities/tech/metal-insert.webp",
+  "system": {
+    "description": {
+      "value": "<p>Requirement: the actor is proficient with Glassblower's Tools.</p>"
+    }
+  },
+  "flags": {
+    "beavers-crafting": {
+      "subtype": "Script",
+      "script": {
+        "macro": "{\n  check() {\n    const tool = \"glassblower\";\n    return actor.system.tools?.[tool]?.value >= 1 || \"not proficient with Glassblower's Tools\";\n  }\n}"
+      }
+    }
+  }
+}

@@ -7,11 +7,13 @@ import {Settings} from "../Settings.js";
 const images={
   recipe: "icons/sundries/scrolls/scroll-worn-tan.webp",
   anyOf: "modules/beavers-crafting/icons/anyOf.png",
+  script: "icons/magic/symbols/cog-glowing-green.webp",
   container: "icons/containers/bags/sack-simple-leather-brown.webp"
 }
 const types = {
   recipe: Settings.RECIPE_SUBTYPE,
   anyOf: Settings.ANYOF_SUBTYPE,
+  script: Settings.SCRIPT_SUBTYPE,
   container: "container"
 }
 
@@ -33,6 +35,9 @@ export async function showCreateItemDialog() {
                 </option>
                 <option value="anyOf">
                     ${(game as Game).i18n.localize("beaversCrafting.create-item-dialog.anyOf")}
+               </option>
+                <option value="script">
+                    ${(game as Game).i18n.localize("beaversCrafting.create-item-dialog.script")}
                </option>
                 <option value="container">
                     ${(game as Game).i18n.localize("beaversCrafting.create-item-dialog.container")}

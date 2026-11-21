@@ -25,6 +25,9 @@ interface SlotView {
     status: SlotStatus,
     missing: boolean,
     isAnyOf: boolean,
+    /** a Script requirement: no quantity, the reason when it is not met */
+    isScript?: boolean,
+    reason?: string,
     clickable: boolean,
     crafted: boolean,
     /** the group was a choice or an AnyOf in the original recipe and can be chosen again */
@@ -247,6 +250,8 @@ export class CraftingApp extends Application {
         const slot = (component: Component, type: DataType, group: string, key: string, results: ComponentResults | undefined, clickable: boolean): SlotView => {
             const isAnyOf = component.type === Settings.ANYOF_SUBTYPE;
             const isMoney = component.flags?.[Settings.NAMESPACE]?.subtype === "money";
+            const isScript = component.type === Settings.SCRIPT_SUBTYPE;
+            let reason: string | undefined = undefined;
             let status: SlotStatus = undefined;
             let have: number | undefined = undefined;
             const anyOfKey = CraftingApp._anyOfKey(type, group, key);
@@ -259,7 +264,9 @@ export class CraftingApp extends Application {
                 const componentResult = results.findComponentResult(component);
                 if (componentResult && !isAnyOf) {
                     status = componentResult.hasError() ? "error" : "success";
-                    if (!isMoney) {
+                    if (isScript) {
+                        reason = componentResult.reason;
+                    } else if (!isMoney) {
                         have = componentResult.originalQuantity;
                     }
                 } else {
@@ -277,7 +284,9 @@ export class CraftingApp extends Application {
                 status,
                 missing: status === "error",
                 isAnyOf,
-                clickable: clickable && !isAnyOf,
+                isScript,
+                reason,
+                clickable: clickable && !isAnyOf && !isScript,
                 crafted: hasCraftedFlag && !!component.flags?.[Settings.NAMESPACE]?.isCrafted,
                 expanded: isAnyOf && this.data.anyOfOpen === anyOfKey,
                 candidates: isAnyOf && this.data.anyOfOpen === anyOfKey ? (candidates || []).map((c, index) => ({
@@ -330,7 +339,8 @@ export class CraftingApp extends Application {
         }
 
         const missing: string[] = [];
-        const describe = (s: SlotView) => s.hasHave ? `${s.need - (s.have ?? 0)}× ${s.name}` : `${s.need}× ${s.name}`;
+        const describe = (s: SlotView) => s.isScript ? (s.reason || s.name)
+            : s.hasHave ? `${s.need - (s.have ?? 0)}× ${s.name}` : `${s.need}× ${s.name}`;
         if (currency?.missing) {
             missing.push(describe(currency));
         }

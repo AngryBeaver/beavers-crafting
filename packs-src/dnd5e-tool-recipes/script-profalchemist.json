@@ -1,0 +1,21 @@
+{
+  "_id": "bcr24profalchemi",
+  "_key": "!items!bcr24profalchemi",
+  "name": "Proficient with Alchemist's Supplies",
+  "type": "loot",
+  "folder": "bcr24folderRequi",
+  "img": "icons/tools/cooking/mortar-herbs-yellow.webp",
+  "system": {
+    "description": {
+      "value": "<p>Requirement: the actor is proficient with Alchemist's Supplies.</p>"
+    }
+  },
+  "flags": {
+    "beavers-crafting": {
+      "subtype": "Script",
+      "script": {
+        "macro": "{\n  check() {\n    const tool = \"alchemist\";\n    return actor.system.tools?.[tool]?.value >= 1 || \"not proficient with Alchemist's Supplies\";\n  }\n}"
+      }
+    }
+  }
+}

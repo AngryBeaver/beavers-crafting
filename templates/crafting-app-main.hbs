@@ -9,7 +9,7 @@
 {{/inline}}
 
 {{#*inline "bc-qty"}}
-  <span class="bc-qty">{{#if (eq type "output")}}×{{need}}{{else if hasHave}}<b>{{have}}</b> / {{need}}{{else}}<span class="bc-na">–</span> / {{need}}{{/if}}</span>
+  {{#unless isScript}}<span class="bc-qty">{{#if (eq type "output")}}×{{need}}{{else if hasHave}}<b>{{have}}</b> / {{need}}{{else}}<span class="bc-na">–</span> / {{need}}{{/if}}</span>{{/unless}}
 {{/inline}}
 
 {{#*inline "bc-undo"}}
@@ -46,7 +46,7 @@
 {{#*inline "bc-slot"}}
   <div class="bc-slot {{#if missing}}missing{{/if}} {{#if isAnyOf}}chooseAnyOf bc-pending{{#if expanded}} expanded{{/if}}{{else if clickable}}open-sheet{{/if}}"
        data-id="{{uuid}}" data-type="{{type}}" data-group="{{group}}" data-key="{{key}}"
-       {{#if isAnyOf}}data-tooltip="{{localize 'beaversCrafting.crafting-app.anyOfHint'}}"{{/if}}>
+       {{#if isAnyOf}}data-tooltip="{{localize 'beaversCrafting.crafting-app.anyOfHint'}}"{{else if reason}}data-tooltip="{{reason}}"{{/if}}>
     <img src="{{img}}" alt="">
     <span class="bc-n">{{name}}</span>
     {{#if crafted}}<img class="bc-crafted" src="modules/beavers-crafting/icons/tools.svg" alt="crafted" data-tooltip="crafted">{{/if}}

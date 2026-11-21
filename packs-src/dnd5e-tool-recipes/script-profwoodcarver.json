@@ -1,0 +1,21 @@
+{
+  "_id": "bcr24profwoodcar",
+  "_key": "!items!bcr24profwoodcar",
+  "name": "Proficient with Woodcarver's Tools",
+  "type": "loot",
+  "folder": "bcr24folderRequi",
+  "img": "icons/tools/hand/chisel-steel-brown.webp",
+  "system": {
+    "description": {
+      "value": "<p>Requirement: the actor is proficient with Woodcarver's Tools.</p>"
+    }
+  },
+  "flags": {
+    "beavers-crafting": {
+      "subtype": "Script",
+      "script": {
+        "macro": "{\n  check() {\n    const tool = \"woodcarver\";\n    return actor.system.tools?.[tool]?.value >= 1 || \"not proficient with Woodcarver's Tools\";\n  }\n}"
+      }
+    }
+  }
+}

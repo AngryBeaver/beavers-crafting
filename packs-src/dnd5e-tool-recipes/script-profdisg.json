@@ -1,0 +1,21 @@
+{
+  "_id": "bcr24profdisg000",
+  "_key": "!items!bcr24profdisg000",
+  "name": "Proficient with Disguise Kit",
+  "type": "loot",
+  "folder": "bcr24folderRequi",
+  "img": "icons/equipment/back/cloak-hooded-blue.webp",
+  "system": {
+    "description": {
+      "value": "<p>Requirement: the actor is proficient with Disguise Kit.</p>"
+    }
+  },
+  "flags": {
+    "beavers-crafting": {
+      "subtype": "Script",
+      "script": {
+        "macro": "{\n  check() {\n    const tool = \"disg\";\n    return actor.system.tools?.[tool]?.value >= 1 || \"not proficient with Disguise Kit\";\n  }\n}"
+      }
+    }
+  }
+}

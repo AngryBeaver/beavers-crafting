@@ -101,19 +101,11 @@ function component(item, pack, quantity) {
 /** ammunition is sold (and priced) as a bundle, everything else as one piece */
 const resultQuantity = item => item.system.type?.value === "ammo" ? (item.system.quantity || 1) : 1;
 
-function macro(tool) {
-  const key = tool.system.type.baseItem;
+function macro() {
   return `{
   async resultChosen(component, preview) {
     if (game.modules.get("dnd-players-handbook")?.active) {
       component.uuid = component.uuid.replace("${E24}", "Compendium.dnd-players-handbook.equipment.Item.");
-    }
-    const tool = "${key}";
-    const proficient = actor.system.tools?.[tool]?.value > 0
-      || actor.items.some(i => i.type === "tool" && i.system.type?.baseItem === tool && i.system.prof?.multiplier > 0);
-    if (!preview && !proficient) {
-      ui.notifications.warn(\`\${actor.name} is not proficient with ${tool.name}\`);
-      throw new Error(\`\${actor.name} is not proficient with ${tool.name}\`);
     }
     const item = await fromUuid(component.uuid);
     const price = item?.system.price;
@@ -160,6 +152,55 @@ function compendiumFolder(name, sort) {
 }
 const TOOLS_FOLDER_ID = compendiumFolder(FOLDER, 100000);
 const FAST_FOLDER_ID = compendiumFolder("Fast Crafting", 200000);
+const REQUIREMENTS_FOLDER_ID = compendiumFolder("Requirements", 300000);
+
+// Script items: requirements of the recipes, checked before anything is chosen
+const SCRIPT_IMG = "icons/magic/symbols/cog-glowing-green.webp";
+/** the actor's proficiency with one tool (dnd5e: actor.system.tools, 1 = proficient, 2 = expertise; 0.5 = half does not count) */
+const proficientScript = (key, toolName) => `{
+  check() {
+    const tool = "${key}";
+    return actor.system.tools?.[tool]?.value >= 1 || "not proficient with ${toolName}";
+  }
+}`;
+
+/** writes a Script item into the pack, returns it as a "required" entry of a recipe */
+function scriptItem(name, idBase, code, description, img = SCRIPT_IMG) {
+  const _id = id(idBase);
+  const doc = {
+    _id,
+    _key: `!items!${_id}`,
+    name,
+    type: "loot",
+    folder: REQUIREMENTS_FOLDER_ID,
+    img,
+    system: { description: { value: description } },
+    flags: { "beavers-crafting": { subtype: "Script", script: { macro: code } } },
+  };
+  fs.writeFileSync(path.join(OUT, `script-${idBase}.json`), JSON.stringify(doc, null, 2) + "\n");
+  const uuid = `Compendium.beavers-crafting.dnd5e-tool-recipes.Item.${_id}`;
+  return {
+    key: uuid.replace(/\./g, "-"),
+    data: { id: _id, uuid, img, name, type: "Script", quantity: 1, itemType: "loot" },
+  };
+}
+/** the "Proficient with <tool>" Script of a tool, written once */
+const proficientScripts = {};
+function proficient(tool) {
+  const key = tool.system.type.baseItem;
+  proficientScripts[key] ??= scriptItem(`Proficient with ${tool.name}`, "prof" + key, proficientScript(key, tool.name),
+    `<p>Requirement: the actor is proficient with ${tool.name}.</p>`, tool.img);
+  return proficientScripts[key];
+}
+// the Crafter feat of the Player's Handbook as a required item: it matches the actor's feat by name
+const CRAFTER_UUID = "Compendium.dnd-players-handbook.feats.Item.phbftCrafter0000";
+const CRAFTER = {
+  key: CRAFTER_UUID.replace(/\./g, "-"),
+  data: {
+    id: "phbftCrafter0000", uuid: CRAFTER_UUID, img: "icons/tools/hand/hammer-and-nail.webp",
+    name: "Crafter", type: "Item", quantity: 1, itemType: "feat",
+  },
+};
 
 let count = 0;
 for (const tool of Object.values(packs.equipment24).filter(i => i.type === "tool").sort((a, b) => a.name.localeCompare(b.name))) {
@@ -188,7 +229,7 @@ for (const tool of Object.values(packs.equipment24).filter(i => i.type === "tool
       "beavers-crafting": {
         subtype: "Recipe",
         recipe: {
-          required: { 1: { [required.key]: required.data } },
+          required: { 1: { [required.key]: required.data }, 2: { [proficient(tool).key]: proficient(tool).data } },
           input: {},
           output: { 1: output },
           // the days of work, set by the macro for the chosen item
@@ -197,7 +238,7 @@ for (const tool of Object.values(packs.equipment24).filter(i => i.type === "tool
             consume: true,
             ands: { 1: { hits: 1, ors: { 1: { type: "IncrementStep", data: { name: "Day of work" } } } } },
           },
-          macro: macro(tool),
+          macro: macro(),
           folder: FOLDER,
           instruction: instruction(tool, skipped),
         },
@@ -224,23 +265,11 @@ const FAST_CRAFTING = {
 // always a separate item, removed by the module after the next long rest
 const FAST_FLAGS = { "beavers-crafting": { noStack: true, fastCrafted: true } };
 
-function fastMacro(tool) {
-  const key = tool.system.type.baseItem;
+function fastMacro() {
   return `{
-  async resultChosen(component, preview) {
+  resultChosen(component, preview) {
     if (game.modules.get("dnd-players-handbook")?.active) {
       component.uuid = component.uuid.replace("${E24}", "Compendium.dnd-players-handbook.equipment.Item.");
-    }
-    if (preview) return;
-    const tool = "${key}";
-    const proficient = actor.system.tools?.[tool]?.value > 0
-      || actor.items.some(i => i.type === "tool" && i.system.type?.baseItem === tool && i.system.prof?.multiplier > 0);
-    const crafter = actor.items.some(i => i.type === "feat" && (i.system.identifier === "crafter" || i.name === "Crafter"));
-    const missing = [!crafter && "the Crafter feat", !proficient && "proficiency with ${tool.name}"].filter(m => m);
-    if (missing.length) {
-      const message = actor.name + " needs " + missing.join(" and ");
-      ui.notifications.warn(message);
-      throw new Error(message);
     }
   }
 }`;
@@ -278,10 +307,14 @@ for (const [key, names] of Object.entries(FAST_CRAFTING)) {
       "beavers-crafting": {
         subtype: "Recipe",
         recipe: {
-          required: { 1: { [required.key]: required.data } },
+          required: {
+            1: { [required.key]: required.data },
+            2: { [proficient(tool).key]: proficient(tool).data },
+            3: { [CRAFTER.key]: CRAFTER.data },
+          },
           input: {},
           output: { 1: output },
-          macro: fastMacro(tool),
+          macro: fastMacro(),
           folder: "Fast Crafting",
           instruction: fastInstruction(tool),
         },

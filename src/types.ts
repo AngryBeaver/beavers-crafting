@@ -51,7 +51,8 @@ interface ComponentResultData {
     component: ComponentData,
     isProcessed: boolean,
     originalQuantity: number,
-    userInteraction: UserInteraction
+    userInteraction: UserInteraction,
+    reason?: string
 }
 
 type UserInteraction =  "always" | "never" | "onSuccess";

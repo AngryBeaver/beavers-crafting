@@ -1,0 +1,21 @@
+{
+  "_id": "bcr24profpainter",
+  "_key": "!items!bcr24profpainter",
+  "name": "Proficient with Painter's Supplies",
+  "type": "loot",
+  "folder": "bcr24folderRequi",
+  "img": "icons/tools/hand/brush-paint-brown-white.webp",
+  "system": {
+    "description": {
+      "value": "<p>Requirement: the actor is proficient with Painter's Supplies.</p>"
+    }
+  },
+  "flags": {
+    "beavers-crafting": {
+      "subtype": "Script",
+      "script": {
+        "macro": "{\n  check() {\n    const tool = \"painter\";\n    return actor.system.tools?.[tool]?.value >= 1 || \"not proficient with Painter's Supplies\";\n  }\n}"
+      }
+    }
+  }
+}

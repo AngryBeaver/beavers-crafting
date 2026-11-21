@@ -1,0 +1,21 @@
+{
+  "_id": "bcr24profcalligr",
+  "_key": "!items!bcr24profcalligr",
+  "name": "Proficient with Calligrapher's Supplies",
+  "type": "loot",
+  "folder": "bcr24folderRequi",
+  "img": "icons/tools/scribal/pen-steel-grey-brown.webp",
+  "system": {
+    "description": {
+      "value": "<p>Requirement: the actor is proficient with Calligrapher's Supplies.</p>"
+    }
+  },
+  "flags": {
+    "beavers-crafting": {
+      "subtype": "Script",
+      "script": {
+        "macro": "{\n  check() {\n    const tool = \"calligrapher\";\n    return actor.system.tools?.[tool]?.value >= 1 || \"not proficient with Calligrapher's Supplies\";\n  }\n}"
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+<div class="flexcol script-sheet anyOf">
+    <p class="hint" style="flex:0">{{localize "beaversCrafting.script.hint"}}</p>
+    <textarea placeholder="{{localize "beaversCrafting.script.placeholder"}}"
+              {{#unless editable}}disabled{{/unless}}
+              name="flags.beavers-crafting.script.macro">{{script.macro}}</textarea>
+    {{#unless hasCheck}}
+        <span style="color:darkred;flex:0">{{localize "beaversCrafting.script.noCheck"}}</span>
+    {{/unless}}
+    <div class="flexrow bottom">
+        <div class="drop-area">
+            {{#if checkActor}}
+                <a class="item flexrow" title="{{checkActor.name}}">
+                    <img src="{{checkActor.img}}" alt="{{checkActor.name}}">
+                </a>
+                {{#if checkResult.ok}}
+                    <i class="fas fa-check"></i>
+                {{else}}
+                    <i class="fas fa-times"></i> {{checkResult.reason}}
+                {{/if}}
+            {{else}}
+                {{localize "beaversCrafting.script.dropActor"}}
+            {{/if}}
+        </div>
+        {{#if editable}}<button type="button" class="example">{{localize "beaversCrafting.script.example"}}</button>{{/if}}
+        <button type="button" class="test">{{localize "beaversCrafting.script.test"}}</button>
+    </div>
+</div>

@@ -4,6 +4,7 @@ import { rerenderItemDirectory, Settings} from './Settings.js';
 import {Crafting} from "./Crafting.js";
 import {RecipeCompendium} from "./apps/RecipeCompendium.js";
 import {AnyOfSheet} from "./apps/AnyOfSheet.js";
+import {ScriptSheet} from "./apps/ScriptSheet.js";
 import {Recipe} from "./Recipe.js";
 import {ActorSheetTab} from "./apps/ActorSheetTab.js";
 import {
@@ -18,7 +19,7 @@ import {ActorSheetContainer} from "./apps/ActorSheetContainer.js";
 import {CraftedItemSheet} from "./apps/CraftedItemSheet.js";
 import {ContainerSheet} from "./apps/ContainerSheet.js";
 import "./compatibility/tidy5e.js";
-import {initDnd5e} from "./compatibility/dnd5e.js";
+import {initDnd5e, dnd5eCreateItemDialog} from "./compatibility/dnd5e.js";
 import { hookChatLog } from "./apps/ChatLog.js";
 import { attachContentsToCreatedContainer, runCleanup } from "./ContainerHandler.js";
 import { getTemplate, markDeleted } from "./helpers/Compat.js";
@@ -159,6 +160,7 @@ Hooks.once("beavers-system-interface.ready", async function(){
   Hooks.on(`renderItemSheet`, async (app, html, data) => {
     if (app instanceof Application) {
       AnyOfSheet.bind(app, html, data);
+      ScriptSheet.bind(app, html, 1);
       CraftedItemSheet.bind(app, html, data);
       ContainerSheet.bind(app, html, data);
     }
@@ -166,6 +168,7 @@ Hooks.once("beavers-system-interface.ready", async function(){
 
   Hooks.on(`renderApplicationV2`, async (app, html, data, options) => {
     AnyOfSheet.bind(app, html, data, 2);
+    ScriptSheet.bind(app, html, 2);
     CraftedItemSheet.bind(app, html, data);
     ContainerSheet.bind(app, html, data);
     if (app.actor) {
@@ -190,6 +193,12 @@ Hooks.once("beavers-system-interface.ready", async function(){
       doc.updateSource({
         "flags.beavers-crafting.subtype": Settings.ANYOF_SUBTYPE,
         "img": "modules/beavers-crafting/icons/anyOf.png",
+      });
+    }
+    if (foundry.utils.getProperty(createData, `flags.${Settings.NAMESPACE}.subtype`) === "script") {
+      doc.updateSource({
+        "flags.beavers-crafting.subtype": Settings.SCRIPT_SUBTYPE,
+        "img": "icons/magic/symbols/cog-glowing-green.webp",
       });
     }
     if (foundry.utils.getProperty(createData, `flags.${Settings.NAMESPACE}.subtype`) === "container") {
@@ -273,10 +282,7 @@ Hooks.once("beavers-system-interface.ready", async function(){
       let windowTitle = app.data?.title; //V1
       if (!windowTitle) windowTitle = app.options.window.title; //V2
       if (windowTitle === title || windowTitle === "Create Item" || windowTitle === "Create New Item") {
-        if (game.system.id === "dnd5e" && game["dnd5e"].version.split(".")[0] >= 3) {
-          dnd5e(html);
-          app.setPosition({ height: "auto" });
-        } else {
+        if (!dnd5eCreateItemDialog(app, html)) {
           legacy(html);
         }
       }
@@ -306,6 +312,7 @@ Hooks.once("beavers-system-interface.ready", async function(){
 
     html.find("select[name='type']").append("<option value='" + itemType + "'>📜Recipe📜</option>");
     html.find("select[name='type']").append("<option value='" + itemType + "'>❔AnyOf❔</option>");
+    html.find("select[name='type']").append("<option value='" + itemType + "'>⚙️Script⚙️</option>");
     html.find("select[name='type']").append("<option value='" + itemType + "'>📦Container📦</option>");
     if (html.find("input.subtype").length === 0) {
       var form = html.find("form");
@@ -328,34 +335,17 @@ Hooks.once("beavers-system-interface.ready", async function(){
         html.find("select[name='system.subType']").parent().parent().remove();
         value = "anyOf";
       }
+      if (name === "⚙️Script⚙️") {
+        event.stopPropagation();
+        html.find("select[name='system.subType']").parent().parent().remove();
+        value = "script";
+      }
       if (name === "📦Container📦") {
         event.stopPropagation();
         html.find("select[name='system.subType']").parent().parent().remove();
         value = "container";
       }
       html.find("input.subtype").val(value);
-    });
-  }
-  //temp quickwin
-  function dnd5e(html) {
-    const itemType = beaversSystemInterface.configLootItemType;
-    // Do NOT add a beavers-crafting Container option for dnd5e — use native dnd5e containers only
-    html.find("ol.card").append(`<li>
-            <label>
-                <img src="icons/sundries/scrolls/scroll-worn-tan.webp" alt="Recipe">
-                <span>Recipe</span>
-                <input type="radio" data-subType="recipe" name="type" value="${itemType}">
-            </label>
-        </li><li>
-            <label>
-                <img src="modules/beavers-crafting/icons/anyOf.png" alt="AnyOf">
-                <span>AnyOf</span>
-                <input type="radio" data-subType="anyOf" name="type" value="${itemType}">
-            </label>
-        </li><input class="subtype" name="flags.beavers-crafting.subtype" style="display:none" value="">`);
-    html.find("input[type=radio]").on("click", function () {
-      const subType = $(this).data("subtype");
-      html.find("input.subtype").val(subType);
     });
   }
 

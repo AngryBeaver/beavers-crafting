@@ -234,6 +234,22 @@ export class Result implements ResultApi, ResultData {
         }
     }
 
+    /** a Script in "required": met (true) or not, with the reason; nothing of the actor is used */
+    setScriptResult(componentData: ComponentData, ok: boolean, reason?: string) {
+        const existing = this._components.required.findComponentResult(componentData);
+        if (existing) {
+            this._components.required.deleteComponentResult(componentData);
+        }
+        const componentResult = new ComponentResult();
+        componentResult.component = beaversSystemInterface.componentCreate(componentData);
+        componentResult.component.quantity = -1;
+        componentResult.originalQuantity = ok ? 1 : 0;
+        componentResult.userInteraction = "never";
+        componentResult.isProcessed = false;
+        componentResult.reason = ok ? undefined : reason;
+        this._components.required.addComponentResult(componentResult);
+    }
+
     deleteComponent(type: ComponentType, componentData: ComponentData) {
         this._components[type].deleteComponentResult(componentData);
     }
@@ -352,6 +368,8 @@ export class ComponentResult implements ComponentResultData {
     originalQuantity: number;
     userInteraction: UserInteraction;
     isProcessed: boolean = false;
+    /** why a Script requirement is not met */
+    reason?: string;
 
     static from(componentResultData: ComponentResultData): ComponentResult {
         const componentResult = new ComponentResult();
@@ -359,6 +377,7 @@ export class ComponentResult implements ComponentResultData {
         componentResult.originalQuantity = componentResultData.originalQuantity;
         componentResult.userInteraction = componentResultData.userInteraction;
         componentResult.isProcessed = componentResultData.isProcessed;
+        componentResult.reason = componentResultData.reason;
         return componentResult;
     }
 
@@ -370,7 +389,8 @@ export class ComponentResult implements ComponentResultData {
             component: this.component,
             isProcessed: this.isProcessed,
             originalQuantity: this.originalQuantity,
-            userInteraction: this.userInteraction
+            userInteraction: this.userInteraction,
+            reason: this.reason,
         }
     }
 

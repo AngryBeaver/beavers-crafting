@@ -1,0 +1,21 @@
+{
+  "_id": "bcr24profleather",
+  "_key": "!items!bcr24profleather",
+  "name": "Proficient with Leatherworker's Tools",
+  "type": "loot",
+  "folder": "bcr24folderRequi",
+  "img": "icons/commodities/leather/leather-buckle-steel-tan.webp",
+  "system": {
+    "description": {
+      "value": "<p>Requirement: the actor is proficient with Leatherworker's Tools.</p>"
+    }
+  },
+  "flags": {
+    "beavers-crafting": {
+      "subtype": "Script",
+      "script": {
+        "macro": "{\n  check() {\n    const tool = \"leatherworker\";\n    return actor.system.tools?.[tool]?.value >= 1 || \"not proficient with Leatherworker's Tools\";\n  }\n}"
+      }
+    }
+  }
+}

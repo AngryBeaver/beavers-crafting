@@ -1,0 +1,21 @@
+{
+  "_id": "bcr24profcarpent",
+  "_key": "!items!bcr24profcarpent",
+  "name": "Proficient with Carpenter's Tools",
+  "type": "loot",
+  "folder": "bcr24folderRequi",
+  "img": "icons/tools/hand/saw-steel-grey.webp",
+  "system": {
+    "description": {
+      "value": "<p>Requirement: the actor is proficient with Carpenter's Tools.</p>"
+    }
+  },
+  "flags": {
+    "beavers-crafting": {
+      "subtype": "Script",
+      "script": {
+        "macro": "{\n  check() {\n    const tool = \"carpenter\";\n    return actor.system.tools?.[tool]?.value >= 1 || \"not proficient with Carpenter's Tools\";\n  }\n}"
+      }
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "_id": "bcr24profsmith00",
+  "_key": "!items!bcr24profsmith00",
+  "name": "Proficient with Smith's Tools",
+  "type": "loot",
+  "folder": "bcr24folderRequi",
+  "img": "icons/skills/trades/smithing-tongs-metal-red.webp",
+  "system": {
+    "description": {
+      "value": "<p>Requirement: the actor is proficient with Smith's Tools.</p>"
+    }
+  },
+  "flags": {
+    "beavers-crafting": {
+      "subtype": "Script",
+      "script": {
+        "macro": "{\n  check() {\n    const tool = \"smith\";\n    return actor.system.tools?.[tool]?.value >= 1 || \"not proficient with Smith's Tools\";\n  }\n}"
+      }
+    }
+  }
+}

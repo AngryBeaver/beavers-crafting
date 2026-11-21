@@ -85,7 +85,8 @@
       "tag": {
         "anyOf": "any of",
         "macro": "macro",
-        "table": "table"
+        "table": "table",
+        "script": "script"
       },
       "summary": {
         "items": "{count} items",
@@ -127,6 +128,17 @@
       "folder": "Folder",
       "folderHint": "You can create subfolder by separating words with '.' e.g. Folder.Subfolder",
       "folderPlaceHolder": "Folder.Subfolder"
+    },
+    "script": {
+      "hint": "A requirement for recipes: put it into \"Required\". The function check() returns true when the requirement is met, otherwise false or a text with the reason. Available: actor and recipe.",
+      "placeholder": "{ check() { return true; } }",
+      "noCheck": "This script has no check() and cannot be used as a requirement.",
+      "dropActor": "drop actor to test",
+      "example": "example",
+      "test": "test actor",
+      "onlyRequired": "A script can only be added to \"Required\".",
+      "noCheckDrop": "This script has no check() and cannot be a requirement.",
+      "missing": "script {name} not found"
     },
     "anyOf": {
       "dropItem": "drop item",
@@ -282,6 +294,7 @@
       "create": "Create",
       "recipe": "\uD83D\uDCDCRecipe",
       "anyOf": "❔AnyOf",
+      "script": "⚙️Script",
       "container": "\uD83D\uDCE6Container"
     },
     "container": {
