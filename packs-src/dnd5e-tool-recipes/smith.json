@@ -3,6 +3,7 @@
   "_key": "!items!bcr24smith000000",
   "name": "Smith's Tools Recipes",
   "type": "loot",
+  "folder": "bcr24folderTools",
   "img": "icons/skills/trades/smithing-tongs-metal-red.webp",
   "system": {
     "description": {

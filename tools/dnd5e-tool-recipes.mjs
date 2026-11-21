@@ -44,7 +44,8 @@ const packs = {
 };
 const mundane = Object.values(packs.equipment24).filter(i => !i.system.rarity && i.system.price?.value > 0);
 const byName = name => {
-  const item = mundane.find(i => i.name === name);
+  // some items are also in the contents of an equipment pack: take the one that is not
+  const item = mundane.find(i => i.name === name && !i.system.container) || mundane.find(i => i.name === name);
   if (!item) throw new Error("missing item " + name);
   return item;
 };
@@ -149,6 +150,17 @@ const id = base => ("bcr24" + base.replace(/[^a-zA-Z0-9]/g, "")).padEnd(16, "0")
 
 fs.rmSync(OUT, { recursive: true, force: true });
 fs.mkdirSync(OUT, { recursive: true });
+
+/** a folder of the compendium, the recipes are sorted into it */
+function compendiumFolder(name, sort) {
+  const _id = id("folder" + name);
+  const doc = { _id, _key: `!folders!${_id}`, name, type: "Item", folder: null, sorting: "a", sort, color: null, description: "", flags: {} };
+  fs.writeFileSync(path.join(OUT, `folder-${name.replace(/[^a-zA-Z0-9]/g, "")}.json`), JSON.stringify(doc, null, 2) + "\n");
+  return _id;
+}
+const TOOLS_FOLDER_ID = compendiumFolder(FOLDER, 100000);
+const FAST_FOLDER_ID = compendiumFolder("Fast Crafting", 200000);
+
 let count = 0;
 for (const tool of Object.values(packs.equipment24).filter(i => i.type === "tool").sort((a, b) => a.name.localeCompare(b.name))) {
   const crafts = craftList(tool);
@@ -169,6 +181,7 @@ for (const tool of Object.values(packs.equipment24).filter(i => i.type === "tool
     _key: `!items!${_id}`,
     name: `${tool.name} Recipes`,
     type: "loot",
+    folder: TOOLS_FOLDER_ID,
     img: tool.img,
     system: { description: { value: instruction(tool, skipped) } },
     flags: {
@@ -194,6 +207,89 @@ for (const tool of Object.values(packs.equipment24).filter(i => i.type === "tool
   const file = tool.system.type.baseItem + ".json";
   fs.writeFileSync(path.join(OUT, file), JSON.stringify(doc, null, 2) + "\n");
   console.log(`${doc.name}: ${Object.keys(output).length} results`);
+  count++;
+}
+
+// Crafter feat, Fast Crafting: after a long rest one item of this table, it falls apart after the next long rest
+const FAST_CRAFTING = {
+  carpenter: ["Ladder", "Torch"],
+  leatherworker: ["Case, Crossbow Bolt", "Case, Map or Scroll", "Pouch"],
+  mason: ["Block and Tackle"],
+  potter: ["Jug", "Lamp"],
+  smith: ["Ball Bearings", "Bucket", "Caltrops", "Grappling Hook", "Pot, Iron"],
+  tinker: ["Bell", "Shovel", "Tinderbox"],
+  weaver: ["Basket", "Rope", "Net", "Tent"],
+  woodcarver: ["Club", "Greatclub", "Quarterstaff"],
+};
+// always a separate item, removed by the module after the next long rest
+const FAST_FLAGS = { "beavers-crafting": { noStack: true, fastCrafted: true } };
+
+function fastMacro(tool) {
+  const key = tool.system.type.baseItem;
+  return `{
+  async resultChosen(component, preview) {
+    if (game.modules.get("dnd-players-handbook")?.active) {
+      component.uuid = component.uuid.replace("${E24}", "Compendium.dnd-players-handbook.equipment.Item.");
+    }
+    if (preview) return;
+    const tool = "${key}";
+    const proficient = actor.system.tools?.[tool]?.value > 0
+      || actor.items.some(i => i.type === "tool" && i.system.type?.baseItem === tool && i.system.prof?.multiplier > 0);
+    const crafter = actor.items.some(i => i.type === "feat" && (i.system.identifier === "crafter" || i.name === "Crafter"));
+    const missing = [!crafter && "the Crafter feat", !proficient && "proficiency with ${tool.name}"].filter(m => m);
+    if (missing.length) {
+      const message = actor.name + " needs " + missing.join(" and ");
+      ui.notifications.warn(message);
+      throw new Error(message);
+    }
+  }
+}`;
+}
+
+function fastInstruction(tool) {
+  return `<p>Fast Crafting with <strong>${tool.name}</strong> (Crafter feat, D&amp;D 2024).</p>
+<ul>
+<li>You need the Crafter feat and proficiency with ${tool.name}.</li>
+<li>When you finish a long rest, you can craft one item of this list, without cost.</li>
+<li>The item lasts until you finish another long rest, then it falls apart and is removed.</li>
+</ul>`;
+}
+
+for (const [key, names] of Object.entries(FAST_CRAFTING)) {
+  const tool = Object.values(packs.equipment24).find(i => i.type === "tool" && i.system.type?.baseItem === key);
+  if (!tool) throw new Error("missing tool " + key);
+  const output = {};
+  for (const name of names) {
+    const item = byName(name);
+    const c = component(item, "equipment24", resultQuantity(item));
+    output[c.key] = { ...c.data, flags: FAST_FLAGS };
+  }
+  const required = component(tool, "equipment24", 1);
+  const _id = id("fast" + key);
+  const doc = {
+    _id,
+    _key: `!items!${_id}`,
+    name: `${tool.name} Fast Crafting`,
+    type: "loot",
+    folder: FAST_FOLDER_ID,
+    img: tool.img,
+    system: { description: { value: fastInstruction(tool) } },
+    flags: {
+      "beavers-crafting": {
+        subtype: "Recipe",
+        recipe: {
+          required: { 1: { [required.key]: required.data } },
+          input: {},
+          output: { 1: output },
+          macro: fastMacro(tool),
+          folder: "Fast Crafting",
+          instruction: fastInstruction(tool),
+        },
+      },
+    },
+  };
+  fs.writeFileSync(path.join(OUT, `fast-${key}.json`), JSON.stringify(doc, null, 2) + "\n");
+  console.log(`${doc.name}: ${names.length} results`);
   count++;
 }
 console.log(`${count} recipes -> ${OUT}`);

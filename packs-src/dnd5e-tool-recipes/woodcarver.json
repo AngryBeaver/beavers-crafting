@@ -3,6 +3,7 @@
   "_key": "!items!bcr24woodcarver0",
   "name": "Woodcarver's Tools Recipes",
   "type": "loot",
+  "folder": "bcr24folderTools",
   "img": "icons/tools/hand/chisel-steel-brown.webp",
   "system": {
     "description": {

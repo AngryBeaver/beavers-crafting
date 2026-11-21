@@ -3,6 +3,7 @@
   "_key": "!items!bcr24alchemist00",
   "name": "Alchemist's Supplies Recipes",
   "type": "loot",
+  "folder": "bcr24folderTools",
   "img": "icons/tools/cooking/mortar-herbs-yellow.webp",
   "system": {
     "description": {

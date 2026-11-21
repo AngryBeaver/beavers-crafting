@@ -38,7 +38,8 @@
                     {{> brs-select cls="currency" name=(concat "flags.beavers-crafting.recipe." ../type "." ../group "." key ".id") value=currencyId current=currency choices=currencyChoices filter=false}}
                 {{else}}
                     <span class="n {{#if clickable}}open-sheet{{/if}}" data-uuid="{{uuid}}" title="{{name}}">{{name}}{{#if tag}}<span class="brs-tag"><i class="fas {{tag.icon}}"></i>{{tag.text}}</span>{{/if}}{{#if hasCrafted}}<button type="button" class="brs-craft {{#if crafted}}on{{/if}}" data-type="{{../type}}" data-group="{{../group}}" data-key="{{key}}"
-                        title="{{#if crafted}}{{localize "beaversCrafting.recipeSheet.crafted"}}{{else}}{{localize "beaversCrafting.recipeSheet.notCrafted"}}{{/if}}" {{#unless @root.editable}}disabled{{/unless}}><i class="fas fa-hammer"></i></button>{{/if}}</span>
+                        title="{{#if crafted}}{{localize "beaversCrafting.recipeSheet.crafted"}}{{else}}{{localize "beaversCrafting.recipeSheet.notCrafted"}}{{/if}}" {{#unless @root.editable}}disabled{{/unless}}><i class="fas fa-hammer"></i></button>{{/if}}{{#if hasNoStack}}<button type="button" class="brs-craft brs-nostack {{#if noStack}}on{{/if}}" data-type="{{../type}}" data-group="{{../group}}" data-key="{{key}}"
+                        title="{{#if noStack}}{{localize "beaversCrafting.recipeSheet.noStack"}}{{else}}{{localize "beaversCrafting.recipeSheet.stack"}}{{/if}}" {{#unless @root.editable}}disabled{{/unless}}><i class="fas fa-layer-group"></i></button>{{/if}}</span>
                 {{/if}}
                 {{#if hasQty}}
                     <label class="brs-qty"><span>×</span><input type="number" step="any" {{#unless @root.editable}}readonly{{/unless}}

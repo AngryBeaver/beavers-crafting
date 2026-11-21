@@ -147,6 +147,8 @@ export class RecipeSheet {
             tag,
             hasCrafted: hasCraftedFlag && type !== "output" && !isMoney,
             crafted: !!component.flags?.[Settings.NAMESPACE]?.isCrafted,
+            hasNoStack: type === "output" && component.type === "Item" && !isMoney,
+            noStack: !!component.flags?.[Settings.NAMESPACE]?.noStack,
             clickable: clickable && !isMoney && !!component.uuid,
           };
         });
@@ -457,10 +459,17 @@ export class RecipeSheet {
       this.recipeElement.find("textarea[name='flags.beavers-crafting.recipe.macro']").val(MACRO_EXAMPLE);
       void this.update();
     });
-    this.recipeElement.find(".brs-craft").on("click", e => {
+    this.recipeElement.find(".brs-craft:not(.brs-nostack)").on("click", e => {
       e.stopPropagation();
       const {type, group, key} = e.currentTarget.dataset;
       const name = `${type}.${group}.${key}.flags.${Settings.NAMESPACE}.isCrafted`;
+      foundry.utils.setProperty(this.recipe, name, foundry.utils.getProperty(this.recipe, name) ? null : true);
+      void this.update();
+    });
+    this.recipeElement.find(".brs-nostack").on("click", e => {
+      e.stopPropagation();
+      const {type, group, key} = e.currentTarget.dataset;
+      const name = `${type}.${group}.${key}.flags.${Settings.NAMESPACE}.noStack`;
       foundry.utils.setProperty(this.recipe, name, foundry.utils.getProperty(this.recipe, name) ? null : true);
       void this.update();
     });

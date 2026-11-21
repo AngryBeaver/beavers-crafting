@@ -3,6 +3,7 @@
   "_key": "!items!bcr24jeweler0000",
   "name": "Jeweler's Tools Recipes",
   "type": "loot",
+  "folder": "bcr24folderTools",
   "img": "icons/commodities/gems/gem-rough-rose-teal.webp",
   "system": {
     "description": {

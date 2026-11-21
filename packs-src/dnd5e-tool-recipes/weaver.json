@@ -3,6 +3,7 @@
   "_key": "!items!bcr24weaver00000",
   "name": "Weaver's Tools Recipes",
   "type": "loot",
+  "folder": "bcr24folderTools",
   "img": "icons/equipment/back/cloak-hooded-pink.webp",
   "system": {
     "description": {

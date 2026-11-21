@@ -3,6 +3,7 @@
   "_key": "!items!bcr24potter00000",
   "name": "Potter's Tools Recipes",
   "type": "loot",
+  "folder": "bcr24folderTools",
   "img": "icons/containers/kitchenware/vase-bottle-brown.webp",
   "system": {
     "description": {

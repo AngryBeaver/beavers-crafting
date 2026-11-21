@@ -60,6 +60,8 @@
       "or": "or",
       "crafted": "Must be crafted (click: any item)",
       "notCrafted": "Any item (click: must be crafted)",
+      "noStack": "Not stacked: always added as its own item, not used as an ingredient (click: stacks)",
+      "stack": "Stacks with the same items (click: always its own item)",
       "remove": "Remove",
       "dropAlternative": "drop an alternative",
       "moneyAlternative": "Money as alternative",
@@ -184,6 +186,9 @@
         "ingredientOne": "{count} ingredient",
         "ingredientMany": "{count} ingredients"
       }
+    },
+    "fastCrafting": {
+      "fellApart": "{items} fell apart (fast crafted, lasts until the next long rest)."
     },
     "settings": {
       "moduleButton": {

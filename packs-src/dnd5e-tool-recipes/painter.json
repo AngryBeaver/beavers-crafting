@@ -3,6 +3,7 @@
   "_key": "!items!bcr24painter0000",
   "name": "Painter's Supplies Recipes",
   "type": "loot",
+  "folder": "bcr24folderTools",
   "img": "icons/tools/hand/brush-paint-brown-white.webp",
   "system": {
     "description": {

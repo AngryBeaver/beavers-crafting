@@ -1,0 +1,56 @@
+{
+  "_id": "bcr24fastmason00",
+  "_key": "!items!bcr24fastmason00",
+  "name": "Mason's Tools Fast Crafting",
+  "type": "loot",
+  "folder": "bcr24folderFastC",
+  "img": "icons/tools/hand/hammer-and-nail.webp",
+  "system": {
+    "description": {
+      "value": "<p>Fast Crafting with <strong>Mason's Tools</strong> (Crafter feat, D&amp;D 2024).</p>\n<ul>\n<li>You need the Crafter feat and proficiency with Mason's Tools.</li>\n<li>When you finish a long rest, you can craft one item of this list, without cost.</li>\n<li>The item lasts until you finish another long rest, then it falls apart and is removed.</li>\n</ul>"
+    }
+  },
+  "flags": {
+    "beavers-crafting": {
+      "subtype": "Recipe",
+      "recipe": {
+        "required": {
+          "1": {
+            "Compendium-dnd5e-equipment24-Item-phbtulMasonsTool": {
+              "id": "phbtulMasonsTool",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbtulMasonsTool",
+              "img": "icons/tools/hand/hammer-and-nail.webp",
+              "name": "Mason's Tools",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "tool"
+            }
+          }
+        },
+        "input": {},
+        "output": {
+          "1": {
+            "Compendium-dnd5e-equipment24-Item-phbagBlockandTac": {
+              "id": "phbagBlockandTac",
+              "uuid": "Compendium.dnd5e.equipment24.Item.phbagBlockandTac",
+              "img": "icons/tools/fishing/reel-brown-white.webp",
+              "name": "Block and Tackle",
+              "type": "Item",
+              "quantity": 1,
+              "itemType": "loot",
+              "flags": {
+                "beavers-crafting": {
+                  "noStack": true,
+                  "fastCrafted": true
+                }
+              }
+            }
+          }
+        },
+        "macro": "{\n  async resultChosen(component, preview) {\n    if (game.modules.get(\"dnd-players-handbook\")?.active) {\n      component.uuid = component.uuid.replace(\"Compendium.dnd5e.equipment24.Item.\", \"Compendium.dnd-players-handbook.equipment.Item.\");\n    }\n    if (preview) return;\n    const tool = \"mason\";\n    const proficient = actor.system.tools?.[tool]?.value > 0\n      || actor.items.some(i => i.type === \"tool\" && i.system.type?.baseItem === tool && i.system.prof?.multiplier > 0);\n    const crafter = actor.items.some(i => i.type === \"feat\" && (i.system.identifier === \"crafter\" || i.name === \"Crafter\"));\n    const missing = [!crafter && \"the Crafter feat\", !proficient && \"proficiency with Mason's Tools\"].filter(m => m);\n    if (missing.length) {\n      const message = actor.name + \" needs \" + missing.join(\" and \");\n      ui.notifications.warn(message);\n      throw new Error(message);\n    }\n  }\n}",
+        "folder": "Fast Crafting",
+        "instruction": "<p>Fast Crafting with <strong>Mason's Tools</strong> (Crafter feat, D&amp;D 2024).</p>\n<ul>\n<li>You need the Crafter feat and proficiency with Mason's Tools.</li>\n<li>When you finish a long rest, you can craft one item of this list, without cost.</li>\n<li>The item lasts until you finish another long rest, then it falls apart and is removed.</li>\n</ul>"
+      }
+    }
+  }
+}

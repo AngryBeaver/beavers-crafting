@@ -1,0 +1,12 @@
+{
+  "_id": "bcr24folderTools",
+  "_key": "!folders!bcr24folderTools",
+  "name": "Tools",
+  "type": "Item",
+  "folder": null,
+  "sorting": "a",
+  "sort": 100000,
+  "color": null,
+  "description": "",
+  "flags": {}
+}

@@ -3,6 +3,7 @@
   "_key": "!items!bcr24brewer00000",
   "name": "Brewer's Supplies Recipes",
   "type": "loot",
+  "folder": "bcr24folderTools",
   "img": "icons/consumables/plants/herb-marjoram-basil-oregano-leaf-bunch-green.webp",
   "system": {
     "description": {

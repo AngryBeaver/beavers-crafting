@@ -3,6 +3,7 @@
   "_key": "!items!bcr24cartographe",
   "name": "Cartographer's Tools Recipes",
   "type": "loot",
+  "folder": "bcr24folderTools",
   "img": "icons/tools/navigation/map-chart-tan.webp",
   "system": {
     "description": {

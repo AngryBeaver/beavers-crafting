@@ -18,6 +18,7 @@ import {ActorSheetContainer} from "./apps/ActorSheetContainer.js";
 import {CraftedItemSheet} from "./apps/CraftedItemSheet.js";
 import {ContainerSheet} from "./apps/ContainerSheet.js";
 import "./compatibility/tidy5e.js";
+import {initDnd5e} from "./compatibility/dnd5e.js";
 import { hookChatLog } from "./apps/ChatLog.js";
 import { attachContentsToCreatedContainer, runCleanup } from "./ContainerHandler.js";
 import { getTemplate, markDeleted } from "./helpers/Compat.js";
@@ -71,6 +72,7 @@ function debug(){
 
 Hooks.once("beavers-system-interface.ready", async function(){
     Settings.init();
+    if (game.system.id === "dnd5e") initDnd5e();
     if(!game[Settings.NAMESPACE])game[Settings.NAMESPACE]={};
     game[Settings.NAMESPACE].Crafting = Crafting;
     game[Settings.NAMESPACE].RecipeCompendium = RecipeCompendium;
@@ -83,7 +85,7 @@ Hooks.once("beavers-system-interface.ready", async function(){
     game[Settings.NAMESPACE].migrateRecipeTestsToBeaversTests= migrateRecipeTestsToBeaversTests;
     hookChatLog();
     migrate();
-    beaversSystemInterface.addExtension(Settings.NAMESPACE,{componentAddFlags:["crafted","isCrafted"]})
+    beaversSystemInterface.addExtension(Settings.NAMESPACE,{componentAddFlags:["crafted","isCrafted","noStack","fastCrafted"]})
 
     const lastCleanup = Settings.get(Settings.LAST_CLEANUP_TIMESTAMP);
     const now = Date.now();
@@ -129,20 +131,19 @@ Hooks.once("beavers-system-interface.ready", async function(){
     });
     rerenderItemDirectory();
 
-    if(Settings.get(Settings.SEPARATE_CRAFTED_ITEMS) === "full"){
-        beaversSystemInterface.addExtension(Settings.NAMESPACE,{componentIsSame:(a,b,previousResult)=>{
-            const aHasFlag = foundry.utils.getProperty(a,`flags.${Settings.NAMESPACE}.isCrafted`);
-            const bHasFlag = foundry.utils.getProperty(b,`flags.${Settings.NAMESPACE}.isCrafted`);
-            return previousResult && aHasFlag === bHasFlag
-            }})
-    }
-    if(Settings.get(Settings.SEPARATE_CRAFTED_ITEMS) === "partial"){
-        beaversSystemInterface.addExtension(Settings.NAMESPACE,{componentIsSame:(a,b,previousResult)=>{
-                const aHasFlag = foundry.utils.getProperty(a,`flags.${Settings.NAMESPACE}.isCrafted`);
-                const bHasFlag = foundry.utils.getProperty(b,`flags.${Settings.NAMESPACE}.isCrafted`);
-                return previousResult && (!aHasFlag || aHasFlag === bHasFlag)
-            }})
-    }
+    // one function only: a second componentIsSame of this module would replace the first
+    const separateCrafted = Settings.get(Settings.SEPARATE_CRAFTED_ITEMS);
+    beaversSystemInterface.addExtension(Settings.NAMESPACE,{componentIsSame:(a,b,previousResult)=>{
+        if (!previousResult) return false;
+        // "no stack": always a separate item, never merged and never used as an ingredient or required item
+        if (foundry.utils.getProperty(a,`flags.${Settings.NAMESPACE}.noStack`)
+            || foundry.utils.getProperty(b,`flags.${Settings.NAMESPACE}.noStack`)) return false;
+        const aHasFlag = foundry.utils.getProperty(a,`flags.${Settings.NAMESPACE}.isCrafted`);
+        const bHasFlag = foundry.utils.getProperty(b,`flags.${Settings.NAMESPACE}.isCrafted`);
+        if (separateCrafted === "full") return aHasFlag === bHasFlag;
+        if (separateCrafted === "partial") return !aHasFlag || aHasFlag === bHasFlag;
+        return true;
+    }});
 
   Hooks.on("renderActorSheet", (app, html, data) => {
     if (app instanceof Application) {

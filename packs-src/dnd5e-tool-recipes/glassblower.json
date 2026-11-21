@@ -3,6 +3,7 @@
   "_key": "!items!bcr24glassblower",
   "name": "Glassblower's Tools Recipes",
   "type": "loot",
+  "folder": "bcr24folderTools",
   "img": "icons/commodities/tech/metal-insert.webp",
   "system": {
     "description": {

@@ -3,6 +3,7 @@
   "_key": "!items!bcr24carpenter00",
   "name": "Carpenter's Tools Recipes",
   "type": "loot",
+  "folder": "bcr24folderTools",
   "img": "icons/tools/hand/saw-steel-grey.webp",
   "system": {
     "description": {

@@ -3,6 +3,7 @@
   "_key": "!items!bcr24tinker00000",
   "name": "Tinker's Tools Recipes",
   "type": "loot",
+  "folder": "bcr24folderTools",
   "img": "icons/commodities/cloth/thread-spindle-white-needle.webp",
   "system": {
     "description": {

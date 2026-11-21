@@ -3,6 +3,7 @@
   "_key": "!items!bcr24cook0000000",
   "name": "Cook's Utensils Recipes",
   "type": "loot",
+  "folder": "bcr24folderTools",
   "img": "icons/tools/laboratory/bowl-mixing.webp",
   "system": {
     "description": {

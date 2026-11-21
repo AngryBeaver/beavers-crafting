@@ -3,6 +3,7 @@
   "_key": "!items!bcr24calligraphe",
   "name": "Calligrapher's Supplies Recipes",
   "type": "loot",
+  "folder": "bcr24folderTools",
   "img": "icons/tools/scribal/pen-steel-grey-brown.webp",
   "system": {
     "description": {

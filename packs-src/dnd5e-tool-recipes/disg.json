@@ -3,6 +3,7 @@
   "_key": "!items!bcr24disg0000000",
   "name": "Disguise Kit Recipes",
   "type": "loot",
+  "folder": "bcr24folderTools",
   "img": "icons/equipment/back/cloak-hooded-blue.webp",
   "system": {
     "description": {

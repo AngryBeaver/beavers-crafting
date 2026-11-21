@@ -1,5 +1,16 @@
 # Changelog
 
+## 4.10.0
+- new: results can be marked "no stack" in the recipe sheet (layer icon next to the result)
+  - the produced item is always added as its own item, never merged with items of the same name
+  - no stack items are not used as ingredients or required items of other recipes
+- D&D 2024 Tool Recipes: Fast Crafting (Crafter feat), folder "Fast Crafting"
+  - one recipe per tool of the feat's table, no cost, needs the Crafter feat and proficiency with the tool
+  - the item is no stack and falls apart (is removed, with a chat message) when the actor finishes the next long rest
+  - only dnd5e's own long rest removes it; one item per long rest is up to the players
+- D&D 2024 Tool Recipes: the compendium sorts the recipes into the folders "Tools" and "Fast Crafting"
+- dnd5e specific code moved into its own file, loaded only for dnd5e
+
 ## 4.9.2
 - D&D 2024 Tool Recipes: optional setting "Crafter feat discount on tool recipes" (dnd5e only)
   - with the Crafter feat the raw materials cost 40% of the item's price instead of half

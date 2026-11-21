@@ -1,0 +1,12 @@
+{
+  "_id": "bcr24folderFastC",
+  "_key": "!folders!bcr24folderFastC",
+  "name": "Fast Crafting",
+  "type": "Item",
+  "folder": null,
+  "sorting": "a",
+  "sort": 200000,
+  "color": null,
+  "description": "",
+  "flags": {}
+}

@@ -3,6 +3,7 @@
   "_key": "!items!bcr24leatherwork",
   "name": "Leatherworker's Tools Recipes",
   "type": "loot",
+  "folder": "bcr24folderTools",
   "img": "icons/commodities/leather/leather-buckle-steel-tan.webp",
   "system": {
     "description": {

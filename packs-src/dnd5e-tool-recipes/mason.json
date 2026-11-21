@@ -3,6 +3,7 @@
   "_key": "!items!bcr24mason000000",
   "name": "Mason's Tools Recipes",
   "type": "loot",
+  "folder": "bcr24folderTools",
   "img": "icons/tools/hand/hammer-and-nail.webp",
   "system": {
     "description": {
