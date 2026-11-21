@@ -274,7 +274,6 @@ Results in the chat message can be dragged to another character.
 - This creates items beyond what the recipe gave.
 - Only items can be dragged.
 - Copied items are not flagged as crafted.
-
 ### Currency exchange
 Money is exchanged automatically (e.g. a gold coin is changed to pay 5 silver).
 Turn it off to require the exact coins.
