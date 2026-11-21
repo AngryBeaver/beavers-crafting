@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.12.0
+- new compendium "D&D 2024 Artificer Recipes"
+  - Tinker's Magic: one of 31 items, without cost; requires Tinker's Tools and the Tinker's Magic feature (matched by name)
+  - the items do not stack and vanish after the next long rest, like Fast Crafting
+  - the uses per long rest (Intelligence modifier) are not tracked
+- README: SRD 5.2 attribution (CC-BY-4.0) for the D&D 2024 Tool Recipes
+
 ## 4.11.0
 - new item type "Script": a small script as an item, like AnyOf (icon: green cog)
   - for now a requirement: `check()` returns true when it is met, otherwise false or a text with the reason

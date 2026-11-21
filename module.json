@@ -49,6 +49,17 @@
         "PLAYER": "OBSERVER",
         "ASSISTANT": "OWNER"
       }
+    },
+    {
+      "label": "D&D 2024 Artificer Recipes",
+      "name": "dnd5e-artificer-recipes",
+      "path": "packs/dnd5e-artificer-recipes",
+      "system": "dnd5e",
+      "type": "Item",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
     }
   ],
   "url": "https://github.com/AngryBeaver/beavers-crafting",

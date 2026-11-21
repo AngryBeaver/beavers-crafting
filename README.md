@@ -76,8 +76,16 @@ This module includes the compendium **D&D 2024 Tool Recipes**: one recipe for ev
 When crafting, the player chooses what to make from everything the tool can craft.
 - Proficiency with the tool is needed.
 - The raw materials cost half the price of the chosen item.
-- The work is a "Craft" step, advanced once per day of work: one day per 10 GP of the item's price (at least one).
+- The work is a "Day of work" step, advanced once per day of work: one day per 10 GP of the item's price (at least one).
 - The items come from the Player's Handbook when that module is active, otherwise from the free dnd5e equipment (SRD 5.2).
+
+### Artificer Recipes (dnd5e)
+The compendium **D&D 2024 Artificer Recipes** has a recipe for the Artificer feature "Tinker's Magic".
+- Requires Tinker's Tools and the feature "Tinker's Magic" on the actor (matched by its name).
+- The results do not stack and are removed after the next long rest.
+- Uses per long rest are not tracked.
+
+The rules themselves are in the book; the recipe only names the feature and the items.
 
 ### Ingredients (dnd5e)
 The compendium "ingredients" of this module has example ingredients you can use in your own recipes.
@@ -302,3 +310,6 @@ The module adds Recipe and AnyOf to the item creation window. It finds that wind
 ## Credits
 - Brazilian Portuguese translation by [Andersants](https://github.com/Andersants)
 - French translation by [Michel](https://github.com/jehan-michel)
+
+## License
+This work includes material from the System Reference Document 5.2 ("SRD 5.2") by Wizards of the Coast LLC, available at https://www.dndbeyond.com/srd. The SRD 5.2 is licensed under the Creative Commons Attribution 4.0 International License, available at https://creativecommons.org/licenses/by/4.0/legalcode.

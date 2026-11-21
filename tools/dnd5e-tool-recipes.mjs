@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-// Generates the "D&D 2024 Tool Recipes" sources (packs-src/dnd5e-tool-recipes) from the free dnd5e equipment.
+// Generates the "D&D 2024 Tool Recipes" (packs-src/dnd5e-tool-recipes) and "D&D 2024 Artificer Recipes"
+// (packs-src/dnd5e-artificer-recipes) sources from the free dnd5e equipment.
 // One recipe per tool: the tool is required, every item listed under "Craft" is a "one of" result.
 // The recipe macro sets the cost to half the price of the chosen item and uses the Player's Handbook items when
 // that module is active (they have the same ids as dnd5e.equipment24).
@@ -326,3 +327,71 @@ for (const [key, names] of Object.entries(FAST_CRAFTING)) {
   count++;
 }
 console.log(`${count} recipes -> ${OUT}`);
+
+// "D&D 2024 Artificer Recipes": a pack of its own, the Artificer is not part of the PHB / SRD 5.2
+const ARTIFICER_OUT = path.join(ROOT, "packs-src", "dnd5e-artificer-recipes");
+fs.rmSync(ARTIFICER_OUT, { recursive: true, force: true });
+fs.mkdirSync(ARTIFICER_OUT, { recursive: true });
+
+// Artificer level 1, Tinker's Magic: while holding Tinker's Tools create one of these items, it vanishes after a long rest
+const TINKERS_MAGIC = [
+  "Ball Bearings", "Basket", "Bedroll", "Bell", "Blanket", "Block and Tackle", "Bottle, Glass", "Bucket", "Caltrops",
+  "Candle", "Crowbar", "Flask", "Grappling Hook", "Hunting Trap", "Jug", "Lamp", "Manacles", "Net", "Oil", "Paper",
+  "Parchment", "Pole", "Pouch", "Rope", "Sack", "Shovel", "Spikes, Iron", "String", "Tinderbox", "Torch", "Vial",
+];
+// the class feature as a required item: it matches the actor's feature by name, there is no free item to link to
+const TINKERS_MAGIC_FEATURE = {
+  key: "feat-TinkersMagic",
+  data: {
+    id: "", uuid: "", img: "icons/tools/hand/wrench-mechanical-heal-blue.webp",
+    name: "Tinker's Magic", type: "Item", quantity: 1, itemType: "feat",
+  },
+};
+
+function tinkersMagicInstruction() {
+  return `<p>For the Tinker's Magic feature (D&amp;D 2024 Artificer).</p>
+<ul>
+<li>Requires the Tinker's Magic feature and Tinker's Tools.</li>
+<li>The results do not stack and are removed after the next long rest.</li>
+<li>Uses per long rest are not tracked.</li>
+</ul>`;
+}
+
+{
+  const tinker = Object.values(packs.equipment24).find(i => i.type === "tool" && i.system.type?.baseItem === "tinker");
+  const output = {};
+  for (const name of TINKERS_MAGIC) {
+    const item = byName(name);
+    const c = component(item, "equipment24", resultQuantity(item));
+    output[c.key] = { ...c.data, flags: FAST_FLAGS };
+  }
+  const required = component(tinker, "equipment24", 1);
+  const _id = id("tinkersmagic");
+  const doc = {
+    _id,
+    _key: `!items!${_id}`,
+    name: "Tinker's Magic",
+    type: "loot",
+    folder: null,
+    img: TINKERS_MAGIC_FEATURE.data.img,
+    system: { description: { value: tinkersMagicInstruction() } },
+    flags: {
+      "beavers-crafting": {
+        subtype: "Recipe",
+        recipe: {
+          required: {
+            1: { [required.key]: required.data },
+            2: { [TINKERS_MAGIC_FEATURE.key]: TINKERS_MAGIC_FEATURE.data },
+          },
+          input: {},
+          output: { 1: output },
+          macro: fastMacro(),
+          folder: "Artificer",
+          instruction: tinkersMagicInstruction(),
+        },
+      },
+    },
+  };
+  fs.writeFileSync(path.join(ARTIFICER_OUT, "tinkers-magic.json"), JSON.stringify(doc, null, 2) + "\n");
+  console.log(`${doc.name}: ${TINKERS_MAGIC.length} results -> ${ARTIFICER_OUT}`);
+}
