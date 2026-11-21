@@ -220,6 +220,10 @@
         "name": "Receitas usam Itens requeridos",
         "hint": "Uma Receita pode exigir que itens estejam presentes no ator sem serem consumidos no processo. Você pode configurar qualquer coisa que seu sistema modele como item, ex.: façanhas de dnd5e, classe, histórico, ferramentas etc!"
       },
+      "dnd5eCrafterDiscount": {
+        "name": "Desconto do talento Artesão nas receitas de ferramentas (dnd5e)",
+        "hint": "Receitas de Ferramentas D&D 2024: com o talento Artesão, as matérias-primas custam 40% em vez da metade do preço do item (o desconto de 20% do talento aplicado aos materiais). Fora das regras, o tempo de fabricação não muda."
+      },
       "currencyExchange": {
         "name": "Trocar moedas",
         "hint": "se desativado, você precisa possuir a moeda exata para pagar o custo da receita"

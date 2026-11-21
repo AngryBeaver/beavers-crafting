@@ -220,6 +220,10 @@
         "name": "Recipes use required Items",
         "hint": "A Recipe can require to have items present on actor that does not get consumed in the process. You can setUp anything your system models as item e.g. for dnd5e feats, class, background, tools etc!"
       },
+      "dnd5eCrafterDiscount": {
+        "name": "Crafter feat discount on tool recipes (dnd5e)",
+        "hint": "D&D 2024 Tool Recipes: with the Crafter feat the raw materials cost 40% instead of half of the item's price (the feat's 20% discount applied to the materials). Not by the rules, the crafting time stays the same."
+      },
       "currencyExchange": {
         "name": "Exchange currencies",
         "hint": "if disabled you need to possess the exact currency in order to pay the recipe cost"

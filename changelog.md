@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.9.2
+- D&D 2024 Tool Recipes: optional setting "Crafter feat discount on tool recipes" (dnd5e only)
+  - with the Crafter feat the raw materials cost 40% of the item's price instead of half
+  - the crafting days always follow the full price of the item
+  - fix: the raw materials are rounded down (was up), as the rules say
+  - the step is named "Day of work" instead of "Craft"
+  - recipes imported into the world before keep their old macro, import them again
+
 ## 4.9.1
 - fix: the check type list of the recipe sheet showed untranslated texts
 - README: videos showing how to create a recipe and how to craft it

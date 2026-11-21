@@ -220,6 +220,10 @@
         "name": "Les recettes utilisent des objets requis",
         "hint": "Une recette peut exiger que des objets soient présents sur l’acteur sans être consommés. Vous pouvez configurer tout ce que votre système considère comme un objet, ex. : dons de dnd5e, classe, historique, outils, etc."
       },
+      "dnd5eCrafterDiscount": {
+        "name": "Réduction du don Artisan sur les recettes d'outils (dnd5e)",
+        "hint": "Recettes d'outils D&D 2024 : avec le don Artisan, les matières premières coûtent 40 % au lieu de la moitié du prix de l'objet (la réduction de 20 % du don appliquée aux matières). Hors règles, la durée de fabrication ne change pas."
+      },
       "currencyExchange": {
         "name": "Échanger des pièces",
         "hint": "si désactivé, vous devez posséder exactement la monnaie requise pour payer le coût de la recette"

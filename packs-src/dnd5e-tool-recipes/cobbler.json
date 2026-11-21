@@ -6,7 +6,7 @@
   "img": "icons/tools/hand/awl-steel-tan.webp",
   "system": {
     "description": {
-      "value": "<p>Crafting with <strong>Cobbler's Tools</strong> by the D&amp;D 2024 rules.</p>\n<ul>\n<li>You need proficiency with Cobbler's Tools.</li>\n<li>Choose what to craft; the raw materials cost half of its price.</li>\n<li>The work takes one day of 8 hours per 10 GP of the item's price (at least one day). Several proficient crafters share the days.</li>\n</ul>"
+      "value": "<p>Crafting with <strong>Cobbler's Tools</strong> by the D&amp;D 2024 rules.</p>\n<ul>\n<li>You need proficiency with Cobbler's Tools.</li>\n<li>Choose what to craft; the raw materials cost half of its price.</li>\n<li>Optional (setting \"Crafter feat discount on tool recipes\"): with the Crafter feat the raw materials cost 40% of its price.</li>\n<li>The work takes one day of 8 hours per 10 GP of the item's price (at least one day). Several proficient crafters share the days.</li>\n</ul>"
     }
   },
   "flags": {
@@ -50,16 +50,16 @@
                 "1": {
                   "type": "IncrementStep",
                   "data": {
-                    "name": "Craft"
+                    "name": "Day of work"
                   }
                 }
               }
             }
           }
         },
-        "macro": "// D&D 2024 crafting (Player's Handbook, SRD 5.2)\n// - proficiency with the tool is needed\n// - the raw materials cost half the price of the chosen item\n// - one step per day of work: a day (8 hours) per 10 GP of the price\n// - the items come from the Player's Handbook when it is active, otherwise from the free dnd5e equipment\n{\n  async resultChosen(component, preview) {\n    if (game.modules.get(\"dnd-players-handbook\")?.active) {\n      component.uuid = component.uuid.replace(\"Compendium.dnd5e.equipment24.Item.\", \"Compendium.dnd-players-handbook.equipment.Item.\");\n    }\n    const tool = \"cobbler\";\n    const proficient = actor.system.tools?.[tool]?.value > 0\n      || actor.items.some(i => i.type === \"tool\" && i.system.type?.baseItem === tool && i.system.prof?.multiplier > 0);\n    if (!preview && !proficient) {\n      ui.notifications.warn(`${actor.name} is not proficient with Cobbler's Tools`);\n      throw new Error(`${actor.name} is not proficient with Cobbler's Tools`);\n    }\n    const item = await fromUuid(component.uuid);\n    const price = item?.system.price;\n    if (!price?.value) return;\n    // in copper, halved and rounded up, then in the largest coin that fits exactly\n    const perGold = CONFIG.DND5E.currencies[price.denomination]?.conversion || 1;\n    const copper = Math.ceil(price.value * 100 / perGold / 2);\n    const coin = copper % 100 === 0 ? \"gp\" : copper % 10 === 0 ? \"sp\" : \"cp\";\n    recipeData.currency = {name: coin, value: copper / {gp: 100, sp: 10, cp: 1}[coin]};\n    const step = recipeData.beaversTests?.ands?.[1];\n    if (step) step.hits = Math.max(1, Math.ceil(copper * 2 / 1000));\n  }\n}",
+        "macro": "{\n  async resultChosen(component, preview) {\n    if (game.modules.get(\"dnd-players-handbook\")?.active) {\n      component.uuid = component.uuid.replace(\"Compendium.dnd5e.equipment24.Item.\", \"Compendium.dnd-players-handbook.equipment.Item.\");\n    }\n    const tool = \"cobbler\";\n    const proficient = actor.system.tools?.[tool]?.value > 0\n      || actor.items.some(i => i.type === \"tool\" && i.system.type?.baseItem === tool && i.system.prof?.multiplier > 0);\n    if (!preview && !proficient) {\n      ui.notifications.warn(`${actor.name} is not proficient with Cobbler's Tools`);\n      throw new Error(`${actor.name} is not proficient with Cobbler's Tools`);\n    }\n    const item = await fromUuid(component.uuid);\n    const price = item?.system.price;\n    if (!price?.value) return;\n    // materials: half the price (40% with the Crafter discount), rounded down to the copper\n    const perGold = CONFIG.DND5E.currencies[price.denomination]?.conversion || 1;\n    const fullCopper = price.value * 100 / perGold;\n    const crafterDiscount = game.settings.settings.has(\"beavers-crafting.dnd5eCrafterDiscount\")\n      && game.settings.get(\"beavers-crafting\", \"dnd5eCrafterDiscount\")\n      && actor.items.some(i => i.type === \"feat\" && (i.system.identifier === \"crafter\" || i.name === \"Crafter\"));\n    const copper = Math.floor(fullCopper * (crafterDiscount ? 4 : 5) / 10);\n    const coin = copper % 100 === 0 ? \"gp\" : copper % 10 === 0 ? \"sp\" : \"cp\";\n    recipeData.currency = copper > 0 ? {name: coin, value: copper / {gp: 100, sp: 10, cp: 1}[coin]} : undefined;\n    const step = recipeData.beaversTests?.ands?.[1];\n    // days: one per 10 GP of the full price\n    if (step) step.hits = Math.max(1, Math.ceil(fullCopper / 1000));\n  }\n}",
         "folder": "Tools",
-        "instruction": "<p>Crafting with <strong>Cobbler's Tools</strong> by the D&amp;D 2024 rules.</p>\n<ul>\n<li>You need proficiency with Cobbler's Tools.</li>\n<li>Choose what to craft; the raw materials cost half of its price.</li>\n<li>The work takes one day of 8 hours per 10 GP of the item's price (at least one day). Several proficient crafters share the days.</li>\n</ul>"
+        "instruction": "<p>Crafting with <strong>Cobbler's Tools</strong> by the D&amp;D 2024 rules.</p>\n<ul>\n<li>You need proficiency with Cobbler's Tools.</li>\n<li>Choose what to craft; the raw materials cost half of its price.</li>\n<li>Optional (setting \"Crafter feat discount on tool recipes\"): with the Crafter feat the raw materials cost 40% of its price.</li>\n<li>The work takes one day of 8 hours per 10 GP of the item's price (at least one day). Several proficient crafters share the days.</li>\n</ul>"
       }
     }
   }

@@ -25,6 +25,7 @@ export class Settings {
     static ITEM_DIRECTORY_BUTTON = "itemDirectoryButton";
     static CONTAINER_CONTENT_HANDLING = "containerContentHandling";
     static LAST_CLEANUP_TIMESTAMP = "lastCleanupTimestamp";
+    static DND5E_CRAFTER_DISCOUNT = "dnd5eCrafterDiscount";
     static init() {
         game.settings.register(this.NAMESPACE, this.CREATE_ITEM_TITLE, {
             name: game.i18n.localize('beaversCrafting.settings.createItemTitle.name'),
@@ -199,6 +200,15 @@ export class Settings {
                 config: false,
                 default: [],
                 type: Object
+            });
+            // used by the macros of the "D&D 2024 Tool Recipes" compendium
+            game.settings.register(this.NAMESPACE, this.DND5E_CRAFTER_DISCOUNT, {
+                name: game.i18n.localize('beaversCrafting.settings.dnd5eCrafterDiscount.name'),
+                hint: game.i18n.localize('beaversCrafting.settings.dnd5eCrafterDiscount.hint'),
+                scope: "world",
+                config: true,
+                default: false,
+                type: Boolean,
             });
         }
     }

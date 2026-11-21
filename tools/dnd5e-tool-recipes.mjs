@@ -102,12 +102,7 @@ const resultQuantity = item => item.system.type?.value === "ammo" ? (item.system
 
 function macro(tool) {
   const key = tool.system.type.baseItem;
-  return `// D&D 2024 crafting (Player's Handbook, SRD 5.2)
-// - proficiency with the tool is needed
-// - the raw materials cost half the price of the chosen item
-// - one step per day of work: a day (8 hours) per 10 GP of the price
-// - the items come from the Player's Handbook when it is active, otherwise from the free dnd5e equipment
-{
+  return `{
   async resultChosen(component, preview) {
     if (game.modules.get("dnd-players-handbook")?.active) {
       component.uuid = component.uuid.replace("${E24}", "Compendium.dnd-players-handbook.equipment.Item.");
@@ -122,13 +117,18 @@ function macro(tool) {
     const item = await fromUuid(component.uuid);
     const price = item?.system.price;
     if (!price?.value) return;
-    // in copper, halved and rounded up, then in the largest coin that fits exactly
+    // materials: half the price (40% with the Crafter discount), rounded down to the copper
     const perGold = CONFIG.DND5E.currencies[price.denomination]?.conversion || 1;
-    const copper = Math.ceil(price.value * 100 / perGold / 2);
+    const fullCopper = price.value * 100 / perGold;
+    const crafterDiscount = game.settings.settings.has("beavers-crafting.dnd5eCrafterDiscount")
+      && game.settings.get("beavers-crafting", "dnd5eCrafterDiscount")
+      && actor.items.some(i => i.type === "feat" && (i.system.identifier === "crafter" || i.name === "Crafter"));
+    const copper = Math.floor(fullCopper * (crafterDiscount ? 4 : 5) / 10);
     const coin = copper % 100 === 0 ? "gp" : copper % 10 === 0 ? "sp" : "cp";
-    recipeData.currency = {name: coin, value: copper / {gp: 100, sp: 10, cp: 1}[coin]};
+    recipeData.currency = copper > 0 ? {name: coin, value: copper / {gp: 100, sp: 10, cp: 1}[coin]} : undefined;
     const step = recipeData.beaversTests?.ands?.[1];
-    if (step) step.hits = Math.max(1, Math.ceil(copper * 2 / 1000));
+    // days: one per 10 GP of the full price
+    if (step) step.hits = Math.max(1, Math.ceil(fullCopper / 1000));
   }
 }`;
 }
@@ -140,6 +140,7 @@ function instruction(tool, skipped) {
 <ul>
 <li>You need proficiency with ${tool.name}.</li>
 <li>Choose what to craft; the raw materials cost half of its price.</li>
+<li>Optional (setting "Crafter feat discount on tool recipes"): with the Crafter feat the raw materials cost 40% of its price.</li>
 <li>The work takes one day of 8 hours per 10 GP of the item's price (at least one day). Several proficient crafters share the days.</li>
 </ul>${extra}`;
 }
@@ -181,7 +182,7 @@ for (const tool of Object.values(packs.equipment24).filter(i => i.type === "tool
           beaversTests: {
             fails: 0,
             consume: true,
-            ands: { 1: { hits: 1, ors: { 1: { type: "IncrementStep", data: { name: "Craft" } } } } },
+            ands: { 1: { hits: 1, ors: { 1: { type: "IncrementStep", data: { name: "Day of work" } } } } },
           },
           macro: macro(tool),
           folder: FOLDER,
