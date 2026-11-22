@@ -1,7 +1,8 @@
 import { Recipe } from "../Recipe.js";
 import { Settings } from "../Settings.js";
 import { RecipeSheet } from "./RecipeSheet.js";
-import { AnyOfItemSheet, ScriptItemSheet } from "./SubtypeItemSheet.js";
+import { AnyOfItemSheet, ContainerItemSheet, ScriptItemSheet } from "./SubtypeItemSheet.js";
+import { Container } from "../Container.js";
 import { AnyOf } from "../AnyOf.js";
 import { Script } from "../Script.js";
 import { editImage, openSystemSheet } from "../helpers/ItemSheetActions.js";
@@ -71,7 +72,7 @@ export class RecipeItemSheet extends DocumentSheetV2 {
 }
 
 /**
- * Registers our sheets (recipe, AnyOf, Script) for every item type (selectable in Foundry's sheet config, never default)
+ * Registers our sheets (recipe, AnyOf, Script, container) for every item type (selectable in Foundry's sheet config, never default)
  * and routes items flagged with that subtype to them unless the user picked another sheet for that item.
  * Call in the init hook; the routing is installed on setup, when the system has set its Item class.
  */
@@ -80,6 +81,7 @@ export function registerRecipeItemSheet() {
         [RecipeItemSheet, "beaversCrafting.recipeSheet.sheetLabel", item => Recipe.isRecipe(item)],
         [AnyOfItemSheet, "beaversCrafting.anyOf.sheetLabel", item => AnyOf.isAnyOf(item)],
         [ScriptItemSheet, "beaversCrafting.script.sheetLabel", item => Script.isScript(item)],
+        [ContainerItemSheet, "beaversCrafting.container.sheetLabel", item => Container.isContainer(item)],
     ];
     for (const [cls, label] of sheets) {
         (foundry as any).applications.apps.DocumentSheetConfig.registerSheet(Item, Settings.NAMESPACE, cls, {

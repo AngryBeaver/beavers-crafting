@@ -15,7 +15,6 @@ import {Container} from "./Container.js";
 import {ActorSheetCraftedInventory} from "./apps/ActorSheetCraftedInventory.js";
 import {ActorSheetContainer} from "./apps/ActorSheetContainer.js";
 import {CraftedItemSheet} from "./apps/CraftedItemSheet.js";
-import {ContainerSheet} from "./apps/ContainerSheet.js";
 import "./compatibility/tidy5e.js";
 import {initDnd5e, dnd5eCreateItemDialog} from "./compatibility/dnd5e.js";
 import { hookChatLog } from "./apps/ChatLog.js";
@@ -158,13 +157,11 @@ Hooks.once("beavers-system-interface.ready", async function(){
   Hooks.on(`renderItemSheet`, async (app, html, data) => {
     if (app instanceof Application) {
       CraftedItemSheet.bind(app, html, data);
-      ContainerSheet.bind(app, html, data);
     }
   });
 
   Hooks.on(`renderApplicationV2`, async (app, html, data, options) => {
     CraftedItemSheet.bind(app, html, data);
-    ContainerSheet.bind(app, html, data);
     if (app.actor) {
       if (!Settings.isDisabledActor(app.actor)) {
         new ActorSheetTab(app, html, data);

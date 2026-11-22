@@ -5,7 +5,7 @@
     <header class="flexrow" style="margin-bottom: 10px;">
         <div class="mode-toggle" style="display: flex; align-items: center; gap: 10px;">
             <label>{{localize "beaversCrafting.container.mode"}}:</label>
-            <select name="flags.beavers-crafting.container.mode" style="flex: 1;">
+            <select class="container-mode" style="flex: 1;" {{#unless editable}}disabled{{/unless}}>
                 <option value="recipes" {{#if (eq container.mode "recipes")}}selected{{/if}}>{{localize "beaversCrafting.container.book"}}</option>
                 <option value="items" {{#if (eq container.mode "items")}}selected{{/if}}>{{localize "beaversCrafting.container.bag"}}</option>
             </select>

@@ -1,5 +1,6 @@
 import { AnyOfSheet } from "./AnyOfSheet.js";
 import { ScriptSheet } from "./ScriptSheet.js";
+import { ContainerSheet } from "./ContainerSheet.js";
 import { editImage, openSystemSheet } from "../helpers/ItemSheetActions.js";
 import { renderTemplate } from "../helpers/Compat.js";
 
@@ -14,7 +15,7 @@ interface SubtypeContent {
 }
 
 /**
- * Our own sheet for the small subtypes (AnyOf, Script): header with image, name and the system sheet,
+ * Our own sheet for the small subtypes (AnyOf, Script, container): header with image, name and the system sheet,
  * the body comes from the content class. Name and code are saved by the form on change.
  * Routed here by their flag, see registerRecipeItemSheet.
  */
@@ -80,5 +81,16 @@ export class ScriptItemSheet extends SubtypeItemSheet {
     constructor(options) {
         super(options);
         this.content = new ScriptSheet(this);
+    }
+}
+
+export class ContainerItemSheet extends SubtypeItemSheet {
+    static DEFAULT_OPTIONS: any = {
+        window: {icon: "fa-solid fa-box-open"},
+    };
+
+    constructor(options) {
+        super(options);
+        this.content = new ContainerSheet(this);
     }
 }

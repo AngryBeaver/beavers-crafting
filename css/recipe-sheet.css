@@ -903,6 +903,11 @@ body.theme-dark .application.beavers-crafting:is(.recipe-item-sheet, .subtype-it
     margin: 0;
     font-family: monospace;
 }
+.beavers-crafting.subtype-item-sheet .container-sheet {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+}
 .beavers-crafting.subtype-item-sheet .anyOf .bottom {
     margin: 0;
     align-items: center;

@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.12.2
+- containers have their own sheet too, like recipes, AnyOf and Script: image, name, mode, contents and the drop area
+
 ## 4.12.1
 - AnyOf and Script items have their own sheet, like recipes: image, name, the code and the test drop area
   - the button "System sheet" opens the sheet of the system for price, weight, description …

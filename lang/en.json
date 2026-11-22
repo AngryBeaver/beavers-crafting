@@ -300,6 +300,7 @@
       "container": "\uD83D\uDCE6Container"
     },
     "container": {
+      "sheetLabel": "Beaver’s Crafting Container",
       "mode": "Mode",
       "mode-recipes": "Recipes (Book)",
       "mode-items": "Physical Items (Bag)",
