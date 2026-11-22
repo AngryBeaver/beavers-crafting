@@ -309,6 +309,7 @@ The module adds Recipe and AnyOf to the item creation window. It finds that wind
 ## Credits
 - Brazilian Portuguese translation by [Andersants](https://github.com/Andersants)
 - French translation by [Michel](https://github.com/jehan-michel)
+- Module icon "Anvil impact" by [Lorc](https://lorcblog.blogspot.com) from [game-icons.net](https://game-icons.net/1x1/lorc/anvil-impact.html), licensed under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
 
 ## License
 This work includes material from the System Reference Document 5.2 ("SRD 5.2") by Wizards of the Coast LLC, available at https://www.dndbeyond.com/srd. The SRD 5.2 is licensed under the Creative Commons Attribution 4.0 International License, available at https://creativecommons.org/licenses/by/4.0/legalcode.

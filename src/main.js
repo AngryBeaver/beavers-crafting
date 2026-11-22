@@ -3,8 +3,6 @@ import {registerRecipeItemSheet} from "./apps/RecipeItemSheet.js";
 import { rerenderItemDirectory, Settings} from './Settings.js';
 import {Crafting} from "./Crafting.js";
 import {RecipeCompendium} from "./apps/RecipeCompendium.js";
-import {AnyOfSheet} from "./apps/AnyOfSheet.js";
-import {ScriptSheet} from "./apps/ScriptSheet.js";
 import {Recipe} from "./Recipe.js";
 import {ActorSheetTab} from "./apps/ActorSheetTab.js";
 import {
@@ -159,16 +157,12 @@ Hooks.once("beavers-system-interface.ready", async function(){
   //SubTypeSheet
   Hooks.on(`renderItemSheet`, async (app, html, data) => {
     if (app instanceof Application) {
-      AnyOfSheet.bind(app, html, data);
-      ScriptSheet.bind(app, html, 1);
       CraftedItemSheet.bind(app, html, data);
       ContainerSheet.bind(app, html, data);
     }
   });
 
   Hooks.on(`renderApplicationV2`, async (app, html, data, options) => {
-    AnyOfSheet.bind(app, html, data, 2);
-    ScriptSheet.bind(app, html, 2);
     CraftedItemSheet.bind(app, html, data);
     ContainerSheet.bind(app, html, data);
     if (app.actor) {

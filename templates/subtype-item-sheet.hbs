@@ -1,0 +1,12 @@
+{{!-- Own sheet of AnyOf and Script items (SubtypeItemSheet.ts): header, the body comes from the content class --}}
+<div class="beavers-crafting brs beavers-subtype-sheet {{#unless editable}}ro{{/unless}}">
+    <header class="brs-head">
+        <img src="{{img}}" alt="" {{#if editable}}data-action="editImage" class="editable"{{/if}}>
+        <div class="brs-title">
+            <input type="text" name="name" value="{{name}}" {{#unless editable}}readonly{{/unless}} placeholder="{{localize "Name"}}">
+        </div>
+        <button type="button" class="brs-hbtn" data-action="systemSheet" title="{{localize "beaversCrafting.recipeSheet.systemSheetHint"}}">
+            <i class="fa-regular fa-up-right-from-square"></i>{{localize "beaversCrafting.recipeSheet.systemSheet"}}</button>
+    </header>
+    {{{body}}}
+</div>

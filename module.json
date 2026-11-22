@@ -62,6 +62,52 @@
       }
     }
   ],
+  "media": [
+    {
+      "type": "icon",
+      "url": "https://raw.githubusercontent.com/AngryBeaver/beavers-crafting/main/pictures/anvil-impact.png"
+    },
+    {
+      "type": "cover",
+      "url": "https://raw.githubusercontent.com/AngryBeaver/beavers-crafting/main/pictures/potionCrafting.png",
+      "caption": "Crafting"
+    },
+    {
+      "type": "screenshot",
+      "url": "https://raw.githubusercontent.com/AngryBeaver/beavers-crafting/main/pictures/crafting.png",
+      "caption": "The crafting window"
+    },
+    {
+      "type": "screenshot",
+      "url": "https://raw.githubusercontent.com/AngryBeaver/beavers-crafting/main/pictures/craftingTab.png",
+      "caption": "The crafting tab on the actor sheet"
+    },
+    {
+      "type": "screenshot",
+      "url": "https://raw.githubusercontent.com/AngryBeaver/beavers-crafting/main/pictures/configure.png",
+      "caption": "The recipe sheet"
+    },
+    {
+      "type": "screenshot",
+      "url": "https://raw.githubusercontent.com/AngryBeaver/beavers-crafting/main/pictures/advance.png",
+      "caption": "Advancing a crafting with checks"
+    },
+    {
+      "type": "screenshot",
+      "url": "https://raw.githubusercontent.com/AngryBeaver/beavers-crafting/main/pictures/result.png",
+      "caption": "The result in the chat"
+    },
+    {
+      "type": "screenshot",
+      "url": "https://raw.githubusercontent.com/AngryBeaver/beavers-crafting/main/pictures/downtime.png",
+      "caption": "Downtime activities"
+    },
+    {
+      "type": "screenshot",
+      "url": "https://raw.githubusercontent.com/AngryBeaver/beavers-crafting/main/pictures/container.png",
+      "caption": "Containers with their contents"
+    }
+  ],
   "url": "https://github.com/AngryBeaver/beavers-crafting",
   "manifest": "https://github.com/AngryBeaver/beavers-crafting/releases/latest/download/module.json",
   "download": "https://github.com/AngryBeaver/beavers-crafting/releases/latest/download/beavers-crafting.zip",

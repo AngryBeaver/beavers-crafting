@@ -1,6 +1,10 @@
 import { Recipe } from "../Recipe.js";
 import { Settings } from "../Settings.js";
 import { RecipeSheet } from "./RecipeSheet.js";
+import { AnyOfItemSheet, ScriptItemSheet } from "./SubtypeItemSheet.js";
+import { AnyOf } from "../AnyOf.js";
+import { Script } from "../Script.js";
+import { editImage, openSystemSheet } from "../helpers/ItemSheetActions.js";
 
 const DocumentSheetV2 = (foundry as any).applications.api.DocumentSheetV2 as any;
 
@@ -58,48 +62,39 @@ export class RecipeItemSheet extends DocumentSheetV2 {
     }
 
     static onEditImage(this: RecipeItemSheet) {
-        if (!this.isEditable) return;
-        const FilePicker = (foundry as any).applications.apps.FilePicker.implementation;
-        new FilePicker({
-            current: this.document.img,
-            type: "image",
-            callback: path => this.document.update({img: path}),
-            position: {top: this.position.top + 40, left: this.position.left + 10},
-            document: this.document,
-        }).browse();
+        editImage(this);
     }
 
-    /** the sheet the system has for this item type, for price, weight, description … */
     static onSystemSheet(this: RecipeItemSheet) {
-        const sheets = CONFIG.Item.sheetClasses[this.document.type] || {};
-        const entries = Object.values(sheets).filter((s: any) => s.cls !== RecipeItemSheet) as any[];
-        const entry = entries.find(s => s.default) ?? entries.find(s => s.canBeDefault) ?? entries[0];
-        if (!entry) return;
-        const cls = entry.cls;
-        const sheet = (foundry.utils as any).isSubclass(cls, DocumentSheetV2)
-            ? new cls({document: this.document})
-            : new cls(this.document, {editable: this.document.isOwner});
-        sheet.render(true);
+        openSystemSheet(this);
     }
 }
 
 /**
- * Registers the sheet for every item type (selectable in Foundry's sheet config, never default)
- * and routes items flagged as recipe to it unless the user picked another sheet for that item.
+ * Registers our sheets (recipe, AnyOf, Script) for every item type (selectable in Foundry's sheet config, never default)
+ * and routes items flagged with that subtype to them unless the user picked another sheet for that item.
  * Call in the init hook; the routing is installed on setup, when the system has set its Item class.
  */
 export function registerRecipeItemSheet() {
-    (foundry as any).applications.apps.DocumentSheetConfig.registerSheet(Item, Settings.NAMESPACE, RecipeItemSheet, {
-        label: "beaversCrafting.recipeSheet.sheetLabel",
-        makeDefault: false,
-        canBeDefault: false,
-    });
+    const sheets: [any, string, (item) => boolean][] = [
+        [RecipeItemSheet, "beaversCrafting.recipeSheet.sheetLabel", item => Recipe.isRecipe(item)],
+        [AnyOfItemSheet, "beaversCrafting.anyOf.sheetLabel", item => AnyOf.isAnyOf(item)],
+        [ScriptItemSheet, "beaversCrafting.script.sheetLabel", item => Script.isScript(item)],
+    ];
+    for (const [cls, label] of sheets) {
+        (foundry as any).applications.apps.DocumentSheetConfig.registerSheet(Item, Settings.NAMESPACE, cls, {
+            label,
+            makeDefault: false,
+            canBeDefault: false,
+        });
+    }
     Hooks.once("setup", () => {
         const proto = CONFIG.Item.documentClass.prototype as any;
         const original = proto._getSheetClass;
         proto._getSheetClass = function () {
-            if (this.getFlag("core", "sheetClass") == null && Recipe.isRecipe(this)) {
-                return RecipeItemSheet;
+            if (this.getFlag("core", "sheetClass") == null) {
+                const own = sheets.find(([, , is]) => is(this));
+                if (own) return own[0];
             }
             return original.call(this);
         };

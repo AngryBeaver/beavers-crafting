@@ -138,9 +138,11 @@
       "test": "test actor",
       "onlyRequired": "A script can only be added to \"Required\".",
       "noCheckDrop": "This script has no check() and cannot be a requirement.",
-      "missing": "script {name} not found"
+      "missing": "script {name} not found",
+      "sheetLabel": "Beaver’s Crafting Script"
     },
     "anyOf": {
+      "sheetLabel": "Beaver’s Crafting AnyOf",
       "dropItem": "drop item",
       "button": "test item",
       "error": "an 'anyOf' macro produced an error. See console (F12)"

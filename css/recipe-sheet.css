@@ -862,6 +862,37 @@
     resize: none;
 }
 
+/* ---------- own sheet window of AnyOf and Script (SubtypeItemSheet) ---------- */
+.beavers-crafting.subtype-item-sheet .window-content {
+    display: flex;
+    flex-direction: column;
+    padding: 12px 15px;
+    overflow: hidden;
+}
+.beavers-crafting.subtype-item-sheet .brs {
+    flex: 1;
+    min-height: 0;
+}
+.beavers-crafting.subtype-item-sheet .anyOf {
+    flex: 1;
+    min-height: 0;
+    height: auto;
+    gap: 6px;
+}
+.beavers-crafting.subtype-item-sheet .anyOf textarea {
+    flex: 1;
+    min-height: 120px;
+    height: auto;
+    width: 100%;
+    margin: 0;
+    font-family: monospace;
+}
+.beavers-crafting.subtype-item-sheet .anyOf .bottom {
+    margin: 0;
+    align-items: center;
+    gap: 6px;
+}
+
 /* ---------- own sheet window (RecipeItemSheet) ---------- */
 .beavers-crafting.recipe-item-sheet .window-content {
     display: block;

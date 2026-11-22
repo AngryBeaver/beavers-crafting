@@ -2,112 +2,49 @@ import { AnyOf } from "../AnyOf.js";
 import { getDataFrom } from "../helpers/Utility.js";
 import { createDragDrop, renderTemplate } from "../helpers/Compat.js";
 
-
-const anyOfSheets: { [key: string]: AnyOfSheet } = {};
-
+/**
+ * Content of the AnyOf sheet (AnyOfItemSheet): the code and a drop area to test it with an item.
+ * The code is saved by the sheet's form on change.
+ */
 export class AnyOfSheet {
     app;
     item;
-    anyOf: AnyOf;
-    anyOfElement?;
+    /** the item dropped to test the code, kept between renders */
     checkItem?;
-    timeout?;
-
-
-    static bind(app, html, version) {
-        if (AnyOf.isAnyOf(app.item)) {
-            app.anyOf = this;
-            app.version = version;
-            if (!anyOfSheets[app.id]) {
-                anyOfSheets[app.id] = new AnyOfSheet(app);
-            }
-            anyOfSheets[app.id].init(html);
-        }
-    }
-
-    get editable() {
-        return this.app.options.editable || (this.app.isEditable && this.app._mode == 2) //V2 or DNDv5
-    }
 
     constructor(app) {
         this.app = app;
-        this.item = app.item;
+        this.item = app.document;
     }
 
-    init(html) {
-        this.anyOf = new AnyOf(this.item);
-        if (html[0].localName !== "div") {
-            html = $(html[0].parentElement.parentElement);
-        }
-        let exists = html.find(".beavers-crafting.any-of");
-        if(exists.length != 0){
-            if(this.app.version === 1){
-                return; //do not repaint
-            }else{
-                exists.remove(); // repaint everything
-            }
-        }
-        this.anyOfElement = $('<div class="beavers-crafting any-of" style="height:100%;width:100%;padding:15px;"></div>');
-        beaversSystemInterface.itemSheetReplaceContent(this.app,html,this.anyOfElement);
-        this.render().then(()=>this.addDragDrop());
+    get editable(): boolean {
+        return !!this.app.isEditable;
     }
 
-    async render() {
-        let macroResult:MacroResult<boolean> = {value:true};
+    async renderBody(): Promise<string> {
+        const anyOf = new AnyOf(this.item);
+        let macroResult: MacroResult<boolean> = {value: true};
         if (this.checkItem) {
-            macroResult = await this.anyOf.executeMacro(this.checkItem);
+            macroResult = await anyOf.executeMacro(this.checkItem);
         }
-        let template = await renderTemplate('modules/beavers-crafting/templates/anyof-sheet.hbs',
-            {anyOf: this.anyOf, editable: this.editable, checkItem: this.checkItem, macroResult: macroResult});
-        this.anyOfElement.find('.anyOf').remove();
-        this.anyOfElement.append(template);
-        this.handleEvents();
+        return renderTemplate('modules/beavers-crafting/templates/anyof-sheet.hbs',
+            {anyOf, editable: this.editable, checkItem: this.checkItem, macroResult});
     }
 
-    handleEvents() {
-        this.anyOfElement.find('button').click(e => {
-            return this.render();
-        });
-        this.anyOfElement.find('textarea').on("change", (e) => {
-            this.anyOf.macro = e.target.value;
-            this.anyOf.update();
-        });
-
-    }
-
-    addDragDrop() {
-        if (this.editable) {
-            if (this.app._dragDrop) {
-                this.app._dragDrop = this.app._dragDrop.filter(d => d.name !== "anyOfSheet");
-            }
-            const dragDrop = createDragDrop({
-                dropSelector: '',
-                permissions: {
-                    dragstart: ()=>true,
-                    drop: ()=>true
-                },
-                callbacks: {
-                    dragstart: this.app._onDragStart?.bind(this.app),
-                    dragover: this.app._onDragOver?.bind(this.app),
-                    drop: this._onDrop.bind(this)
-                }
-            });
-            dragDrop["name"]="anyOfSheet";
-            this.app._dragDrop?.push(dragDrop);
-            dragDrop.bind(this.anyOfElement[0]);
-        }
+    attach(content: HTMLElement) {
+        $(content).find('button.test').on("click", () => this.app.render());
+        createDragDrop({
+            dropSelector: ".drop-area",
+            permissions: {drop: () => true},
+            callbacks: {drop: this._onDrop.bind(this)},
+        }).bind(content);
     }
 
     async _onDrop(e) {
-        const isDropArea = $(e.target).hasClass("drop-area")
-        if (!isDropArea) {
-            return;
-        }
         const data = getDataFrom(e);
-        if (data && (data.type === "Item")) {
+        if (data?.type === "Item") {
             this.checkItem = await fromUuid(data.uuid);
         }
-        this.render();
+        this.app.render();
     }
-
 }
