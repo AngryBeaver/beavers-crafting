@@ -4,6 +4,7 @@
 - AnyOf and Script items have their own sheet, like recipes: image, name, the code and the test drop area
   - the button "System sheet" opens the sheet of the system for price, weight, description …
   - another sheet can still be chosen per item in Foundry's sheet configuration
+- recipe, AnyOf and Script sheets: solid background in the dark theme instead of the transparent one
 - fix: AnyOf and Script sheets failed on the new item sheets of the systems: "this.app._dragDrop.filter is not a function"
 - fix: the empty tools icon of the recipe list did not load on Linux servers (e.g. the Forge)
 - module.json: icon, cover and screenshots for the package browsers (icon "Anvil impact" by Lorc, game-icons.net, CC BY 3.0)
