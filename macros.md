@@ -264,8 +264,8 @@ if (inputKey) {
 
 
 ## Script requirements
-A **Script** is an item (like AnyOf) with a small script. Create it with the item type "Script" and drop it into "Required" of a recipe.
-It can only be put into "Required", and only when it has a `check`.
+A **Script** is an item (like AnyOf) with a small script. Create it with the item type "Script" and drop it into "Required" or "Cost" of a recipe.
+In "Required" it needs a `check`, in "Cost" a `pay` (see "Script costs" below); it can never be a result.
 
 ```javascript
 {
@@ -282,3 +282,27 @@ It can only be put into "Required", and only when it has a `check`.
 - it runs whenever the recipe is evaluated (recipe list, crafting window, start), so it must only check, never change anything
 - like required items it is only checked when the setting "Recipes use required Items" is on
 - drop an actor on the script's sheet to test it
+
+## Script costs
+A Script in "Cost" is paid like the other costs: `pay()` runs when the items and the money are used up,
+`refund()` when a failed crafting gives the costs back ("Consume on fail" off). `check()` is optional here:
+it says whether the cost can be paid, so the recipe list and the crafting window already show "not craftable".
+
+```javascript
+// costs XP (dnd5e): the quantity in the recipe is the amount, e.g. "XP ×100"
+{
+  check(quantity) {
+    return (actor.system.details.xp.value ?? 0) >= quantity || `needs ${quantity} XP`;
+  },
+  pay(quantity) {
+    return actor.update({"system.details.xp.value": actor.system.details.xp.value - quantity});
+  },
+  refund(quantity) {
+    return actor.update({"system.details.xp.value": actor.system.details.xp.value + quantity});
+  }
+}
+```
+- `quantity`: the amount in the recipe; the same script several times in a section is checked and paid once with the sum
+- `pay()` and `refund()` may change the actor or its items; an error stops the crafting
+- without `refund()` a paid cost is not given back
+- uses of a feature: see the example in the README ("Script")

@@ -141,7 +141,7 @@ export class RecipeSheet {
             img: isMoney ? currencyView(component.id).img || component.img : component.img,
             uuid: component.uuid,
             quantity: component.quantity,
-            hasQty: component.type !== "Macro" && component.type !== Settings.SCRIPT_SUBTYPE,
+            hasQty: component.type !== "Macro" && !(type === "output" && component.type === Settings.SCRIPT_SUBTYPE),
             isMoney,
             currencyId: component.id,
             currency: isMoney ? {label: currencyView(component.id).label} : undefined,
@@ -583,11 +583,14 @@ export class RecipeSheet {
     if (data.type === "Item" || (type === "output" && data.type === "RollTable")) {
       const entity = await fromUuid(data.uuid);
       if (entity && Script.isScript(entity)) {
-        // a Script is a requirement: only in "required" and only with a check
-        if (type !== "required") {
-          ui.notifications?.warn(game["i18n"].localize("beaversCrafting.script.onlyRequired"));
-        } else if (!await new Script(entity).hasCheck()) {
+        // a Script is a requirement (needs check) or a cost (needs pay), never a result
+        const script = new Script(entity);
+        if (type === "output") {
+          ui.notifications?.warn(game["i18n"].localize("beaversCrafting.script.notResult"));
+        } else if (type === "required" && !await script.hasCheck()) {
           ui.notifications?.warn(game["i18n"].localize("beaversCrafting.script.noCheckDrop"));
+        } else if (type === "input" && !await script.hasPay()) {
+          ui.notifications?.warn(game["i18n"].localize("beaversCrafting.script.noPayDrop"));
         } else {
           const component = beaversSystemInterface.componentFromEntity(entity);
           component.type = Settings.SCRIPT_SUBTYPE;

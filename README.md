@@ -117,9 +117,11 @@ Flavour text or instructions for the players, e.g. how long the work takes.
 
 ### Required
 Items that must be present but are not used up: tools, features, classes, backgrounds …
+Anything else can be checked with a [Script](#script), e.g. a level or a proficiency.
 
 ### Cost
 Ingredients and money that are used up.
+Anything else can be paid with a [Script](#script), e.g. uses of a feature, spell slots or XP.
 
 ### Results
 What the crafting gives on success: items, containers, roll tables or macros.
@@ -241,6 +243,47 @@ Test your AnyOf by dropping an item on its drop area and clicking "test item".
   ![img.png](pictures/anyOfDrop2.png)
 
 An AnyOf that is not chosen yet asks before the crafting starts. Selecting the recipe again starts over.
+
+## Script
+A Script is an item (like AnyOf) with a small script. Create it with the item type "Script" and drop it into a recipe:
+- **Required** (needs `check()`): a requirement that is not an item, e.g. a level or a proficiency.
+- **Cost** (needs `pay()`): a cost that is not an item or money, e.g. uses of a feature.
+
+| function | returns / does |
+|---|---|
+| `check(quantity)` | `true` when it is there in this quantity (or can be paid); `false` or a text with the reason when not. Optional for a cost. |
+| `pay(quantity)` | pays the cost, at the moment the other costs are paid |
+| `refund(quantity)` | optional: gives it back when a failed crafting returns its costs |
+
+Like an item, a Script has a quantity in the recipe; the same Script several times in a section counts as one with the sum.
+A script that does not use `quantity` works as before. A Script with `pay()` can also be a requirement: then only `check()` runs,
+e.g. "at least one use left" without using it up.
+
+Available are `actor` (who crafts) and `recipe`. `check()` runs whenever the recipe is evaluated (recipe list, crafting window, start), so it must only check, never change anything.
+Test the check by dropping an actor on the script's sheet.
+
+**Example: uses of a feature as a cost** (dnd5e, the feature needs its uses set up, e.g. "Int modifier per long rest")
+```js
+{
+  check(quantity) {
+    const feature = actor.items.find(i => i.name === "Tinker's Magic");
+    if (!feature?.system.uses?.max) return "needs the feature Tinker's Magic with uses";
+    return feature.system.uses.value >= quantity || `needs ${quantity} uses of Tinker's Magic`;
+  },
+  pay(quantity) {
+    const feature = actor.items.find(i => i.name === "Tinker's Magic");
+    return feature.update({"system.uses.spent": feature.system.uses.spent + quantity});
+  },
+  refund(quantity) {
+    const feature = actor.items.find(i => i.name === "Tinker's Magic");
+    return feature.update({"system.uses.spent": Math.max(0, feature.system.uses.spent - quantity)});
+  }
+}
+```
+dnd5e calculates `uses.value` (left) from `uses.max` and `uses.spent` (used): change `spent`. A long rest resets it, when the feature recovers on a long rest.
+Other systems keep uses elsewhere: look at the item with `console.log(actor.items.getName("Tinker's Magic"))`.
+
+More examples in [macros.md](macros.md#script-requirements).
 
 ## Hooks
 ### beavers-crafting.start

@@ -9,7 +9,7 @@
 {{/inline}}
 
 {{#*inline "bc-qty"}}
-  {{#unless isScript}}<span class="bc-qty">{{#if (eq type "output")}}×{{need}}{{else if hasHave}}<b>{{have}}</b> / {{need}}{{else}}<span class="bc-na">–</span> / {{need}}{{/if}}</span>{{/unless}}
+  {{#if isScript}}{{#if scriptQty}}<span class="bc-qty">×{{need}}</span>{{/if}}{{else}}<span class="bc-qty">{{#if (eq type "output")}}×{{need}}{{else if hasHave}}<b>{{have}}</b> / {{need}}{{else}}<span class="bc-na">–</span> / {{need}}{{/if}}</span>{{/if}}
 {{/inline}}
 
 {{#*inline "bc-undo"}}

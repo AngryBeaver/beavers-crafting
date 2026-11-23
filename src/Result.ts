@@ -234,20 +234,25 @@ export class Result implements ResultApi, ResultData {
         }
     }
 
-    /** a Script in "required": met (true) or not, with the reason; nothing of the actor is used */
-    setScriptResult(componentData: ComponentData, ok: boolean, reason?: string) {
-        const existing = this._components.required.findComponentResult(componentData);
+    /**
+     * a Script in "required" or "consumed" (cost): met / payable (true) or not, with the reason.
+     * required: nothing of the actor is used; consumed: paid (pay) and returned (refund) like the other costs.
+     * quantity: the sum of this script in the section; met counts as "has that many", like an item.
+     */
+    setScriptResult(componentData: ComponentData, ok: boolean, reason?: string, type: "required" | "consumed" = "required", quantity = 1) {
+        const existing = this._components[type].findComponentResult(componentData);
         if (existing) {
-            this._components.required.deleteComponentResult(componentData);
+            this._components[type].deleteComponentResult(componentData);
         }
         const componentResult = new ComponentResult();
         componentResult.component = beaversSystemInterface.componentCreate(componentData);
-        componentResult.component.quantity = -1;
-        componentResult.originalQuantity = ok ? 1 : 0;
-        componentResult.userInteraction = "never";
-        componentResult.isProcessed = false;
+        componentResult.component.quantity = -quantity;
+        componentResult.originalQuantity = ok ? quantity : 0;
+        componentResult.userInteraction = type === "required" ? "never"
+            : this._recipe.beaversTests?.consume ? "always" : "onSuccess";
+        componentResult.isProcessed = existing?.isProcessed ?? false;
         componentResult.reason = ok ? undefined : reason;
-        this._components.required.addComponentResult(componentResult);
+        this._components[type].addComponentResult(componentResult);
     }
 
     deleteComponent(type: ComponentType, componentData: ComponentData) {

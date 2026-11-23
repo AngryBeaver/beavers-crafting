@@ -23,14 +23,19 @@ export class ScriptSheet {
 
     async renderBody(): Promise<string> {
         const script = new Script(this.item);
+        const hasCheck = await script.hasCheck();
+        const hasPay = await script.hasPay();
         let checkResult: ScriptCheckResult | undefined = undefined;
         if (this.checkActor) {
-            checkResult = await script.check(this.checkActor, undefined);
+            // a cost without check can always be paid
+            checkResult = hasCheck ? await script.check(this.checkActor, undefined) : {ok: true};
         }
         return renderTemplate('modules/beavers-crafting/templates/script-sheet.hbs', {
             script,
             editable: this.editable,
-            hasCheck: await script.hasCheck(),
+            hasCheck,
+            // usable in a recipe: a requirement needs check, a cost needs pay
+            usable: hasCheck || hasPay,
             checkActor: this.checkActor,
             checkResult,
         });

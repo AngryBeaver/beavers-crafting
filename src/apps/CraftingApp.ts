@@ -27,6 +27,8 @@ interface SlotView {
     isAnyOf: boolean,
     /** a Script requirement: no quantity, the reason when it is not met */
     isScript?: boolean,
+    /** a Script needed more than once: show its quantity */
+    scriptQty?: boolean,
     reason?: string,
     clickable: boolean,
     crafted: boolean,
@@ -229,6 +231,7 @@ export class CraftingApp extends Application {
         const crafting = await Crafting.fromRecipe(this.data.actor.id, recipe);
         await crafting.checkCurrency();
         RecipeCompendium.validateRecipeToItemList(RecipeCompendium._filterData(recipe.input, (c) => c.type === "Item"), this.data.actor.items, crafting.result);
+        await RecipeCompendium.validateScriptCosts(recipe, crafting.result);
         await crafting.checkRequired();
         this.data.result = crafting.result;
         const content = await renderTemplate('modules/beavers-crafting/templates/crafting-app-main.hbs',
@@ -285,6 +288,7 @@ export class CraftingApp extends Application {
                 missing: status === "error",
                 isAnyOf,
                 isScript,
+                scriptQty: isScript && component.quantity > 1,
                 reason,
                 clickable: clickable && !isAnyOf && !isScript,
                 crafted: hasCraftedFlag && !!component.flags?.[Settings.NAMESPACE]?.isCrafted,

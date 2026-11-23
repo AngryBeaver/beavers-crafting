@@ -130,14 +130,15 @@
       "folderPlaceHolder": "Folder.Subfolder"
     },
     "script": {
-      "hint": "A requirement for recipes: put it into \"Required\". The function check() returns true when the requirement is met, otherwise false or a text with the reason. Available: actor and recipe.",
+      "hint": "For recipes. In \"Required\": check() returns true when the requirement is met, otherwise false or a text with the reason. In \"Cost\": pay() pays it, check() (optional) says whether it can be paid, refund() (optional) gives it back when a failed crafting returns its costs. Each gets the quantity of the recipe. Available: actor and recipe.",
       "placeholder": "{ check() { return true; } }",
-      "noCheck": "This script has no check() and cannot be used as a requirement.",
+      "noCheck": "This script has neither check() nor pay() and cannot be used in a recipe.",
       "dropActor": "drop actor to test",
       "example": "example",
       "test": "test actor",
-      "onlyRequired": "A script can only be added to \"Required\".",
+      "notResult": "A script cannot be a result, only \"Required\" or \"Cost\".",
       "noCheckDrop": "This script has no check() and cannot be a requirement.",
+      "noPayDrop": "This script has no pay() and cannot be a cost.",
       "missing": "script {name} not found",
       "sheetLabel": "Beaver’s Crafting Script"
     },

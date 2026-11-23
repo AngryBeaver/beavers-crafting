@@ -3,15 +3,19 @@ import {Settings} from "./Settings.js";
 const AsyncFunction = (async function () {}).constructor as any;
 const PARAMS = ["actor", "recipe"];
 
-export const SCRIPT_EXAMPLE = `// a requirement of a recipe, put it into "Required"
-// available: actor (who crafts), recipe (the recipe)
-// check: true when the requirement is met;
-//        false or a text (the reason) when it is not
+export const SCRIPT_EXAMPLE = `// available: actor (who crafts), recipe (the recipe)
+// "Required": needs check(); "Cost": needs pay(), check() and refund() are optional
+// quantity: the amount set in the recipe (the same script several times: the sum)
 {
-  check() {
+  // true when it is there (in this quantity); false or a text (the reason) when not
+  check(quantity) {
     if (actor.items.some(i => i.name === "Forge")) return true;
     return "needs a Forge";
-  }
+  },
+  // as a cost: pay it, at the moment the other costs are paid
+  // pay(quantity) { },
+  // as a cost: give it back, when a failed crafting returns its costs
+  // refund(quantity) { }
 }`;
 
 export interface ScriptCheckResult {
@@ -21,7 +25,8 @@ export interface ScriptCheckResult {
 
 /**
  * Script item: a small script as an item, like AnyOf.
- * The code is one object with a function per job; for now only "check" (a requirement of a recipe).
+ * The code is one object with a function per job:
+ * check (requirement, or whether a cost can be paid), pay and refund (a cost); each gets the quantity.
  */
 export class Script {
     macro: string;
@@ -48,22 +53,38 @@ export class Script {
         return handlers && typeof handlers === "object" ? handlers : {};
     }
 
-    async hasCheck(): Promise<boolean> {
+    async hasHandler(name: "check" | "pay" | "refund"): Promise<boolean> {
         try {
-            return typeof (await this.handlers()).check === "function";
+            return typeof (await this.handlers())[name] === "function";
         } catch (e) {
             return false;
         }
     }
 
+    async hasCheck(): Promise<boolean> {
+        return this.hasHandler("check");
+    }
+
+    async hasPay(): Promise<boolean> {
+        return this.hasHandler("pay");
+    }
+
+    /** runs pay or refund; a missing handler does nothing, an error is thrown */
+    async run(name: "pay" | "refund", actor, recipe, quantity = 1): Promise<void> {
+        const handlers = await this.handlers(actor, recipe);
+        if (typeof handlers[name] === "function") {
+            await handlers[name](quantity);
+        }
+    }
+
     /** true: met; false or anything else: not met with the name as reason; a text or an error: not met with that reason */
-    async check(actor, recipe): Promise<ScriptCheckResult> {
+    async check(actor, recipe, quantity = 1): Promise<ScriptCheckResult> {
         try {
             const handlers = await this.handlers(actor, recipe);
             if (typeof handlers.check !== "function") {
                 return {ok: false, reason: this.name};
             }
-            const value = await handlers.check();
+            const value = await handlers.check(quantity);
             if (value === true) {
                 return {ok: true};
             }

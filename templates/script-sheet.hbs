@@ -3,7 +3,7 @@
     <textarea placeholder="{{localize "beaversCrafting.script.placeholder"}}"
               {{#unless editable}}disabled{{/unless}}
               name="flags.beavers-crafting.script.macro">{{script.macro}}</textarea>
-    {{#unless hasCheck}}
+    {{#unless usable}}
         <span style="color:darkred;flex:0">{{localize "beaversCrafting.script.noCheck"}}</span>
     {{/unless}}
     <div class="flexrow bottom">

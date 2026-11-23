@@ -4,6 +4,7 @@ import { RecipeCompendium } from "./apps/RecipeCompendium.js";
 import { ComponentResults, Result } from "./Result.js";
 import { TestHandler } from "./TestHandler.js";
 import { Container } from "./Container.js";
+import { Script } from "./Script.js";
 import { dnd5eCopyContent, getActorContentPool } from "./ContainerHandler.js";
 import { bringToFront, enrichHTML, markReplaced, renderTemplate } from "./helpers/Compat.js";
 import { chatCardView } from "./apps/ChatCard.js";
@@ -92,6 +93,7 @@ export class Crafting implements CraftingData {
     Hooks.call(Settings.NAMESPACE + ".start", this.recipe);
     await this.checkRequired();
     RecipeCompendium.validateRecipeToItemList(RecipeCompendium._filterData(this.recipe.input, component => true), this.actor.items, this.result);
+    await RecipeCompendium.validateScriptCosts(this.recipe, this.result);
     await this.payCurrency();
     await this.addOutput();
     await this.executeMacro();
@@ -281,6 +283,7 @@ export class Crafting implements CraftingData {
       const itemChange = await this._addComponentsToActor(componentList);
       this.restore.push(...itemChange.delete);
       await this._processMoney(moneyList);
+      await this._processScripts(this.result._components.consumed);
     } catch (e) {
       // @ts-ignore
       ui.notifications.error(e.message);
@@ -310,10 +313,36 @@ export class Crafting implements CraftingData {
   }
 
 
+  /**
+   * Scripts in the cost: pay() when the other costs are paid, refund() when a failed crafting returns them.
+   * Same rules as the items, but they are run instead of changing items. An error stops the processing.
+   */
+  private async _processScripts(componentResults: ComponentResults) {
+    const hasError = this.result.hasError();
+    for (const componentResult of componentResults._data) {
+      if (componentResult.component.type !== Settings.SCRIPT_SUBTYPE) continue;
+      const shouldBeProcessed = componentResult.userInteraction === "always" || (componentResult.userInteraction === "onSuccess" && !hasError);
+      let handler: "pay" | "refund" | undefined;
+      if (shouldBeProcessed && !componentResult.isProcessed && !componentResult.hasError()) {
+        handler = "pay";
+      } else if (!shouldBeProcessed && componentResult.isProcessed && componentResult.userInteraction === "onSuccess" && hasError) {
+        handler = "refund";
+      }
+      if (!handler) continue;
+      const entity = await beaversSystemInterface.uuidToDocument(componentResult.component.uuid).catch(() => undefined);
+      if (!entity || !Script.isScript(entity)) {
+        throw new Error(game["i18n"].format("beaversCrafting.script.missing", {name: componentResult.component.name}));
+      }
+      await new Script(entity).run(handler, this.actor, this.recipe, Math.abs(componentResult.component.quantity) || 1);
+    }
+  }
+
   private _processComponentResult(componentResults: ComponentResultsData): Component[] {
     const componentList: Component[] = [];
     const hasError = this.result.hasError();
     for (const componentResult of componentResults._data) {
+      // Scripts change no items: _processScripts
+      if (componentResult.component.type === Settings.SCRIPT_SUBTYPE) continue;
       let component = beaversSystemInterface.componentCreate(componentResult.component);
       const shouldBeProcessed = componentResult.userInteraction === "always" || (componentResult.userInteraction === "onSuccess" && !hasError);
       if (shouldBeProcessed) {
@@ -360,6 +389,7 @@ export class Crafting implements CraftingData {
     try {
       const itemChange = await this._addComponentsToActor(componentList);
       await this._processMoney(moneyList);
+      await this._processScripts(this.result._components.consumed);
       if (!this.result.hasError()) {
         await this.actor.update(this.result._actorUpdate);
       }

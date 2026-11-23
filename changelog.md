@@ -1,5 +1,17 @@
 # Changelog
 
+## 4.13.0
+- Script items can now also be a cost: drop a Script with `pay()` into "Cost"
+  - `pay()` runs when the other costs are paid, the optional `refund()` when a failed crafting gives the costs back
+  - the optional `check()` says whether it can be paid: the recipe list and the crafting window show it before the start
+  - e.g. uses of a feature, spell slots or XP; examples in the README ("Script") and macros.md ("Script costs")
+- Scripts have a quantity, like items, in "Required" and "Cost": `check(quantity)`, `pay(quantity)`, `refund(quantity)`
+  - the same Script several times in a section is checked and paid once with the sum
+  - scripts that ignore the quantity work as before
+  - a Script with `pay()` can also be a requirement: only `check()` runs, e.g. "at least one use left"
+- Script sheet: says when a script has neither `check()` nor `pay()`; the test with an actor also works for costs
+- README: new section "Script"
+
 ## 4.12.2
 - containers have their own sheet too, like recipes, AnyOf and Script: image, name, mode, contents and the drop area
 

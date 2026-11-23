@@ -109,6 +109,7 @@ export class RecipeCompendium {
         }
         const listOfIngredientsWithoutAnyOf = this._filterData(recipe.input, component => component.type !== Settings.ANYOF_SUBTYPE);
         const result = RecipeCompendium.validateRecipeToItemList(listOfIngredientsWithoutAnyOf, pool, Result.from(recipe, actor));
+        await RecipeCompendium.validateScriptCosts(recipe, result);
         await RecipeCompendium.filterRequired(actor, recipe, result);
         return {available: result._isAnyConsumedAvailable(), usable: !result.hasError()};
     }
@@ -157,19 +158,46 @@ export class RecipeCompendium {
         if (Settings.get(Settings.USE_ATTENDANTS)) {
             const listOfRequiredWithoutAnyOf = this._filterData(recipe.required, component => component.type !== Settings.ANYOF_SUBTYPE);
             for (const component of listOfRequiredWithoutAnyOf) {
-                if (component.type === Settings.SCRIPT_SUBTYPE) {
-                    const {ok, reason} = await this.checkScript(component, result._actor, recipe);
-                    result.setScriptResult(component, ok, reason);
-                } else {
+                if (component.type !== Settings.SCRIPT_SUBTYPE) {
                     result.updateComponent("required", component);
                 }
+            }
+            for (const {component, quantity} of this._sumScripts(listOfRequiredWithoutAnyOf)) {
+                const {ok, reason} = await this.checkScript(component, result._actor, recipe, false, quantity);
+                result.setScriptResult(component, ok, reason, "required", quantity);
             }
         }
         return result;
     }
 
 
-    static async checkScript(component: Component, actor, recipe: Recipe): Promise<{ ok: boolean, reason?: string }> {
+    /** the Scripts in "Cost": their check says whether they can be paid (no check: always) */
+    static async validateScriptCosts(recipe: Recipe, result: Result): Promise<Result> {
+        for (const {component, quantity} of this._sumScripts(this._filterData(recipe.input, () => true))) {
+            const {ok, reason} = await this.checkScript(component, result._actor, recipe, true, quantity);
+            result.setScriptResult(component, ok, reason, "consumed", quantity);
+        }
+        return result;
+    }
+
+    /** the Scripts of a section, the same script once with the sum of its quantities (like items) */
+    static _sumScripts(components: Component[]): { component: Component, quantity: number }[] {
+        const sums = new Map<string, { component: Component, quantity: number }>();
+        for (const component of components) {
+            if (component.type !== Settings.SCRIPT_SUBTYPE) continue;
+            const quantity = Math.max(1, Number(component.quantity) || 1);
+            const sum = sums.get(component.uuid);
+            if (sum) {
+                sum.quantity += quantity;
+            } else {
+                sums.set(component.uuid, {component, quantity});
+            }
+        }
+        return [...sums.values()];
+    }
+
+    /** @param optional true: a script without check counts as met (a cost that only pays) */
+    static async checkScript(component: Component, actor, recipe: Recipe, optional = false, quantity = 1): Promise<{ ok: boolean, reason?: string }> {
         let entity;
         try {
             entity = await component.getEntity();
@@ -180,7 +208,11 @@ export class RecipeCompendium {
             // @ts-ignore
             return {ok: false, reason: game.i18n.format("beaversCrafting.script.missing", {name: component.name})};
         }
-        return new Script(entity).check(actor, recipe);
+        const script = new Script(entity);
+        if (optional && !await script.hasCheck()) {
+            return {ok: true};
+        }
+        return script.check(actor, recipe, quantity);
     }
 
     static async evaluateOption(type: DataType, recipe: Recipe, group: string): Promise<string> {
@@ -243,8 +275,12 @@ export class RecipeCompendium {
         return beaversSystemInterface.uiDialogSelect(selectData);
     }
 
+    /** the items (and money) of the cost; Scripts are evaluated by validateScriptCosts */
     static validateRecipeToItemList(listOfIngredients: Component[], listOfItems, result: Result): Result {
         for (const component of listOfIngredients) {
+            if (component.type === Settings.SCRIPT_SUBTYPE) {
+                continue;
+            }
             result.updateComponent("consumed", component);
         }
         return result;
