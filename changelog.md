@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.14.0
+- the compendium "D&D 2024 Artificer Recipes" moved to its own module
+  [Beaver's Artificer's Crafting](https://github.com/AngryBeaver/beavers-artificers-crafting):
+  Tinker's Magic with its uses counted, and the 56 plans of Replicate Magic Item
+  - it is listed as a recommended module
+  - recipes already imported into a world stay as they are
+
 ## 4.13.0
 - Script items can now also be a cost: drop a Script with `pay()` into "Cost"
   - `pay()` runs when the other costs are paid, the optional `refund()` when a failed crafting gives the costs back

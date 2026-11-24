@@ -44,6 +44,7 @@ https://github.com/user-attachments/assets/6da63c89-439c-4681-9d1c-798b2250eaf1
 <!-- TOC -->
 * [Ready-made recipes](#ready-made-recipes)
   * [Tool Recipes (dnd5e)](#tool-recipes-dnd5e)
+  * [Artificer Recipes (dnd5e)](#artificer-recipes-dnd5e)
   * [Ingredients (dnd5e)](#ingredients-dnd5e)
 * [Create a recipe](#create-a-recipe)
 * [The recipe sheet](#the-recipe-sheet)
@@ -80,12 +81,10 @@ When crafting, the player chooses what to make from everything the tool can craf
 - The items come from the Player's Handbook when that module is active, otherwise from the free dnd5e equipment (SRD 5.2).
 
 ### Artificer Recipes (dnd5e)
-The compendium **D&D 2024 Artificer Recipes** has a recipe for the Artificer feature "Tinker's Magic".
-- Requires Tinker's Tools and the feature "Tinker's Magic" on the actor (matched by its name).
-- The results do not stack and are removed after the next long rest.
-- Uses per long rest are not tracked.
-
-The rules themselves are in the book; the recipe only names the feature and the items.
+The D&D 2024 Artificer recipes are a module of their own:
+[Beaver's Artificer's Crafting](https://github.com/AngryBeaver/beavers-artificers-crafting).
+- Tinker's Magic, with its uses per long rest counted.
+- Replicate Magic Item: 56 plans by Artificer level, items per long rest and held at once, the oldest item vanishes.
 
 ### Ingredients (dnd5e)
 The compendium "ingredients" of this module has example ingredients you can use in your own recipes.

@@ -49,17 +49,6 @@
         "PLAYER": "OBSERVER",
         "ASSISTANT": "OWNER"
       }
-    },
-    {
-      "label": "D&D 2024 Artificer Recipes",
-      "name": "dnd5e-artificer-recipes",
-      "path": "packs/dnd5e-artificer-recipes",
-      "system": "dnd5e",
-      "type": "Item",
-      "ownership": {
-        "PLAYER": "OBSERVER",
-        "ASSISTANT": "OWNER"
-      }
     }
   ],
   "media": [
@@ -124,6 +113,12 @@
       }
     ],
     "recommends": [
+      {
+        "id": "beavers-artificer-crafting",
+        "type": "module",
+        "manifest": "https://github.com/AngryBeaver/beavers-artificers-crafting/releases/latest/download/module.json",
+        "reason": "D&D 2024 Artificer recipes: Tinker's Magic and the plans of Replicate Magic Item (dnd5e)"
+      },
       {
         "id": "bsa-a5e",
         "type": "module",
