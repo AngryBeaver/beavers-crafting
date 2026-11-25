@@ -30,16 +30,6 @@
   "styles": "{{css}}",
   "packs": [
     {
-      "entity": "Item",
-      "label": "ingredients",
-      "name": "ingredients",
-      "path": "./packs/ingredients.db",
-      "module": "beavers-crafting",
-      "system": "dnd5e",
-      "type": "Item",
-      "private": false
-    },
-    {
       "label": "D&D 2024 Tool Recipes",
       "name": "dnd5e-tool-recipes",
       "path": "packs/dnd5e-tool-recipes",
@@ -123,7 +113,7 @@
         "manifest": "https://github.com/AngryBeaver/beavers-system-interface/releases/latest/download/module.json",
         "compatibility": {
           "minimum": "2.2.0",
-          "verified": "2.3.4"
+          "verified": "2.5.0"
         }
       }
     ],
@@ -183,11 +173,6 @@
         "id": "bsa-sfrpg",
         "type": "module",
         "manifest": "https://github.com/AngryBeaver/bsa-sfrpg/releases/latest/download/module.json"
-      },
-      {
-        "id": "bsa-swnr",
-        "type": "module",
-        "manifest": "https://github.com/AngryBeaver/bsa-swnr/releases/latest/download/module.json"
       },
       {
         "id": "bsa-wfrp4e",

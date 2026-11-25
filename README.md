@@ -16,7 +16,28 @@ A recipe can
 
 It works in possibly every system through the [Beaver's System Interface](https://github.com/AngryBeaver/beavers-system-interface) ([list of adaption layers](https://github.com/AngryBeaver/beavers-system-interface/wiki/BSA-x-links)).
 
-**New to the module?** Start with the [ready-made recipes](#ready-made-recipes): with dnd5e you get a recipe for every tool of the D&D 2024 rules out of the box.
+**Tested in** (2026-11-25, beavers-crafting 4.15.1, Beaver's System Interface 2.5.0): create recipes of every check
+type, craft them from the crafting window, advance them on the actor sheet, results and chat.
+
+| System | System version | Foundry | Adapter |
+|---|---|---|---|
+| Level Up: Advanced 5th Edition (a5e) | 1.5.3 | 14.368 | bsa-a5e 1.3.0 |
+| Call of Cthulhu 7th Edition (CoC7) | 9.2 | 14.368 | built in |
+| 3.5e SRD (D35E) | 3.1.0 | 14.368 | bsa-D35E 1.1.0 |
+| DnD 4th Edition (dnd4e) | 0.9.3 | 14.368 | bsa-dnd4e 1.3.0 |
+| Dungeons & Dragons Fifth Edition (dnd5e) | 6.1.1 | 14.368 | bsa-dnd5e 2.2.0 |
+| Fallout: The Roleplaying Game (fallout) | 11.17.1 | 14.368 | bsa-fallout 2.1.0 |
+| Pathfinder 1e (pf1) | 11.11 | 13.351 | bsa-pf1 1.2.1 |
+| Pathfinder Second Edition (pf2e) | 7.12.2 | 13.351 | bsa-pf2e 1.2.2 |
+| Fabula Ultima (projectfu) | 5.0.0 | 14.368 | built in |
+| Starfinder First Edition (sfrpg) | 14.0.2 | 14.368 | bsa-sfrpg 1.2.0 |
+| Savage Worlds Adventure Edition (swade) | 6.0.4 | 14.368 | bsa-swade 1.3.1 |
+| Systems Without Number (swnr) | 2.3.3 | 14.368 | built in |
+| Warhammer Fantasy Roleplay 4th / 5th Edition (wfrp4e) | 10.1.2 | 14.368 | bsa-wfrp4e 1.2.2 |
+
+currently no longer tested: Cyberpunk RED (cyberpunk-red-core v0.92.4 needs Foundry 12).
+
+**Playing dnd5e?** Start with the [ready-made recipes](#ready-made-recipes-dnd5e): you get a recipe for every tool of the D&D 2024 rules out of the box.
 
 ## Features
 ### Crafting
@@ -48,10 +69,6 @@ Gamemaster to learn it. See [Recipes and blueprints](#recipes-and-blueprints).
 
 ## Contents
 <!-- TOC -->
-* [Ready-made recipes](#ready-made-recipes)
-  * [Tool Recipes (dnd5e)](#tool-recipes-dnd5e)
-  * [Artificer Recipes (dnd5e)](#artificer-recipes-dnd5e)
-  * [Ingredients (dnd5e)](#ingredients-dnd5e)
 * [Create a recipe](#create-a-recipe)
 * [The recipe sheet](#the-recipe-sheet)
   * [Instruction](#instruction)
@@ -66,37 +83,16 @@ Gamemaster to learn it. See [Recipes and blueprints](#recipes-and-blueprints).
   * [Result](#result)
 * [Recipes and blueprints](#recipes-and-blueprints)
 * [AnyOf](#anyof)
+* [Script](#script)
+* [Ready-made recipes (dnd5e)](#ready-made-recipes-dnd5e)
+  * [Tool Recipes (dnd5e)](#tool-recipes-dnd5e)
+  * [Artificer Recipes (dnd5e)](#artificer-recipes-dnd5e)
 * [Hooks](#hooks)
 * [Settings](#settings)
 * [Good to know](#good-to-know)
 * [Troubleshooting](#troubleshooting)
 * [Credits](#credits)
 <!-- TOC -->
-
-## Ready-made recipes
-The easiest way to get started is to import existing recipes.
-
-### Tool Recipes (dnd5e)
-This module includes the compendium **D&D 2024 Tool Recipes**: one recipe for every tool that can craft something by the D&D 2024 rules, e.g. "Smith's Tools Recipes".
-1. Import the recipes into your world (they go into the folder "Tools").
-2. Give the players permission to see them.
-
-When crafting, the player chooses what to make from everything the tool can craft.
-- Proficiency with the tool is needed.
-- The raw materials cost half the price of the chosen item.
-- The work is a "Day of work" step, advanced once per day of work: one day per 10 GP of the item's price (at least one).
-- The items come from the Player's Handbook when that module is active, otherwise from the free dnd5e equipment (SRD 5.2).
-
-### Artificer Recipes (dnd5e)
-The D&D 2024 Artificer recipes are a module of their own:
-[Beaver's Artificer's Crafting](https://github.com/AngryBeaver/beavers-artificers-crafting).
-- Tinker's Magic, with its uses per long rest counted.
-- Replicate Magic Item: 56 plans by Artificer level, items per long rest and held at once, the oldest item vanishes.
-
-### Ingredients (dnd5e)
-The compendium "ingredients" of this module has example ingredients you can use in your own recipes.
-
-![img.png](pictures/ingredients.png)
 
 ## Create a recipe
 ![img.png](pictures/newItem.png)
@@ -330,6 +326,26 @@ dnd5e calculates `uses.value` (left) from `uses.max` and `uses.spent` (used): ch
 Other systems keep uses elsewhere: look at the item with `console.log(actor.items.getName("Tinker's Magic"))`.
 
 More examples in [macros.md](macros.md#script-requirements).
+
+## Ready-made recipes (dnd5e)
+With dnd5e you can import existing recipes instead of creating your own.
+
+### Tool Recipes (dnd5e)
+This module includes the compendium **D&D 2024 Tool Recipes**: one recipe for every tool that can craft something by the D&D 2024 rules, e.g. "Smith's Tools Recipes".
+1. Import the recipes into your world (they go into the folder "Tools").
+2. Give the players permission to see them.
+
+When crafting, the player chooses what to make from everything the tool can craft.
+- Proficiency with the tool is needed.
+- The raw materials cost half the price of the chosen item.
+- The work is a "Day of work" step, advanced once per day of work: one day per 10 GP of the item's price (at least one).
+- The items come from the Player's Handbook when that module is active, otherwise from the free dnd5e equipment (SRD 5.2).
+
+### Artificer Recipes (dnd5e)
+The D&D 2024 Artificer recipes are a module of their own:
+[Beaver's Artificer's Crafting](https://github.com/AngryBeaver/beavers-artificers-crafting).
+- Tinker's Magic, with its uses per long rest counted.
+- Replicate Magic Item: 56 plans by Artificer level, items per long rest and held at once, the oldest item vanishes.
 
 ## Hooks
 ### beavers-crafting.start

@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.15.1
+- cleanup: the example compendium "ingredients" and its 50 mushroom icons are no longer shipped, they made the
+  package huge
+  - ingredients already imported into a world stay as they are, but lose their icons
+- Call of Cthulhu 7th Edition (CoC7): supported through Beaver's System Interface 2.5.0, which has the adapter built in
+  (skill, characteristic, luck and sanity checks; no currencies)
+- Beaver's System Interface verified 2.5.0; bsa-swnr is no longer recommended, swnr is built in there now
+
 ## 4.15.0
 - recipes and blueprints: the recipe sheet has a kind under the name
   - **Recipe** (default, as before): everyone who sees it can craft it
