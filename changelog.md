@@ -1,5 +1,23 @@
 # Changelog
 
+## 4.15.0
+- recipes and blueprints: the recipe sheet has a kind under the name
+  - **Recipe** (default, as before): everyone who sees it can craft it
+  - **Blueprint**: listed greyed until the actor learned it; crafting it is refused
+- learning: a recipe item on the actor is a known recipe
+  - **Learn** in the crafting window (top right), drag & drop, a recipe whose result is a recipe, or
+    `game["beavers-crafting"].RecipeKnowledge.learn(actor, uuid)`
+  - players: new setting "Learning recipes", **Gamemaster approves** (default: "Waiting for approval", a whispered
+    chat card with Allow / Reject, the answer as a popup) or **Players learn directly**
+  - a recipe is learned once: a second copy (same source, or same name) is refused with a message
+  - **Forget** in the crafting window (top right) removes it at once
+  - the filter "own" is now called "known"
+  - an open crafting window follows what its actor learns and forgets
+  - once learned, a world recipe is listed only as the actor's own copy, not twice
+- crafting window: each recipe shows its kind icon (scroll = recipe, compass = blueprint), yellow when craftable now,
+  grey when not (replaces the green dot); the header shows the kind and folder, then tool, cost and result
+- hooks `beavers-crafting.preLearn` (return false to refuse) and `beavers-crafting.forget`
+
 ## 4.14.0
 - the compendium "D&D 2024 Artificer Recipes" moved to its own module
   [Beaver's Artificer's Crafting](https://github.com/AngryBeaver/beavers-artificers-crafting):

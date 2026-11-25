@@ -30,6 +30,12 @@ https://github.com/user-attachments/assets/f5e02b8f-ef72-4c76-a622-9aabf0788f51
 
 https://github.com/user-attachments/assets/6da63c89-439c-4681-9d1c-798b2250eaf1
 
+### Recipes and blueprints
+A recipe is either a **Recipe** everyone can use, or a **Blueprint** an actor must learn first; players can ask the
+Gamemaster to learn it. See [Recipes and blueprints](#recipes-and-blueprints).
+
+![showcase-not-known.png](pictures/showcase-not-known.png)
+
 ### Downtime activities
 ![downtime.png](pictures/downtime.png)
 ### Containers
@@ -58,6 +64,7 @@ https://github.com/user-attachments/assets/6da63c89-439c-4681-9d1c-798b2250eaf1
   * [Choose a recipe](#choose-a-recipe)
   * [Progress](#progress)
   * [Result](#result)
+* [Recipes and blueprints](#recipes-and-blueprints)
 * [AnyOf](#anyof)
 * [Hooks](#hooks)
 * [Settings](#settings)
@@ -104,8 +111,10 @@ The button **System sheet** in its header opens your system's own item sheet, e.
 ## The recipe sheet
 ![configure.png](pictures/configure.png)
 
-The header shows the image, the name and the folder of the recipe.
-The folder groups the recipes in the crafting window and on the actor tab; click it to change it, e.g. `Smithing/Weapons`.
+The header shows the image, the name, the kind and the folder of the recipe.
+- **Kind**: **Recipe** (default) can be crafted by everyone who sees it, a **Blueprint** must be learned first,
+  see [Recipes and blueprints](#recipes-and-blueprints).
+- The folder groups the recipes in the crafting window and on the actor tab; click it to change it, e.g. `Smithing/Weapons`.
 
 The sheet follows Foundry's light and dark mode. Every section can be folded; players without edit rights see a read-only version.
 
@@ -195,8 +204,10 @@ Click **Craft…** to open the crafting window.
 - Filters:
   - **available**: you have at least one of the ingredients
   - **usable**: you have all ingredients in the needed quantity
-  - **own**: the recipe is in your inventory
+  - **known**: the recipe is in your inventory (learned)
   - **by item**: drop items to see only recipes using all of them
+- Each recipe shows its kind, a scroll (recipe) or a compass (blueprint): yellow when you can craft it now, grey when not.
+  Blueprints you have not learned are greyed, see [Recipes and blueprints](#recipes-and-blueprints).
 - The recipe shows what you have and what is missing.
 - Where a recipe offers a choice ("one of", AnyOf), make it in the window; it can be undone.
 - **Start** begins the crafting.
@@ -216,6 +227,42 @@ A chat message shows the result.
 ![img.png](pictures/result.png)
 
 Items created or updated by a successful crafting are flagged with `flags.beavers-crafting.isCrafted = true`.
+
+## Recipes and blueprints
+A recipe item on an actor is a recipe the actor **knows**. The kind (in the recipe sheet, under the name) decides
+whether that matters:
+- **Recipe** (default): everyone who sees it in the world can craft it, as before.
+- **Blueprint**: everyone who sees it finds it in the crafting window, greyed: it must be learned before it can be crafted.
+
+![showcase-recipe-sheet-kind.png](pictures/showcase-recipe-sheet-kind.png)
+
+In the crafting window each recipe shows its kind, a scroll (Recipe) or a compass (Blueprint): yellow when it can be
+crafted now, grey when not. A blueprint the actor has not learned is greyed, with **Learn** at the top right.
+
+![showcase-not-known.png](pictures/showcase-not-known.png)
+
+Who sees a world recipe is up to its Foundry permissions, as before.
+
+**Learn**: the recipe lands on the actor, by
+- dragging it onto the actor (from the world or a compendium)
+- **Learn** in the crafting window (top right), see below
+- a recipe whose result is a recipe (e.g. a book that is consumed)
+- the API: `game["beavers-crafting"].RecipeKnowledge.learn(actor, uuid)`
+
+A recipe is learned once: when the actor already knows it (same source, or without a recorded source the same name),
+it is refused with a message.
+
+**Learn in the crafting window**: select a greyed blueprint and click **Learn** (top right).
+- The Gamemaster learns it at once.
+- Players: setting **Learning recipes**
+  - **Gamemaster approves** (default): the window shows "Waiting for approval", the Gamemasters get a whispered chat
+    card with **Allow** / **Reject**. The player gets the answer as a popup, also when they were offline meanwhile.
+    The request is kept on the actor until it is answered.
+  - **Players learn directly**: like the Gamemaster.
+
+![showcase-request-card.png](pictures/showcase-request-card.png)
+
+**Forget**: **Forget** in the crafting window (top right, at once) or removing the recipe item from the actor.
 
 ## AnyOf
 An AnyOf is an ingredient that stands for "any item that …", e.g. any weapon or any herb.
@@ -291,6 +338,26 @@ The recipe can be changed here to change the crafting.
 ```js
 Hooks.on("beavers-crafting.start", (recipe) => {
   console.log(recipe);
+});
+```
+
+### beavers-crafting.preLearn
+Fires before an actor learns a recipe, whatever the way (drag & drop, Learn, crafting, API).
+Return `false` to refuse it; show your own message why.
+```js
+Hooks.on("beavers-crafting.preLearn", (actor, recipeItem) => {
+  if (tooManyRecipes(actor)) {
+    ui.notifications.warn(`${actor.name} can't learn more recipes.`);
+    return false;
+  }
+});
+```
+
+### beavers-crafting.forget
+Fires after a recipe was removed from an actor (by Forget or any other way), on the client that removed it.
+```js
+Hooks.on("beavers-crafting.forget", (actor, recipeItem) => {
+  // e.g. remove what was made with it
 });
 ```
 

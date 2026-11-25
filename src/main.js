@@ -20,6 +20,8 @@ import {initDnd5e, dnd5eCreateItemDialog} from "./compatibility/dnd5e.js";
 import { hookChatLog } from "./apps/ChatLog.js";
 import { attachContentsToCreatedContainer, runCleanup } from "./ContainerHandler.js";
 import { getTemplate, markDeleted } from "./helpers/Compat.js";
+import { RecipeKnowledge } from "./RecipeKnowledge.js";
+import { LearnRequests } from "./LearnRequests.js";
 
 //recipes open our own sheet, whatever item type the system uses for them
 Hooks.once("init", registerRecipeItemSheet);
@@ -76,6 +78,7 @@ Hooks.once("beavers-system-interface.ready", async function(){
     game[Settings.NAMESPACE].RecipeCompendium = RecipeCompendium;
     game[Settings.NAMESPACE].Recipe = Recipe;
     game[Settings.NAMESPACE].Settings = Settings;
+    game[Settings.NAMESPACE].RecipeKnowledge = RecipeKnowledge;
     game[Settings.NAMESPACE].migrateRecipeAddItemType = itemTypeMigration;
     game[Settings.NAMESPACE].migrateRecipeSkillToTests= migrateRecipeSkillToTests;
     game[Settings.NAMESPACE].migrateDeprecateTools= migrateDeprecateTools;
@@ -243,6 +246,27 @@ Hooks.once("beavers-system-interface.ready", async function(){
   Hooks.on("preDeleteItem", (item, options, userId) => {
     return Container.preDeleteItem(item, options, userId);
   });
+
+  // learning = a recipe item lands on an actor, forgetting = it is removed
+  Hooks.on("preCreateItem", (item) => RecipeKnowledge.guardLearning(item));
+  Hooks.on("deleteItem", (item, options, userId) => {
+    if (userId === game.user.id) RecipeKnowledge.announceForgotten(item);
+  });
+  // an open crafting window follows what its actor learns and forgets, whatever the way
+  const refreshOnRecipeChange = (item) => {
+    if (item.parent instanceof Actor && Recipe.isRecipe(item)) CraftingApp.refreshFor(item.parent);
+  };
+  Hooks.on("createItem", refreshOnRecipeChange);
+  Hooks.on("deleteItem", refreshOnRecipeChange);
+
+  // players asking the Gamemaster to learn a blueprint: the requests live on the actor
+  Hooks.on("updateActor", (actor, changes) => {
+    if (!LearnRequests.isAffectedBy(changes)) return;
+    void LearnRequests.process(actor);
+    CraftingApp.refreshFor(actor);
+  });
+  Hooks.on("renderChatMessageHTML", (message, html) => LearnRequests.bindCard(message, html));
+  void LearnRequests.processAll();
 
   function hookForCatchingDialogTitle(dialog, buttons) {
     if (Settings.get(Settings.CAPTURE_CREATE_ITEM_TITLE)) {

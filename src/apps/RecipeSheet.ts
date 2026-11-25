@@ -1,4 +1,4 @@
-import { Recipe } from "../Recipe.js";
+import { Recipe, RECIPE_KIND_ICONS } from "../Recipe.js";
 import { Settings } from "../Settings.js";
 import { getDataFrom } from "../helpers/Utility.js";
 import { AnyOf } from "../AnyOf.js";
@@ -16,6 +16,20 @@ const TEST_ICONS = {
   SkillTest: "fa-person-running",
   ToolTest: "fa-screwdriver-wrench",
 };
+/** the kinds of a recipe and their icons: a recipe can be crafted by all who see it, a blueprint must be learned */
+/** the kind select of the sheet's header */
+function kindView(kind: RecipeKind) {
+  const label = (k: string) => game["i18n"].localize(`beaversCrafting.knowledge.kind.${k}`);
+  const hint = (k: string) => game["i18n"].localize(`beaversCrafting.knowledge.kindHint.${k}`);
+  return {
+    kind,
+    kindCurrent: {label: label(kind), icon: RECIPE_KIND_ICONS[kind]},
+    kindChoices: Object.entries(RECIPE_KIND_ICONS).map(([value, icon]) => ({
+      value, icon, label: label(value), hint: hint(value), on: value === kind,
+    })),
+  };
+}
+
 /** folded sections per recipe item, survives re-rendering */
 const foldedSections = new Map<string, Set<string>>();
 /** a text of a test class; a missing translation comes back as its key ("module.tests.x.info.note"), it is left out */
@@ -249,6 +263,7 @@ export class RecipeSheet {
       name: this.item.name,
       img: this.item.img,
       typeLabel: game["i18n"].localize(CONFIG.Item.typeLabels?.[this.item.type] || this.item.type),
+      ...kindView(recipe.kind),
       folder: recipe.folder || "",
       folderParts: (recipe.folder || "").split(".").filter(p => p !== ""),
       instruction: recipe.instruction || "",

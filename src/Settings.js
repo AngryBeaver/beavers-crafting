@@ -26,6 +26,7 @@ export class Settings {
     static ITEM_DIRECTORY_BUTTON = "itemDirectoryButton";
     static CONTAINER_CONTENT_HANDLING = "containerContentHandling";
     static LAST_CLEANUP_TIMESTAMP = "lastCleanupTimestamp";
+    static LEARN_MODE = "learnMode";
     static init() {
         game.settings.register(this.NAMESPACE, this.CREATE_ITEM_TITLE, {
             name: game.i18n.localize('beaversCrafting.settings.createItemTitle.name'),
@@ -141,6 +142,18 @@ export class Settings {
             requiresReload: true,
             default: "fa-scroll",
             type: String,
+        });
+        game.settings.register(this.NAMESPACE, this.LEARN_MODE, {
+            name: game.i18n.localize('beaversCrafting.settings.learnMode.name'),
+            hint: game.i18n.localize('beaversCrafting.settings.learnMode.hint'),
+            scope: "world",
+            config: true,
+            default: "approve",
+            type: String,
+            choices: {
+                approve: game.i18n.localize('beaversCrafting.settings.learnMode.choices.approve'),
+                direct: game.i18n.localize('beaversCrafting.settings.learnMode.choices.direct'),
+            }
         });
         game.settings.register(this.NAMESPACE, this.SEPARATE_CRAFTED_ITEMS, {
             name: game.i18n.localize('beaversCrafting.settings.separateItems.name'),

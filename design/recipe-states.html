@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recipe States</title>
+<!--
+  Mockup: one state icon per recipe, a cleaner recipe header, a compact GM request card.
+  Follows learn-recipes.html (implemented in 4.15.0). Same tokens as crafting-window.html.
+
+  - List row: the kind icon (scroll = Recipe, compass = Blueprint) replaces the green dot and the lock.
+    Yellow = you can craft it now. Grey = you can't (not known, or something missing). No reason in the list: click to see it.
+  - Header line 1: name. A blueprint gets the compass behind the name: yellow = known, grey = not known.
+    Line 2: only the kind (icon + Recipe/Blueprint) and the folder.
+    Line 3: tool, cost, result ("1 item"). No Known / Not known badge any more.
+  - GM card: two small icon buttons on the right: ✕ reject, ✓ allow.
+-->
+<link rel="stylesheet" href="assets/foundry/fontawesome/css/all.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Signika:wght@400;600&family=Modesto+Condensed:wght@700&family=Alegreya+SC:wght@500;700&display=swap">
+<style>
+body{margin:0;padding:32px;background:#3a3836;font-family:'Signika',sans-serif;display:flex;flex-wrap:wrap;gap:40px;justify-content:center}
+.board{display:flex;flex-direction:column;gap:8px}
+.board>h2{margin:0;color:#ddd;font-size:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.board>p{margin:0;color:#bbb;font-size:13px;max-width:900px;line-height:1.45}
+.dark{--fg:#ece6da;--muted:#a59c8c;--grey:#6f685d;--line:rgba(255,240,215,.13);--line-strong:rgba(255,240,215,.26);--accent:#e3a548;--accent-fg:#1d1408;--hover:rgba(255,240,215,.05);--sel:rgba(227,165,72,.16);--slot:rgba(0,0,0,.35);--chip:rgba(255,240,215,.08);--info-tint:rgba(227,165,72,.09);--bad:#f08a83;--ok:#7cc47f}
+.bc{width:900px;height:560px;display:flex;flex-direction:column;font-size:14px;color:var(--fg);border-radius:8px;overflow:hidden;background:#1c1b1a;box-shadow:0 10px 40px rgba(0,0,0,.55)}
+.bc *{box-sizing:border-box}
+.wh{height:34px;flex:none;display:flex;align-items:center;padding:0 12px;background:#0f0e0d;font-weight:600;font-size:13px;border-bottom:1px solid var(--line-strong)}
+.wh .t{flex:1}
+.wb{flex:1;display:grid;grid-template-columns:232px minmax(0,1fr);min-height:0}
+.side{display:flex;flex-direction:column;border-right:1px solid var(--line-strong);background:#121110}
+.tools{padding:10px;display:flex;flex-direction:column;gap:8px;border-bottom:1px solid var(--line)}
+.field{display:flex;align-items:center;gap:8px;height:32px;padding:0 10px;background:rgba(0,0,0,.4);border:1px solid var(--line-strong);border-radius:5px;color:var(--muted);font-size:13px}
+.list{flex:1;overflow:auto;padding:6px 6px 6px 4px;display:flex;flex-direction:column;gap:1px}
+.fold{display:flex;align-items:center;gap:6px;padding:8px 6px 4px;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+.fold .c{margin-left:auto;font-weight:400}
+.rec{display:flex;align-items:center;gap:8px;padding:3px 8px;border-radius:5px;margin-left:8px;color:inherit}
+.rec.sub{margin-left:18px}
+.rec img{width:32px;height:32px;border-radius:4px;border:1px solid var(--line-strong);background:var(--slot)}
+.rec .n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'Alegreya SC',serif;font-size:15px}
+.rec.unk img{filter:grayscale(1);opacity:.55}
+.rec.unk .n{color:var(--muted);font-style:italic}
+.rec.sel{background:var(--sel);box-shadow:inset 3px 0 0 var(--accent)}
+/* the one state icon */
+.st{width:16px;text-align:center;font-size:13px}
+.st.yes{color:var(--accent)}
+.st.no{color:var(--grey)}
+.sfoot{padding:8px 12px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center}
+.sfoot i{color:var(--accent)}
+.main{display:flex;flex-direction:column;min-height:0;background:#201e1b}
+.rh{display:flex;gap:14px;align-items:center;padding:16px 20px 14px;border-bottom:1px solid var(--line)}
+.rh .big{width:64px;height:64px;border-radius:8px;border:1px solid var(--line-strong);background:var(--slot)}
+.rh h1{margin:0;font-family:'Alegreya SC',serif;font-size:27px;font-weight:700;line-height:1.05;display:flex;align-items:center;gap:10px}
+.rh h1 .kn{font-size:17px}
+.rh h1 .kn.yes{color:var(--accent)}
+.rh h1 .kn.no{color:var(--grey)}
+.meta{color:var(--muted);font-size:13px;margin-top:4px;display:flex;align-items:center;gap:6px}
+.meta .kind{color:var(--fg);display:inline-flex;gap:6px;align-items:center}
+.meta .kind i.yes{color:var(--accent)}
+.meta .kind i.no{color:var(--grey)}
+.tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.tag{font-size:12px;padding:2px 9px 2px 7px;border-radius:999px;background:var(--chip);border:1px solid var(--line);display:inline-flex;gap:6px;align-items:center}
+.hact{margin-left:auto;align-self:flex-start}
+.hb{height:32px;padding:0 14px;border-radius:6px;font:inherit;font-size:13px;font-weight:600;display:inline-flex;gap:7px;align-items:center;border:1px solid var(--accent);background:var(--accent);color:var(--accent-fg)}
+.hb.quiet{background:transparent;border-color:var(--line-strong);color:var(--muted);font-weight:400}
+.wait{height:32px;padding:0 12px;border-radius:6px;display:inline-flex;gap:7px;align-items:center;font-size:13px;color:var(--accent);border:1px dashed var(--accent);background:var(--sel)}
+.body{flex:1;padding:14px 20px;display:flex;flex-direction:column;gap:12px;color:var(--muted);font-size:13px}
+.note{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:8px;border:1px solid var(--accent);background:var(--info-tint);color:var(--fg)}
+.note i{color:var(--accent)}
+.ph{flex:1;border:1px dashed var(--line);border-radius:8px;display:grid;place-items:center;font-style:italic}
+.ft{display:flex;justify-content:flex-end;padding:10px 16px;border-top:1px solid var(--line-strong);background:rgba(0,0,0,.4)}
+.craft{height:38px;padding:0 18px;border-radius:6px;font:inherit;font-weight:600;display:inline-flex;gap:8px;align-items:center;border:1px solid var(--accent);background:var(--accent);color:var(--accent-fg)}
+.craft[disabled]{opacity:.4}
+
+/* compact GM card (Foundry dark chat) */
+.cards{display:flex;gap:18px;align-items:flex-start;width:900px}
+.chat{width:288px;font-size:13px;color:#e7e1d6;background:#1f1d1c;border:1px solid #444;border-radius:6px;padding:8px 10px;box-shadow:0 6px 20px #0008}
+.chat .ch{display:flex;gap:8px;align-items:center}
+.chat .ch img{width:36px;height:36px;border-radius:4px}
+.chat .ch b{display:block;font-family:'Modesto Condensed',serif;font-size:19px}
+.chat .ch small{color:#aaa}
+.chat .fl{font-style:italic;color:#bbb;margin:4px 0 6px}
+.rq{display:flex;align-items:center;gap:8px;padding:4px 6px 4px 4px;border:1px solid #555;border-radius:5px;background:#0003}
+.rq img{width:32px;height:32px;border-radius:4px}
+.rq .n{flex:1;font-weight:600}
+.ibtn{width:28px;height:28px;border-radius:5px;display:grid;place-items:center;border:0;color:#fff;font-size:13px;cursor:pointer}
+.ibtn.no{background:#a93a32}
+.ibtn.yes{background:#3a8a3e}
+.res{font-size:12px;font-weight:600;margin-left:4px}
+.res.learned{color:#7cc47f}
+.res.rejected{color:#f08a83}
+.legend{width:900px;color:#ddd;font-size:13px;line-height:1.5;background:#2b2a28;border-radius:8px;padding:14px 18px}
+.legend h3{margin:0 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:.06em}
+.legend ul{margin:0;padding-left:18px}
+.legend .y{color:#e3a548}.legend .g{color:#8a8274}
+</style>
+</head>
+<body>
+
+<div class="board">
+  <h2>1 · Not known blueprint, player waits</h2>
+  <p>List: one icon per recipe, the kind (<i class="fas fa-scroll"></i> Recipe, <i class="fas fa-compass-drafting"></i> Blueprint).
+    Yellow: you can craft it now. Grey: you can't, for whatever reason. Not known rows stay greyed.
+    Header line 1: only the name. Line 2: kind + folder; a grey compass = not known. Line 3: tool, cost, result. No badge.</p>
+  <div class="bc dark" data-sel="Potion of Heroism"></div>
+</div>
+
+<div class="board">
+  <h2>2 · Known blueprint</h2>
+  <p>Yellow compass in line 2 = known. "Forget" top right.</p>
+  <div class="bc dark" data-sel="Alchemist's Fire"></div>
+</div>
+
+<div class="board">
+  <h2>3 · A plain recipe</h2>
+  <p>Scroll in line 2, nothing to learn or forget. Missing gold: grey scroll in the list, the reason shows in the body (as today).</p>
+  <div class="bc dark" data-sel="Antitoxin"></div>
+</div>
+
+<div class="board">
+  <h2>4 · Gamemaster card: small icon buttons on the right</h2>
+  <p>✕ rejects, ✓ allows (tooltips "Reject" / "Allow"). After the decision the buttons give way to the result.</p>
+  <div class="cards">
+    <div class="chat"><div class="ch"><img src="assets/foundry/potion-bottle-labeled-stopped-purple.webp" alt=""><div><b>Mira Brightflask</b><small>To: Gamemaster</small></div></div>
+      <div class="fl">wants to learn a recipe</div>
+      <div class="rq"><img src="assets/foundry/potion-flask-corked-green.webp" alt=""><span class="n">Potion of Heroism</span>
+        <button class="ibtn no" title="Reject"><i class="fas fa-xmark"></i></button><button class="ibtn yes" title="Allow"><i class="fas fa-check"></i></button></div></div>
+    <div class="chat"><div class="ch"><img src="assets/foundry/potion-bottle-labeled-stopped-purple.webp" alt=""><div><b>Mira Brightflask</b><small>To: Gamemaster</small></div></div>
+      <div class="fl">wants to learn a recipe</div>
+      <div class="rq"><img src="assets/foundry/potion-flask-corked-green.webp" alt=""><span class="n">Potion of Heroism</span>
+        <span class="res learned"><i class="fas fa-check"></i> Learned</span></div></div>
+    <div class="chat"><div class="ch"><img src="assets/foundry/potion-bottle-labeled-stopped-purple.webp" alt=""><div><b>Mira Brightflask</b><small>To: Gamemaster</small></div></div>
+      <div class="fl">wants to learn a recipe</div>
+      <div class="rq"><img src="assets/foundry/potion-flask-corked-green.webp" alt=""><span class="n">Potion of Heroism</span>
+        <span class="res rejected"><i class="fas fa-xmark"></i> Rejected</span></div></div>
+  </div>
+</div>
+
+<div class="legend">
+  <h3>Rules</h3>
+  <ul>
+    <li>List icon = kind. <span class="y">Yellow</span>: craftable now. <span class="g">Grey</span>: not craftable now (not known or requirements missing; no difference in the list).</li>
+    <li>Not known rows stay greyed (image grey, name italic).</li>
+    <li>Header line 1: only the name. Line 2: <span class="y"><i class="fas fa-compass-drafting"></i></span> Blueprint (known) / <span class="g"><i class="fas fa-compass-drafting"></i></span> Blueprint (not known) / <span class="y"><i class="fas fa-scroll"></i></span> Recipe · folder. Line 3: tool, cost, <i class="fas fa-flask"></i> 1 item.</li>
+    <li>The sidebar footer: yellow <i class="fas fa-hammer"></i> "2 of 6 craftable now".</li>
+  </ul>
+</div>
+
+<template id="frame">
+  <div class="wh"><span class="t">Beaver's Recipe Compendium</span><i class="fas fa-xmark"></i>&nbsp;Close</div>
+  <div class="wb">
+    <aside class="side">
+      <div class="tools">
+        <div class="field"><i class="fas fa-magnifying-glass"></i>Search recipes…</div>
+        <div class="field"><i class="fas fa-filter"></i>all</div>
+      </div>
+      <nav class="list" data-list></nav>
+      <div class="sfoot"><i class="fas fa-hammer"></i>2 of 6 craftable now</div>
+    </aside>
+    <section class="main" data-main></section>
+  </div>
+</template>
+
+<script>
+  const R = (name, img, kind, can, sub, unk) => ({name, img, kind, can, sub, unk});
+  const LIST = [
+    ["Alchemy", 6],
+    R("Acid", "conical-mushroom-poison-red.webp", "blueprint", false, false, true),
+    R("Alchemist's Fire", "potion-bottle-labeled-stopped-purple.webp", "blueprint", true),
+    R("Antitoxin", "potion-flask-corked-green.webp", "recipe", false),
+    R("Potion of Healing", "scroll-bound-red-tan.webp", "recipe", true),
+    ["Potions", 2],
+    R("Potion of Climbing", "ladder.webp", "blueprint", false, true),
+    R("Potion of Heroism", "potion-flask-corked-green.webp", "blueprint", false, true, true),
+  ];
+  const MAIN = {
+    "Potion of Heroism": {kind: "blueprint", known: false, path: "Alchemy › Potions", tags: [["fa-screwdriver-wrench", "1 tool"], ["fa-coins", "250 Gold + 1 ingredient"]], act: '<span class="wait"><i class="fas fa-hourglass-half"></i>Waiting for approval</span>', note: true, craft: false},
+    "Alchemist's Fire": {kind: "blueprint", known: true, path: "Alchemy", tags: [["fa-screwdriver-wrench", "1 tool"], ["fa-coins", "25 Gold + 1 ingredient"]], act: '<button class="hb quiet"><i class="fas fa-trash"></i>Forget</button>', craft: true},
+    "Antitoxin": {kind: "recipe", path: "Alchemy", tags: [["fa-screwdriver-wrench", "1 tool"], ["fa-coins", "50 Gold"]], act: "", craft: false},
+  };
+  const KIND = {recipe: ["fa-scroll", "Recipe"], blueprint: ["fa-compass-drafting", "Blueprint"]};
+
+  function row(r, sel) {
+    if (Array.isArray(r)) return `<div class="fold"><i class="fas fa-chevron-down"></i>${r[0]}<span class="c">${r[1]}</span></div>`;
+    return `<a class="rec ${r.sub ? "sub" : ""} ${r.unk ? "unk" : ""} ${r.name === sel ? "sel" : ""}"><img src="assets/foundry/${r.img}" alt=""><span class="n">${r.name}</span>
+      <i class="fas ${KIND[r.kind][0]} st ${r.can ? "yes" : "no"}" title="${r.can ? "Craftable now" : "Not craftable now"}"></i></a>`;
+  }
+  function main(name) {
+    const m = MAIN[name], img = LIST.find(r => r.name === name).img;
+    const kc = m.kind === "blueprint" && !m.known ? "no" : "yes";
+    const kt = m.kind === "blueprint" ? (m.known ? "Known" : "Not known") : "";
+    const tags = [...m.tags, ["fa-flask", "1 item"]].map(([i, t]) => `<span class="tag"><i class="fas ${i}"></i>${t}</span>`).join("");
+    return `<div class="rh"><img class="big" src="assets/foundry/${img}" alt=""><div>
+        <h1>${name}</h1>
+        <div class="meta"><span class="kind" title="${kt}"><i class="fas ${KIND[m.kind][0]} ${kc}"></i>${KIND[m.kind][1]}</span>·<span>${m.path}</span></div>
+        <div class="tags">${tags}</div></div>
+        <div class="hact">${m.act}</div></div>
+      <div class="body">${m.note ? '<div class="note"><i class="fas fa-compass-drafting"></i>This blueprint must be learned before it can be crafted. Learned, it is on the actor and listed as known.</div>' : ""}
+        <div class="ph">Required · Cost → Result (as today)</div></div>
+      <div class="ft"><button class="craft" ${m.craft ? "" : "disabled"}><i class="fas fa-hammer"></i>Start</button></div>`;
+  }
+  document.querySelectorAll(".bc[data-sel]").forEach(host => {
+    host.append(document.getElementById("frame").content.cloneNode(true));
+    host.querySelector("[data-list]").innerHTML = LIST.map(r => row(r, host.dataset.sel)).join("");
+    host.querySelector("[data-main]").innerHTML = main(host.dataset.sel);
+  });
+</script>
+</body>
+</html>

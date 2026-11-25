@@ -467,19 +467,17 @@
     font-size: 16px;
 }
 
-.beavers-crafting.crafting-app .bc-dot {
+/* one state icon per recipe: its kind, yellow when craftable now */
+.beavers-crafting.crafting-app .bc-state {
     flex: none;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
+    font-size: 12px;
+    color: var(--bc-muted);
+    opacity: .7;
 }
 
-.beavers-crafting.crafting-app .bc-dot.ok {
-    background: var(--bc-ok);
-}
-
-.beavers-crafting.crafting-app .bc-dot.no {
-    border: 1.5px solid var(--bc-muted);
+.beavers-crafting.crafting-app .bc-state.ok {
+    color: var(--bc-accent);
+    opacity: 1;
 }
 
 .beavers-crafting.crafting-app .bc-sfoot {
@@ -538,9 +536,29 @@
 }
 
 .beavers-crafting.crafting-app .bc-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     margin-top: 3px;
     font-size: 13px;
     color: var(--bc-muted);
+}
+
+.beavers-crafting.crafting-app .bc-sfoot i,
+.beavers-crafting.crafting-app .bc-kind i {
+    color: var(--bc-accent);
+}
+
+.beavers-crafting.crafting-app .bc-kind {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 600;
+}
+
+.beavers-crafting.crafting-app .bc-kind.off i {
+    color: var(--bc-muted);
+    opacity: .7;
 }
 
 .beavers-crafting.crafting-app .bc-tags {
@@ -1009,6 +1027,124 @@
 
 .beavers-crafting.crafting-app .bc-craft.go:hover {
     filter: brightness(1.1);
+}
+
+.beavers-crafting.crafting-app .bc-craft:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+    background: transparent;
+    filter: none;
+}
+
+/* ---------------- header actions: Learn / waiting / Forget, top right ---------------- */
+.beavers-crafting.crafting-app .bc-hact {
+    margin-left: auto;
+    align-self: flex-start;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.beavers-crafting.crafting-app .bc-learn {
+    appearance: none;
+    flex: none;
+    width: auto;
+    height: 32px;
+    min-height: 0;
+    margin: 0;
+    padding: 0 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--bc-accent);
+    border: 1px solid var(--bc-accent);
+    border-radius: 6px;
+    box-shadow: none;
+    color: var(--bc-accent-fg);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.beavers-crafting.crafting-app .bc-learn:hover {
+    filter: brightness(1.1);
+}
+
+.beavers-crafting.crafting-app .bc-waiting {
+    height: 32px;
+    padding: 0 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    border: 1px dashed var(--bc-accent);
+    border-radius: 6px;
+    background: var(--bc-sel);
+    color: var(--bc-accent);
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+/* forget: quiet */
+.beavers-crafting.crafting-app .bc-forget {
+    appearance: none;
+    flex: none;
+    width: auto;
+    height: 32px;
+    min-height: 0;
+    margin: 0;
+    padding: 0 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: transparent;
+    border: 1px solid var(--bc-line-strong);
+    border-radius: 6px;
+    box-shadow: none;
+    color: var(--bc-muted);
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.beavers-crafting.crafting-app .bc-forget:hover {
+    color: var(--bc-bad);
+    border-color: var(--bc-bad-line);
+    background: var(--bc-bad-tint);
+}
+
+/* ---------------- knowledge: known / not known ---------------- */
+/* a blueprint not learned yet: its row and its main panel are greyed */
+.beavers-crafting.crafting-app .bc-dim {
+    filter: grayscale(1);
+    opacity: .55;
+}
+
+.beavers-crafting.crafting-app .bc-rec.bc-locked img {
+    filter: grayscale(1);
+    opacity: .55;
+}
+
+.beavers-crafting.crafting-app .bc-rec.bc-locked .bc-n {
+    color: var(--bc-muted);
+    font-style: italic;
+}
+
+.beavers-crafting.crafting-app .bc-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--bc-accent);
+    border-radius: 8px;
+    background: var(--bc-sel);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.beavers-crafting.crafting-app .bc-note i {
+    margin-top: 3px;
+    color: var(--bc-accent);
 }
 
 /* ---------------- narrow window: stack inputs above the result ---------------- */

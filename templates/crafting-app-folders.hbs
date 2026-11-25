@@ -1,11 +1,13 @@
 {{#each recipes}}
-  <a class="bc-rec {{#if selected}}selected{{/if}}" data-id="{{uuid}}">
+  <a class="bc-rec {{#if selected}}selected{{/if}} {{#if locked}}bc-locked{{/if}}" data-id="{{uuid}}">
     <img src="{{img}}" alt="">
     <span class="bc-n">{{name}}</span>
-    {{#if craftable}}
-      <span class="bc-dot ok" data-tooltip="{{localize 'beaversCrafting.crafting-app.craftableNow'}}"></span>
+    {{#if locked}}
+      <i class="fas {{kindIcon}} fa-fw bc-state" data-tooltip="{{localize 'beaversCrafting.knowledge.notKnownTag'}}"></i>
+    {{else if craftable}}
+      <i class="fas {{kindIcon}} fa-fw bc-state ok" data-tooltip="{{localize 'beaversCrafting.crafting-app.craftableNow'}}"></i>
     {{else}}
-      <span class="bc-dot no" data-tooltip="{{localize 'beaversCrafting.crafting-app.notCraftable'}}"></span>
+      <i class="fas {{kindIcon}} fa-fw bc-state" data-tooltip="{{localize 'beaversCrafting.crafting-app.notCraftable'}}"></i>
     {{/if}}
   </a>
 {{/each}}

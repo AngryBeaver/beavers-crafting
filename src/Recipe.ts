@@ -5,6 +5,12 @@ import { recipeSkillToTests, recipeTestsToBeaversTests } from "./migration.js";
 import { markReplaced } from "./helpers/Compat.js";
 import { isHandlerMacro, MacroPhase, runMacroHandler } from "./helpers/RecipeMacro.js";
 
+/** the icon of each kind: the recipe sheet's kind select and the crafting window */
+export const RECIPE_KIND_ICONS: { [kind in RecipeKind]: string } = {
+    recipe: "fa-scroll",
+    blueprint: "fa-compass-drafting",
+};
+
 export class Recipe implements RecipeData {
     uuid: string;
     id: string;
@@ -33,6 +39,7 @@ export class Recipe implements RecipeData {
     macro: string
     folder?: string;
     instruction?: string;
+    kind: RecipeKind;
 
     /** our flag marks a recipe, whatever item type the system uses for it */
     static isRecipe(item) {
@@ -101,7 +108,13 @@ export class Recipe implements RecipeData {
         this.macro = data.macro || "";
         this.folder = data.folder;
         this.instruction = data.instruction;
+        this.kind = data.kind === "blueprint" ? "blueprint" : "recipe";
         recipeTestsToBeaversTests(this)
+    }
+
+    /** a blueprint can only be crafted by an actor that has learned it */
+    get mustBeLearned(): boolean {
+        return this.kind === "blueprint";
     }
 
     serialize(): RecipeData {
@@ -131,6 +144,9 @@ export class Recipe implements RecipeData {
         }
         if (this.instruction !== undefined) {
             serialized.instruction = this.instruction;
+        }
+        if (this.mustBeLearned) {
+            serialized.kind = this.kind;
         }
         return serialized;
     }

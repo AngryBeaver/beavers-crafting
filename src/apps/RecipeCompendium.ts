@@ -5,6 +5,7 @@ import {Script} from "../Script.js";
 import {Result} from "../Result.js";
 import {Container} from "../Container.js";
 import { getActorContentPool } from "../ContainerHandler.js";
+import { RecipeKnowledge } from "../RecipeKnowledge.js";
 
 function isAllowedToSee(item:Item):boolean{
   // @ts-ignore
@@ -29,8 +30,16 @@ export class RecipeCompendium {
             .map(item => Recipe.fromItem(item));
     }
 
+    /** world recipes the user may see and the actor has not learned: a learned one is listed as the actor's own copy */
+    static getWorldFor(actor): Recipe[] {
+        // @ts-ignore
+        return game.items
+            .filter(item => isAllowedToSee(item) && Recipe.isRecipe(item) && !RecipeKnowledge.findLearned(actor, item))
+            .map(item => Recipe.fromItem(item));
+    }
+
     static getAll(actor): Recipe[] {
-        return [...RecipeCompendium.getAllItems(), ...RecipeCompendium.getForActor(actor)];
+        return [...RecipeCompendium.getWorldFor(actor), ...RecipeCompendium.getForActor(actor)];
     }
 
     static _filterData(data: { [key: string]: { [key: string]: Component } }, filter: (component: Component) => boolean): Component[] {
@@ -82,9 +91,8 @@ export class RecipeCompendium {
      * @param craftable optional map that gets filled with uuid -> "can be crafted right now" (incl. currency).
      */
     static async filterForActor(actor, filter, craftable?: Map<string, boolean>) {
-        const items = RecipeCompendium.getAllItems();
         const own = RecipeCompendium.getForActor(actor);
-        const list = (filter == FilterType.own) ? own : [...items, ...own];
+        const list = (filter == FilterType.own) ? own : [...RecipeCompendium.getWorldFor(actor), ...own];
         const returnList: Recipe[] = [];
         const pool = await getActorContentPool(actor);
         for (const recipe of list) {
@@ -103,6 +111,9 @@ export class RecipeCompendium {
     }
 
     static async evaluateForActor(actor, recipe: Recipe, pool): Promise<{ available: boolean, usable: boolean }> {
+        if (!RecipeKnowledge.mayCraft(actor, recipe)) {
+            return {available: false, usable: false};
+        }
         const listOfAnyOfIngredients = this._filterData(recipe.input, component => component.type === Settings.ANYOF_SUBTYPE);
         if (!await this.isAnyAnyOfInList(listOfAnyOfIngredients, pool)) { //isAvailable or usable ! when any item matches anyOf has the given quantity
             return {available: false, usable: false};

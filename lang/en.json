@@ -160,7 +160,7 @@
         "all": "all",
         "available": "available",
         "usable": "usable",
-        "own": "own"
+        "own": "known"
       },
       "title": "Beaver's Recipe Compendium",
       "button": "Start",
@@ -192,8 +192,8 @@
       "missing": "Missing",
       "anyOfHint": "Click or drop an item to choose",
       "summary": {
-        "producesOne": "produces {count} item",
-        "producesMany": "produces {count} items",
+        "itemOne": "{count} item",
+        "itemMany": "{count} items",
         "checkOne": "{count} check",
         "checkMany": "{count} checks",
         "toolOne": "{count} tool",
@@ -201,6 +201,33 @@
         "ingredientOne": "{count} ingredient",
         "ingredientMany": "{count} ingredients"
       }
+    },
+    "knowledge": {
+      "kind": {
+        "recipe": "Recipe",
+        "blueprint": "Blueprint"
+      },
+      "kindHint": {
+        "recipe": "Everyone who sees it can craft it",
+        "blueprint": "Must be learned before it can be crafted"
+      },
+      "known": "Known",
+      "notKnownTag": "Not known",
+      "mustLearnNote": "This blueprint must be learned before it can be crafted. Learned, it is on the actor and listed as known.",
+      "notKnown": "{actor} has not learned \"{recipe}\" and can't craft it.",
+      "alreadyKnown": "{actor} already knows \"{recipe}\".",
+      "learn": "Learn",
+      "forget": "Forget",
+      "waiting": "Waiting for approval",
+      "requestFlavor": "wants to learn a recipe",
+      "allow": "Allow",
+      "reject": "Reject",
+      "decided": {
+        "learned": "Allowed by {gm}: learned",
+        "rejected": "Rejected by {gm}"
+      },
+      "learned": "{actor} learned \"{recipe}\".",
+      "rejected": "The Gamemaster rejected learning \"{recipe}\"."
     },
     "fastCrafting": {
       "fellApart": "{items} fell apart (fast crafted, lasts until the next long rest)."
@@ -239,6 +266,14 @@
       "useAttendants": {
         "name": "Recipes use required Items",
         "hint": "A Recipe can require to have items present on actor that does not get consumed in the process. You can setUp anything your system models as item e.g. for dnd5e feats, class, background, tools etc!"
+      },
+      "learnMode": {
+        "name": "Learning recipes",
+        "hint": "How players learn a blueprint with \"Learn\" in the crafting window. The Gamemaster always learns directly.",
+        "choices": {
+          "approve": "Gamemaster approves",
+          "direct": "Players learn directly"
+        }
       },
       "dnd5eCrafterDiscount": {
         "name": "Crafter feat discount on tool recipes (dnd5e)",

@@ -1,6 +1,7 @@
 import { Recipe } from "./Recipe.js";
 import { Settings } from "./Settings.js";
 import { RecipeCompendium } from "./apps/RecipeCompendium.js";
+import { RecipeKnowledge } from "./RecipeKnowledge.js";
 import { ComponentResults, Result } from "./Result.js";
 import { TestHandler } from "./TestHandler.js";
 import { Container } from "./Container.js";
@@ -21,6 +22,8 @@ export class Crafting implements CraftingData {
   recipe: Recipe;
   actor;
   restore: any[];
+  /** false for a blueprint the actor has not learned; a crafting restored from the actor was allowed when it started */
+  mayCraft = true;
 
   constructor(craftingData: CraftingData, actor) {
     this.uuid = craftingData.uuid || actor.uuid + ".Crafting." + foundry.utils.randomID();
@@ -62,7 +65,10 @@ export class Crafting implements CraftingData {
       recipe: recipe,
       restore: [],
     };
-    return new Crafting(craftingData, actor);
+    const crafting = new Crafting(craftingData, actor);
+    // decided here: the crafting keeps a copy of the recipe data, not the recipe document it came from
+    crafting.mayCraft = RecipeKnowledge.mayCraft(actor, recipe);
+    return crafting;
   }
 
   static async fromRecipe(actorId, recipe: Recipe) {
@@ -123,6 +129,13 @@ export class Crafting implements CraftingData {
   }
 
   async craft() {
+    if (!this.mayCraft) {
+      ui.notifications?.warn(
+        game["i18n"].format("beaversCrafting.knowledge.notKnown", { actor: this.actor.name, recipe: this.recipe.name }),
+      );
+      this.result._hasException = true;
+      return this.result;
+    }
     await this.startCrafting();
     if (Settings.get(Settings.TIME_TO_CRAFT) === "instantly") {
       let moreChecks = await this.checkTests();

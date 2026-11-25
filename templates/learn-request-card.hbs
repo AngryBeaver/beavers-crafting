@@ -1,0 +1,16 @@
+{{!-- Chat card of a player's request to learn a blueprint (LearnRequests.ts), whispered to the Gamemasters --}}
+<div class="beavers-crafting beavers-learn-request">
+  <div class="blr-recipe">
+    {{#if img}}<img src="{{img}}" alt="">{{/if}}
+    <b>{{name}}</b>
+    {{#if pending}}
+      <button type="button" class="blr-reject" data-learn-decision="reject" data-tooltip="{{localize 'beaversCrafting.knowledge.reject'}}"
+              aria-label="{{localize 'beaversCrafting.knowledge.reject'}}"><i class="fas fa-xmark"></i></button>
+      <button type="button" class="blr-allow" data-learn-decision="allow" data-tooltip="{{localize 'beaversCrafting.knowledge.allow'}}"
+              aria-label="{{localize 'beaversCrafting.knowledge.allow'}}"><i class="fas fa-check"></i></button>
+    {{/if}}
+  </div>
+  {{#unless pending}}
+    <div class="blr-result {{status}}">{{result}}</div>
+  {{/unless}}
+</div>

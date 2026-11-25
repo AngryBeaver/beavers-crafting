@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Learn Recipes</title>
+<!--
+  Mockup: learning and forgetting recipes in the crafting window (dark + light theme).
+  Builds on crafting-window.html (same tokens and classes).
+  Foundry core textures/icons come from assets/foundry/ (git-ignored, see crafting-window.html).
+
+  Model:
+  - A recipe item on the actor = the actor knows it (as today). It keeps its source (_stats.compendiumSource)
+    and is shown and crafted from the current source version.
+  - Who sees a world recipe: Foundry permissions (as today).
+  - Per recipe badge on the recipe sheet (click switches): "Usable by all" (default, as today) | "Must be learned"
+    (flag beavers-crafting.mustBeLearned). No settings.
+  - Learn: drag & drop, the "Learn" button (GM), a recipe whose result is a recipe (books), or the API.
+    All of them: no duplicates, hook "beavers-crafting.preLearn" (cancelable).
+  - Forget: the "Forget" button (owner of the actor), hook "beavers-crafting.forget".
+-->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Signika:wght@400;600&family=Alegreya+SC:wght@500;700&display=swap">
+<style>
+body{margin:0;padding:32px;background:#3a3836;font-family:'Signika',sans-serif;display:flex;flex-wrap:wrap;gap:40px;justify-content:center}
+.board{display:flex;flex-direction:column;gap:8px}
+.board>h2{margin:0;color:#ddd;font-size:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.board>p{margin:0;color:#bbb;font-size:13px;max-width:920px;line-height:1.45}
+
+.bc{width:920px;height:640px;display:flex;flex-direction:column;font-size:14px;color:var(--fg);border-radius:8px;overflow:hidden;background:var(--bg-base);box-shadow:0 10px 40px rgba(0,0,0,.55)}
+.bc *,.pop *{box-sizing:border-box}
+
+/* ---------- theme tokens (as crafting-window.html) ---------- */
+.dark{--fg:#ece6da;--muted:#b3aa9a;--bg-base:#1c1b1a;--head-bg:#0f0e0d;--head-fg:#f0e6d2;--line:rgba(255,240,215,.13);--line-strong:rgba(255,240,215,.26);--accent:#e3a548;--accent-fg:#1d1408;--hover:rgba(255,240,215,.05);--sel:rgba(227,165,72,.16);--slot:rgba(0,0,0,.35);--slot-border:rgba(255,240,215,.2);--ok:#7cc47f;--bad:#f08a83;--bad-tint:rgba(240,138,131,.10);--bad-line:rgba(240,138,131,.45);--chip:rgba(255,240,215,.08);--input:rgba(0,0,0,.4);--foot:rgba(0,0,0,.4);--shadow:rgba(0,0,0,.5);--info-tint:rgba(227,165,72,.09)}
+.dark .side{background:linear-gradient(rgba(10,9,8,.6),rgba(10,9,8,.6)),url(assets/foundry/denim075.png)}
+.dark .main{background:linear-gradient(rgba(32,30,27,.8),rgba(32,30,27,.8)),url(assets/foundry/denim075.png)}
+.light{--fg:#2a241d;--muted:#5f5345;--bg-base:#efe9de;--head-bg:#e2d9c8;--head-fg:#2a241d;--line:rgba(70,50,25,.14);--line-strong:rgba(70,50,25,.28);--accent:#94490f;--accent-fg:#fff8ee;--hover:rgba(255,252,245,.45);--sel:rgba(148,73,15,.11);--slot:rgba(255,252,245,.8);--slot-border:rgba(70,50,25,.22);--ok:#2c7531;--bad:#a92c26;--bad-tint:rgba(169,44,38,.07);--bad-line:rgba(169,44,38,.42);--chip:rgba(70,50,25,.06);--input:rgba(255,253,248,.85);--foot:rgba(255,250,240,.55);--shadow:rgba(60,40,20,.25);--info-tint:rgba(148,73,15,.07)}
+.light .side{background:linear-gradient(rgba(252,249,242,.55),rgba(252,249,242,.55)),url(assets/foundry/parchment.jpg)}
+.light .main{background:url(assets/foundry/parchment.jpg)}
+
+/* ---------- layout (as crafting-window.html) ---------- */
+svg.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.wh{height:34px;flex:none;display:flex;align-items:center;gap:8px;padding:0 6px 0 12px;background:var(--head-bg);color:var(--head-fg);border-bottom:1px solid var(--line-strong);font-weight:600}
+.wh .t{flex:1}
+.ib{width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;border:0;background:transparent;color:inherit;border-radius:4px;padding:0;cursor:pointer}
+.ib:hover{background:var(--hover)}
+.wb{flex:1;display:grid;grid-template-columns:248px minmax(0,1fr);min-height:0}
+.side{display:flex;flex-direction:column;border-right:1px solid var(--line-strong);min-height:0}
+.tools{padding:10px;display:flex;flex-direction:column;gap:8px;border-bottom:1px solid var(--line)}
+.field{display:flex;align-items:center;gap:6px;height:32px;padding:0 8px;background:var(--input);border:1px solid var(--line-strong);border-radius:5px;color:var(--muted);flex:1;min-width:0}
+.field input,.field select{flex:1;min-width:0;background:transparent;border:0;color:var(--fg);font:inherit;outline:none;padding:0}
+.field select option{color:#222}
+.tools>.field{flex:none}
+.trow{display:flex;gap:6px;align-items:center}
+.trow .ib{border:1px solid var(--line-strong);background:var(--input);color:var(--muted);height:32px;width:32px}
+.list{flex:1;overflow:auto;padding:6px 6px 6px 4px;display:flex;flex-direction:column;gap:1px}
+.fold{display:flex;align-items:center;gap:6px;padding:8px 6px 4px;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+.fold .c{margin-left:auto;font-weight:400}
+.rec{display:flex;align-items:center;gap:8px;padding:3px 8px;border-radius:5px;margin-left:8px;text-decoration:none;color:inherit}
+.rec:hover{background:var(--hover)}
+.rec img{width:32px;height:32px;border-radius:4px;border:1px solid var(--slot-border);flex:none;background:var(--slot)}
+.rec .n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'Alegreya SC',serif;font-size:15px;font-weight:500}
+.rec.sel{background:var(--sel);box-shadow:inset 3px 0 0 var(--accent)}
+.dot{width:8px;height:8px;border-radius:50%;flex:none}
+.dot.ok{background:var(--ok)}
+.dot.no{border:1.5px solid var(--muted)}
+.sfoot{padding:8px 12px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.main{display:flex;flex-direction:column;min-height:0}
+.rh{display:flex;gap:14px;align-items:center;padding:16px 20px 14px;border-bottom:1px solid var(--line)}
+.rh .big{width:64px;height:64px;border-radius:8px;border:1px solid var(--line-strong);box-shadow:0 3px 10px var(--shadow);background:var(--slot)}
+.rh h1{margin:0;font-family:'Alegreya SC',serif;font-size:27px;font-weight:700;line-height:1.05}
+.meta{color:var(--muted);font-size:13px;margin-top:3px}
+.tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.tag{font-size:12px;padding:2px 9px 2px 7px;border-radius:999px;background:var(--chip);border:1px solid var(--line);display:inline-flex;gap:5px;align-items:center}
+.tag svg.i{width:13px;height:13px}
+.scroll{flex:1;overflow:auto;padding:14px 20px 16px;display:flex;flex-direction:column;gap:16px}
+.flow{display:grid;grid-template-columns:minmax(0,1.3fr) 32px minmax(0,1fr);gap:10px;align-items:stretch}
+.col{display:flex;flex-direction:column;gap:14px}
+.sec{display:flex;flex-direction:column;gap:6px}
+.sh{display:flex;align-items:center;gap:7px;font-family:'Alegreya SC',serif;font-size:15px;font-weight:700;padding-bottom:5px;background:linear-gradient(to right,var(--line-strong),transparent) left bottom/100% 1px no-repeat}
+.sh svg.i{color:var(--accent)}
+.sh .cnt{margin-left:auto;font-family:'Signika',sans-serif;font-size:12px;font-weight:400;color:var(--muted)}
+.slot{display:flex;align-items:center;gap:10px;padding:4px 8px 4px 4px;border-radius:6px;border:1px solid var(--line);background:var(--hover)}
+.slot img{width:36px;height:36px;border-radius:5px;border:1px solid var(--slot-border);background:var(--slot);flex:none}
+.slot .n{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qty{font-variant-numeric:tabular-nums;font-size:13px;color:var(--muted);white-space:nowrap}
+.qty b{color:var(--fg);font-weight:600}
+.st{width:20px;display:flex;justify-content:center}
+.st.ok{color:var(--ok)}
+.arrow{display:flex;align-items:center;justify-content:center;color:var(--accent)}
+.arrow svg.i{width:26px;height:26px;stroke-width:1.75}
+.res{display:flex;flex-direction:column;align-items:center;gap:8px;padding:18px 12px 14px;border:1px solid var(--line-strong);border-radius:10px;background:var(--hover);text-align:center;position:relative}
+.res img{width:76px;height:76px;border-radius:9px;border:1px solid var(--slot-border);box-shadow:0 4px 14px var(--shadow);background:var(--slot)}
+.res .n{font-family:'Alegreya SC',serif;font-size:19px;font-weight:700;line-height:1.1}
+.res .q{position:absolute;top:10px;right:10px;font-size:12px;font-weight:600;padding:1px 8px;border-radius:999px;background:var(--chip);border:1px solid var(--line)}
+.res .d{font-size:12px;color:var(--muted);line-height:1.35;max-width:220px}
+.ft{display:flex;align-items:center;gap:12px;padding:10px 16px 10px 20px;border-top:1px solid var(--line-strong);background:var(--foot)}
+.craft{height:38px;padding:0 18px;border-radius:6px;font:inherit;font-weight:600;display:inline-flex;gap:8px;align-items:center;cursor:pointer;border:1px solid var(--accent);background:transparent;color:var(--accent)}
+.craft:hover{background:var(--sel)}
+.craft.go{background:var(--accent);color:var(--accent-fg)}
+.craft[disabled]{opacity:.45;cursor:not-allowed}
+
+/* ---------- new: knowledge ---------- */
+/* known marker in the list: a small book before the craftable dot */
+.kn{color:var(--accent);display:inline-flex}
+.kn svg.i{width:14px;height:14px}
+/* unknown recipe in the list (setting "show unknown recipes") */
+.rec.unk img{filter:grayscale(1);opacity:.55}
+.rec.unk .n{color:var(--muted);font-style:italic}
+.rec.unk .lock{color:var(--muted);display:inline-flex}
+.rec.unk .lock svg.i{width:14px;height:14px}
+.tag.known{border-color:var(--accent);color:var(--accent)}
+.tag.src{color:var(--muted)}
+/* main area of an unknown recipe: shown, but not craftable */
+.note{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:8px;border:1px solid var(--accent);background:var(--info-tint);font-size:13px;line-height:1.45}
+.note svg.i{color:var(--accent);margin-top:2px}
+.note b{font-weight:600}
+.dim{opacity:.55}
+/* forget: quiet, on the left of the footer */
+.forget{height:32px;padding:0 12px;border-radius:6px;font:inherit;font-size:13px;display:inline-flex;gap:7px;align-items:center;cursor:pointer;border:1px solid var(--line-strong);background:transparent;color:var(--muted)}
+.forget:hover{color:var(--bad);border-color:var(--bad-line);background:var(--bad-tint)}
+.grow{flex:1}
+/* header actions: Learn / Forget top right, the footer stays for errors and Start */
+.hact{margin-left:auto;align-self:flex-start;display:flex;gap:8px;align-items:center}
+.hb{height:32px;padding:0 14px;border-radius:6px;font:inherit;font-size:13px;font-weight:600;display:inline-flex;gap:7px;align-items:center;cursor:pointer;border:1px solid var(--accent);background:var(--accent);color:var(--accent-fg)}
+.hb:hover{filter:brightness(1.1)}
+.hb.quiet{background:transparent;border-color:var(--line-strong);color:var(--muted);font-weight:400}
+.hb.quiet:hover{color:var(--bad);border-color:var(--bad-line);background:var(--bad-tint);filter:none}
+.wait{height:32px;padding:0 12px;border-radius:6px;display:inline-flex;gap:7px;align-items:center;font-size:13px;color:var(--accent);border:1px dashed var(--accent);background:var(--sel)}
+/* chat card for the GM */
+.chat{width:300px;font-size:13px;color:#191813;background:url(assets/foundry/parchment.jpg);border-radius:6px;box-shadow:0 6px 20px #0008;padding:8px 10px;font-family:Signika,sans-serif}
+.chat .ch{display:flex;align-items:center;gap:8px;border-bottom:1px solid #0003;padding-bottom:6px;margin-bottom:8px}
+.chat .ch img{width:36px;height:36px;border-radius:4px;border:1px solid #0004}
+.chat .ch b{display:block}
+.chat .ch small{color:#555}
+.chat .wh2{font-size:11px;color:#7a5a2a;margin-left:auto;align-self:flex-start}
+.chat .rq{display:flex;gap:8px;align-items:center;padding:6px;border-radius:5px;background:#fff6;border:1px solid #0002}
+.chat .rq img{width:32px;height:32px;border-radius:4px}
+.chat .act{display:flex;gap:6px;margin-top:8px}
+.chat .act button{flex:1;height:30px;border-radius:4px;border:1px solid #0004;background:#fff8;font:inherit;font-weight:600;cursor:pointer}
+.chat .act .yes{background:#2c7531;color:#fff;border-color:#2c7531}
+.chat .act .no{background:#a92c26;color:#fff;border-color:#a92c26}
+.chat .done{margin-top:8px;font-size:12px;color:#2c7531;font-weight:600}
+.toast.warn{border-left-color:#e3a548}
+.toast.warn svg.i{color:#e3a548}
+.toasts{display:flex;flex-direction:column;gap:12px}
+.toasts .toast{width:440px}
+/* the module setting */
+.setting{width:560px;font-family:Signika,sans-serif;font-size:14px;color:#ece6da;background:#1c1b1a url(assets/foundry/denim075.png);border-radius:6px;padding:12px 14px;box-shadow:0 6px 20px #0008}
+.setting .row{display:grid;grid-template-columns:200px 1fr;gap:12px;align-items:center}
+.setting label{font-weight:600}
+.setting select{height:30px;border-radius:4px;background:#0006;color:#ece6da;border:1px solid #fff3;font:inherit;padding:0 8px}
+.setting p{margin:6px 0 0;color:#b3aa9a;font-size:12px;line-height:1.4}
+/* simplified own recipe sheet (templates/recipe-sheet.hbs): header = image, name, and under the name kind + folder */
+.sheets{display:flex;gap:20px;width:920px;align-items:flex-start}
+.rs{flex:1 1 0;min-width:0;border-radius:6px;box-shadow:0 10px 34px #000a;font-size:13px;color:var(--fg);font-family:Roboto,Signika,sans-serif}
+.rs.dark{background:#1c1b1a url(assets/foundry/denim075.png)}
+.rs.light{background:#f4efe6}
+.rs-wh{height:30px;display:flex;align-items:center;gap:8px;padding:0 10px;background:#0b0a13;color:#eee;border-radius:6px 6px 0 0}
+.rs-head{display:flex;gap:12px;align-items:center;padding:12px 16px 10px;border-bottom:1px solid var(--line)}
+.rs-head>img{width:56px;height:56px;border-radius:6px;border:1px solid var(--line-strong)}
+.rs-title{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.rs-name{font-size:20px;font-weight:700;padding:2px 6px;border-radius:5px;border:1px solid transparent}
+.rs-name:hover{border-color:var(--line-strong)}
+.rs-sub{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.rs-crumb{display:inline-flex;align-items:center;gap:5px;padding:2px 6px;border-radius:5px;min-width:0;white-space:nowrap;overflow:hidden}
+.rs-crumb b{white-space:nowrap;font-weight:600;color:var(--fg);padding:1px 7px;border-radius:8px;background:var(--chip)}
+.rs-crumb svg.i{width:13px;height:13px}
+.rs-hbtn{flex:none;align-self:flex-start;height:26px;padding:0 10px;border-radius:13px;border:1px solid var(--line-strong);font:inherit;font-size:12px;font-weight:600;color:var(--muted);background:transparent}
+.rs-rest{padding:10px 16px 14px;color:var(--muted);font-size:12px;font-style:italic}
+/* the kind dropdown (like the sheet's other icon selects) */
+.kd{position:relative}
+.kd>button{height:24px;display:inline-flex;align-items:center;gap:6px;padding:0 8px 0 4px;border-radius:5px;border:1px solid var(--line-strong);background:var(--chip);color:var(--fg);font:inherit;font-weight:600;cursor:pointer}
+.kd>button .ico{width:18px;height:18px;display:grid;place-items:center;border-radius:4px;background:var(--sel);color:var(--accent)}
+.kd>button .ico svg.i{width:12px;height:12px}
+.kd>button .car{width:11px;height:11px;color:var(--muted)}
+.kd .pop{display:none;position:absolute;z-index:5;top:calc(100% + 4px);left:0;width:270px;padding:4px;border-radius:6px;background:#2a2622;color:#eee;box-shadow:0 8px 24px #0008;border:1px solid #fff2}
+.kd.open .pop{display:block}
+.kd .opt{display:flex;align-items:center;gap:9px;width:100%;padding:6px 8px 6px 6px;border-radius:4px;border:0;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.kd .opt:hover,.kd .opt.on{background:#ffffff1a}
+.kd .opt .ico{width:24px;height:24px;flex:none;display:grid;place-items:center;border-radius:4px;background:#ffffff14}
+.kd .opt b{display:block;font-weight:600;font-size:13px}
+.kd .opt small{display:block;opacity:.65;font-size:11px;margin-top:2px;line-height:1.3}
+.kd .opt .ck{margin-left:auto;color:#e3a548;visibility:hidden}
+.kd .opt.on .ck{visibility:visible}
+/* Foundry's svg icons are white: keep them on a dark tile in both themes */
+.bc img[src$=".svg"]{background:#2b2a28}
+
+/* ---------- popups: notification, dialog ---------- */
+.pops{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start;width:920px}
+.pop{font-size:14px;color:var(--fg);background:var(--bg-base);border-radius:8px;box-shadow:0 10px 40px rgba(0,0,0,.55);overflow:hidden}
+.toast{width:440px;display:flex;gap:10px;align-items:flex-start;padding:10px 14px;border-left:4px solid var(--bad);line-height:1.45}
+.toast svg.i{color:var(--bad);margin-top:2px}
+.toast.info{border-left-color:var(--accent)}
+.toast.info svg.i{color:var(--accent)}
+.dlg{width:440px}
+.dlg .body{padding:14px 16px;display:flex;flex-direction:column;gap:10px;line-height:1.45}
+.dlg ul{margin:0;padding-left:18px;color:var(--muted)}
+.dlg .btns{display:flex;gap:8px;justify-content:flex-end;padding:10px 16px;border-top:1px solid var(--line);background:var(--foot)}
+.btn{height:34px;padding:0 14px;border-radius:6px;font:inherit;font-weight:600;cursor:pointer;border:1px solid var(--line-strong);background:transparent;color:var(--fg);display:inline-flex;gap:7px;align-items:center}
+.btn.danger{border-color:var(--bad);background:var(--bad);color:#fff}
+.legend{width:920px;color:#ddd;font-size:13px;line-height:1.5;background:#2b2a28;border-radius:8px;padding:14px 18px}
+.legend h3{margin:0 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:.06em}
+.legend ul{margin:0;padding-left:18px}
+.legend code{color:#e3a548}
+</style>
+</head>
+<body>
+
+<!-- ============ 1: a known recipe ============ -->
+<div class="board">
+  <h2>1 · A known recipe (dark)</h2>
+  <p>Filter "Own" becomes "Known" (the recipes on the actor). A learned blueprint has the blueprint icon (as in the kind dropdown).
+    A normal recipe on the actor ("Healing Salve") looks as before: no marker, no tag, no Forget. The header shows where it was learned from;
+    the recipe follows its source. "Forget" sits quietly at the top right and acts at once, without asking.
+    The footer stays for what is missing and Start.</p>
+  <div class="bc dark" data-window="known"></div>
+</div>
+<div class="board">
+  <h2>2 · The kind on the recipe sheet</h2>
+  <p>Our own sheet: under the name, in front of the folder, a dropdown with the kind. <b>Recipe</b> (default, as today):
+    everyone who sees it can craft it. <b>Blueprint</b>: must be learned first. More kinds later (e.g. Book).
+    On a locked sheet or for players it is a plain label. Click the dropdowns to try.</p>
+  <div class="sheets">
+    <div class="rs dark">
+      <div class="rs-wh">Plan: Cloak of Elvenkind</div>
+      <div class="rs-head">
+        <img src="assets/foundry/scroll-bound-green.webp" alt="">
+        <div class="rs-title">
+          <div class="rs-name">Plan: Cloak of Elvenkind</div>
+          <div class="rs-sub">
+            <div class="kd open" data-kind="blueprint"></div>
+            <span class="rs-crumb"><svg class="i" data-use="folder"></svg><b>Replicate Magic Item</b>›<b>Plans (Level 6+)</b></span>
+          </div>
+        </div>
+        <button type="button" class="rs-hbtn">System sheet</button>
+      </div>
+      <div class="rs-rest" style="padding-top:96px">Instruction · Required · Cost · Result · Checks …</div>
+    </div>
+    <div class="rs light">
+      <div class="rs-wh">Tinker's Magic</div>
+      <div class="rs-head">
+        <img src="assets/foundry/hammer-and-nail.webp" alt="">
+        <div class="rs-title">
+          <div class="rs-name">Tinker's Magic</div>
+          <div class="rs-sub">
+            <div class="kd" data-kind="recipe"></div>
+            <span class="rs-crumb"><svg class="i" data-use="folder"></svg><b>Artificer</b></span>
+          </div>
+        </div>
+        <button type="button" class="rs-hbtn">System sheet</button>
+      </div>
+      <div class="rs-rest">Instruction · Required · Cost · Result · Checks …</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 3: an unknown recipe ============ -->
+<div class="board">
+  <h2>3 · A blueprint, not known yet: "Learn" top right</h2>
+  <p>Visible to whoever may see it (Foundry permissions, as today): greyed out with a lock, "Not known", Start disabled.
+    "Learn" is top right, for players too. The GM (or everyone, with the setting "Players learn directly") learns at once.</p>
+  <div class="bc dark" data-window="unknown" data-learn-state="button"></div>
+</div>
+<div class="board">
+  <h2>3b · A player clicked "Learn": waiting for the Gamemaster</h2>
+  <p>Setting "Gamemaster approves" (default): "Waiting for approval" instead of the button. It stays after closing the
+    window or reloading (the request is kept on the actor), so the same request can't be sent twice.</p>
+  <div class="bc dark" data-window="unknown" data-learn-state="waiting"></div>
+</div>
+
+<!-- ============ 4: messages ============ -->
+<div class="board">
+  <h2>4 · The Gamemaster decides, the player gets a popup</h2>
+  <p>The request is a chat card whispered to the Gamemasters only: the player doesn't see it. Allow learns it (same rules:
+    no duplicates, preLearn hook), Reject ends the request. The player gets no chat message, only a popup, or at the
+    next login when offline. No Gamemaster online: the card is posted when one comes.</p>
+  <div class="pops">
+    <div class="chat">
+      <div class="ch"><img src="assets/foundry/scroll-bound-green.webp" alt=""><div><b>Artificer-Test</b><small>wants to learn a recipe</small></div><span class="wh2">to: Gamemaster</span></div>
+      <div class="rq"><img src="assets/foundry/scroll-bound-green.webp" alt=""><div><b>Plan: Cloak of Elvenkind</b><br><small>Blueprint · Replicate Magic Item › Plans (Level 6+)</small></div></div>
+      <div class="act"><button class="yes" type="button">✔ Allow</button><button class="no" type="button">✖ Reject</button></div>
+    </div>
+    <div class="chat">
+      <div class="ch"><img src="assets/foundry/scroll-bound-green.webp" alt=""><div><b>Artificer-Test</b><small>wants to learn a recipe</small></div><span class="wh2">to: Gamemaster</span></div>
+      <div class="rq"><img src="assets/foundry/scroll-bound-green.webp" alt=""><div><b>Plan: Cloak of Elvenkind</b><br><small>Blueprint · Replicate Magic Item › Plans (Level 6+)</small></div></div>
+      <div class="done">✔ Allowed by Gamemaster: learned</div>
+    </div>
+    <div class="toasts">
+      <div class="pop dark toast info"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21a2 2 0 0 1 2-2h13"/></svg><div>player: Artificer-Test learned "Plan: Cloak of Elvenkind".</div></div>
+      <div class="pop dark toast warn"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 21h20z"/><path d="M12 10v5M12 18h.01"/></svg>
+        <div>player: The Gamemaster rejected learning "Plan: Cloak of Elvenkind".</div></div>
+      <div class="pop dark toast"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+        <div>GM on Allow: <b>Artificer-Test can't learn "Plan: Cloak of Elvenkind":</b> all 4 plans known at Artificer level 2.
+          <br><span style="color:var(--muted);font-size:12px">refused by a <code>preLearn</code> hook; the player then gets "The Gamemaster rejected …"</span></div></div>
+      <div class="pop dark toast info"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21a2 2 0 0 1 2-2h13"/></svg><div>Artificer-Test already knows "Plan: Bag of Holding".</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 5: setting ============ -->
+<div class="board">
+  <h2>5 · The setting</h2>
+  <div class="setting">
+    <div class="row"><label>Learning recipes</label>
+      <select><option>Gamemaster approves</option><option>Players learn directly</option></select></div>
+    <p>How players learn a blueprint with "Learn" in the crafting window. The Gamemaster always learns directly.</p>
+  </div>
+</div>
+
+<div class="legend">
+  <h3>Rules behind the mockup</h3>
+  <ul>
+    <li><b>Known</b> = a recipe item on the actor (as today).</li>
+    <li><b>Who sees</b> a world recipe: Foundry permissions (as today). <b>Who can craft it</b>: the kind under the name,
+      <b>Recipe</b> (default, so existing worlds don't change) or <b>Blueprint</b> (must be learned; <code>flags.beavers-crafting.recipe.kind</code>). Book: later, as another kind.</li>
+    <li><b>Learn</b>: drag &amp; drop, the "Learn" button (top right), or <code>api.learn(actor, uuid)</code>. All of them: no duplicates (same source), hook <code>beavers-crafting.preLearn</code> (return false refuses, with a message).</li>
+    <li><b>Players</b>: setting "Learning recipes" = <b>Gamemaster approves</b> (default): the request is kept on the actor
+      (<code>flags.beavers-crafting.learnRequests</code>), the active Gamemaster gets a whispered chat card (Allow / Reject),
+      the player a popup with the answer. <b>Players learn directly</b>: like the Gamemaster.</li>
+    <li><b>Follow the source</b>: a learned recipe keeps <code>_stats.compendiumSource</code> and is shown and crafted from the current source; a recipe changed on the actor stays local.</li>
+    <li><b>Forget</b>: button for the actor's owner, top right, acts at once (no confirmation); hook <code>beavers-crafting.forget</code> after the recipe is removed.</li>
+    <li><b>Compendium recipes</b> stay unlisted (as today); learn them by drag &amp; drop or the API.</li>
+    <li><b>One setting</b>: "Learning recipes" (Gamemaster approves | Players learn directly).</li>
+  </ul>
+</div>
+
+<!-- ============ templates ============ -->
+<template id="icons">
+  <svg class="i" data-icon="book" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2"/><path d="M11 7 5 21M13 7l6 14M7.5 15h9"/></svg>
+  <svg class="i" data-icon="users" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6.5 6.5 0 0 1 3.5 6"/></svg>
+  <svg class="i" data-icon="blueprint" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2"/><path d="M11 7 5 21M13 7l6 14M7.5 15h9"/></svg>
+  <svg class="i" data-icon="scroll" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h11a2 2 0 0 0 2-2v-1H10v1a2 2 0 1 1-4 0V5a2 2 0 0 0-2-2 2 2 0 0 0-2 2v2h4"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/></svg>
+  <svg class="i car" data-icon="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+  <svg class="i ck" data-icon="check" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 5 5L20 7"/></svg>
+  <svg class="i" data-icon="folder" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+  <svg class="i" data-icon="lock" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+</template>
+
+<template id="frame">
+  <header class="wh">
+    <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 12-8.5 8.5a2.1 2.1 0 0 1-3-3L12 9"/><path d="M17.6 15 22 10.6 13.4 2 9 6.4z"/></svg>
+    <span class="t">Beaver's Recipe Compendium · Artificer-Test</span>
+    <button class="ib" type="button" aria-label="Close"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </header>
+  <div class="wb">
+    <aside class="side">
+      <div class="tools">
+        <label class="field">
+          <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input type="text" placeholder="Search recipes…" aria-label="Search recipes">
+        </label>
+        <div class="trow">
+          <label class="field">
+            <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg>
+            <select aria-label="Filter recipes" data-filter><option>All</option><option>Known</option><option>Available</option><option>Usable</option></select>
+          </label>
+          <button class="ib" type="button" aria-label="Collapse all folders"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 11 5-5 5 5M7 18l5-5 5 5"/></svg></button>
+        </div>
+      </div>
+      <nav class="list" aria-label="Recipes" data-list></nav>
+      <div class="sfoot"><span class="dot ok"></span><span data-count></span></div>
+    </aside>
+    <section class="main" data-main></section>
+  </div>
+</template>
+
+<!-- main: known recipe -->
+<template id="main-known">
+  <div class="rh">
+    <img class="big" src="assets/foundry/item-bag.svg" alt="">
+    <div>
+      <h1>Plan: Bag of Holding</h1>
+      <div class="meta">Blueprint · Replicate Magic Item · Plans (Level 2+)</div>
+      <div class="tags">
+        <span class="tag known" data-tooltip="A recipe item on this actor"><svg class="i" data-use="book"></svg>Known</span>
+        <span class="tag src" data-tooltip="Shown and crafted from the current compendium version"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>learned from D&amp;D 2024 Artificer Recipes</span>
+      </div>
+    </div>
+    <div class="hact"><button class="hb quiet" type="button"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>Forget</button></div>
+  </div>
+  <div class="scroll">
+    <div class="flow">
+      <div class="col">
+        <div class="sec">
+          <div class="sh"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg>Required<span class="cnt">not consumed</span></div>
+          <div class="slot"><img src="assets/foundry/hammer-cobbler-steel.webp" alt=""><span class="n">Tinker's Tools</span><span class="qty"><b>1</b> / 1</span><span class="st ok"><svg class="i" viewBox="0 0 24 24"><path d="m5 12 5 5L20 7"/></svg></span></div>
+          <div class="slot"><img src="assets/foundry/scroll-bound-gold-tan.webp" alt=""><span class="n">Artificer level 2</span><span class="st ok"><svg class="i" viewBox="0 0 24 24"><path d="m5 12 5 5L20 7"/></svg></span></div>
+        </div>
+        <div class="sec">
+          <div class="sh"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/></svg>Cost</div>
+          <div class="slot"><img src="assets/foundry/scroll-bound-blue-tan.webp" alt=""><span class="n">Replicate Magic Item</span><span class="st ok"><svg class="i" viewBox="0 0 24 24"><path d="m5 12 5 5L20 7"/></svg></span></div>
+        </div>
+      </div>
+      <div class="arrow"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></div>
+      <div class="col">
+        <div class="sec">
+          <div class="sh">Result</div>
+          <div class="res"><span class="q">×1</span><img src="assets/foundry/item-bag.svg" alt=""><span class="n">Bag of Holding</span><span class="d">Click to open the item sheet</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="ft">
+    <span class="grow"></span>
+    <button class="craft go" type="button"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 12-8.5 8.5a2.1 2.1 0 0 1-3-3L12 9"/><path d="M17.6 15 22 10.6 13.4 2 9 6.4z"/></svg>Craft</button>
+  </footer>
+</template>
+
+<!-- main: unknown recipe -->
+<template id="main-unknown">
+  <div class="rh">
+    <img class="big dim" src="assets/foundry/scroll-bound-green.webp" alt="">
+    <div>
+      <h1>Plan: Cloak of Elvenkind</h1>
+      <div class="meta">Blueprint · Replicate Magic Item · Plans (Level 6+)</div>
+      <div class="tags">
+        <span class="tag"><svg class="i" data-use="lock"></svg>Not known</span>
+      </div>
+    </div>
+    <div class="hact" data-learn></div>
+  </div>
+  <div class="scroll">
+    <div class="note"><svg class="i" data-use="book"></svg>
+      <div><b>Artificer-Test doesn't know this blueprint.</b> It must be learned before it can be crafted: then it is on the actor and listed as known.</div></div>
+    <div class="flow dim">
+      <div class="col">
+        <div class="sec">
+          <div class="sh">Required<span class="cnt">not consumed</span></div>
+          <div class="slot"><img src="assets/foundry/hammer-cobbler-steel.webp" alt=""><span class="n">Tinker's Tools</span><span class="qty"><b>1</b> / 1</span></div>
+          <div class="slot"><img src="assets/foundry/scroll-bound-gold-tan.webp" alt=""><span class="n">Artificer level 6</span></div>
+        </div>
+        <div class="sec">
+          <div class="sh">Cost</div>
+          <div class="slot"><img src="assets/foundry/scroll-bound-blue-tan.webp" alt=""><span class="n">Replicate Magic Item</span></div>
+        </div>
+      </div>
+      <div class="arrow"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></div>
+      <div class="col">
+        <div class="sec">
+          <div class="sh">Result</div>
+          <div class="res"><span class="q">×1</span><img src="assets/foundry/scroll-bound-green.webp" alt=""><span class="n">Cloak of Elvenkind</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="ft">
+    <span class="grow"></span>
+    <button class="craft" type="button" disabled><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 12-8.5 8.5a2.1 2.1 0 0 1-3-3L12 9"/><path d="M17.6 15 22 10.6 13.4 2 9 6.4z"/></svg>Craft</button>
+  </footer>
+</template>
+
+<script>
+  // Recipe list rows: [name, icon, state]  state: known | common | unknown ; craftable: true/false
+  const LIST = {
+    known: [
+      ["fold", "Artificer", 2],
+      ["Tinker's Magic", "hammer-and-nail.webp", "common", true],
+      ["Rope", "rope-wrapped-brown.webp", "common", true],
+      ["fold", "Plans (Level 2+)", 3],
+      ["Plan: Bag of Holding", "item-bag.svg", "known", true, "sel"],
+      ["Plan: Sending Stones", "gem-faceted-rough-purple.webp", "known", false],
+      ["Plan: Weapon, +1", "saw-steel-grey.webp", "known", true],
+      ["fold", "Potions", 1],
+      ["Healing Salve", "potion-flask-corked-green.webp", "common", false],
+    ],
+    unknown: [
+      ["fold", "Plans (Level 2+)", 3],
+      ["Plan: Bag of Holding", "item-bag.svg", "known", true],
+      ["Plan: Sending Stones", "gem-faceted-rough-purple.webp", "known", false],
+      ["Plan: Weapon, +1", "saw-steel-grey.webp", "known", true],
+      ["fold", "Plans (Level 6+)", 2],
+      ["Plan: Cloak of Elvenkind", "scroll-bound-green.webp", "unknown", false, "sel"],
+      ["Plan: Boots of Elvenkind", "kindling-sticks-brown.webp", "unknown", false],
+    ],
+  };
+  const COUNT = {known: "4 of 7 craftable now · 4 known", unknown: "2 of 3 known craftable · 2 not known"};
+  const FILTER = {known: "All", unknown: "All"};
+
+  const icons = document.getElementById('icons').content;
+  const icon = (name) => icons.querySelector(`[data-icon=${name}]`).cloneNode(true);
+
+  function row([name, img, state, craftable, sel]) {
+    if (name === "fold") {
+      const f = document.createElement('div');
+      f.className = 'fold';
+      f.innerHTML = `<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>${img}<span class="c">${state}</span>`;
+      return f;
+    }
+    const a = document.createElement('a');
+    a.href = '#';
+    a.className = `rec ${state === 'unknown' ? 'unk' : ''} ${sel ?? ''}`;
+    a.innerHTML = `<img src="assets/foundry/${img}" alt=""><span class="n"></span>`;
+    a.querySelector('.n').textContent = name;
+    if (state === 'known') {
+      const k = document.createElement('span'); k.className = 'kn'; k.title = 'Known'; k.append(icon('book')); a.append(k);
+    }
+    if (state === 'unknown') {
+      const l = document.createElement('span'); l.className = 'lock'; l.title = 'Not known'; l.append(icon('lock')); a.append(l);
+    } else {
+      const d = document.createElement('span'); d.className = `dot ${craftable ? 'ok' : 'no'}`;
+      d.title = craftable ? 'Can craft now' : 'Missing ingredients'; a.append(d);
+    }
+    return a;
+  }
+
+  document.querySelectorAll('[data-window]').forEach(host => {
+    const kind = host.dataset.window;
+    host.append(document.getElementById('frame').content.cloneNode(true));
+    host.querySelector('[data-list]').append(...LIST[kind].map(row));
+    host.querySelector('[data-count]').textContent = COUNT[kind];
+    host.querySelector('[data-filter]').value = FILTER[kind];
+    host.querySelector('[data-main]').append(document.getElementById('main-' + kind).content.cloneNode(true));
+    const learn = host.querySelector('[data-learn]');
+    if (learn) learn.innerHTML = host.dataset.learnState === 'waiting'
+      ? '<span class="wait">⏳ Waiting for approval</span>'
+      : '<button class="hb" type="button"><svg class="i" data-use="book"></svg>Learn</button>';
+    host.querySelectorAll('svg[data-use]').forEach(s => s.replaceWith(icon(s.dataset.use)));
+  });
+  document.querySelectorAll('.pops svg[data-use], .sheets svg[data-use]').forEach(s => s.replaceWith(icon(s.dataset.use)));
+  // the kind dropdown: Recipe (default) | Blueprint
+  const KINDS = {
+    recipe: {icon: "scroll", label: "Recipe", hint: "Everyone who sees it can craft it"},
+    blueprint: {icon: "blueprint", label: "Blueprint", hint: "Must be learned before it can be crafted"},
+  };
+  function renderKind(host) {
+    const current = KINDS[host.dataset.kind];
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.innerHTML = `<span class="ico"></span><span>${current.label}</span>`;
+    btn.querySelector(".ico").append(icon(current.icon));
+    btn.append(icon("chevron"));
+    const pop = document.createElement("div");
+    pop.className = "pop";
+    for (const [value, kind] of Object.entries(KINDS)) {
+      const opt = document.createElement("button");
+      opt.type = "button";
+      opt.className = "opt" + (value === host.dataset.kind ? " on" : "");
+      opt.innerHTML = `<span class="ico"></span><span><b>${kind.label}</b><small>${kind.hint}</small></span>`;
+      opt.querySelector(".ico").append(icon(kind.icon));
+      opt.append(icon("check"));
+      opt.addEventListener("click", () => { host.dataset.kind = value; host.classList.remove("open"); renderKind(host); });
+      pop.append(opt);
+    }
+    btn.addEventListener("click", () => host.classList.toggle("open"));
+    host.replaceChildren(btn, pop);
+  }
+  document.querySelectorAll(".kd").forEach(renderKind);
+</script>
+</body>
+</html>

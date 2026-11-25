@@ -81,19 +81,41 @@
 
 {{#if recipe}}
   <header class="bc-rh">
-    <img class="bc-big" src="{{recipe.img}}" alt="">
+    <img class="bc-big {{#if locked}}bc-dim{{/if}}" src="{{recipe.img}}" alt="">
     <div class="bc-rh-text">
       <h1>{{recipe.name}}</h1>
-      {{#if meta}}<div class="bc-meta">{{meta}}</div>{{/if}}
+      <div class="bc-meta">
+        <span class="bc-kind {{#if locked}}off{{/if}}" {{#if kind.tooltip}}data-tooltip="{{kind.tooltip}}"{{/if}}><i class="fas {{kind.icon}} fa-fw"></i>{{kind.label}}</span>
+        {{#if folder}}<span>· {{folder}}</span>{{/if}}
+      </div>
       {{#if tags.length}}
         <div class="bc-tags">
           {{#each tags}}<span class="bc-tag"><i class="fas {{icon}} fa-fw"></i>{{text}}</span>{{/each}}
         </div>
       {{/if}}
     </div>
+    {{#if (or canLearn waiting canForget)}}
+      <div class="bc-hact">
+        {{#if canLearn}}
+          <button type="button" class="bc-learn"><i class="fas fa-compass-drafting"></i>{{localize "beaversCrafting.knowledge.learn"}}</button>
+        {{/if}}
+        {{#if waiting}}
+          <span class="bc-waiting"><i class="fas fa-hourglass-half"></i>{{localize "beaversCrafting.knowledge.waiting"}}</span>
+        {{/if}}
+        {{#if canForget}}
+          <button type="button" class="bc-forget"><i class="fas fa-trash"></i>{{localize "beaversCrafting.knowledge.forget"}}</button>
+        {{/if}}
+      </div>
+    {{/if}}
   </header>
 
   <div class="bc-scroll">
+    {{#if locked}}
+      <div class="bc-note">
+        <i class="fas fa-compass-drafting fa-fw"></i>
+        <span>{{localize "beaversCrafting.knowledge.mustLearnNote"}}</span>
+      </div>
+    {{/if}}
     {{#if instruction}}
       <details class="bc-instruction" {{#if instructionOpen}}open{{/if}}>
         <summary>
@@ -106,7 +128,7 @@
       </details>
     {{/if}}
 
-    <div class="bc-flow">
+    <div class="bc-flow {{#if locked}}bc-dim{{/if}}">
       <div class="bc-col">
         {{#if hasRequired}}
           <div class="bc-sec required">
@@ -181,7 +203,9 @@
   </div>
 
   <footer class="bc-ft">
-    {{#if hasPending}}
+    {{#if locked}}
+      <div class="bc-warn ok"></div>
+    {{else if hasPending}}
       <div class="bc-warn pending">
         <i class="fas fa-hand-pointer"></i>
         <span>{{localize "beaversCrafting.crafting-app.chooseFirst"}} <b>{{pending}}</b></span>
@@ -194,7 +218,7 @@
     {{else}}
       <div class="bc-warn ok"></div>
     {{/if}}
-    <button type="button" class="bc-craft {{#if ready}}go{{/if}}">
+    <button type="button" class="bc-craft {{#if (and ready (not locked))}}go{{/if}}" {{#if locked}}disabled{{/if}}>
       <i class="fas fa-hammer"></i>
       {{localize "beaversCrafting.crafting-app.button"}}
     </button>

@@ -92,15 +92,18 @@
         <img src="{{img}}" alt="" {{#if editable}}data-action="editImage" data-edit="img" class="editable"{{/if}}>
         <div class="brs-title">
             <input type="text" name="name" value="{{name}}" {{#unless editable}}readonly{{/unless}} placeholder="{{localize "Name"}}">
-            <div class="brs-folder">
-                <button type="button" class="brs-folder-show" title="{{localize "beaversCrafting.recipe.folderHint"}}" {{#unless editable}}disabled{{/unless}}>
-                    <i class="fa-regular fa-folder"></i>
-                    {{#if folderParts.length}}
-                        {{#each folderParts}}{{#unless @first}}<i class="fa-regular fa-chevron-right sep"></i>{{/unless}}<span>{{this}}</span>{{/each}}
-                    {{else}}<span class="ph">{{localize "beaversCrafting.recipeSheet.noFolder"}}</span>{{/if}}
-                </button>
-                <input type="text" class="brs-folder-in" name="flags.beavers-crafting.recipe.folder" value="{{folder}}"
-                       placeholder="{{localize "beaversCrafting.recipe.folderPlaceHolder"}}" {{#unless editable}}readonly{{/unless}}>
+            <div class="brs-subline">
+                {{> brs-select cls="kind" name="flags.beavers-crafting.recipe.kind" value=kind current=kindCurrent choices=kindChoices filter=false}}
+                <div class="brs-folder">
+                    <button type="button" class="brs-folder-show" title="{{localize "beaversCrafting.recipe.folderHint"}}" {{#unless editable}}disabled{{/unless}}>
+                        <i class="fa-regular fa-folder"></i>
+                        {{#if folderParts.length}}
+                            {{#each folderParts}}{{#unless @first}}<i class="fa-regular fa-chevron-right sep"></i>{{/unless}}<span>{{this}}</span>{{/each}}
+                        {{else}}<span class="ph">{{localize "beaversCrafting.recipeSheet.noFolder"}}</span>{{/if}}
+                    </button>
+                    <input type="text" class="brs-folder-in" name="flags.beavers-crafting.recipe.folder" value="{{folder}}"
+                           placeholder="{{localize "beaversCrafting.recipe.folderPlaceHolder"}}" {{#unless editable}}readonly{{/unless}}>
+                </div>
             </div>
         </div>
         <button type="button" class="brs-hbtn" data-action="systemSheet" title="{{localize "beaversCrafting.recipeSheet.systemSheetHint"}}">

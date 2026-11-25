@@ -157,7 +157,11 @@ interface RecipeData {
     macro?: string
     folder?: string
     instruction?: string
+    /** "recipe" (default): who sees it can craft it; "blueprint": must be learned first */
+    kind?: RecipeKind
 }
+
+type RecipeKind = "recipe" | "blueprint";
 
 
 //legacy Test can be removed

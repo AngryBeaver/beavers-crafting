@@ -78,6 +78,21 @@
     },
     {
       "type": "screenshot",
+      "url": "https://raw.githubusercontent.com/AngryBeaver/beavers-crafting/main/pictures/showcase-recipe-sheet-kind.png",
+      "caption": "Recipe or blueprint: the kind on the recipe sheet"
+    },
+    {
+      "type": "screenshot",
+      "url": "https://raw.githubusercontent.com/AngryBeaver/beavers-crafting/main/pictures/showcase-not-known.png",
+      "caption": "A blueprint not learned yet: Learn it in the crafting window"
+    },
+    {
+      "type": "screenshot",
+      "url": "https://raw.githubusercontent.com/AngryBeaver/beavers-crafting/main/pictures/showcase-request-card.png",
+      "caption": "A player asks to learn a blueprint: the Gamemaster allows or rejects"
+    },
+    {
+      "type": "screenshot",
       "url": "https://raw.githubusercontent.com/AngryBeaver/beavers-crafting/main/pictures/advance.png",
       "caption": "Advancing a crafting with checks"
     },

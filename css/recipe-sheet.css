@@ -962,6 +962,26 @@ body.theme-dark .application.beavers-crafting:is(.recipe-item-sheet, .subtype-it
 .beavers-crafting.brs .brs-title input:focus {
     border-color: var(--brs-acc);
 }
+/* under the name: the kind (recipe / blueprint), then the folder */
+.beavers-crafting.brs .brs-subline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+.beavers-crafting.brs .brs-sel.kind {
+    flex: none;
+}
+.beavers-crafting.brs .brs-sel.kind .brs-sel-btn {
+    width: auto;
+    height: 24px;
+    font-size: .88em;
+    font-weight: 600;
+}
+.beavers-crafting.brs .brs-sel.kind .brs-sel-btn .ico {
+    width: 18px;
+    height: 18px;
+}
 /* folder: a path, the text field only while editing */
 .beavers-crafting.brs .brs-folder {
     display: flex;

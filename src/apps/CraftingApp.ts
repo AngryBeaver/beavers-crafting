@@ -3,12 +3,14 @@ import {Crafting, getCurrencyComponent} from "../Crafting.js";
 import {getDataFrom, sanitizeUuid} from "../helpers/Utility.js";
 import {Settings} from "../Settings.js";
 import {AnyOf} from "../AnyOf.js";
-import {Recipe} from "../Recipe.js";
+import {Recipe, RECIPE_KIND_ICONS} from "../Recipe.js";
 import {ComponentResults, Result} from "../Result.js";
 import {TestHandler} from "../TestHandler.js";
 import { sortByFolder } from "../helpers/Folder.js";
 import { createDragDrop, renderTemplate } from "../helpers/Compat.js";
 import { isHandlerMacro } from "../helpers/RecipeMacro.js";
+import { RecipeKnowledge } from "../RecipeKnowledge.js";
+import { LearnRequests } from "../LearnRequests.js";
 
 type SlotStatus = "success" | "error" | "unknown" | undefined;
 
@@ -60,6 +62,10 @@ interface RecipeListView {
     img: string,
     craftable?: boolean,
     selected: boolean,
+    /** the kind icon, yellow when craftable now */
+    kindIcon: string,
+    /** a blueprint the actor has not learned */
+    locked: boolean,
 }
 
 interface FolderView {
@@ -176,6 +182,8 @@ export class CraftingApp extends Application {
             img: r.img,
             craftable: this.data.craftable.get(r.uuid),
             selected: r.uuid === this.data.selected,
+            kindIcon: RECIPE_KIND_ICONS[r.kind],
+            locked: !RecipeKnowledge.mayCraft(this.data.actor, r),
         }));
         const folders: FolderView[] = Object.keys(node)
             .filter(name => name !== "")
@@ -371,15 +379,12 @@ export class CraftingApp extends Application {
         const tests = recipe.beaversTests;
         const maxHits = tests ? TestHandler.getMaxHits(tests) : 0;
 
-        // header: "Folder › Sub · produces N items" + summary tags
+        // header: kind + "Folder › Sub", then summary tags
         const plural = (key: string, count: number) =>
             // @ts-ignore
             game.i18n.format(`beaversCrafting.crafting-app.summary.${key}${count === 1 ? "One" : "Many"}`, {count});
         const produced = output.reduce((sum, g) => sum + (Number(g.options[0]?.need) || 0), 0);
-        const meta = [
-            recipe.folder ? recipe.folder.split(".").join(" › ") : "",
-            produced > 0 ? plural("produces", produced) : "",
-        ].filter(s => s).join(" · ");
+        const folder = recipe.folder ? recipe.folder.split(".").join(" › ") : "";
         const tags: { icon: string, text: string }[] = [];
         if (maxHits > 0) {
             tags.push({icon: "fa-dice-d20", text: plural("check", maxHits)});
@@ -394,6 +399,9 @@ export class CraftingApp extends Application {
         if (cost) {
             tags.push({icon: "fa-coins", text: cost});
         }
+        if (produced > 0) {
+            tags.push({icon: "fa-flask", text: plural("item", produced)});
+        }
 
         return {
             recipe: {
@@ -401,7 +409,7 @@ export class CraftingApp extends Application {
                 name: recipe.name,
                 img: recipe.img,
             },
-            meta,
+            folder,
             tags,
             required,
             hasRequired: required.length > 0,
@@ -421,6 +429,29 @@ export class CraftingApp extends Application {
             pending: pending.join(", "),
             hasPending: pending.length > 0,
             ready: missing.length === 0 && pending.length === 0,
+            ...this._knowledgeView(recipe),
+        };
+    }
+
+    /** the kind (grey while not learned), and who may learn or forget it here */
+    _knowledgeView(recipe: Recipe) {
+        const actor = this.data.actor;
+        const known = RecipeKnowledge.isLearnedBlueprint(actor, recipe);
+        const locked = !RecipeKnowledge.mayCraft(actor, recipe);
+        const waiting = locked && LearnRequests.isPending(actor, recipe.uuid);
+        const state = known ? "known" : locked ? "notKnownTag" : "";
+        return {
+            kind: {
+                icon: RECIPE_KIND_ICONS[recipe.kind],
+                // @ts-ignore
+                label: game.i18n.localize(`beaversCrafting.knowledge.kind.${recipe.kind}`),
+                // @ts-ignore
+                tooltip: state ? game.i18n.localize(`beaversCrafting.knowledge.${state}`) : "",
+            },
+            locked,
+            waiting,
+            canLearn: locked && !waiting && actor.isOwner,
+            canForget: known && actor.isOwner,
         };
     }
 
@@ -521,6 +552,9 @@ export class CraftingApp extends Application {
                 .then(() => this.close());
         });
 
+        html.find(".bc-learn").on("click", () => void this._learnSelected());
+        html.find(".bc-forget").on("click", () => void this._forgetSelected());
+
         html.find(".choose").on("click", e => {
             const group = $(e.currentTarget).data("group") + "";
             const key = $(e.currentTarget).data("key") + "";
@@ -557,6 +591,41 @@ export class CraftingApp extends Application {
         });
 
         this.addDragDrop(html);
+    }
+
+    /** learns the selected blueprint at once, or asks the Gamemaster (setting "Learning recipes") */
+    async _learnSelected() {
+        const recipe = this.data.recipe;
+        if (!recipe) {
+            return;
+        }
+        // @ts-ignore
+        if (!RecipeKnowledge.learnsDirectly(game.user)) {
+            await LearnRequests.request(this.data.actor, recipe);
+            return; // the actor update re-renders the window
+        }
+        const learned = await RecipeKnowledge.learn(this.data.actor, recipe.uuid);
+        if (learned) {
+            this.data.selected = learned.uuid;
+            this.render();
+        }
+    }
+
+    /** the actor forgets the selected blueprint */
+    async _forgetSelected() {
+        const item = this.data.actor.items.find(i => i.uuid === this.data.recipe?.uuid);
+        if (item) {
+            await RecipeKnowledge.forget(item);
+            this.data.selected = null;
+            this.render();
+        }
+    }
+
+    /** an open crafting window of the actor shows the current state */
+    static refreshFor(actor) {
+        Object.values(ui.windows)
+            .filter(app => app instanceof CraftingApp && app.data.actor?.id === actor.id)
+            .forEach(app => app.render());
     }
 
     static _anyOfKey(type: DataType, group: string, key: string): string {

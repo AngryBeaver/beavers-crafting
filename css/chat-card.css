@@ -235,3 +235,60 @@
 .beavers-crafting.bcc .bcc-it.kept {
     opacity: .55;
 }
+
+/* request of a player to learn a blueprint (templates/learn-request-card.hbs), whispered to the Gamemasters */
+.beavers-crafting.beavers-learn-request {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px;
+    border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+    border-radius: 6px;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+}
+.beavers-crafting.beavers-learn-request .blr-recipe {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.beavers-crafting.beavers-learn-request .blr-recipe img {
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    border: 1px solid color-mix(in srgb, currentColor 30%, transparent);
+}
+.beavers-crafting.beavers-learn-request .blr-recipe b {
+    flex: 1;
+    min-width: 0;
+}
+.beavers-crafting.beavers-learn-request .blr-recipe button {
+    flex: none;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    display: grid;
+    place-items: center;
+    color: #fff;
+}
+.beavers-crafting.beavers-learn-request .blr-recipe button i {
+    margin: 0;
+    color: inherit;
+}
+.beavers-crafting.beavers-learn-request .blr-allow {
+    background: #3e8e48;
+    border-color: #3e8e48;
+}
+.beavers-crafting.beavers-learn-request .blr-reject {
+    background: #b2443b;
+    border-color: #b2443b;
+}
+.beavers-crafting.beavers-learn-request .blr-result {
+    font-size: .9em;
+    font-weight: 600;
+}
+.beavers-crafting.beavers-learn-request .blr-result.learned {
+    color: #3e8e48;
+}
+.beavers-crafting.beavers-learn-request .blr-result.rejected {
+    color: #b2443b;
+}
