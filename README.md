@@ -38,6 +38,7 @@ type, craft them from the crafting window, advance them on the actor sheet, resu
 currently no longer tested: Cyberpunk RED (cyberpunk-red-core v0.92.4 needs Foundry 12).
 
 **Playing dnd5e?** Start with the [ready-made recipes](#ready-made-recipes-dnd5e): you get a recipe for every tool of the D&D 2024 rules out of the box.
+More recipes come as modules of their own: [Artificer recipes](#artificer-recipes-dnd5e) and [50 potions to brew](#potion-recipes-dnd5e).
 
 ## Features
 ### Crafting
@@ -86,7 +87,9 @@ Gamemaster to learn it. See [Recipes and blueprints](#recipes-and-blueprints).
 * [Script](#script)
 * [Ready-made recipes (dnd5e)](#ready-made-recipes-dnd5e)
   * [Tool Recipes (dnd5e)](#tool-recipes-dnd5e)
+  * [Scribe Spell Scroll (dnd5e)](#scribe-spell-scroll-dnd5e)
   * [Artificer Recipes (dnd5e)](#artificer-recipes-dnd5e)
+  * [Potion Recipes (dnd5e)](#potion-recipes-dnd5e)
 * [Hooks](#hooks)
 * [Settings](#settings)
 * [Good to know](#good-to-know)
@@ -146,6 +149,8 @@ Optional checks the crafting needs, as numbered steps that are done one after an
 - A step needs a number of successes before the next step starts.
 - Check types: skill, ability, tool, or a fixed success without rolling (just progress over time). What is available depends on your system.
 - **Fails allowed**: the crafting fails when this many checks fail; 0 means it can never fail.
+- **Fails in a row**: a success resets the failed checks, so the crafting only fails after this many fails in a row
+  (e.g. "fail three times in a row and the materials are lost").
 - **Consume on fail**: whether the cost is lost when the crafting fails.
 
 ![img.png](pictures/skillchallenge.png)
@@ -162,12 +167,14 @@ Plain code runs when the crafting starts. Or write one object with a function pe
 ```js
 {
   start() {},                           // the crafting starts
+  requiredChosen(component, preview) {},// a requirement is chosen (e.g. by an AnyOf), before anything is checked or paid
   inputChosen(component, preview) {},   // a cost is chosen, before anything is checked or paid
   resultChosen(component, preview) {},  // a result is chosen, before anything is checked or paid
   finish(success) {}                    // the crafting ends, before the results are given
 }
 ```
 `inputChosen` and `resultChosen` can change quantities and money; the crafting window shows these changes as a preview (`preview` is `true` there).
+`requiredChosen` runs first, so what was chosen for a requirement (e.g. a spell) can set the cost, see the [Scribe Spell Scroll](#scribe-spell-scroll-dnd5e) recipe.
 Throwing an error stops the crafting, it counts as failed.
 
 The sheet has an example to insert; more in [Macros](macros.md).
@@ -341,11 +348,29 @@ When crafting, the player chooses what to make from everything the tool can craf
 - The work is a "Day of work" step, advanced once per day of work: one day per 10 GP of the item's price (at least one).
 - The items come from the Player's Handbook when that module is active, otherwise from the free dnd5e equipment (SRD 5.2).
 
+### Scribe Spell Scroll (dnd5e)
+The compendium **D&D 2024 Tool Recipes** also has the recipe **Scribe Spell Scroll** (folder "Tools"), by the rules of the Player's Handbook 2024.
+- Proficiency in Arcana or with Calligrapher's Supplies is needed; no spell slot is used.
+- Choose a spell you have prepared ("Prepared spell"; cantrips and spells that are always available count as well).
+- The spell's level sets the cost and the days of work, from 15 GP and 1 day (cantrip) up to 50,000 GP and 120 days (level 9).
+- On success the scroll is made from the spell, with the scribe's spell save DC and attack bonus.
+- Two costs in gold: the scribing (by the level) and, when the spell consumes Material components with a price (e.g. Revivify's diamonds), their price. Other components are not part of the recipe, have them at hand.
+
+It shows how a requirement can drive a recipe: the recipe macro `requiredChosen` sets the cost and the days for the chosen
+spell, `finish` creates the scroll.
+
 ### Artificer Recipes (dnd5e)
 The D&D 2024 Artificer recipes are a module of their own:
 [Beaver's Artificer's Crafting](https://github.com/AngryBeaver/beavers-artificers-crafting).
 - Tinker's Magic, with its uses per long rest counted.
 - Replicate Magic Item: 56 plans by Artificer level, items per long rest and held at once, the oldest item vanishes.
+
+### Potion Recipes (dnd5e)
+50 magical potions with their recipes are a module of their own:
+[Beaver's Potions](https://github.com/AngryBeaver/beavers-potions) (3.0.0, Foundry 14, dnd5e 6).
+- 50 potions that work with dnd5e alone: drinking one applies its effects.
+- 22 mushrooms and Magical Essence as ingredients, with "Any Mushroom" / "Any Potion" choices.
+- 58 recipes: one for each of the 50 potions, the 4 SRD healing potions, "Gather Essence" (a potion turned into Magical Essence) and 3 random potions by rarity.
 
 ## Hooks
 ### beavers-crafting.start

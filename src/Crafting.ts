@@ -216,8 +216,9 @@ export class Crafting implements CraftingData {
   }
 
   /**
-   * macro "inputChosen" / "resultChosen": once per cost and per result, after the choices are made
-   * and before anything is checked or paid, so quantities and prices can still be changed.
+   * macro "requiredChosen" / "inputChosen" / "resultChosen": once per requirement, per cost and per result, after the
+   * choices are made and before anything is checked or paid, so quantities and prices can still be changed.
+   * Requirements come first: what was chosen there (e.g. a spell) can decide the cost.
    */
   async executeChosenMacros() {
     const error = await Crafting.runChosenMacros(this.recipe, this.result, this.actor, false);
@@ -236,7 +237,7 @@ export class Crafting implements CraftingData {
    * @returns the error of the first failing handler
    */
   static async runChosenMacros(recipe: Recipe, result: Result, actor, preview: boolean): Promise<any> {
-    for (const [type, phase] of [["input", "inputChosen"], ["output", "resultChosen"]] as const) {
+    for (const [type, phase] of [["required", "requiredChosen"], ["input", "inputChosen"], ["output", "resultChosen"]] as const) {
       for (const group of Object.values(recipe[type] || {})) {
         const components = Object.values(group as { [key: string]: Component });
         if (preview && (components.length !== 1 || components[0].type === Settings.ANYOF_SUBTYPE)) {

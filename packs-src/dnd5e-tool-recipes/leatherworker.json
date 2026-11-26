@@ -116,7 +116,7 @@
             "Compendium-dnd5e-equipment24-Item-phbwepSling00000": {
               "id": "phbwepSling00000",
               "uuid": "Compendium.dnd5e.equipment24.Item.phbwepSling00000",
-              "img": "icons/weapons/slings/slingshot-wood.webp",
+              "img": "icons/weapons/slings/sling-leather.webp",
               "name": "Sling",
               "type": "Item",
               "quantity": 1,

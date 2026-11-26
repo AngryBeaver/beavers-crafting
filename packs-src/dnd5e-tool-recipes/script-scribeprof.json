@@ -1,0 +1,21 @@
+{
+  "_id": "bcr24scribeprof0",
+  "_key": "!items!bcr24scribeprof0",
+  "name": "Proficient in Arcana or with Calligrapher's Supplies",
+  "type": "loot",
+  "folder": "bcr24folderRequi",
+  "img": "icons/magic/symbols/rune-sigil-black-pink.webp",
+  "system": {
+    "description": {
+      "value": "<p>Requirement: the actor is proficient in the Arcana skill or with Calligrapher's Supplies.</p>"
+    }
+  },
+  "flags": {
+    "beavers-crafting": {
+      "subtype": "Script",
+      "script": {
+        "macro": "{\n  check() {\n    return actor.system.skills?.arc?.value >= 1 || actor.system.tools?.calligrapher?.value >= 1\n      || \"not proficient in Arcana or with Calligrapher's Supplies\";\n  }\n}"
+      }
+    }
+  }
+}

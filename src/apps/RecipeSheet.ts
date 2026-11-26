@@ -46,6 +46,9 @@ const MACRO_EXAMPLE = `// one function per moment, each is optional
   start() {
     ui.notifications.info(\`\${actor.name} starts crafting \${recipeData.name}\`);
   },
+  // every requirement once it is chosen (e.g. the item an AnyOf stands for); it is not used up
+  requiredChosen(component, preview) {
+  },
   // every cost once it is chosen: change its quantity before anything is paid
   inputChosen(component, preview) {
     // component.quantity = Math.ceil(component.quantity / 2);
@@ -249,11 +252,12 @@ export class RecipeSheet {
       steps,
       fails,
       consume: !!tests?.consume,
+      failsInARow: !!tests?.failsInARow,
       // preview of what is needed: empty green ones per success, empty red ones per allowed fail
       pips: maxHits + fails <= MAX_PIPS
         ? [...Array(maxHits).fill({cls: ""}), ...(fails ? [{sep: true}] : []), ...Array(fails).fill({cls: "bad"})]
         : [],
-      summary: steps.length ? f("summary.checks", {steps: steps.length, hits: maxHits, fails}) : t("noChecks"),
+      summary: steps.length ? f(tests?.failsInARow ? "summary.checksInARow" : "summary.checks", {steps: steps.length, hits: maxHits, fails}) : t("noChecks"),
     };
 
     const folded = Object.fromEntries([...this.folded].map(id => [id, true]));

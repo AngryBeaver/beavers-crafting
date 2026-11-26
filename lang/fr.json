@@ -33,7 +33,8 @@
       "progress": {
         "hits": "{hits} sur {maxHits}",
         "fails": "{count} échecs",
-        "tip": "{hits}/{maxHits} tests réussis · {fails}/{maxFails} échoués"
+        "tip": "{hits}/{maxHits} tests réussis · {fails}/{maxFails} échoués",
+        "tipInARow": "{hits}/{maxHits} tests réussis · {fails}/{maxFails} échoués d’affilée"
       },
       "details": {
         "toggle": "Détails",
@@ -70,6 +71,7 @@
       "addResult": "ajouter un objet, une table ou une macro",
       "failsAllowed": "Échecs autorisés",
       "consumeOnFail": "Consommer le coût en cas d'échec",
+      "failsInARow": "Échecs d’affilée",
       "then": "puis",
       "step": "Étape",
       "needs": "requiert",
@@ -88,6 +90,7 @@
       "summary": {
         "items": "{count} objets",
         "checks": "{steps} étapes · {hits} réussites · {fails} échecs autorisés",
+        "checksInARow": "{steps} étapes · {hits} réussites · {fails} échecs d’affilée autorisés",
         "lines": "{count} lignes"
       }
     },
@@ -105,6 +108,7 @@
         "dc": "dd",
         "consume": "consommer",
         "consumeHint": "consomme le coût en cas d’échecs",
+        "failsInARowHint": "une réussite remet les échecs à zéro : le processus échoue seulement après ce nombre d’échecs d’affilée",
         "andTestHint": "ajouter un test supplémentaire",
         "orTestHint": "ajouter un test alternatif",
         "skill": "Compétence :",
@@ -158,6 +162,7 @@
       "result": "Résultat",
       "pass": "succès",
       "before": "avant",
+      "inARow": "d’affilée",
       "fails": "échecs",
       "checks": "Liste de vérification",
       "searchPlaceholder": "Rechercher des recettes…",

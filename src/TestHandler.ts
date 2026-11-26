@@ -75,7 +75,7 @@ export class TestHandler{
         var result:TestResult =  await test.action(this.initiatorData);
         const testAnd = this.getCurrentTestAnd();
         var hits = Math.min(result.success,testAnd.hits);
-        this.result.updateTests(hits,result.fail);
+        this.result.updateTests(hits,result.fail,!!this.beaversTests.failsInARow);
     }
 
     async selectTestChoice():Promise<SerializedTest<any>>{

@@ -1,5 +1,15 @@
 # Changelog
 
+## 4.16.0
+- checks: new switch **Fails in a row** next to "Fails allowed": a success resets the failed checks, the crafting fails
+  only after that many fails in a row (shown in the recipe sheet, the crafting window, the chat card and the actor tab)
+- recipe macro: new moment `requiredChosen(component, preview)`, once per requirement after the choices are made and
+  before `inputChosen`; e.g. the item an AnyOf in Required stands for can set the cost
+- D&D 2024 Tool Recipes: new recipe **Scribe Spell Scroll** (proficiency in Arcana or with Calligrapher's Supplies, a
+  prepared spell, no spell slot; cost and days of work by the spell's level; the scroll gets the scribe's spell save DC
+  and attack bonus), with the Script "Proficient in Arcana or with Calligrapher's Supplies" and the AnyOf "Prepared spell"
+  - the price of Material components the spell consumes is a second money line, "Gold (material components)"
+
 ## 4.15.1
 - cleanup: the example compendium "ingredients" and its 50 mushroom icons are no longer shipped, they made the
   package huge

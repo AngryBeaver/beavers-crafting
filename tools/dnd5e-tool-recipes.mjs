@@ -66,7 +66,7 @@ const GROUPS = {
   "Druidic Focus": () => ["Sprig of mistletoe", "Wooden staff", "Yew wand"].map(byName),
   "Holy Symbol": () => ["Amulet", "Emblem", "Reliquary"].map(byName),
 };
-/** not craftable by a recipe alone: needs a spell, see the instruction */
+/** not in the tool's recipe: it has its own recipe "Scribe Spell Scroll" */
 const SKIPPED = ["Spell Scroll"];
 
 function craftList(tool) {
@@ -129,7 +129,7 @@ function macro() {
 
 function instruction(tool, skipped) {
   const extra = skipped.length
-    ? `<p>${skipped.join(", ")}: not part of this recipe, it follows its own rules in the Player's Handbook.</p>` : "";
+    ? `<p>${skipped.join(", ")}: see the recipe <strong>Scribe Spell Scroll</strong>.</p>` : "";
   return `<p>Crafting with <strong>${tool.name}</strong> by the D&amp;D 2024 rules.</p>
 <ul>
 <li>You need proficiency with ${tool.name}.</li>
@@ -326,5 +326,169 @@ for (const [key, names] of Object.entries(FAST_CRAFTING)) {
   console.log(`${doc.name}: ${names.length} results`);
   count++;
 }
+// Scribe Spell Scroll (Player's Handbook 2024, "Scribing Spell Scrolls"): proficiency in Arcana or with Calligrapher's
+// Supplies, a spell you have prepared, cost and days by its level; no spell slot is used
+const ANYOF_IMG = "icons/magic/symbols/runes-star-pentagon-orange.webp";
+const SCROLL_IMG = "icons/sundries/scrolls/scroll-bound-blue-tan.webp";
+/** level: [days, GP] */
+const SCROLL_COSTS = { 0: [1, 15], 1: [1, 25], 2: [3, 100], 3: [5, 150], 4: [10, 1000], 5: [25, 1500], 6: [40, 10000], 7: [50, 12500], 8: [60, 15000], 9: [120, 50000] };
+
+const scribeProficient = scriptItem("Proficient in Arcana or with Calligrapher's Supplies", "scribeprof", `{
+  check() {
+    return actor.system.skills?.arc?.value >= 1 || actor.system.tools?.calligrapher?.value >= 1
+      || "not proficient in Arcana or with Calligrapher's Supplies";
+  }
+}`, "<p>Requirement: the actor is proficient in the Arcana skill or with Calligrapher's Supplies.</p>", "icons/magic/symbols/rune-sigil-black-pink.webp");
+
+/** AnyOf: a spell of the actor it can cast now; dnd5e 5+: system.method/prepared, before: system.preparation */
+const preparedSpellId = id("anyofprepspell");
+const preparedSpellDoc = {
+  _id: preparedSpellId,
+  _key: `!items!${preparedSpellId}`,
+  name: "Prepared spell",
+  type: "loot",
+  folder: REQUIREMENTS_FOLDER_ID,
+  img: ANYOF_IMG,
+  system: { description: { value: "<p>Any spell of the actor that it has prepared: cantrips, prepared spells and spells that are always available (innate, pact, always prepared).</p>" } },
+  flags: {
+    "beavers-crafting": {
+      subtype: "AnyOf",
+      anyOf: {
+        macro: `if (item.type !== "spell") return false;
+const s = item.system;
+if (s.level === 0) return true;
+// dnd5e before 5.0
+if (s.preparation) return s.preparation.mode !== "prepared" || !!s.preparation.prepared;
+// prepared (1) or always prepared (2); innate, pact and at will spells are not prepared, they are always there
+return !s.canPrepare || s.prepared >= 1;`,
+      },
+    },
+  },
+};
+fs.writeFileSync(path.join(OUT, "anyof-prepared-spell.json"), JSON.stringify(preparedSpellDoc, null, 2) + "\n");
+const preparedSpellUuid = `Compendium.beavers-crafting.dnd5e-tool-recipes.Item.${preparedSpellId}`;
+const preparedSpell = {
+  key: preparedSpellUuid.replace(/\./g, "-"),
+  data: { id: preparedSpellId, uuid: preparedSpellUuid, img: ANYOF_IMG, name: "Prepared spell", type: "AnyOf", quantity: 1, itemType: "loot" },
+};
+
+/** a money line of the cost (like "| coin" in the recipe sheet); its name tells the lines apart in the crafting window */
+const GOLD_IMG = "icons/commodities/currency/coins-assorted-mix-copper-silver-gold.webp";
+const gold = (name, quantity) => ({ id: "gp", name, img: GOLD_IMG, type: "item", quantity, flags: { "beavers-crafting": { subtype: "money" } } });
+
+function scrollMacro() {
+  return `{
+  // the chosen spell sets the cost and the days by its level (Player's Handbook 2024)
+  async requiredChosen(component, preview) {
+    if (component.itemType !== "spell") return;
+    const spell = await fromUuid(component.uuid);
+    if (!spell) return;
+    const costs = ${JSON.stringify(SCROLL_COSTS)};
+    const [days, gp] = costs[Math.min(9, Math.max(0, spell.system.level))];
+    // two money lines: the scribing by the level, the Material components the spell consumes (dnd5e: cost in GP)
+    const scribing = recipeData.input?.[1]?.gp;
+    if (scribing) scribing.quantity = gp;
+    const materialGp = consumedMaterialsGp(spell.system.materials);
+    const line = recipeData.input?.[2]?.gp;
+    if (materialGp > 0 && line) {
+      // less than whole gold (Gentle Repose: 2 CP): pay it in copper
+      if (!Number.isInteger(materialGp)) {
+        line.id = "cp";
+        line.name = (CONFIG.DND5E.currencies.cp?.label || "Copper") + " (material components)";
+        line.quantity = Math.round(materialGp * 100);
+      } else line.quantity = materialGp;
+    } else delete recipeData.input?.[2];
+
+    /** GP of the Material components the spell consumes: the price field, or "worth 300+ GP" in the text before "consumes" */
+    function consumedMaterialsGp(materials) {
+      if (!materials?.consumed) return 0;
+      if (Number(materials.cost) > 0) return Number(materials.cost);
+      const text = String(materials.value || "");
+      const end = text.toLowerCase().lastIndexOf("consume");
+      const part = end >= 0 ? text.slice(0, end) : text;
+      const perGp = {pp: 10, gp: 1, ep: 0.5, sp: 0.1, cp: 0.01};
+      let sum = 0;
+      for (const [, amount, coin] of part.matchAll(/worth\\s+([\\d,.]+)\\+?\\s*(PP|GP|EP|SP|CP)/gi)) {
+        sum += Number(amount.replace(/,/g, "")) * perGp[coin.toLowerCase()];
+      }
+      return Math.round(sum * 100) / 100;
+    }
+    const step = recipeData.beaversTests?.ands?.[1];
+    if (step) step.hits = days;
+  },
+  // the scroll is made from the spell, with the scribe's spell save DC and attack bonus
+  async finish(success) {
+    if (!success) return;
+    const component = Object.values(recipeData.required || {}).flatMap(group => Object.values(group))
+      .find(c => c.itemType === "spell");
+    const spell = component && await fromUuid(component.uuid);
+    if (!spell) throw new Error("the spell for the scroll is no longer there");
+    const scroll = await CONFIG.Item.documentClass.createScrollFromSpell(spell, {}, {dialog: false});
+    if (!scroll) throw new Error("dnd5e could not create the scroll");
+    const data = scroll.toObject();
+    foundry.utils.setProperty(data, "flags.beavers-crafting.isCrafted", true);
+    await actor.createEmbeddedDocuments("Item", [data]);
+  }
+}`;
+}
+
+function scrollInstruction() {
+  return `<p>Scribing a <strong>Spell Scroll</strong> by the D&amp;D 2024 rules.</p>
+<ul>
+<li>You need proficiency in the Arcana skill or with Calligrapher's Supplies.</li>
+<li>Choose a spell you have prepared (a cantrip or a spell that is always available counts as well). You must have it prepared on each day of the work.</li>
+<li>No spell slot is used.</li>
+<li>You must have the spell's Material components at hand. If the spell consumes Material components with a price, that price is a second cost: "Gold (material components)". Others are not part of this recipe.</li>
+<li>Each day of work is 8 hours; the days needn't be consecutive.</li>
+<li>Cost and days of work by the spell's level:</li>
+</ul>
+<table><tr><th>Level</th><th>Days</th><th>Cost</th></tr>
+${Object.entries(SCROLL_COSTS).map(([level, [days, gp]]) => `<tr><td>${level === "0" ? "Cantrip" : level}</td><td>${days}</td><td>${gp.toLocaleString("en")} GP</td></tr>`).join("\n")}
+</table>
+<p>The scroll uses your spell save DC and spell attack bonus.</p>`;
+}
+
+{
+  const _id = id("scribescroll");
+  const doc = {
+    _id,
+    _key: `!items!${_id}`,
+    name: "Scribe Spell Scroll",
+    type: "loot",
+    folder: TOOLS_FOLDER_ID,
+    img: SCROLL_IMG,
+    system: { description: { value: scrollInstruction() } },
+    flags: {
+      "beavers-crafting": {
+        subtype: "Recipe",
+        recipe: {
+          required: {
+            1: { [scribeProficient.key]: scribeProficient.data },
+            2: { [preparedSpell.key]: preparedSpell.data },
+          },
+          // set by the macro for the chosen spell; the second line goes away when the spell consumes no priced components
+          input: {
+            1: { gp: gold("Gold (scribing)", 15) },
+            2: { gp: gold("Gold (material components)", 0) },
+          },
+          output: {},
+          // the days of work, set by the macro for the chosen spell
+          beaversTests: {
+            fails: 0,
+            consume: true,
+            ands: { 1: { hits: 1, ors: { 1: { type: "IncrementStep", data: { name: "Day of work" } } } } },
+          },
+          macro: scrollMacro(),
+          folder: FOLDER,
+          instruction: scrollInstruction(),
+        },
+      },
+    },
+  };
+  fs.writeFileSync(path.join(OUT, "scribe-spell-scroll.json"), JSON.stringify(doc, null, 2) + "\n");
+  console.log(`${doc.name}: spell levels 0-9`);
+  count++;
+}
+
 console.log(`${count} recipes -> ${OUT}`);
 

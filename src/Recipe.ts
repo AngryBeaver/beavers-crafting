@@ -164,6 +164,7 @@ export class Recipe implements RecipeData {
             return {
                 fails: this.beaversTests.fails,
                 consume: this.beaversTests.consume,
+                failsInARow: !!this.beaversTests.failsInARow,
                 ands: JSON.parse(JSON.stringify(this.beaversTests.ands))
             };
         }

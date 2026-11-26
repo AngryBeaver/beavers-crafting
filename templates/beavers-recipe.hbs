@@ -26,6 +26,7 @@
                   {{#if (gt recipe.beaversTests.fails 1)}}
                     {{localize "beaversCrafting.crafting-app.before"}} {{recipe.beaversTests.fails}}
                     {{localize "beaversCrafting.crafting-app.fails"}}
+                    {{#if recipe.beaversTests.failsInARow}}{{localize "beaversCrafting.crafting-app.inARow"}}{{/if}}
                   {{/if}}
                 </div>
               </div>

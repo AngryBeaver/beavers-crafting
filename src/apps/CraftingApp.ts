@@ -231,7 +231,7 @@ export class CraftingApp extends Application {
         const renderId = ++this._sheetRenderId;
         let recipe = this.data.recipe;
         if (isHandlerMacro(recipe.macro)) {
-            // macro "inputChosen" / "resultChosen" may change costs: show them on a copy, the recipe itself stays as it is
+            // macro "requiredChosen" / "inputChosen" / "resultChosen" may change costs: show them on a copy, the recipe itself stays as it is
             recipe = Recipe.clone(recipe);
             const error = await Crafting.runChosenMacros(recipe, Result.from(recipe, this.data.actor), this.data.actor, true);
             if (error) console.warn("Beavers Crafting | recipe macro (preview):", error);

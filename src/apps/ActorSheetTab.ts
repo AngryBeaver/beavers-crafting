@@ -143,7 +143,7 @@ export class ActorSheetTab {
         if (hasTests) {
             const hits = Math.min(tests.hits, tests.maxHits);
             const fails = Math.min(tests.fails, tests.maxFails);
-            view.progressTip = f("progress.tip", {hits, maxHits: tests.maxHits, fails, maxFails: tests.maxFails});
+            view.progressTip = f(crafting.recipe.beaversTests?.failsInARow ? "progress.tipInARow" : "progress.tip", {hits, maxHits: tests.maxHits, fails, maxFails: tests.maxFails});
             view.pips = progressPips(hits, tests.maxHits, fails, tests.maxFails);
             if (!view.pips) {
                 view.bar = {

@@ -153,6 +153,9 @@
                 <label title="{{localize "beaversCrafting.recipe.beaversTests.consumeHint"}}">
                     <input type="checkbox" class="brs-switch" {{#unless editable}}disabled{{/unless}} {{#if checks.consume}}checked{{/if}}
                            name="flags.beavers-crafting.recipe.beaversTests.consume">{{localize "beaversCrafting.recipeSheet.consumeOnFail"}}</label>
+                <label title="{{localize "beaversCrafting.recipe.beaversTests.failsInARowHint"}}">
+                    <input type="checkbox" class="brs-switch" {{#unless editable}}disabled{{/unless}} {{#if checks.failsInARow}}checked{{/if}}
+                           name="flags.beavers-crafting.recipe.beaversTests.failsInARow">{{localize "beaversCrafting.recipeSheet.failsInARow"}}</label>
                 <span class="brs-pips" title="{{checks.summary}}">{{#each checks.pips}}{{#if sep}}<span class="sep"></span>{{else}}<i class="{{cls}}"></i>{{/if}}{{/each}}</span>
             </div>
             <div class="brs-steps">

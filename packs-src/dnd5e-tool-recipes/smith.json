@@ -134,7 +134,7 @@
             "Compendium-dnd5e-equipment24-Item-phbagCrowbar0000": {
               "id": "phbagCrowbar0000",
               "uuid": "Compendium.dnd5e.equipment24.Item.phbagCrowbar0000",
-              "img": "icons/tools/hand/pickaxe-steel-white.webp",
+              "img": "icons/tools/hand/pry-bar-hook-steel.webp",
               "name": "Crowbar",
               "type": "Item",
               "quantity": 1,

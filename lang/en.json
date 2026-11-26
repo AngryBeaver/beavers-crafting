@@ -33,7 +33,8 @@
       "progress": {
         "hits": "{hits} of {maxHits}",
         "fails": "{count} fails",
-        "tip": "{hits}/{maxHits} checks passed · {fails}/{maxFails} failed"
+        "tip": "{hits}/{maxHits} checks passed · {fails}/{maxFails} failed",
+        "tipInARow": "{hits}/{maxHits} checks passed · {fails}/{maxFails} failed in a row"
       },
       "details": {
         "toggle": "Details",
@@ -72,6 +73,7 @@
       "addResult": "add item, roll table or macro",
       "failsAllowed": "Fails allowed",
       "consumeOnFail": "Consume cost on fail",
+      "failsInARow": "Fails in a row",
       "then": "then",
       "step": "Step",
       "needs": "needs",
@@ -91,6 +93,7 @@
       "summary": {
         "items": "{count} items",
         "checks": "{steps} steps · {hits} successes · {fails} fails allowed",
+        "checksInARow": "{steps} steps · {hits} successes · {fails} fails in a row allowed",
         "lines": "{count} lines"
       }
     },
@@ -108,6 +111,7 @@
         "dc": "dc",
         "consume": "consume",
         "consumeHint": "consumes cost on failed tests",
+        "failsInARowHint": "a success resets the failed checks: the crafting fails only after this many fails in a row",
         "andTestHint": "add additional Test",
         "orTestHint": "add alternative Test",
         "skill": "Skill:",
@@ -175,6 +179,7 @@
       "result": "Result",
       "pass": "pass",
       "before": "before",
+      "inARow": "in a row",
       "fails": "fails",
       "checks": "Checklist",
       "searchPlaceholder": "Search recipes…",

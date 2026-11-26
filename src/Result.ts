@@ -189,9 +189,13 @@ export class Result implements ResultApi, ResultData {
         this._currencyCombined[currency.name] = (this._currencyCombined[currency.name] || 0 )+ currency.value
     }
 
-    updateTests(hits:number, fails:number=0){
+    /** failsInARow: a success resets the failed checks counted so far */
+    updateTests(hits:number, fails:number=0, failsInARow:boolean=false){
         if(!this._tests){
             this._initTests(1,1);
+        }
+        if(failsInARow && hits > 0){
+            this._tests.fails = 0;
         }
         this._tests.hits +=hits;
         this._tests.fails +=fails;

@@ -1,0 +1,21 @@
+{
+  "_id": "bcr24anyofprepsp",
+  "_key": "!items!bcr24anyofprepsp",
+  "name": "Prepared spell",
+  "type": "loot",
+  "folder": "bcr24folderRequi",
+  "img": "icons/magic/symbols/runes-star-pentagon-orange.webp",
+  "system": {
+    "description": {
+      "value": "<p>Any spell of the actor that it has prepared: cantrips, prepared spells and spells that are always available (innate, pact, always prepared).</p>"
+    }
+  },
+  "flags": {
+    "beavers-crafting": {
+      "subtype": "AnyOf",
+      "anyOf": {
+        "macro": "if (item.type !== \"spell\") return false;\nconst s = item.system;\nif (s.level === 0) return true;\n// dnd5e before 5.0\nif (s.preparation) return s.preparation.mode !== \"prepared\" || !!s.preparation.prepared;\n// prepared (1) or always prepared (2); innate, pact and at will spells are not prepared, they are always there\nreturn !s.canPrepare || s.prepared >= 1;"
+      }
+    }
+  }
+}

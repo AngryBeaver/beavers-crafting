@@ -123,6 +123,8 @@ interface AnyOfStoreData {
 
 interface BeaversCraftingTests extends BeaversTests{
     consume: boolean,
+    /** a success resets the failed checks: the crafting fails only after this many fails in a row */
+    failsInARow?: boolean,
 }
 
 interface RecipeData {

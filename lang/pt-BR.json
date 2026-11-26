@@ -33,7 +33,8 @@
       "progress": {
         "hits": "{hits} de {maxHits}",
         "fails": "{count} falhas",
-        "tip": "{hits}/{maxHits} testes aprovados · {fails}/{maxFails} falhos"
+        "tip": "{hits}/{maxHits} testes aprovados · {fails}/{maxFails} falhos",
+        "tipInARow": "{hits}/{maxHits} testes aprovados · {fails}/{maxFails} falhos seguidos"
       },
       "details": {
         "toggle": "Detalhes",
@@ -70,6 +71,7 @@
       "addResult": "adicionar item, tabela ou macro",
       "failsAllowed": "Falhas permitidas",
       "consumeOnFail": "Consumir custo ao falhar",
+      "failsInARow": "Falhas seguidas",
       "then": "depois",
       "step": "Etapa",
       "needs": "precisa de",
@@ -88,6 +90,7 @@
       "summary": {
         "items": "{count} itens",
         "checks": "{steps} etapas · {hits} sucessos · {fails} falhas permitidas",
+        "checksInARow": "{steps} etapas · {hits} sucessos · {fails} falhas seguidas permitidas",
         "lines": "{count} linhas"
       }
     },
@@ -105,6 +108,7 @@
         "dc": "cd",
         "consume": "consumir",
         "consumeHint": "consome o custo em testes falhados",
+        "failsInARowHint": "um sucesso zera as falhas: o processo só falha após este número de falhas seguidas",
         "andTestHint": "adicionar Teste adicional",
         "orTestHint": "adicionar Teste alternativo",
         "skill": "Habilidade:",
@@ -158,6 +162,7 @@
       "result": "Resultado",
       "pass": "sucesso",
       "before": "antes",
+      "inARow": "seguidas",
       "fails": "falhas",
       "checks": "Lista de Checagem",
       "searchPlaceholder": "Buscar receitas…",

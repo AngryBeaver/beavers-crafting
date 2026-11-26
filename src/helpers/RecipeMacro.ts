@@ -1,13 +1,14 @@
 /**
  * Recipe macros come in two forms:
  *  - old: a function body, it runs when the crafting starts
- *  - new: one object with a handler per moment: { start(){}, inputChosen(component){}, resultChosen(component){}, finish(success){} }
+ *  - new: one object with a handler per moment:
+ *    { start(){}, requiredChosen(component){}, inputChosen(component){}, resultChosen(component){}, finish(success){} }
  * In both, result, actor and recipeData can be used.
  */
 const AsyncFunction = (async function () {}).constructor as any;
 const PARAMS = ["result", "actor", "recipeData"];
 
-export type MacroPhase = "start" | "inputChosen" | "resultChosen" | "finish";
+export type MacroPhase = "start" | "requiredChosen" | "inputChosen" | "resultChosen" | "finish";
 
 /** new form: the whole text is one object. Decided by compiling only, nothing runs. */
 export function isHandlerMacro(code: string | undefined): boolean {

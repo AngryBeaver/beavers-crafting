@@ -193,7 +193,7 @@
             <div class="bc-rule">
               {{localize "beaversCrafting.crafting-app.pass"}} {{maxHits}}
               {{#if showFails}}
-                {{localize "beaversCrafting.crafting-app.before"}} {{tests.fails}} {{localize "beaversCrafting.crafting-app.fails"}}
+                {{localize "beaversCrafting.crafting-app.before"}} {{tests.fails}} {{localize "beaversCrafting.crafting-app.fails"}}{{#if tests.failsInARow}} {{localize "beaversCrafting.crafting-app.inARow"}}{{/if}}
               {{/if}}
             </div>
           </div>
