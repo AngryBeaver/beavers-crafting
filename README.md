@@ -53,6 +53,7 @@ https://github.com/user-attachments/assets/f5e02b8f-ef72-4c76-a622-9aabf0788f51
 https://github.com/user-attachments/assets/6da63c89-439c-4681-9d1c-798b2250eaf1
 
 ### Recipes and blueprints
+
 A recipe is either a **Recipe** everyone can use, or a **Blueprint** an actor must learn first; players can ask the
 Gamemaster to learn it. See [Recipes and blueprints](#recipes-and-blueprints).
 
