@@ -93,8 +93,8 @@ export class Crafting implements CraftingData {
     return "progress";
   }
 
+  /** the choices (one of, AnyOf) must be made before, see evaluatePossibilities */
   async startCrafting() {
-    await this.evaluatePossibilities();
     await this.executeChosenMacros();
     Hooks.call(Settings.NAMESPACE + ".start", this.recipe);
     await this.checkRequired();
@@ -133,6 +133,10 @@ export class Crafting implements CraftingData {
       ui.notifications?.warn(
         game["i18n"].format("beaversCrafting.knowledge.notKnown", { actor: this.actor.name, recipe: this.recipe.name }),
       );
+      this.result._hasException = true;
+      return this.result;
+    }
+    if (!await this.evaluatePossibilities()) {
       this.result._hasException = true;
       return this.result;
     }
@@ -176,12 +180,15 @@ export class Crafting implements CraftingData {
     await RecipeCompendium.validateRequired(this.recipe, this.result);
   }
 
-  async evaluatePossibilities() {
-    const pool = await getActorContentPool(this.actor);
-    await RecipeCompendium.evaluateOptions("required", this.recipe, pool);
-    await RecipeCompendium.evaluateOptions("input", this.recipe, pool);
-    const outputPool = game["items"].contents;
-    await RecipeCompendium.evaluateOptions("output", this.recipe, outputPool);
+  /**
+   * makes the open choices: "one of" and AnyOf (from the actor's items; results from the world's items)
+   * @returns false when an AnyOf can not be resolved
+   */
+  async evaluatePossibilities(): Promise<boolean> {
+    const pool = getActorContentPool(this.actor);
+    return await RecipeCompendium.evaluateOptions("required", this.recipe, pool)
+      && await RecipeCompendium.evaluateOptions("input", this.recipe, pool)
+      && await RecipeCompendium.evaluateOptions("output", this.recipe, game["items"].contents);
   }
 
   async checkCurrency() {

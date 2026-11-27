@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.16.1
+- fix: a recipe with an AnyOf (e.g. "Any Potion", "Any Mushroom") did not use the chosen item: "Missing: …" although the
+  actor had it (4.15.1, 4.16.0). The AnyOf now gets the actor's items again, not copies without type and quantity.
+  - AnyOf macros get the item again (`item.system` …), as documented; this also fixes the "available" / "usable"
+    filters of the crafting window for such recipes
+- fix: when no item matches an AnyOf, crafting is refused with a message instead of an error in the
+  console; cancelling the choice refuses it as well
+
 ## 4.16.0
 - checks: new switch **Fails in a row** next to "Fails allowed": a success resets the failed checks, the crafting fails
   only after that many fails in a row (shown in the recipe sheet, the crafting window, the chat card and the actor tab)

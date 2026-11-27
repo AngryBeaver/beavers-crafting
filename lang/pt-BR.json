@@ -133,7 +133,8 @@
     "anyOf": {
       "dropItem": "soltar item",
       "button": "testar item",
-      "error": "uma macro 'anyOf' produziu um erro. Verifique o console (F12)"
+      "error": "uma macro 'anyOf' produziu um erro. Verifique o console (F12)",
+      "noMatch": "Nenhum item corresponde a {anyOf}"
     },
     "component": {
       "warning": "Seu Ator controlado não possui um item chamado "

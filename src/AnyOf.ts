@@ -57,7 +57,8 @@ export class AnyOf {
         return result;
     }
 
-    async filter(itemList): Promise<Component[]>{
+    /** the items (documents, not components) the macro accepts, as components with summed quantities */
+    async filter(itemList: Item[]): Promise<Component[]>{
         const resultList:Component[] = [];
         for(const item of itemList){
             const result = await this.executeMacro(item);

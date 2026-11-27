@@ -150,7 +150,8 @@
       "sheetLabel": "Beaver’s Crafting AnyOf",
       "dropItem": "drop item",
       "button": "test item",
-      "error": "an 'anyOf' macro produced an error. See console (F12)"
+      "error": "an 'anyOf' macro produced an error. See console (F12)",
+      "noMatch": "No item matches {anyOf}"
     },
     "component": {
       "warning": "Your controlled Actor does not have an item named "

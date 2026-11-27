@@ -133,7 +133,8 @@
     "anyOf": {
       "dropItem": "déposer l’objet",
       "button": "tester l’objet",
-      "error": "une macro 'anyOf' a produit une erreur. Vérifiez la console (F12)"
+      "error": "une macro 'anyOf' a produit une erreur. Vérifiez la console (F12)",
+      "noMatch": "Aucun objet ne correspond à {anyOf}"
     },
     "component": {
       "warning": "Votre acteur contrôlé ne possède pas d’objet nommé "

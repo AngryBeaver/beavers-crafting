@@ -83,21 +83,15 @@ export async function attachContentsToCreatedContainer(createdContainerItem: Ite
 }
 
 /**
- * Unified read API to get the content pool an actor offers to crafting logic.
- * For now, this simply maps actor.items to components; hiding is a UI concern.
+ * The items an actor offers to crafting: containers themselves are left out, their contents stay.
+ * Items, not components: AnyOf macros get an item, and components are made from the items where needed.
  */
-export function getActorContentPool(actor: Actor, asComponents: boolean = true): Component[] | any[] {
-  const filteredItems = actor.items
-    .filter((i: any) => {
-      const isBeaversContainer = foundry.utils.getProperty(i, `flags.${Settings.NAMESPACE}.subtype`) === 'container';
-      const isNativeDnd5eContainer = ((game as Game).system?.id === 'dnd5e') && i.type === 'container';
-      // Filter OUT containers themselves, but KEEP their contents and regular items
-      return !(isBeaversContainer || isNativeDnd5eContainer);
-    });
-  if (asComponents) {
-    return filteredItems.map((i: any) => beaversSystemInterface.componentFromEntity(i));
-  }
-  return filteredItems;
+export function getActorContentPool(actor: Actor): Item[] {
+  return actor.items.filter((i: any) => {
+    const isBeaversContainer = foundry.utils.getProperty(i, `flags.${Settings.NAMESPACE}.subtype`) === 'container';
+    const isNativeDnd5eContainer = ((game as Game).system?.id === 'dnd5e') && i.type === 'container';
+    return !(isBeaversContainer || isNativeDnd5eContainer);
+  });
 }
 
 /**

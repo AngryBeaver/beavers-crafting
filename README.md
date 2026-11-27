@@ -16,7 +16,7 @@ A recipe can
 
 It works in possibly every system through the [Beaver's System Interface](https://github.com/AngryBeaver/beavers-system-interface) ([list of adaption layers](https://github.com/AngryBeaver/beavers-system-interface/wiki/BSA-x-links)).
 
-**Tested in** (2026-11-25, beavers-crafting 4.15.1, Beaver's System Interface 2.5.0): create recipes of every check
+**Tested in** (2026-11-27, beavers-crafting 4.16.1, Beaver's System Interface 2.5.0): create recipes of every check
 type, craft them from the crafting window, advance them on the actor sheet, results and chat.
 
 | System | System version | Foundry | Adapter |
@@ -25,7 +25,7 @@ type, craft them from the crafting window, advance them on the actor sheet, resu
 | Call of Cthulhu 7th Edition (CoC7) | 9.2 | 14.368 | built in |
 | 3.5e SRD (D35E) | 3.1.0 | 14.368 | bsa-D35E 1.1.0 |
 | DnD 4th Edition (dnd4e) | 0.9.3 | 14.368 | bsa-dnd4e 1.3.0 |
-| Dungeons & Dragons Fifth Edition (dnd5e) | 6.1.1 | 14.368 | bsa-dnd5e 2.2.0 |
+| Dungeons & Dragons Fifth Edition (dnd5e) | 6.1.2 | 14.368 | bsa-dnd5e 2.2.0 |
 | Fallout: The Roleplaying Game (fallout) | 11.17.1 | 14.368 | bsa-fallout 2.1.0 |
 | Pathfinder 1e (pf1) | 11.11 | 13.351 | bsa-pf1 1.2.1 |
 | Pathfinder Second Edition (pf2e) | 7.12.2 | 13.351 | bsa-pf2e 1.2.2 |
@@ -33,7 +33,7 @@ type, craft them from the crafting window, advance them on the actor sheet, resu
 | Starfinder First Edition (sfrpg) | 14.0.2 | 14.368 | bsa-sfrpg 1.2.0 |
 | Savage Worlds Adventure Edition (swade) | 6.0.4 | 14.368 | bsa-swade 1.3.1 |
 | Systems Without Number (swnr) | 2.3.3 | 14.368 | built in |
-| Warhammer Fantasy Roleplay 4th / 5th Edition (wfrp4e) | 10.1.2 | 14.368 | bsa-wfrp4e 1.2.2 |
+| Warhammer Fantasy Roleplay 4th / 5th Edition (wfrp4e) | 10.2.0 | 14.368 | bsa-wfrp4e 1.2.2 |
 
 currently no longer tested: Cyberpunk RED (cyberpunk-red-core v0.92.4 needs Foundry 12).
 

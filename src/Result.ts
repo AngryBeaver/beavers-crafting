@@ -278,7 +278,7 @@ export class Result implements ResultApi, ResultData {
             componentResult = new ComponentResult();
             let originalQuantity = 0;
             if (componentData.flags?.[Settings.NAMESPACE]?.subtype !== "money") {
-                const pool = getActorContentPool(this._actor, false);
+                const pool = getActorContentPool(this._actor);
                 const actorFindings = beaversSystemInterface.itemListComponentFind(pool, componentData);
                 originalQuantity = actorFindings.quantity;
             }

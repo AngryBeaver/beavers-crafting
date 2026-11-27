@@ -94,7 +94,7 @@ export class RecipeCompendium {
         const own = RecipeCompendium.getForActor(actor);
         const list = (filter == FilterType.own) ? own : [...RecipeCompendium.getWorldFor(actor), ...own];
         const returnList: Recipe[] = [];
-        const pool = await getActorContentPool(actor);
+        const pool = getActorContentPool(actor);
         for (const recipe of list) {
             const needsEvaluation = craftable !== undefined || (filter != FilterType.all && filter != FilterType.own);
             const status = needsEvaluation ? await this.evaluateForActor(actor, recipe, pool) : undefined;
@@ -137,7 +137,7 @@ export class RecipeCompendium {
     static async filterRequired(actor: Actor, recipe: Recipe,result:Result) {
         if (Settings.get(Settings.USE_ATTENDANTS)) {
             const listOfAnyOfRequired = this._filterData(recipe.required, component => component.type === Settings.ANYOF_SUBTYPE);
-            const pool = await getActorContentPool(actor);
+            const pool = getActorContentPool(actor);
             if (await this.isAnyAnyOfInList(listOfAnyOfRequired, pool)) {
                 await RecipeCompendium.validateRequired(recipe, result);
             }
@@ -241,28 +241,38 @@ export class RecipeCompendium {
         return chosen;
     }
 
-    static async evaluateOptions(type: DataType, recipe: Recipe, items) {
-        for (const [group, data] of Object.entries(recipe[type])) {
+    /** @returns false when an AnyOf can not be resolved: nothing matches or the choice was cancelled */
+    static async evaluateOptions(type: DataType, recipe: Recipe, items: Item[]): Promise<boolean> {
+        for (const group of Object.keys(recipe[type])) {
             const key = await this.evaluateOption(type, recipe, group);
-            await this.evaluateAnyOf(type, recipe, group, key, items);
+            if (!await this.evaluateAnyOf(type, recipe, group, key, items)) {
+                return false;
+            }
         }
+        return true;
     }
 
-    static async evaluateAnyOf(type: DataType, recipe: Recipe, group: string, key: string, items) {
+    /** @returns false when nothing in items matches the AnyOf (with a warning) or the choice was cancelled */
+    static async evaluateAnyOf(type: DataType, recipe: Recipe, group: string, key: string, items: Item[]): Promise<boolean> {
         const component = recipe[type][group][key];
-        if (component.type === Settings.ANYOF_SUBTYPE) {
-            const components = await this.anyOfCandidates(component, items);
-            const comps = components.reduce((result, item, index) => {
-                result[index.toString()] = item;
-                return result;
-            }, {})
-            const used = await this.chooseComponent(comps);
-            this.resolveAnyOf(type, recipe, group, key, comps[used]);
+        if (component.type !== Settings.ANYOF_SUBTYPE) {
+            return true;
         }
+        const candidates = await this.anyOfCandidates(component, items);
+        if (candidates.length === 0) {
+            ui.notifications?.warn(game["i18n"].format("beaversCrafting.anyOf.noMatch", {anyOf: component.name}));
+            return false;
+        }
+        const chosen = candidates[await this.chooseComponent(Object.fromEntries(candidates.entries()))];
+        if (chosen === undefined) {
+            return false;
+        }
+        this.resolveAnyOf(type, recipe, group, key, chosen);
+        return true;
     }
 
     /** the items of the pool that match an AnyOf component */
-    static async anyOfCandidates(component: Component, items): Promise<Component[]> {
+    static async anyOfCandidates(component: Component, items: Item[]): Promise<Component[]> {
         const item = await component.getEntity();
         return new AnyOf(item).filter(items);
     }
