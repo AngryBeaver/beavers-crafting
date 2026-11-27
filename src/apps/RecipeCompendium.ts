@@ -119,7 +119,7 @@ export class RecipeCompendium {
             return {available: false, usable: false};
         }
         const listOfIngredientsWithoutAnyOf = this._filterData(recipe.input, component => component.type !== Settings.ANYOF_SUBTYPE);
-        const result = RecipeCompendium.validateRecipeToItemList(listOfIngredientsWithoutAnyOf, pool, Result.from(recipe, actor));
+        const result = RecipeCompendium.validateRecipeToItemList(listOfIngredientsWithoutAnyOf, Result.from(recipe, actor));
         await RecipeCompendium.validateScriptCosts(recipe, result);
         await RecipeCompendium.filterRequired(actor, recipe, result);
         return {available: result._isAnyConsumedAvailable(), usable: !result.hasError()};
@@ -297,7 +297,8 @@ export class RecipeCompendium {
     }
 
     /** the items (and money) of the cost; Scripts are evaluated by validateScriptCosts */
-    static validateRecipeToItemList(listOfIngredients: Component[], listOfItems, result: Result): Result {
+    /** the costs against the actor of the result (its items without containers, see getActorContentPool) */
+    static validateRecipeToItemList(listOfIngredients: Component[], result: Result): Result {
         for (const component of listOfIngredients) {
             if (component.type === Settings.SCRIPT_SUBTYPE) {
                 continue;

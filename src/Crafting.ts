@@ -2,7 +2,7 @@ import { Recipe } from "./Recipe.js";
 import { Settings } from "./Settings.js";
 import { RecipeCompendium } from "./apps/RecipeCompendium.js";
 import { RecipeKnowledge } from "./RecipeKnowledge.js";
-import { ComponentResults, Result } from "./Result.js";
+import { ComponentResult, ComponentResults, Result } from "./Result.js";
 import { TestHandler } from "./TestHandler.js";
 import { Container } from "./Container.js";
 import { Script } from "./Script.js";
@@ -29,7 +29,7 @@ export class Crafting implements CraftingData {
     this.uuid = craftingData.uuid || actor.uuid + ".Crafting." + foundry.utils.randomID();
     this.startAt = craftingData.startAt;
     this.endAt = craftingData.endAt;
-    this.lastAt = craftingData.lastAt | craftingData.startAt;
+    this.lastAt = craftingData.lastAt || craftingData.startAt;
     this.isFinished = craftingData.isFinished;
     this.name = craftingData.name;
     this.img = craftingData.img;
@@ -93,13 +93,29 @@ export class Crafting implements CraftingData {
     return "progress";
   }
 
-  /** the choices (one of, AnyOf) must be made before, see evaluatePossibilities */
-  async startCrafting() {
+  /**
+   * recipe macros ("…Chosen", hook "start"), then what the actor has is checked; nothing is paid yet.
+   * The choices (one of, AnyOf) must be made before, see evaluatePossibilities.
+   */
+  async prepareCrafting() {
     await this.executeChosenMacros();
     Hooks.call(Settings.NAMESPACE + ".start", this.recipe);
-    await this.checkRequired();
-    RecipeCompendium.validateRecipeToItemList(RecipeCompendium._filterData(this.recipe.input, component => true), this.actor.items, this.result);
+    await this.validate();
+  }
+
+  /**
+   * checks the requirements and the costs (items, money, Scripts) against the actor; nothing is paid.
+   * isCheckedInput: the costs to check, e.g. the preview leaves out AnyOf that are not chosen yet
+   */
+  async validate(isCheckedInput: (component: Component) => boolean = () => true) {
+    await this.result.checkCurrency();
+    RecipeCompendium.validateRecipeToItemList(RecipeCompendium._filterData(this.recipe.input, isCheckedInput), this.result);
     await RecipeCompendium.validateScriptCosts(this.recipe, this.result);
+    await RecipeCompendium.validateRequired(this.recipe, this.result);
+  }
+
+  /** pays the costs and records the crafting on the actor, see prepareCrafting */
+  async startCrafting() {
     await this.payCurrency();
     await this.addOutput();
     await this.executeMacro();
@@ -129,16 +145,17 @@ export class Crafting implements CraftingData {
   }
 
   async craft() {
+    const names = { actor: this.actor.name, recipe: this.recipe.name };
     if (!this.mayCraft) {
-      ui.notifications?.warn(
-        game["i18n"].format("beaversCrafting.knowledge.notKnown", { actor: this.actor.name, recipe: this.recipe.name }),
-      );
-      this.result._hasException = true;
-      return this.result;
+      return this._refuse(game["i18n"].format("beaversCrafting.knowledge.notKnown", names));
     }
     if (!await this.evaluatePossibilities()) {
-      this.result._hasException = true;
-      return this.result;
+      return this._refuse(); // evaluatePossibilities has told why
+    }
+    await this.prepareCrafting();
+    const missing = this.result.missingNames();
+    if (missing.length > 0) {
+      return this._refuse(game["i18n"].format("beaversCrafting.crafting-app.notEnough", { ...names, items: missing.join(", ") }));
     }
     await this.startCrafting();
     if (Settings.get(Settings.TIME_TO_CRAFT) === "instantly") {
@@ -157,7 +174,15 @@ export class Crafting implements CraftingData {
       bringToFront(this.actor.sheet);
     }
     return this.result;
+  }
 
+  /** the crafting does not start: nothing is paid, nothing is recorded on the actor */
+  private _refuse(warning?: string): Result {
+    if (warning) {
+      ui.notifications?.warn(warning);
+    }
+    this.result._hasException = true;
+    return this.result;
   }
 
   /**
@@ -176,10 +201,6 @@ export class Crafting implements CraftingData {
     return false;
   }
 
-  async checkRequired() {
-    await RecipeCompendium.validateRequired(this.recipe, this.result);
-  }
-
   /**
    * makes the open choices: "one of" and AnyOf (from the actor's items; results from the world's items)
    * @returns false when an AnyOf can not be resolved
@@ -189,10 +210,6 @@ export class Crafting implements CraftingData {
     return await RecipeCompendium.evaluateOptions("required", this.recipe, pool)
       && await RecipeCompendium.evaluateOptions("input", this.recipe, pool)
       && await RecipeCompendium.evaluateOptions("output", this.recipe, game["items"].contents);
-  }
-
-  async checkCurrency() {
-    await this.result.checkCurrency();
   }
 
   async payCurrency() {
@@ -215,8 +232,7 @@ export class Crafting implements CraftingData {
   /** an error in the recipe macro stops the crafting: it counts as failed */
   _macroError(macroResult: MacroResult<Result>) {
     if (macroResult.error !== undefined) {
-      // @ts-ignore
-      ui.notifications.error("Beavers Crafting | recipe Error see logs");
+      ui.notifications?.error("Beavers Crafting | recipe Error see logs");
       console.error("Beavers Crafting | recipe Error:", macroResult.error);
       this.result._hasException = true;
     }
@@ -276,8 +292,7 @@ export class Crafting implements CraftingData {
           continue;
         }
       } catch (e) {
-        // @ts-ignore
-        ui.notifications.error("Beavers Crafting | macro Error see logs");
+        ui.notifications?.error("Beavers Crafting | macro Error see logs");
         console.error("Beavers Crafting | macro Error:", e);
         this.result._hasException = true;
         return;
@@ -288,37 +303,32 @@ export class Crafting implements CraftingData {
   async processInput() {
     if (this.result._hasException) return;
     this.actor = await fromUuid(this.actor.uuid); //refresh Actor
-    const componentList: Component[] = [];
-    const moneyList: Component[] = [];
-
-    [this.result._components.required, this.result._components.consumed].forEach(crs => {
-      this._processComponentResult(crs).forEach(c => {
-        if (c.flags?.[Settings.NAMESPACE]?.subtype === "money") {
-          moneyList.push(c);
-        } else {
-          componentList.push(c);
-        }
-      });
-    });
+    const { required, consumed } = this.result._components;
+    const { items, money } = this._changesOf(required, consumed);
     try {
-      const itemChange = await this._addComponentsToActor(componentList);
+      const itemChange = await this._addComponentsToActor(items);
       this.restore.push(...itemChange.delete);
-      await this._processMoney(moneyList);
-      await this._processScripts(this.result._components.consumed);
+      await this._processMoney(money);
+      await this._processScripts(consumed);
     } catch (e) {
-      // @ts-ignore
-      ui.notifications.error(e.message);
+      ui.notifications?.error(e.message);
       this.result._hasException = true;
       return;
     }
     this.actor = await fromUuid(this.actor.uuid);
-    [this.result._components.required, this.result._components.consumed].forEach(crs => {
-      for (const componentResult of crs._data) {
-        if (componentResult.userInteraction === "always" || (componentResult.userInteraction === "onSuccess" && !this.result.hasError())) {
-          componentResult.setProcessed(true);
-        }
+    const hasError = this.result.hasError();
+    for (const componentResult of [...required._data, ...consumed._data]) {
+      if (componentResult.shouldBeProcessed(hasError)) {
+        componentResult.setProcessed(true);
       }
-    });
+    }
+  }
+
+  /** what processing changes on the actor: items (also returned ones) and money, apart */
+  private _changesOf(...componentResults: ComponentResults[]): { items: Component[], money: Component[] } {
+    const changes = componentResults.flatMap(crs => this._processComponentResult(crs));
+    const isMoney = (c: Component) => c.flags?.[Settings.NAMESPACE]?.subtype === "money";
+    return { items: changes.filter(c => !isMoney(c)), money: changes.filter(isMoney) };
   }
 
 
@@ -342,7 +352,7 @@ export class Crafting implements CraftingData {
     const hasError = this.result.hasError();
     for (const componentResult of componentResults._data) {
       if (componentResult.component.type !== Settings.SCRIPT_SUBTYPE) continue;
-      const shouldBeProcessed = componentResult.userInteraction === "always" || (componentResult.userInteraction === "onSuccess" && !hasError);
+      const shouldBeProcessed = componentResult.shouldBeProcessed(hasError);
       let handler: "pay" | "refund" | undefined;
       if (shouldBeProcessed && !componentResult.isProcessed && !componentResult.hasError()) {
         handler = "pay";
@@ -358,15 +368,14 @@ export class Crafting implements CraftingData {
     }
   }
 
-  private _processComponentResult(componentResults: ComponentResultsData): Component[] {
+  private _processComponentResult(componentResults: ComponentResults): Component[] {
     const componentList: Component[] = [];
     const hasError = this.result.hasError();
     for (const componentResult of componentResults._data) {
       // Scripts change no items: _processScripts
       if (componentResult.component.type === Settings.SCRIPT_SUBTYPE) continue;
       let component = beaversSystemInterface.componentCreate(componentResult.component);
-      const shouldBeProcessed = componentResult.userInteraction === "always" || (componentResult.userInteraction === "onSuccess" && !hasError);
-      if (shouldBeProcessed) {
+      if (componentResult.shouldBeProcessed(hasError)) {
         if (!componentResult.isProcessed) {
           componentList.push(component);
         }
@@ -389,48 +398,29 @@ export class Crafting implements CraftingData {
   async processAll() {
     if (this.result._hasException) return;
     this.actor = await fromUuid(this.actor.uuid); //refresh Actor
-    const componentList: Component[] = [];
-    const moneyList: Component[] = [];
-
-    [this.result._components.required, this.result._components.consumed, this.result._components.produced].forEach(crs => {
-      this._processComponentResult(crs).forEach(c => {
-        if (c.flags?.[Settings.NAMESPACE]?.subtype === "money") {
-          moneyList.push(c);
-        } else {
-          componentList.push(c);
-        }
-      });
-    });
-
-    if (this.result._currencyResult !== undefined) {
-      if (!this.recipe.beaversTests?.consume && this.result.hasError()) {
-        await this.result.revertPayedCurrency();
-      }
+    const { required, consumed, produced } = this.result._components;
+    const { items, money } = this._changesOf(required, consumed, produced);
+    const hasError = this.result.hasError();
+    if (hasError && !this.recipe.beaversTests?.consume) {
+      await this.result.revertPayedCurrency();
     }
     try {
-      const itemChange = await this._addComponentsToActor(componentList);
-      await this._processMoney(moneyList);
-      await this._processScripts(this.result._components.consumed);
-      if (!this.result.hasError()) {
+      const itemChange = await this._addComponentsToActor(items);
+      await this._processMoney(money);
+      await this._processScripts(consumed);
+      if (!hasError) {
         await this.actor.update(this.result._actorUpdate);
       }
-      Object.values(this.result._components).forEach(crs => {
-        for (const componentResult of crs._data) {
-          if (componentResult.userInteraction === "always" || (componentResult.userInteraction === "onSuccess" && !this.result.hasError())) {
-            componentResult.setProcessed(true);
-          } else {
-            componentResult.setProcessed(false);
-          }
-        }
-      });
+      for (const componentResult of [...required._data, ...consumed._data, ...produced._data]) {
+        componentResult.setProcessed(componentResult.shouldBeProcessed(hasError));
+      }
       Hooks.call(Settings.NAMESPACE + ".processed", {
         recipe: this.recipe,
         result: this.result,
         processed: itemChange,
       });
     } catch (e) {
-      // @ts-ignore
-      ui.notifications.error(e.message);
+      ui.notifications?.error(e.message);
       this.result._hasException = true;
       return;
     }
@@ -463,46 +453,30 @@ export class Crafting implements CraftingData {
       consumed: [],
       produced: [],
     };
+    const componentStatus = (hasError: boolean, isProcessed: boolean) =>
+      hasError ? "error" : !isProcessed ? "undefined" : this.isFinished ? "success" : "locked";
+    const chatComponent = (componentResult: ComponentResult, type: ComponentType): ComponentChatData => ({
+      component: componentResult.component,
+      status: componentStatus(componentResult.hasError(), componentResult.isProcessed),
+      type,
+      isProcessed: componentResult.isProcessed,
+    });
+    const { required, consumed, produced } = this.result._components;
+    components.required.push(...required._data.map(cr => chatComponent(cr, "required")));
+    const currencyResult = this.result._currencyResult;
+    if (currencyResult) {
+      components.consumed.push({
+        component: getCurrencyComponent(currencyResult.name, currencyResult.value * -1),
+        status: componentStatus(currencyResult.hasError, currencyResult.isConsumed),
+        type: "consumed",
+        isProcessed: currencyResult.isConsumed,
+      });
+    }
+    components.consumed.push(...consumed._data.map(cr => chatComponent(cr, "consumed")));
     const hasError = this.result.hasError();
-    for (const componentResult of this.result._components.required._data) {
-      const status = componentResult.hasError() ? "error" : !componentResult.isProcessed ? "undefined" : this.isFinished ? "success" : "locked";
-      components.required.push({
-        component: componentResult.component,
-        status: status,
-        type: "required",
-        isProcessed: componentResult.isProcessed,
-      });
-    }
-    if (this.result._currencyResult) {
-      const component = getCurrencyComponent(this.result._currencyResult?.name, this.result._currencyResult.value * -1);
-      const status = this.result._currencyResult.hasError ? "error" : !this.result._currencyResult.isConsumed ? "undefined" : this.isFinished ? "success" : "locked";
-      components.consumed.push({
-        component: component,
-        status: status,
-        type: "consumed",
-        isProcessed: this.result._currencyResult.isConsumed,
-      });
-    }
-    for (const componentResult of this.result._components.consumed._data) {
-      const status = componentResult.hasError() ? "error" : !componentResult.isProcessed ? "undefined" : this.isFinished ? "success" : "locked";
-      components.consumed.push({
-        component: componentResult.component,
-        status: status,
-        type: "consumed",
-        isProcessed: componentResult.isProcessed,
-      });
-    }
-    for (const componentResult of this.result._components.produced._data) {
-      if (componentResult.userInteraction === "always" || (componentResult.userInteraction === "onSuccess" && !hasError)) {
-        const status = componentResult.hasError() ? "error" : !componentResult.isProcessed ? "undefined" : this.isFinished ? "success" : "locked";
-        components.produced.push({
-          component: componentResult.component,
-          status: status,
-          type: "produced",
-          isProcessed: componentResult.isProcessed,
-        });
-      }
-    }
+    components.produced.push(...produced._data
+      .filter(cr => cr.shouldBeProcessed(hasError))
+      .map(cr => chatComponent(cr, "produced")));
     Object.values(this.result._chatAddition)
       .filter(s => s.component.type !== "Currency")//legacy
       .forEach(c => {
@@ -575,8 +549,7 @@ export class Crafting implements CraftingData {
     const table = await beaversSystemInterface.uuidToDocument(component.uuid);
     let components: Component[] = [];
     if (!table) {
-      // @ts-ignore
-      ui.notifications.error(game.i18n.localize(`beaversCrafting.crafting-app.errors.tableNotFound`) + component.name);
+      ui.notifications?.error(game["i18n"].localize(`beaversCrafting.crafting-app.errors.tableNotFound`) + component.name);
       result._hasException = true;
       return [];
     }
@@ -597,15 +570,13 @@ export class Crafting implements CraftingData {
           }
         }
         if (!uuid) {
-          // @ts-ignore
-          ui.notifications.error(game.i18n.localize(`beaversCrafting.crafting-app.errors.tableNotValid`) + r.name);
+          ui.notifications?.error(game["i18n"].localize(`beaversCrafting.crafting-app.errors.tableNotValid`) + r.name);
           result._hasException = true;
           return [];
         }
         const item = await beaversSystemInterface.uuidToDocument(uuid);
         if (!item) {
-          // @ts-ignore
-          ui.notifications.error(game.i18n.localize(`beaversCrafting.crafting-app.errors.tableItemNotFound`) + r.name);
+          ui.notifications?.error(game["i18n"].localize(`beaversCrafting.crafting-app.errors.tableItemNotFound`) + r.name);
           result._hasException = true;
           return [];
         }

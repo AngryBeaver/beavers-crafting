@@ -12,14 +12,16 @@ export class ActorSheetCraftedInventory{
         void this.init()
     }
 
+    /** the crafted icon behind each crafted item's name; sheets without ".item[data-item-id] .item-name" show none */
     async init() {
-        //TODO make this system independent !
+        if (Settings.get(Settings.SEPARATE_CRAFTED_ITEMS) === "none") {
+            return;
+        }
         this.app.actor.items
-            .forEach(i=>{
-                if(Settings.get(Settings.SEPARATE_CRAFTED_ITEMS) !== "none" && !!foundry.utils.getProperty(i,`flags.${Settings.NAMESPACE}.crafted`)){
-                    this.html.find(`.item[data-item-id=${i.id}] .item-name`)
-                        .append('<img title="crafted" class="beavers-fontsize-svg-img" src="modules/beavers-crafting/icons/tools.svg"/>')
-                }
+            .filter(i => !!foundry.utils.getProperty(i, `flags.${Settings.NAMESPACE}.crafted`))
+            .forEach(i => {
+                this.html.find(`.item[data-item-id=${i.id}] .item-name`)
+                    .append('<img title="crafted" class="beavers-fontsize-svg-img" src="modules/beavers-crafting/icons/tools.svg"/>')
             })
     }
 

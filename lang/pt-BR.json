@@ -179,6 +179,7 @@
       "chooseAgain": "Escolher novamente",
       "noMatch": "Nenhum item correspondente",
       "missing": "Faltando",
+      "notEnough": "{actor} não pode fabricar \"{recipe}\", faltando: {items}",
       "anyOfHint": "Clique ou solte um item para escolher",
       "summary": {
         "producesOne": "produz {count} item",

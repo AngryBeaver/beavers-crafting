@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.16.2
+- fix: a recipe could be started without the materials (#63). It then failed at once, and with "Consume cost on fail"
+  the materials the actor did have were used up. Now crafting is refused with a message that names what is missing;
+  nothing is paid or recorded
+- fix: the time of the last check of a crafting could be wrong (`lastAt` was combined with `|` instead of `||`)
+- internal: clean up of the crafting and result code (one rule for "process this cost now", one check of what the
+  actor has for crafting and the crafting window), stale TODOs replaced by notes
+
 ## 4.16.1
 - fix: a recipe with an AnyOf (e.g. "Any Potion", "Any Mushroom") did not use the chosen item: "Missing: …" although the
   actor had it (4.15.1, 4.16.0). The AnyOf now gets the actor's items again, not copies without type and quantity.

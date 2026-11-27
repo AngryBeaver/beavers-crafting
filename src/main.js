@@ -211,8 +211,8 @@ Hooks.once("beavers-system-interface.ready", async function(){
     }
   });
 
-  //evil TODO fix this make recipes own type !
-  // own type does not yet work for all supported systems.
+  // recipes, containers … are items of the system's loot type marked by flags.beavers-crafting.subtype:
+  // an item type of their own does not work in every supported system.
 
   // After a container is created, copy its predefined contents over and assign to the created container
   Hooks.on("createItem", async (doc, options) => {

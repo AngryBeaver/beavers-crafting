@@ -196,6 +196,7 @@
       "chooseAgain": "Choose again",
       "noMatch": "No matching item",
       "missing": "Missing",
+      "notEnough": "{actor} can't craft \"{recipe}\", missing: {items}",
       "anyOfHint": "Click or drop an item to choose",
       "summary": {
         "itemOne": "{count} item",

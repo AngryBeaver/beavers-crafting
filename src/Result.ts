@@ -3,13 +3,12 @@ import {Settings} from "./Settings.js";
 import { getActorContentPool } from "./ContainerHandler.js";
 
 
-//todo currencies can be stored and can come in.
-//in resultData is stored the orignalQuantity when started this then calculates if it hasError.
-//when you processItems as you go you would need to change here something.
-//as is it can not be serialized without beeing processed so the check for true is fine if we store originalQuantity.
-//how to store OriginalQuantity. idea sumUp currencies as they come in if the combinedCurrency is valid originalQuantity = quantity needed.
-//the check if the money is fine is then done automatically in the item and stored as all other as well.
-
+/**
+ * What a crafting needs, uses and produces. Each component keeps the quantity the actor had when it was checked
+ * (originalQuantity), so whether it is missing (hasError) survives serialization.
+ * Money components are summed up per currency as they come in (_currencyCombined) and count as there when the actor
+ * can pay that sum.
+ */
 export class Result implements ResultApi, ResultData {
     _actorUpdate: {
         [key: string]: string
@@ -126,25 +125,20 @@ export class Result implements ResultApi, ResultData {
     }
 
     hasError(): boolean {
-        let hasError = false;
-        if (this._components.required.hasAnyError()) {
-            hasError = true;
+        return this.missingNames().length > 0 || this._testHasError() || this._hasException;
+    }
+
+    /** what the actor lacks: requirements, costs and the recipe's money (legacy currency) */
+    missingNames(): string[] {
+        const { required, consumed } = this._components;
+        const names = [...required._data, ...consumed._data]
+            .filter(componentResult => componentResult.hasError())
+            .map(componentResult => componentResult.component.name);
+        if (this._currencyResult?.hasError) {
+            const label = beaversSystemInterface.configCurrencies.find(c => c.id === this._currencyResult?.name)?.label;
+            names.push(label ? game["i18n"].localize(label) : this._currencyResult.name);
         }
-        if (this._components.consumed.hasAnyError()) {
-            hasError = true;
-        }
-        if(this._testHasError()){
-            hasError = true;
-        }
-        if (this._currencyResult !== undefined) {
-            if (this._currencyResult.hasError) {
-                hasError = true;
-            }
-        }
-        if (this._hasException ){
-            hasError = true;
-        }
-        return hasError
+        return names;
     }
 
     _testHasError(){
@@ -333,15 +327,6 @@ export class ComponentResults implements ComponentResultsData {
         return serialized;
     }
 
-    hasAnyError() {
-        for (const componentResult of this._data) {
-            if (componentResult.hasError()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     isAnyAvailable() {
         for (const componentResult of this._data) {
             if (componentResult.originalQuantity > 0) {
@@ -368,7 +353,10 @@ export class ComponentResults implements ComponentResultsData {
     }
 
     deleteComponentResult(componentData: ComponentData) {
-        this._data.splice(this._data.findIndex(e => e.component.isSame(componentData)), 1);
+        const index = this._data.findIndex(e => e.component.isSame(componentData));
+        if (index >= 0) { // splice(-1) would delete the last one
+            this._data.splice(index, 1);
+        }
     }
 }
 
@@ -405,6 +393,11 @@ export class ComponentResult implements ComponentResultData {
 
     hasError(): boolean {
         return this.resultQuantity() < 0;
+    }
+
+    /** "always" (e.g. costs consumed on fail) or "onSuccess" while the crafting has not failed */
+    shouldBeProcessed(craftingHasError: boolean): boolean {
+        return this.userInteraction === "always" || (this.userInteraction === "onSuccess" && !craftingHasError);
     }
 
     resultQuantity(): number {

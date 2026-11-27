@@ -179,6 +179,7 @@
       "chooseAgain": "Choisir à nouveau",
       "noMatch": "Aucun objet correspondant",
       "missing": "Manquant",
+      "notEnough": "{actor} ne peut pas fabriquer « {recipe} », manquant : {items}",
       "anyOfHint": "Cliquez ou déposez un objet pour choisir",
       "summary": {
         "producesOne": "produit {count} objet",

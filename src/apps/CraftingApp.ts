@@ -237,10 +237,7 @@ export class CraftingApp extends Application {
             if (error) console.warn("Beavers Crafting | recipe macro (preview):", error);
         }
         const crafting = await Crafting.fromRecipe(this.data.actor.id, recipe);
-        await crafting.checkCurrency();
-        RecipeCompendium.validateRecipeToItemList(RecipeCompendium._filterData(recipe.input, (c) => c.type === "Item"), this.data.actor.items, crafting.result);
-        await RecipeCompendium.validateScriptCosts(recipe, crafting.result);
-        await crafting.checkRequired();
+        await crafting.validate((c) => c.type === "Item");
         this.data.result = crafting.result;
         const content = await renderTemplate('modules/beavers-crafting/templates/crafting-app-main.hbs',
             this._recipeView(recipe, crafting.result));

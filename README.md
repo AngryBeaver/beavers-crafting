@@ -16,7 +16,7 @@ A recipe can
 
 It works in possibly every system through the [Beaver's System Interface](https://github.com/AngryBeaver/beavers-system-interface) ([list of adaption layers](https://github.com/AngryBeaver/beavers-system-interface/wiki/BSA-x-links)).
 
-**Tested in** (2026-11-27, beavers-crafting 4.16.1, Beaver's System Interface 2.5.0): create recipes of every check
+**Tested in** (2026-11-27, beavers-crafting 4.16.2, Beaver's System Interface 2.5.0): create recipes of every check
 type, craft them from the crafting window, advance them on the actor sheet, results and chat.
 
 | System | System version | Foundry | Adapter |
