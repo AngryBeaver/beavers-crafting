@@ -161,6 +161,7 @@ This example means:
 - then 2 successes in History,
 - before 3 fails overall.
 
+
 ### Macro
 For advanced users: JavaScript that runs during the crafting, with `result`, `actor` and `recipeData` available.
 
