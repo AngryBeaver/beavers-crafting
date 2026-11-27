@@ -101,7 +101,6 @@ Gamemaster to learn it. See [Recipes and blueprints](#recipes-and-blueprints).
 ## Create a recipe
 ![img.png](pictures/newItem.png)
 
-
 Create a new item and choose "Recipe" (or "AnyOf") as its type.
 
 If the type is missing, enable the [Create Beaver's Item Button](#create-beavers-item-button) or see [Troubleshooting](#troubleshooting).
